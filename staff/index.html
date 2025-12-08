@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login - Foodshare Seychelles</title>
 
+    <link rel="icon" type="image/png" href="../image/logo.png">
+
+    <style>
+        /* Theme Variables */
+        :root {
+            --primary: #4CAF50; 
+            --secondary: #388E3C;
+            --neutral: #F5F5F5; 
+            --dark: #212121; 
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--neutral);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            color: var(--dark);
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ensures padding doesn't widen the input */
+            font-size: 1em;
+        }
+        
+        #login-error {
+            color: red;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Staff Administration Sign In</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div id="login-error">Invalid Username or Password.</div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+
+            // Define the specific credential
+            const correctUsername = 'RSADMIN2025';
+            const correctPassword = 'Rosetta';
+
+            if (username === correctUsername && password === correctPassword) {
+                // Successful login: Redirect to the Admin Dashboard
+                window.location.href = 'staff-admin-dashboard.html';
+            } else {
+                // Failed login: Show error message
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+
+</body>
+</html>
