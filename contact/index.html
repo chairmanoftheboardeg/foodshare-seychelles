@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us & Claim Forms - Foodshare Seychelles</title>
+    <title>Contact Us - Foodshare Seychelles</title>
     
     <link rel="icon" type="image/png" href="../image/logo.png">
 
@@ -32,30 +32,94 @@
         }
 
         /* --- Page-Specific Heading --- */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
         .page-header h1 {
             color: var(--secondary);
             font-size: 2.5em;
-            text-align: center;
             margin-bottom: 10px;
         }
         .page-header p {
-            text-align: center;
             font-size: 1.1em;
             color: #666;
             margin-bottom: 30px;
         }
         
-        /* --- Form Styling (General) --- */
+        /* --- Contact Routing Grid --- */
+        .contact-options-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .contact-option-card {
+            flex: 1;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .contact-option-card:hover {
+            transform: translateY(-5px);
+        }
+        .contact-option-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+        .contact-option-card i {
+            font-size: 3em;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        .contact-option-card a {
+            display: inline-block;
+            background-color: var(--secondary);
+            color: var(--white);
+            padding: 10px 20px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .contact-option-card a:hover {
+            background-color: var(--dark);
+        }
+        
+        /* --- General Contact Info --- */
+        .general-contact-info {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: var(--neutral);
+            border-radius: 8px;
+        }
+        .contact-detail {
+            margin-bottom: 20px;
+        }
+        .contact-detail i {
+            color: var(--primary);
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+        .contact-detail strong {
+            display: block;
+            font-size: 1.2em;
+            margin-top: 5px;
+        }
+
+        /* --- Form Specific Styling (General & Transport) --- */
         .form-section {
             background-color: var(--neutral);
             padding: 30px;
             border-radius: 8px;
             margin-top: 30px;
-            display: none; /* Hidden by default, shown by JS based on URL hash */
         }
         .form-section h2 {
-            color: var(--dark);
-            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
             padding-bottom: 10px;
             margin-top: 0;
             margin-bottom: 20px;
@@ -80,10 +144,6 @@
             box-sizing: border-box;
             font-size: 1em;
         }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
         .form-submit-btn {
             background-color: var(--primary);
             color: var(--white);
@@ -97,39 +157,14 @@
         .form-submit-btn:hover {
             background-color: var(--secondary);
         }
-
-        /* Message for Claimed Item */
-        .claimed-item-message {
-            background-color: #E8F5E9;
-            border: 1px solid #C8E6C9;
+        .claim-message {
+            background-color: #FFFDE7;
+            border: 1px solid #FFECB3;
             padding: 15px;
             border-radius: 4px;
             margin-bottom: 20px;
             font-weight: bold;
-            color: var(--secondary);
-            display: none;
-        }
-
-
-        /* --- General Contact Info (Default View) --- */
-        .general-contact-info {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: var(--neutral);
-            border-radius: 8px;
-        }
-        .contact-detail {
-            margin-bottom: 20px;
-        }
-        .contact-detail i {
-            color: var(--primary);
-            margin-right: 10px;
-            font-size: 1.5em;
-        }
-        .contact-detail strong {
-            display: block;
-            font-size: 1.2em;
-            margin-top: 5px;
+            color: #FFA000;
         }
         
         /* ------------------------------------------- */
@@ -254,90 +289,74 @@
     <main>
         <div class="content-container">
             <section class="page-header">
-                <h1 id="mainHeader">Contact Us & Claim Forms</h1>
-                <p id="subHeader">Need to get in touch? Use the appropriate form below or see our general contact details.</p>
+                <h1 id="mainHeader">Contact Foodshare Seychelles</h1>
+                <p id="subHeader">How can we assist you? Choose the relevant option below or fill out the form.</p>
             </section>
-
-            <section id="general-contact" class="general-contact-info">
-                <h2>General Enquiries</h2>
-                <p>For questions about volunteering, donating, or partnerships, please reach out via email.</p>
+            
+            <div id="dynamic-form-container">
+            
+                <section id="general-inquiries" class="form-section">
+                    <h2>General Inquiries & Support</h2>
+                    <p>Use this form for all non-food claim related queries, including partnership, technical support, and general questions.</p>
+                    
+                    <form action="/submit-general-inquiry" method="POST">
+                        <div class="form-group">
+                            <label for="giName">Your Full Name / Organization</label>
+                            <input type="text" id="giName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="giEmail">Email Address</label>
+                            <input type="email" id="giEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="giSubject">Subject</label>
+                            <input type="text" id="giSubject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="giMessage">Your Message</label>
+                            <textarea id="giMessage" name="message" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="form-submit-btn">Send Inquiry</button>
+                    </form>
+                </section>
                 
-                <div class="contact-detail">
-                    <i class="fas fa-envelope"></i>
-                    Email Address
-                    <strong><a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a></strong>
-                </div>
-                
-                <p style="margin-top: 30px; color: var(--secondary); font-weight: bold;">
-                    NOTE: To claim available food, please start on the <a href="/available-food" style="color: var(--secondary); text-decoration: underline;">Available Food Page</a>.
-                </p>
-            </section>
+                <section id="transport-assistance" class="form-section" style="display: none;">
+                    <h2>Transport Assistance Request</h2>
+                    <div id="claim-message" class="claim-message">
+                        You are requesting transport for a listing. Please fill in details below.
+                    </div>
 
-            <section id="self-collection-form" class="form-section">
-                <h2>Self-Collection Claim Form</h2>
-                <div id="self-collection-message" class="claimed-item-message">
-                    You are claiming: **[Item Name Placeholder]** (Listing ID: LSTXXX)
-                </div>
+                    <form action="/submit-transport-request" method="POST">
+                        <p>Provide detailed logistics information so our staff can try to coordinate delivery support for the claimed food listing.</p>
+                        
+                        <div class="form-group">
+                            <label for="transName">Your Full Name / Organization Name</label>
+                            <input type="text" id="transName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transPhone">Direct Contact Number</label>
+                            <input type="tel" id="transPhone" name="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transLocation">Exact Delivery Location (Detailed Address / Landmark)</label>
+                            <input type="text" id="transLocation" name="location" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transTime">Preferred Delivery Timeframe</label>
+                            <input type="text" id="transTime" name="time" placeholder="e.g., Tuesday 2-4 PM, or flexible" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="transNotes">Notes/Special Instructions (e.g., "Need help carrying," "Gate Code")</label>
+                            <textarea id="transNotes" name="notes"></textarea>
+                        </div>
+                        
+                        <input type="hidden" id="transListingId" name="listing_id">
+                        <button type="submit" class="form-submit-btn">Submit Transport Request</button>
+                    </form>
+                </section>
 
-                <form action="/submit-claim-self" method="POST">
-                    <p>Please fill out this form to finalize your self-collection. A staff member will contact you shortly to confirm the pickup time.</p>
-                    
-                    <div class="form-group">
-                        <label for="selfName">Your Full Name / Organization Name</label>
-                        <input type="text" id="selfName" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="selfEmail">Email Address</label>
-                        <input type="email" id="selfEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="selfPhone">Direct Contact Number</label>
-                        <input type="tel" id="selfPhone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="selfNotes">Notes/Comments (Optional)</label>
-                        <textarea id="selfNotes" name="notes"></textarea>
-                    </div>
-                    
-                    <input type="hidden" id="selfListingId" name="listing_id">
-                    <button type="submit" class="form-submit-btn">Submit Self-Collection Request</button>
-                </form>
-            </section>
-
-            <section id="transport-request-form" class="form-section">
-                <h2>Transport Request Claim Form</h2>
-                <div id="transport-message" class="claimed-item-message">
-                    You are requesting transport for: **[Item Name Placeholder]** (Listing ID: LSTXXX)
-                </div>
-
-                <form action="/submit-claim-transport" method="POST">
-                    <p>Please provide detailed information so our logistics team can coordinate delivery support.</p>
-                    
-                    <div class="form-group">
-                        <label for="transportName">Your Full Name / Organization Name</label>
-                        <input type="text" id="transportName" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="transportPhone">Direct Contact Number</label>
-                        <input type="tel" id="transportPhone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="transportLocation">Exact Delivery Location (Detailed Address / Landmark)</label>
-                        <input type="text" id="transportLocation" name="location" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="transportTime">Preferred Delivery Timeframe</label>
-                        <input type="text" id="transportTime" name="time" placeholder="e.g., Tuesday morning, or flexible">
-                    </div>
-                    <div class="form-group">
-                        <label for="transportNotes">Notes/Special Instructions (e.g., "Need help carrying," "Gate Code")</label>
-                        <textarea id="transportNotes" name="notes"></textarea>
-                    </div>
-                    
-                    <input type="hidden" id="transportListingId" name="listing_id">
-                    <button type="submit" class="form-submit-btn">Submit Transport Request</button>
-                </form>
-            </section>
+            </div>
         </div>
     </main>
 
@@ -386,54 +405,50 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Function to get the value of a parameter from the URL query string
-            const getQueryParam = (param) => {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(param);
-            };
+            const path = window.location.pathname;
+            const urlParams = new URLSearchParams(window.location.search);
+            const listingId = urlParams.get('listing');
 
-            // Function to parse the hash (e.g., #self-collection-form)
-            const hash = window.location.hash.substring(1); // Remove the '#'
-            const listingId = getQueryParam('listing');
+            const generalForm = document.getElementById('general-inquiries');
+            const transportForm = document.getElementById('transport-assistance');
+            const mainHeader = document.getElementById('mainHeader');
+            const subHeader = document.getElementById('subHeader');
 
-            const selfCollectionForm = document.getElementById('self-collection-form');
-            const transportRequestForm = document.getElementById('transport-request-form');
-            const generalContact = document.getElementById('general-contact');
+            // Hide both forms initially
+            generalForm.style.display = 'none';
+            transportForm.style.display = 'none';
             
-            // Function to update the claimed item message in the forms
-            const updateClaimMessage = (formId, itemId) => {
-                const messageElement = document.getElementById(formId === 'self-collection-form' ? 'self-collection-message' : 'transport-message');
-                const title = "the selected food listing"; // Placeholder, as we don't pass the name via URL
-
-                if (itemId) {
-                    messageElement.innerHTML = `You are claiming: **${title}** (Listing ID: ${itemId})`;
-                    messageElement.style.display = 'block';
-
-                    // Set hidden input fields for form submission
-                    document.getElementById(formId === 'self-collection-form' ? 'selfListingId' : 'transportListingId').value = itemId;
-                }
+            // Function to show only one form
+            const showForm = (formElement, headerText, subHeaderText) => {
+                formElement.style.display = 'block';
+                mainHeader.textContent = headerText;
+                subHeader.textContent = subHeaderText;
             };
 
-            // Determine which section to show
-            if (hash === 'self-collection-form' && listingId) {
-                // Show Self-Collection Form
-                selfCollectionForm.style.display = 'block';
-                generalContact.style.display = 'none';
-                document.getElementById('mainHeader').textContent = 'Finalize Self-Collection';
-                document.getElementById('subHeader').textContent = 'Complete the form below to reserve the food and confirm pickup details.';
-                updateClaimMessage('self-collection-form', listingId);
-            } else if (hash === 'transport-request-form' && listingId) {
-                // Show Transport Request Form
-                transportRequestForm.style.display = 'block';
-                generalContact.style.display = 'none';
-                document.getElementById('mainHeader').textContent = 'Request Transport Assistance';
-                document.getElementById('subHeader').textContent = 'Provide logistics details. Our team will contact you to schedule delivery.';
-                updateClaimMessage('transport-request-form', listingId);
+            // Check the URL path to determine which form to display
+            if (path.includes('/contact/transport-assistance')) {
+                // Display Transport Assistance Form
+                showForm(
+                    transportForm, 
+                    'Request Transport Assistance', 
+                    'Please fill in the details below so our staff can coordinate delivery support.'
+                );
+
+                // Update the message and hidden field if a listing ID is present
+                if (listingId) {
+                    document.getElementById('claim-message').textContent = `You are requesting transport for Listing ID: ${listingId}.`;
+                    document.getElementById('transListingId').value = listingId;
+                } else {
+                     document.getElementById('claim-message').textContent = `Warning: No specific food listing was attached to this request.`;
+                }
+
             } else {
-                // Default view: General Contact Info
-                generalContact.style.display = 'block';
-                selfCollectionForm.style.display = 'none';
-                transportRequestForm.style.display = 'none';
+                // Default to General Inquiries Form (contact/general-inquiries or just /contact)
+                showForm(
+                    generalForm, 
+                    'General Inquiries & Support', 
+                    'Use this form for non-claim related queries, or reach out via email.'
+                );
             }
         });
         
