@@ -31,14 +31,15 @@
             padding: 0 20px;
         }
 
-        /* --- Page-Specific Heading (Based on Screenshot 170818.png) --- */
+        /* --- Page-Specific Heading --- */
         .page-header h1 {
             color: var(--dark);
             font-size: 2.5em;
             margin-bottom: 30px;
+            text-align: center;
         }
         
-        /* --- Food Listing Cards (AvailableFoodList.tsx structure) --- */
+        /* --- Food Listing Cards (Hidden) --- */
         .food-listings {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -51,17 +52,11 @@
             border-radius: 8px;
             padding: 25px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
-
-        .food-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-
+        
         .category-tag {
             display: flex;
             align-items: center;
@@ -74,10 +69,6 @@
             margin-left: 5px;
             color: #666;
             font-weight: normal;
-        }
-        .category-tag .icon {
-            font-size: 1.2em;
-            margin-right: 5px;
         }
         
         .food-card h3 {
@@ -94,14 +85,9 @@
             font-size: 0.95em;
             margin-bottom: 10px;
         }
-        .details-row i {
-            margin-right: 8px;
-            color: var(--secondary);
-            font-size: 1.1em;
-        }
 
         .claim-button {
-            background-color: #8DED7C; /* Light green as seen in screenshot */
+            background-color: #8DED7C; 
             color: var(--dark);
             border: none;
             padding: 12px 20px;
@@ -114,27 +100,36 @@
         }
 
         .claim-button:hover {
-            background-color: #7AD169;
+            background-color: var(--secondary);
+            color: var(--white);
         }
         
-        /* --- No Listings Message --- */
-        .no-listings {
+        /* --- No Listings Message (Default View) --- */
+        #no-listings {
             text-align: center;
-            padding: 50px;
+            padding: 80px 30px;
             background-color: var(--neutral);
             border-radius: 8px;
-            border: 1px dashed #ccc;
+            border: 2px dashed var(--primary);
             color: #666;
+            max-width: 600px;
+            margin: 40px auto;
         }
-        .no-listings h2 {
+        #no-listings h2 {
             color: var(--secondary);
+            font-size: 2em;
+        }
+        #no-listings p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
         }
 
+
         /* ------------------------------------------- */
-        /* --- MODAL STYLING (Claim Options) --- */
+        /* --- Claim Modal (Simplified for New Logic) --- */
         /* ------------------------------------------- */
         .modal-overlay {
-            display: none; /* Hidden by default */
+            display: none; 
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -149,72 +144,69 @@
 
         .modal-content {
             background-color: var(--white);
-            margin: auto;
             padding: 30px;
             border-radius: 8px;
             width: 90%;
             max-width: 500px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-content h3 {
-            margin-top: 0;
-            color: var(--secondary);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            color: var(--primary);
         }
 
-        .modal-safety-tip {
-            background-color: #FFFDE7; /* Light yellow background */
-            border: 1px solid #FFECB3;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
-        .modal-safety-tip strong {
-            color: #FFA000; /* Amber icon color */
-        }
-
-        .logistics-options label {
-            display: block;
+        .modal-option {
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            padding: 20px;
             margin-bottom: 15px;
-            font-size: 1.1em;
-            cursor: pointer;
-        }
-        .logistics-options input[type="radio"] {
-            margin-right: 10px;
+            border-radius: 6px;
         }
 
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-cancel {
-            background-color: #ccc;
+        .modal-option h4 {
             color: var(--dark);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            margin-top: 0;
         }
 
-        .btn-proceed {
+        .modal-option button, .modal-option a {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-transport {
+            background-color: #FFC107; /* Amber */
+            color: var(--dark);
+            border: none;
+        }
+        .btn-transport:hover {
+            background-color: #FFA000;
+        }
+
+        .btn-pickup {
             background-color: var(--primary);
             color: var(--white);
-            padding: 10px 20px;
             border: none;
-            border-radius: 4px;
+        }
+        .btn-pickup:hover {
+            background-color: var(--secondary);
+        }
+
+        .modal-close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
             cursor: pointer;
+        }
+        .modal-close-btn:hover {
+            color: var(--dark);
         }
 
         /* ------------------------------------------- */
@@ -339,86 +331,62 @@
     <main>
         <div class="content-container">
             <section class="page-header">
-                <h1>Available Food</h1>
+                <h1>Available Food Listings</h1>
                 <p>Browse surplus food listings available for claiming right now from businesses and donors across Seychelles.</p>
             </section>
 
-            <section class="food-listings">
+            <section id="no-listings">
+                <p style="font-size: 3em;">😔</p>
+                <h2>No Food Available Right Now</h2>
+                <p>We are sorry, but there are currently **no food listings** available for claim. Please check back later, as our inventory updates throughout the day.</p>
+                <a href="/learn" class="cta-button" style="background-color: var(--secondary);">Learn About Our Mission</a>
+            </section>
+
+
+            <section class="food-listings" style="display: none;"> 
                 
-                <div class="food-card" data-listing-id="LST001">
+                <div class="food-card" data-listing-id="LST001" data-location="Beau Vallon Bakery, Mahé" data-contact="admin@foodshare-seychelles.com">
                     <div>
                         <div class="category-tag">
-                            <span class="icon">🥖</span> <span>Bread/Pastry</span>
+                            <i class="fas fa-bread-slice"></i> <span>Bread/Pastry</span>
                         </div>
-                        <h3>Surplus Baguettes from Bakery</h3>
+                        <h3>Surplus Baguettes and Rolls (5kg)</h3>
                         
                         <div class="details-row">
-                            <i class="fas fa-weight-hanging"></i> <span>5 kg</span>
+                            <i class="fas fa-calendar-times"></i> <span>Expires: Today, 7 PM</span>
                         </div>
                         <div class="details-row">
-                            <i class="fas fa-calendar-times"></i> <span>Expires: 12/9/2025</span>
-                        </div>
-                        <div class="details-row">
-                            <i class="fas fa-map-marker-alt"></i> <span>Beau Vallon Bakery</span>
+                            <i class="fas fa-map-marker-alt"></i> <span>Beau Vallon Bakery, Mahé</span>
                         </div>
                     </div>
-                    <button class="claim-button" onclick="openClaimModal('Surplus Baguettes from Bakery', 'LST001')">Claim Food</button>
+                    <button class="claim-button" onclick="openClaimModal('Surplus Baguettes and Rolls (5kg)', 'LST001', 'Beau Vallon Bakery, Mahé', 'admin@foodshare-seychelles.com')">Claim Food</button>
                 </div>
 
-                <div class="food-card" data-listing-id="LST002">
-                    <div>
-                        <div class="category-tag">
-                            <span class="icon">🥘</span> <span>Cooked</span>
-                        </div>
-                        <h3>Leftover Catering Rice & Curry</h3>
-                        
-                        <div class="details-row">
-                            <i class="fas fa-weight-hanging"></i> <span>8 kg</span>
-                        </div>
-                        <div class="details-row">
-                            <i class="fas fa-calendar-times"></i> <span>Expires: 12/8/2025</span>
-                        </div>
-                        <div class="details-row">
-                            <i class="fas fa-map-marker-alt"></i> <span>Eden Island Conference Center</span>
-                        </div>
-                    </div>
-                    <button class="claim-button" onclick="openClaimModal('Leftover Catering Rice & Curry', 'LST002')">Claim Food</button>
-                </div>
-                
                 </section>
         </div>
     </main>
 
     <div id="claimModal" class="modal-overlay">
         <div class="modal-content">
+            <span class="modal-close-btn" onclick="closeClaimModal()">&times;</span>
             <h3 id="modalTitle">Claim Item Name Placeholder</h3>
             
-            <div id="modalTip" class="modal-safety-tip">
-                <strong>✨ AI Food Safety Tip</strong><br>
-                The listed expiry date is likely incorrect for fresh baguettes; always check for mold and consume or freeze promptly for safety.
-            </div>
-
-            <p style="margin-bottom: 5px;">Collection Time: <strong id="modalCollectionTime">Today 5 PM - 7 PM</strong></p>
-            <p>Location: <strong id="modalLocation">Beau Vallon Bakery</strong></p>
+            <p>Please select your logistics preference:</p>
             
-            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-
-            <p style="font-weight: bold;">Logistics</p>
-            <div class="logistics-options">
-                <label>
-                    <input type="radio" name="logistics" value="self" checked>
-                    I will collect it myself
-                </label>
-                <label>
-                    <input type="radio" name="logistics" value="transport">
-                    I need support from Admin (Transport)
-                </label>
+            <div class="modal-option">
+                <h4>I will collect it myself (Recommended)</h4>
+                <p>Go directly to the **Location** below and identify yourself as a Foodshare claimant. **No further form needed.**</p>
+                <p><strong>Location:</strong> <span id="modalLocation"></span></p>
+                <p style="font-size: 0.9em;">*Advised: Contact Admin (<span id="modalContactEmail"></span>) just in case of last-minute changes.</p>
+                <button class="btn-pickup" onclick="closeClaimModal()">Proceed to Pickup Location</button>
             </div>
-
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeClaimModal()">Cancel</button>
-                <button class="btn-proceed" id="proceedButton" onclick="handleProceed()">Proceed</button>
+            
+            <div class="modal-option">
+                <h4>I need support from Admin (Transport)</h4>
+                <p>Fill out the detailed transport request form. Our team will coordinate delivery scheduling, subject to volunteer availability.</p>
+                <a id="transportLink" href="/contact/transport-assistance?listing=LST001" class="btn-transport">Go to Transport Request Form</a>
             </div>
+            
         </div>
     </div>
 
@@ -466,36 +434,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <script>
+        // Store current listing details
         let currentListingId = null;
+        let currentListingLocation = null;
+        let currentListingContact = null;
 
         // Function to open the modal
-        function openClaimModal(itemName, listingId) {
+        function openClaimModal(itemName, listingId, location, contactEmail) {
             currentListingId = listingId;
-            document.getElementById('modalTitle').textContent = `Claim ${itemName}`;
+            currentListingLocation = location;
+            currentListingContact = contactEmail;
+            
+            document.getElementById('modalTitle').textContent = itemName;
+            document.getElementById('modalLocation').textContent = location;
+            document.getElementById('modalContactEmail').textContent = contactEmail;
+            
+            // Update the link for Transport Assistance with the correct listing ID
+            const transportLink = document.getElementById('transportLink');
+            transportLink.href = `/contact/transport-assistance?listing=${listingId}`;
+            
             document.getElementById('claimModal').style.display = 'flex';
         }
 
         // Function to close the modal
         function closeClaimModal() {
             document.getElementById('claimModal').style.display = 'none';
-        }
-        
-        // Function to handle the "Proceed" button click based on radio selection
-        function handleProceed() {
-            const selectedOption = document.querySelector('input[name="logistics"]:checked').value;
-            
-            if (selectedOption === 'self') {
-                // If "I will collect it myself" is selected
-                // Redirects to the specific Contact Us form for self-collection
-                window.location.href = `/contact#self-collection-form?listing=${currentListingId}`;
-            } else if (selectedOption === 'transport') {
-                // If "I need support from Admin (Transport)" is selected
-                // Redirects to the Transport Request Form (which we need to create on the Contact Us page)
-                window.location.href = `/contact#transport-request-form?listing=${currentListingId}`;
-            }
-            
-            // Close the modal after redirection
-            closeClaimModal();
         }
 
         // JavaScript for mobile navigation toggle
@@ -511,6 +474,15 @@
                 modal.style.display = "none";
             }
         }
+
+        // TEMP: Logic to show listings if needed for testing (Set to 'none' by default)
+        document.addEventListener('DOMContentLoaded', () => {
+            // const hasListings = true; // Set to true to show examples
+            // if (hasListings) {
+            //     document.getElementById('no-listings').style.display = 'none';
+            //     document.querySelector('.food-listings').style.display = 'grid';
+            // }
+        });
     </script>
 
 </body>
