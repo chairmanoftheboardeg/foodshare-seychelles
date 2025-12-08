@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | Foodshare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="./image/logo.png">
+
+    <style>
+        /* Theme Variables */
+        :root {
+            --primary: #4CAF50; /* Vibrant Green */
+            --secondary: #388E3C; /* Darker Green */
+            --neutral: #F5F5F5; /* Light Grey */
+            --dark: #212121; /* Dark Text */
+            --white: #ffffff;
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+
+        /* Base and Layout for Error Page */
+        body {
+            font-family: var(--font-family); 
+            margin: 0; 
+            background-color: var(--neutral);
+            color: var(--dark); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* --- Error Box Styling --- */
+        .error-container {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* --- Loading State --- */
+        #loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #loading-state p {
+            font-size: 1.2em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* --- Error State (Hidden by Default) --- */
+        #error-state {
+            display: none;
+        }
+        
+        #error-state h1 {
+            font-size: 4em;
+            color: #FF5722; /* Orange-Red for Error */
+            margin-bottom: 5px;
+        }
+
+        #error-state h2 {
+            color: var(--dark);
+            font-size: 1.8em;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        #error-state p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .support-link {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            transition: background-color 0.2s;
+        }
+
+        .support-link:hover {
+            background-color: var(--secondary);
+        }
+
+        .home-link {
+            margin-top: 15px;
+            display: block;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        
+        <div id="loading-state">
+            <div class="spinner"></div>
+            <p>Fetching data and checking route...</p>
+        </div>
+
+        <div id="error-state">
+            <h1>404</h1>
+            <h2>Page Not Found</h2>
+            
+            <p>
+                We apologize for the inconvenience. The page you are looking for cannot be found or may have been moved.
+                If you believe this is an error, please contact support.
+            </p>
+            
+            <a href="/contact/general-inquiries" class="support-link">Contact Support</a>
+            <a href="/" class="home-link">Go to Foodshare Home Page</a>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingState = document.getElementById('loading-state');
+            const errorState = document.getElementById('error-state');
+
+            // Set a timeout (e.g., 2 seconds) to simulate fetching and fail
+            setTimeout(() => {
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+            }, 2000); // 2000 milliseconds = 2 seconds delay
+        });
+    </script>
+
+</body>
+</html>
