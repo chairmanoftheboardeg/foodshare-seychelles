@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - Foodshare Seychelles Management</title>
+    
+    <link rel="icon" type="image/png" href="../image/logo.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Theme Variables */
+        :root {
+            --primary: #4CAF50; /* Vibrant Green */
+            --secondary: #388E3C; /* Darker Green */
+            --tertiary: #FFC107; /* Amber/Warning */
+            --neutral: #F5F5F5; /* Light Grey */
+            --dark: #212121; /* Dark Text */
+            --white: #ffffff;
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+            --danger: #D32F2F; /* Red */
+        }
+
+        /* Base and Layout */
+        body {
+            font-family: var(--font-family); 
+            margin: 0; 
+            background-color: var(--neutral);
+            color: var(--dark); 
+            display: flex;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        /* --- Sidebar Navigation --- */
+        #sidebar {
+            width: 250px;
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo-dash {
+            text-align: center;
+            padding: 10px 20px 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+            border-bottom: 1px solid #333;
+            margin-bottom: 20px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 1.05em;
+        }
+
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+
+        .nav-item:hover .badge, .nav-item.active .badge {
+            background-color: var(--tertiary);
+            color: var(--dark);
+        }
+
+        .badge {
+            margin-left: auto;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        /* --- Main Content Area --- */
+        #main-content {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto; /* Enable scrolling for main content */
+        }
+        
+        .content-section {
+            display: none; /* Hidden by default, shown by JS */
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: var(--dark);
+        }
+
+        /* --- Table Styling --- */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--white);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .data-table th {
+            background-color: var(--secondary);
+            color: var(--white);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: var(--neutral);
+        }
+
+        .data-table tr:hover {
+            background-color: #e0f2f1; /* Light hover effect */
+        }
+
+        /* --- Action Buttons in Table --- */
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            margin-right: 5px;
+        }
+
+        .btn-view { background-color: var(--primary); color: var(--white); }
+        .btn-approve { background-color: #64B5F6; color: var(--white); }
+        .btn-reject { background-color: var(--danger); color: var(--white); }
+        .btn-publish { background-color: var(--tertiary); color: var(--dark); }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* --- Status/Pill Indicators --- */
+        .status-pill {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-new { background-color: #FFC107; color: var(--dark); }
+        .status-pending { background-color: #64B5F6; color: var(--dark); }
+        .status-approved { background-color: var(--primary); color: var(--white); }
+        .status-completed { background-color: var(--secondary); color: var(--white); }
+        .status-rejected { background-color: var(--danger); color: var(--white); }
+        .status-published { background-color: var(--primary); color: var(--white); }
+
+
+        /* --- Dashboard Overview Styles (Home Section) --- */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid;
+            text-align: left;
+        }
+
+        .stat-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-card.green { border-color: var(--primary); }
+        .stat-card.green .value { color: var(--primary); }
+
+        .stat-card.blue { border-color: #64B5F6; }
+        .stat-card.blue .value { color: #64B5F6; }
+
+        .stat-card.yellow { border-color: var(--tertiary); }
+        .stat-card.yellow .value { color: var(--tertiary); }
+        
+        .stat-card.red { border-color: var(--danger); }
+        .stat-card.red .value { color: var(--danger); }
+
+
+        /* --- Footer for Dashboard (Hidden in main view, used for reference) --- */
+        #dashboard-footer {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #ccc;
+            border-top: 1px solid #333;
+        }
+        .logout-link {
+            color: var(--tertiary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <aside id="sidebar">
+        <div class="logo-dash">Foodshare Admin</div>
+
+        <nav>
+            <div class="nav-item active" data-section="home">
+                <i class="fas fa-tachometer-alt"></i> Dashboard Overview
+            </div>
+            
+            <div class="nav-item" data-section="donations">
+                <i class="fas fa-box-open"></i> Donation Listings 
+                <span class="badge" id="donation-badge">0</span>
+            </div>
+            
+            <div class="nav-item" data-section="volunteers">
+                <i class="fas fa-user-plus"></i> Volunteer Applications
+                <span class="badge" id="volunteer-badge">0</span>
+            </div>
+            
+            <div class="nav-item" data-section="transport">
+                <i class="fas fa-shipping-fast"></i> Transport Requests
+                <span class="badge" id="transport-badge">0</span>
+            </div>
+
+            <div class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i> Settings
+            </div>
+        </nav>
+
+        <div id="dashboard-footer">
+            <p>
+                © 2025 Foodshare Seychelles.
+                <br> <span class="logout-link" onclick="logout()">Logout</span>
+            </p>
+        </div>
+    </aside>
+
+    <main id="main-content">
+
+        <section id="home" class="content-section active">
+            <div class="section-header">
+                <h2>Dashboard Overview</h2>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card green">
+                    <h3>Active Food Listings</h3>
+                    <div class="value" id="stat-active-listings">0</div>
+                </div>
+                <div class="stat-card yellow">
+                    <h3>New Volunteer Applications</h3>
+                    <div class="value" id="stat-new-volunteers">0</div>
+                </div>
+                <div class="stat-card blue">
+                    <h3>Open Transport Requests</h3>
+                    <div class="value" id="stat-open-transport">0</div>
+                </div>
+                <div class="stat-card red">
+                    <h3>Urgent Items (Expiring Today)</h3>
+                    <div class="value" id="stat-urgent-items">0</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h3>Quick Actions</h3>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <button class="action-btn btn-view" style="padding: 10px 20px;" onclick="switchSection('donations')"><i class="fas fa-plus-circle"></i> Create New Listing</button>
+                <button class="action-btn btn-approve" style="padding: 10px 20px;" onclick="switchSection('volunteers')"><i class="fas fa-check"></i> Review New Apps</button>
+                <button class="action-btn btn-reject" style="padding: 10px 20px;" onclick="window.location.href='../volunteer/'"><i class="fas fa-users-slash"></i> Close Volunteer Intake</button>
+            </div>
+        </section>
+
+
+        <section id="donations" class="content-section">
+            <div class="section-header">
+                <h2>Manage Donation Listings</h2>
+                <button class="action-btn btn-view" onclick="alert('Simulated: Opening New Listing Modal')"><i class="fas fa-plus"></i> Add Listing Manually</button>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Listing ID</th>
+                        <th>Item</th>
+                        <th>Donor</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="donations-table-body">
+                    </tbody>
+            </table>
+        </section>
+
+        <section id="volunteers" class="content-section">
+            <div class="section-header">
+                <h2>Review Volunteer Applications</h2>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>App ID</th>
+                        <th>Applicant Name</th>
+                        <th>Contact Email</th>
+                        <th>Preferred Role/Island</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="volunteers-table-body">
+                    </tbody>
+            </table>
+        </section>
+
+        <section id="transport" class="content-section">
+            <div class="section-header">
+                <h2>Open Transport Requests</h2>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Req ID</th>
+                        <th>Item ID</th>
+                        <th>Recipient</th>
+                        <th>Delivery Location</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="transport-table-body">
+                    </tbody>
+            </table>
+        </section>
+
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h2>System Settings</h2>
+            </div>
+            
+            <div style="background-color: var(--white); padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <h3>Volunteer Intake Status</h3>
+                <p>Control whether the public can submit new volunteer applications.</p>
+                <button class="action-btn btn-approve" style="padding: 8px 15px; margin-right: 15px;" onclick="alert('Simulated: Volunteer applications are now OPEN.')">Set Status to OPEN</button>
+                <button class="action-btn btn-reject" style="padding: 8px 15px;" onclick="alert('Simulated: Volunteer applications are now CLOSED.')">Set Status to CLOSED</button>
+                
+                <h3 style="margin-top: 30px;">Email Notifications</h3>
+                <p>Admin Email: <strong>admin@foodshare-seychelles.com</strong></p>
+                <p>Ensure applications receive follow-up emails no later than 7 days.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- SIMULATED DATA ---
+        let donationsData = [
+            { id: 'LST001', item: '20kg Fresh Fish', donor: 'Fisherman Co-op', expiry: 'Dec 9, 2025', status: 'Published', category: 'Meat' },
+            { id: 'LST002', item: 'Surplus Rolls & Bread', donor: 'Beau Vallon Bakery', expiry: 'Today 7 PM', status: 'New', category: 'Baked' },
+            { id: 'LST003', item: 'Canned Goods (Mixed)', donor: 'Local Hotel Chain', expiry: 'Jan 20, 2026', status: 'Claimed', category: 'Pantry' },
+        ];
+
+        let volunteersData = [
+            { id: 'APP001', name: 'James Michel', email: 'james.m@example.com', role: 'Driver, Mahé', status: 'New' },
+            { id: 'APP002', name: 'Lucie Pierre', email: 'lucie.p@example.com', role: 'Admin Support, Praslin', status: 'Approved' },
+            { id: 'APP003', name: 'Anil Sahoo', email: 'anil.s@example.com', role: 'Community Outreach', status: 'New' },
+        ];
+
+        let transportData = [
+            { id: 'REQ001', itemId: 'LST003', recipient: 'Orphanage Trust', location: 'Victoria Center', status: 'Pending Assignment' },
+            { id: 'REQ002', itemId: 'LST002', recipient: 'Family X', location: 'Takamaka South', status: 'New' },
+        ];
+
+        // --- DASHBOARD CORE FUNCTIONS ---
+
+        // 1. Navigation Switching
+        function switchSection(sectionId) {
+            // Update Active Nav Item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
+
+            // Update Active Content Section
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Reload data for the specific section
+            if (sectionId !== 'home') {
+                renderData(sectionId);
+            } else {
+                updateStats();
+            }
+        }
+
+        // 2. Rendering Data Tables
+        function renderData(section) {
+            let data, tableBodyId, headers;
+
+            if (section === 'donations') {
+                data = donationsData;
+                tableBodyId = 'donations-table-body';
+            } else if (section === 'volunteers') {
+                data = volunteersData;
+                tableBodyId = 'volunteers-table-body';
+            } else if (section === 'transport') {
+                data = transportData;
+                tableBodyId = 'transport-table-body';
+            } else {
+                return;
+            }
+
+            const tableBody = document.getElementById(tableBodyId);
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            data.forEach(item => {
+                const row = tableBody.insertRow();
+                let statusClass = getStatusClass(item.status);
+
+                if (section === 'donations') {
+                    row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.item}</td>
+                        <td>${item.donor}</td>
+                        <td>${item.expiry}</td>
+                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="alert('Viewing Details for ${item.id}')">View</button>
+                            <button class="action-btn btn-publish" onclick="updateStatus('${item.id}', 'donations', 'Published')">Publish</button>
+                        </td>
+                    `;
+                } else if (section === 'volunteers') {
+                     row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>${item.email}</td>
+                        <td>${item.role}</td>
+                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="alert('Reviewing Application ${item.id}')">Review</button>
+                            <button class="action-btn btn-approve" onclick="updateStatus('${item.id}', 'volunteers', 'Approved')">Approve</button>
+                            <button class="action-btn btn-reject" onclick="updateStatus('${item.id}', 'volunteers', 'Rejected')">Reject</button>
+                        </td>
+                    `;
+                } else if (section === 'transport') {
+                     row.innerHTML = `
+                        <td>${item.id}</td>
+                        <td>${item.itemId}</td>
+                        <td>${item.recipient}</td>
+                        <td>${item.location}</td>
+                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="alert('Assigning Volunteer for ${item.id}')">Assign</button>
+                            <button class="action-btn btn-approve" onclick="updateStatus('${item.id}', 'transport', 'Completed')">Complete</button>
+                        </td>
+                    `;
+                }
+            });
+            updateStats();
+        }
+
+        // 3. Status Helper
+        function getStatusClass(status) {
+            const statusMap = {
+                'New': 'status-new',
+                'Pending': 'status-pending',
+                'Approved': 'status-approved',
+                'Claimed': 'status-pending',
+                'Published': 'status-published',
+                'Completed': 'status-completed',
+                'Rejected': 'status-rejected',
+                'Pending Assignment': 'status-pending'
+            };
+            return statusMap[status] || '';
+        }
+
+        // 4. Update Status (Simulated Action)
+        function updateStatus(id, type, newStatus) {
+            let dataArray;
+            if (type === 'donations') dataArray = donationsData;
+            else if (type === 'volunteers') dataArray = volunteersData;
+            else if (type === 'transport') dataArray = transportData;
+
+            const item = dataArray.find(i => i.id === id);
+            if (item) {
+                item.status = newStatus;
+                alert(`${item.id} status updated to: ${newStatus}`);
+                renderData(type); // Re-render table after update
+            } else {
+                console.error("Item not found:", id);
+            }
+            updateStats(); // Update badges and home stats
+        }
+        
+        // 5. Update Badges and Home Stats
+        function updateStats() {
+            const newDonations = donationsData.filter(d => d.status === 'New').length;
+            const newVolunteers = volunteersData.filter(v => v.status === 'New').length;
+            const openTransport = transportData.filter(t => t.status !== 'Completed').length;
+            const activeListings = donationsData.filter(d => d.status === 'Published' || d.status === 'Claimed').length;
+            const urgentItems = donationsData.filter(d => d.expiry.includes('Today')).length;
+
+
+            // Update Badges
+            document.getElementById('donation-badge').textContent = newDonations;
+            document.getElementById('volunteer-badge').textContent = newVolunteers;
+            document.getElementById('transport-badge').textContent = openTransport;
+            
+            // Update Home Stats
+            document.getElementById('stat-active-listings').textContent = activeListings;
+            document.getElementById('stat-new-volunteers').textContent = newVolunteers;
+            document.getElementById('stat-open-transport').textContent = openTransport;
+            document.getElementById('stat-urgent-items').textContent = urgentItems;
+        }
+
+        // 6. Logout Simulation
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                // Redirect back to the staff login page
+                window.location.href = '../staff/'; 
+            }
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the dashboard to the home view
+            switchSection('home');
+            
+            // Initial render of all data and stats
+            renderData('donations');
+            renderData('volunteers');
+            renderData('transport');
+            updateStats();
+            
+            // Set up navigation click handlers
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const sectionId = item.getAttribute('data-section');
+                    switchSection(sectionId);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
