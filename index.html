@@ -67,7 +67,7 @@
 
         /* --- Main Content Styling (After Load) --- */
         #main-content {
-            display: none; /* Hidden by default */
+            display: none;
             flex-grow: 1;
             padding: 40px 20px;
             display: flex;
@@ -82,6 +82,7 @@
             border-radius: 8px;
             background-color: white;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px; /* Space above the staff link */
         }
 
         .message-container h2 {
@@ -94,6 +95,23 @@
             font-size: 1.1em;
             line-height: 1.6;
         }
+        
+        /* New Staff Link Style */
+        .staff-link-area {
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .staff-link-area a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 2px;
+            transition: color 0.3s;
+        }
+        .staff-link-area a:hover {
+            color: var(--primary);
+        }
 
         /* --- Footer Styling --- */
         footer {
@@ -101,7 +119,7 @@
             color: var(--neutral);
             padding: 15px 20px;
             font-size: 0.9em;
-            margin-top: auto; /* Pushes footer to the bottom */
+            margin-top: auto;
         }
 
         footer a {
@@ -138,6 +156,10 @@
                 *Your patience and support are greatly appreciated.*
             </p>
         </div>
+        
+        <div class="staff-link-area">
+            <p>If you work here, please <a href="foodshare-seychelles/staff-login.html">sign in here</a>.</p>
+        </div>
     </main>
 
     <footer>
@@ -155,17 +177,14 @@
             const loader = document.getElementById('loader-screen');
             const mainContent = document.getElementById('main-content');
             
-            // Set the delay in milliseconds (5 seconds = 5000ms)
             const delayTime = 5000; 
 
             setTimeout(() => {
-                // Fade out the loader
                 loader.style.opacity = '0'; 
 
-                // Wait for the fade-out transition to complete (0.5s)
                 setTimeout(() => {
-                    loader.style.display = 'none'; // Hide the loader
-                    mainContent.style.display = 'flex'; // Show the main content
+                    loader.style.display = 'none'; 
+                    mainContent.style.display = 'flex';
                 }, 500); 
 
             }, delayTime);
