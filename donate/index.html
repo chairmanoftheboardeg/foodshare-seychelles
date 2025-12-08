@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food - Foodshare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="../image/logo.png">
+
+    <style>
+        /* Theme Variables */
+        :root {
+            --primary: #4CAF50; /* Vibrant Green */
+            --secondary: #388E3C; /* Darker Green */
+            --neutral: #F5F5F5; /* Light Grey */
+            --dark: #212121; /* Dark Text */
+            --white: #ffffff;
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+
+        /* Base and Layout */
+        body {
+            font-family: var(--font-family); margin: 0; background-color: var(--white);
+            color: var(--dark); display: flex; flex-direction: column; min-height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+        main { flex-grow: 1; padding: 40px 0; }
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Page-Specific Heading --- */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-header h1 {
+            color: var(--secondary);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* --- Guidance Section --- */
+        .guidance-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .guidance-card {
+            flex: 1;
+            background-color: #E8F5E9; /* Light green */
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        .guidance-card h3 {
+            color: var(--dark);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .guidance-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .guidance-card li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        .guidance-card li:before {
+            content: "•";
+            color: var(--secondary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* --- Donation Form Styling --- */
+        .donation-form {
+            background-color: var(--neutral);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .donation-form h2 {
+            color: var(--primary);
+            margin-top: 0;
+            border-bottom: 2px dashed var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #444;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .form-submit-btn {
+            background-color: var(--secondary);
+            color: var(--white);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .form-submit-btn:hover {
+            background-color: var(--dark);
+        }
+
+        @media (max-width: 768px) {
+            .guidance-section {
+                flex-direction: column;
+            }
+        }
+
+        /* ------------------------------------------- */
+        /* --- NAVIGATION BAR STYLING (Copy/Paste) --- */
+        /* ------------------------------------------- */
+        #navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; background-color: var(--neutral);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .logo-container { font-size: 1.5em; font-weight: bold; }
+        .logo-share { color: var(--dark); }
+        .logo-feed { color: var(--primary); }
+        .nav-links-container { display: flex; align-items: center; }
+        .nav-link {
+            padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s;
+        }
+        .nav-link:hover { color: var(--secondary); }
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; background-color: var(--neutral);
+            min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;
+            top: 35px; left: 0; border-radius: 4px;
+        }
+        .dropdown-content a {
+            color: var(--dark); padding: 12px 16px; text-decoration: none;
+            display: block; text-align: left;
+        }
+        .dropdown-content a:hover { background-color: #ddd; color: var(--secondary); }
+        .dropdown:hover .dropdown-content { display: block; }
+        .cta-button {
+            background-color: var(--primary); color: white; border-radius: 4px;
+            margin-left: 15px; padding: 10px 20px; font-weight: bold;
+        }
+        .cta-button:hover { background-color: var(--secondary); color: white; }
+        .staff-login { margin-left: 10px; font-weight: bold; }
+        .hamburger {
+            display: none; font-size: 1.8em; background: none; border: none;
+            cursor: pointer; color: var(--dark); z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            #navbar { padding: 10px 20px; }
+            .nav-links-container {
+                position: absolute; top: 60px; left: 0; width: 100%;
+                flex-direction: column; background-color: var(--neutral);
+                border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                display: none; z-index: 999;
+            }
+            .nav-links-container.open { display: flex; }
+            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
+            .hamburger { display: block; }
+            .dropdown { width: 100%; }
+            .dropdown-content { position: relative; width: 100%; top: 0; box-shadow: none; border-top: 1px solid #eee; }
+        }
+
+        /* ------------------------------------------- */
+        /* --- FOOTER STYLING (Copy/Paste) --- */
+        /* ------------------------------------------- */
+        #main-footer {
+            margin-top: auto; background-color: var(--dark); color: var(--neutral);
+            padding: 40px 30px 15px; font-size: 0.9em;
+        }
+        .footer-content {
+            display: flex; justify-content: space-between; flex-wrap: wrap; 
+            max-width: 1200px; margin: 0 auto 20px;
+        }
+        .footer-section { width: 23%; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
+        .footer-section p, .footer-section li { margin: 5px 0; }
+        .footer-section a { color: var(--neutral); transition: color 0.3s; }
+        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
+        .footer-section ul { list-style: none; padding: 0; }
+
+        .footer-bottom {
+            max-width: 1200px; margin: 0 auto; text-align: center;
+            padding-top: 15px; border-top: 1px solid #444; color: #999;
+            font-size: 0.8em;
+        }
+        .footer-credit a { color: var(--primary); }
+        .footer-credit a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .footer-content { flex-direction: column; padding: 0 20px; }
+            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
+            .footer-section:last-child { border-bottom: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="navbar">
+        <div class="logo-container">
+            <a href="/">
+                <span class="logo-share">Share Food.</span>
+                <span class="logo-feed">Feed Seychelles.</span>
+            </a>
+        </div>
+        
+        <button class="hamburger" aria-label="Toggle navigation" id="hamburger-btn">☰</button>
+        
+        <nav class="nav-links-container" id="nav-menu">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About Us</a>
+            <a href="/available-food" class="nav-link">Available Food</a>
+            <a href="/donate" class="nav-link cta-button">Donate Food</a>
+            <a href="/learn" class="nav-link">Learn</a>
+            
+            <div class="dropdown">
+                <a href="#" class="nav-link">Volunteer</a>
+                <div class="dropdown-content">
+                    <a href="/volunteer">Volunteer Now</a>
+                    <a href="/volunteers">Our Volunteers</a>
+                </div>
+            </div>
+            
+            <a href="/staff" class="nav-link staff-login">Staff Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="content-container">
+            <section class="page-header">
+                <h1>List Your Surplus Food for Donation</h1>
+                <p>Prevent edible food from becoming waste. We make it easy to list your surplus inventory for rapid collection by vetted community organizations.</p>
+            </section>
+
+            <section class="guidance-section">
+                <div class="guidance-card">
+                    <h3>What We Accept</h3>
+                    <ul>
+                        <li>Safe, packaged **perishables** (dairy, meat, cooked meals)</li>
+                        <li>Fresh produce, fruit, and eggs</li>
+                        <li>**Non-perishables** with a future expiry date</li>
+                        <li>Frozen items that have maintained temperature</li>
+                    </ul>
+                </div>
+                <div class="guidance-card">
+                    <h3>Donation Checklist</h3>
+                    <ul>
+                        <li>Food must be ready for pickup.</li>
+                        <li>Clearly label all items with contents and preparation date.</li>
+                        <li>Ensure all food is kept at appropriate temperatures until collection.</li>
+                        <li>Provide an accurate weight/quantity to help us match recipients.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="donation-form">
+                <h2>Donation Listing Form</h2>
+                <p>Fill out this form to create a new food listing. A staff member or volunteer will contact you shortly to coordinate pickup.</p>
+                
+                <form action="/submit-food-listing" method="POST">
+                    
+                    <h3>Donor Contact Information</h3>
+                    <div class="form-group">
+                        <label for="donorName">Organization / Donor Name</label>
+                        <input type="text" id="donorName" name="donorName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donorEmail">Contact Email</label>
+                        <input type="email" id="donorEmail" name="donorEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donorPhone">Contact Phone Number</label>
+                        <input type="tel" id="donorPhone" name="donorPhone" required>
+                    </div>
+
+                    <hr>
+                    
+                    <h3>Food Details</h3>
+                    <div class="form-group">
+                        <label for="foodItem">Food Item Description (e.g., "3 boxes of day-old pastries", "10kg fresh fish")</label>
+                        <input type="text" id="foodItem" name="foodItem" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Food Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select a Category</option>
+                            <option value="Produce">Fresh Produce</option>
+                            <option value="Meat">Meat/Fish</option>
+                            <option value="Dairy">Dairy/Eggs</option>
+                            <option value="Prepared">Prepared Meals (Cooked)</option>
+                            <option value="Pantry">Pantry/Canned Goods</option>
+                            <option value="Baked">Baked Goods</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expiry">Best Before / Use By Date (Estimate)</label>
+                        <input type="text" id="expiry" name="expiry" placeholder="e.g., Today 6 PM, or 3 days from now">
+                    </div>
+                    <div class="form-group">
+                        <label for="pickupLocation">Pickup Address / Location</label>
+                        <input type="text" id="pickupLocation" name="pickupLocation" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Special Instructions (e.g., parking, cooling requirements)</label>
+                        <textarea id="notes" name="notes"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit-btn">Submit Food Donation</button>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h3>Our Mission</h3>
+                <p>Connecting surplus food with those who need it across the Seychelles islands to eliminate food waste and nourish our community.</p>
+            </div>
+            
+            <div class="footer-section links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/available-food">Available Food</a></li>
+                    <li><a href="/volunteer">Volunteer Now</a></li>
+                    <li><a href="/donate">Donate Food</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section contact">
+                <h3>Contact & Support</h3>
+                <p>Email: <a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a></p>
+            </div>
+            
+            <div class="footer-section legal">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Use</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p class="footer-credit">
+                Website by 
+                <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener noreferrer">Tyler Nicholas</a> | 
+                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </p>
+            &copy; 2025 Foodshare Seychelles. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript for mobile navigation toggle
+        document.getElementById('hamburger-btn').addEventListener('click', function() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('open');
+        });
+    </script>
+
+</body>
+</html>
