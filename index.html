@@ -18,6 +18,46 @@
             --font-family: 'Helvetica', 'Arial', sans-serif;
         }
 
+        /* ------------------------------------------- */
+        /* --- 0. LOADER STYLING & ANIMATION --- */
+        /* ------------------------------------------- */
+        #loader-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary); /* Full green background */
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Always on top */
+            opacity: 1;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+
+        .loader-logo {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0; /* Starts hidden, revealed by JS */
+            animation: fadeInZoom 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .loader-logo .share-text { color: var(--dark); display: block; }
+        .loader-logo .feed-text { color: var(--white); display: block; }
+
+        @keyframes fadeInZoom {
+            0% { opacity: 0; transform: scale(0.8); }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; transform: scale(1.05); } /* Gentle pulse before fade */
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* ------------------------------------------- */
+        /* --- GLOBAL STYLING (Hidden initially) --- */
+        /* ------------------------------------------- */
         body {
             font-family: var(--font-family);
             margin: 0;
@@ -26,160 +66,79 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            opacity: 0; /* Page content starts invisible */
+            transition: opacity 0.5s;
+        }
+        body.loaded {
+            opacity: 1; /* Revealed after loader fades */
         }
         a { text-decoration: none; color: inherit; }
-
-        /* --- Global Styles for Main Content Padding --- */
-        main {
-            flex-grow: 1; /* Ensures main content fills vertical space */
-            padding: 20px 0;
-        }
+        main { flex-grow: 1; padding: 20px 0; }
 
         /* ------------------------------------------- */
-        /* --- 1. NAVIGATION BAR STYLING --- */
+        /* --- 1. NAVIGATION BAR STYLING (Same as before) --- */
         /* ------------------------------------------- */
         #navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background-color: var(--neutral);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; background-color: var(--neutral);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .logo-container { font-size: 1.5em; font-weight: bold; }
         .logo-share { color: var(--dark); }
         .logo-feed { color: var(--primary); }
 
-        .nav-links-container {
-            display: flex;
-            align-items: center;
-        }
+        .nav-links-container { display: flex; align-items: center; }
         .nav-link {
-            padding: 8px 15px;
-            color: var(--dark);
-            font-weight: 500;
-            transition: color 0.3s, background-color 0.3s;
+            padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s;
         }
-        .nav-link:hover {
-            color: var(--secondary);
-        }
+        .nav-link:hover { color: var(--secondary); }
 
         .cta-button {
-            background-color: var(--primary);
-            color: white;
-            border-radius: 4px;
-            margin-left: 15px;
-            padding: 10px 20px;
-            font-weight: bold;
+            background-color: var(--primary); color: white; border-radius: 4px;
+            margin-left: 15px; padding: 10px 20px; font-weight: bold;
         }
-        .cta-button:hover {
-            background-color: var(--secondary);
-            color: white;
-        }
+        .cta-button:hover { background-color: var(--secondary); color: white; }
 
-        .staff-login {
-            margin-left: 10px;
-            font-weight: bold;
-        }
+        .staff-login { margin-left: 10px; font-weight: bold; }
         .hamburger {
-            display: none; /* Hidden by default on desktop */
-            font-size: 1.8em;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--dark);
-            z-index: 1001; /* Ensure it's above the menu */
+            display: none; font-size: 1.8em; background: none; border: none;
+            cursor: pointer; color: var(--dark); z-index: 1001;
         }
 
-        /* --- Mobile Nav Responsiveness (Max width 768px) --- */
         @media (max-width: 768px) {
-            #navbar {
-                padding: 10px 20px;
-            }
+            #navbar { padding: 10px 20px; }
             .nav-links-container {
-                position: absolute;
-                top: 60px; 
-                left: 0;
-                width: 100%;
-                flex-direction: column;
-                background-color: var(--neutral);
-                border-top: 1px solid #ccc;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                display: none; 
-                z-index: 999;
+                position: absolute; top: 60px; left: 0; width: 100%;
+                flex-direction: column; background-color: var(--neutral);
+                border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                display: none; z-index: 999;
             }
-            
-            .nav-links-container.open {
-                display: flex; 
-            }
-
-            .nav-link {
-                width: 100%;
-                text-align: center;
-                padding: 15px 0;
-                border-bottom: 1px solid #eee;
-            }
-            
-            .cta-button, .staff-login {
-                margin: 10px 0;
-                border-radius: 0;
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            .hamburger {
-                display: block; 
-            }
+            .nav-links-container.open { display: flex; }
+            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
+            .hamburger { display: block; }
         }
 
         /* ------------------------------------------- */
-        /* --- 2. HOME HERO SECTION STYLING --- */
+        /* --- 2. HOME HERO SECTION STYLING (Same as before) --- */
         /* ------------------------------------------- */
         .hero-section {
-            padding: 80px 30px;
-            text-align: left;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 80px 30px; text-align: left; max-width: 1200px; margin: 0 auto;
         }
-
-        .hero-headline h1 {
-            font-size: 4em;
-            line-height: 1.1;
-            margin: 0 0 20px 0;
-        }
-        
+        .hero-headline h1 { font-size: 4em; line-height: 1.1; margin: 0 0 20px 0; }
         .hero-headline .share { color: var(--dark); }
         .hero-headline .feed { color: var(--primary); }
         .hero-headline .seychelles { color: var(--secondary); }
-
-        .hero-body {
-            font-size: 1.3em;
-            color: #555;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
+        .hero-body { font-size: 1.3em; color: #555; margin-bottom: 30px; max-width: 600px; }
 
         .hero-cta-buttons a {
-            padding: 15px 30px;
-            margin-right: 15px;
-            border-radius: 6px;
-            font-weight: bold;
-            display: inline-block;
-            transition: opacity 0.3s;
+            padding: 15px 30px; margin-right: 15px; border-radius: 6px;
+            font-weight: bold; display: inline-block; transition: opacity 0.3s;
         }
-
         .hero-cta-buttons a:hover { opacity: 0.8; }
-
-        .find-food-btn {
-            background-color: var(--secondary);
-            color: white;
-        }
-
+        .find-food-btn { background-color: var(--secondary); color: white; }
         .donate-food-btn {
-            background-color: #E8F5E9; /* Lightest green background */
-            color: var(--secondary);
-            border: 1px solid var(--secondary);
+            background-color: #E8F5E9; color: var(--secondary); border: 1px solid var(--secondary);
         }
 
         @media (max-width: 600px) {
@@ -191,77 +150,43 @@
         }
 
         /* ------------------------------------------- */
-        /* --- 3. FOOTER STYLING --- */
+        /* --- 3. FOOTER STYLING (Same as before) --- */
         /* ------------------------------------------- */
         #main-footer {
-            margin-top: auto; /* Pushes footer to the bottom */
-            background-color: var(--dark);
-            color: var(--neutral);
-            padding: 40px 30px 15px;
-            font-size: 0.9em;
+            margin-top: auto; background-color: var(--dark); color: var(--neutral);
+            padding: 40px 30px 15px; font-size: 0.9em;
         }
         .footer-content {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap; 
-            max-width: 1200px;
-            margin: 0 auto 20px;
+            display: flex; justify-content: space-between; flex-wrap: wrap; 
+            max-width: 1200px; margin: 0 auto 20px;
         }
-        .footer-section {
-            width: 23%; 
-            margin-bottom: 20px;
-        }
-
-        .footer-section h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .footer-section p, .footer-section li {
-            margin: 5px 0;
-        }
-        .footer-section a {
-            color: var(--neutral);
-            transition: color 0.3s;
-        }
-        .footer-section a:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-        .footer-section ul {
-            list-style: none;
-            padding: 0;
-        }
+        .footer-section { width: 23%; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
+        .footer-section p, .footer-section li { margin: 5px 0; }
+        .footer-section a { color: var(--neutral); transition: color 0.3s; }
+        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
+        .footer-section ul { list-style: none; padding: 0; }
 
         .footer-bottom {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-            padding-top: 15px;
-            border-top: 1px solid #444;
-            color: #999;
+            max-width: 1200px; margin: 0 auto; text-align: center;
+            padding-top: 15px; border-top: 1px solid #444; color: #999;
         }
 
-        /* --- Mobile Footer Responsiveness --- */
         @media (max-width: 600px) {
-            .footer-content {
-                flex-direction: column;
-                padding: 0 20px;
-            }
-            .footer-section {
-                width: 100%; 
-                text-align: center;
-                border-bottom: 1px solid #333;
-                padding-bottom: 15px;
-            }
-            .footer-section:last-child {
-                border-bottom: none;
-            }
+            .footer-content { flex-direction: column; padding: 0 20px; }
+            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
+            .footer-section:last-child { border-bottom: none; }
         }
     </style>
 </head>
 <body>
+
+    <div id="loader-screen">
+        <div class="loader-logo">
+            <span class="share-text">SHARE FOOD.</span>
+            <span class="feed-text">FEED SEYCHELLES.</span>
+        </div>
+    </div>
 
     <header id="navbar">
         <div class="logo-container">
@@ -275,12 +200,12 @@
         
         <nav class="nav-links-container" id="nav-menu">
             <a href="/" class="nav-link">Home</a>
-            <a href="/about.html" class="nav-link">About Us</a>
-            <a href="/food/available.html" class="nav-link">Available Food</a>
-            <a href="/donate.html" class="nav-link cta-button">Donate Food</a>
-            <a href="/learn.html" class="nav-link">Learn</a>
-            <a href="/volunteer.html" class="nav-link">Volunteer Now</a>
-            <a href="/foodshare-seychelles/staff-login.html" class="nav-link staff-login">Staff Login</a>
+            <a href="/about" class="nav-link">About Us</a>
+            <a href="/available-food" class="nav-link">Available Food</a>
+            <a href="/donate" class="nav-link cta-button">Donate Food</a>
+            <a href="/learn" class="nav-link">Learn</a>
+            <a href="/volunteer" class="nav-link">Volunteer Now</a>
+            <a href="/staff" class="nav-link staff-login">Staff Login</a>
         </nav>
     </header>
 
@@ -300,12 +225,11 @@
             </p>
             
             <div class="hero-cta-buttons">
-                <a href="/food/available.html" class="find-food-btn">Find Food</a>
-                <a href="/donate.html" class="donate-food-btn">Donate Food</a>
+                <a href="/available-food" class="find-food-btn">Find Food</a>
+                <a href="/donate" class="donate-food-btn">Donate Food</a>
             </div>
         </section>
-
-        </main>
+    </main>
 
     <footer id="main-footer">
         <div class="footer-content">
@@ -317,10 +241,10 @@
             <div class="footer-section links">
                 <h3>Quick Links</h3>
                 <ul>
-                    <li><a href="/about.html">About Us</a></li>
-                    <li><a href="/food/available.html">Available Food</a></li>
-                    <li><a href="/volunteer.html">Volunteer Now</a></li>
-                    <li><a href="/donate.html">Donate Food</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/available-food">Available Food</a></li>
+                    <li><a href="/volunteer">Volunteer Now</a></li>
+                    <li><a href="/donate">Donate Food</a></li>
                 </ul>
             </div>
             
@@ -333,8 +257,8 @@
             <div class="footer-section legal">
                 <h3>Legal</h3>
                 <ul>
-                    <li><a href="/privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="/terms.html">Terms of Use</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a href="/terms">Terms of Use</a></li>
                 </ul>
             </div>
         </div>
@@ -345,6 +269,27 @@
     </footer>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader-screen');
+            const body = document.body;
+            
+            // Set the delay in milliseconds (5 seconds = 5000ms)
+            const delayTime = 5000; 
+
+            setTimeout(() => {
+                // 1. Fade out the loader
+                loader.style.opacity = '0'; 
+
+                // 2. After the fade-out transition completes (0.5s), hide loader and show content
+                setTimeout(() => {
+                    loader.style.display = 'none'; 
+                    body.classList.add('loaded');
+                }, 500); 
+
+            }, delayTime);
+        });
+
+        // JavaScript for mobile navigation toggle (re-integrated)
         document.getElementById('hamburger-btn').addEventListener('click', function() {
             const navMenu = document.getElementById('nav-menu');
             navMenu.classList.toggle('open');
