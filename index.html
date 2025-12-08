@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodshare Seychelles - Coming Soon</title>
+    <style>
+        /* Theme Variables */
+        :root {
+            --primary: #4CAF50; /* Vibrant Green */
+            --secondary: #388E3C; /* Darker Green */
+            --neutral: #F5F5F5; /* Light Grey */
+            --dark: #212121; /* Dark Text */
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+
+        /* --- Global Styling --- */
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--neutral);
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        /* --- Loader Screen Styling --- */
+        #loader-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Main Content Styling (After Load) --- */
+        #main-content {
+            display: none; /* Hidden by default */
+            flex-grow: 1;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .message-container {
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-container h2 {
+            color: var(--secondary);
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .message-container p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        /* --- Footer Styling --- */
+        footer {
+            background-color: var(--dark);
+            color: var(--neutral);
+            padding: 15px 20px;
+            font-size: 0.9em;
+            margin-top: auto; /* Pushes footer to the bottom */
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader-screen">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <h1>Foodshare Seychelles</h1>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <main id="main-content">
+        <div class="message-container">
+            <h2>Website Under Development</h2>
+            <p>
+                Thank you for visiting Foodshare Seychelles. Our official website is currently being built to serve you better.
+            </p>
+            <p>
+                **Please visit back soon!** We sincerely apologize for any inconvenience caused.
+            </p>
+            <p style="margin-top: 30px; font-style: italic; color: #666;">
+                *Your patience and support are greatly appreciated.*
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        <p>
+            &copy; 2025 Foodshare Seychelles. All rights reserved.
+        </p>
+        <p>
+            For assistance, please contact the Lead Developer, Tyler Nicholas, at 
+            <a href="mailto:tyler@tylernicholasgroup.com">tyler@tylernicholasgroup.com</a>.
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loader = document.getElementById('loader-screen');
+            const mainContent = document.getElementById('main-content');
+            
+            // Set the delay in milliseconds (5 seconds = 5000ms)
+            const delayTime = 5000; 
+
+            setTimeout(() => {
+                // Fade out the loader
+                loader.style.opacity = '0'; 
+
+                // Wait for the fade-out transition to complete (0.5s)
+                setTimeout(() => {
+                    loader.style.display = 'none'; // Hide the loader
+                    mainContent.style.display = 'flex'; // Show the main content
+                }, 500); 
+
+            }, delayTime);
+        });
+    </script>
+
+</body>
+</html>
