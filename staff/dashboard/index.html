@@ -10,10 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START STAFF DASHBOARD CSS BLOCK] */
+        /* [START STAFF DASHBOARD CSS BLOCK] - Added accent-orange for status */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; /* Defined accent-orange */
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -41,8 +41,10 @@
         .section-header { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
         .task-list { list-style: none; padding: 0; }
         .task-list li { background-color: var(--neutral-card); padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid var(--accent-blue); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
-        .task-list .status-new { border-left-color: var(--accent-orange); }
-        .task-list .status-complete { border-left-color: var(--primary-main); opacity: 0.8; }
+        /* Ensure accent-orange is used here - it was missing from :root in your original staff CSS */
+        .task-list .status-new { border-left-color: var(--accent-orange); } 
+        .task-list .status-pending { border-left-color: var(--accent-blue); }
+        .task-list .status-completed { border-left-color: var(--primary-main); opacity: 0.8; }
         .task-title { font-weight: bold; margin-bottom: 5px; }
         .task-meta { font-size: 0.9em; color: var(--text-light); }
         /* [END STAFF DASHBOARD CSS BLOCK] */
@@ -76,13 +78,15 @@
                 return;
             }
             
-            if (profile.role_id === 1) { // Admin redirect fix
-                alert('Redirecting you to the Admin Dashboard...');
+            // REDIRECT STAFF TO ADMIN DASHBOARD IF THEY ARE ADMIN (role_id=1)
+            if (profile.role_id === 1) { 
+                // Removed the redundant alert here as the login page already handles this redirect.
                 window.location.href = '/admin-dashboard/';
                 return;
             }
 
-            if (profile.role_id !== 2) { // Only Staff (role_id=2) proceeds
+            // ONLY Staff (role_id=2) proceeds. Deny others (e.g., role_id=3, etc.)
+            if (profile.role_id !== 2) { 
                 alert('Authorization Failed: You do not have Staff privileges. Redirecting to Staff Login.');
                 await supabase.auth.signOut();
                 window.location.href = '/staff-login/';
@@ -96,7 +100,6 @@
 
         async function fetchStaffMetrics(staffId) {
             // Placeholder function to fetch staff-specific metrics
-            // (e.g., Number of pickups assigned, number of completed pickups)
             document.getElementById('assignedTasks').textContent = '12'; 
             document.getElementById('completedTasks').textContent = '5';
             document.getElementById('nextPickup').textContent = 'Beau Vallon (10:00 AM)';
@@ -115,7 +118,8 @@
 
             mockTasks.forEach(task => {
                 const li = document.createElement('li');
-                li.className = `status-${task.status.toLowerCase()}`;
+                // Ensure status is correctly converted to lowercase for CSS class
+                li.className = `status-${task.status.toLowerCase()}`; 
                 li.innerHTML = `
                     <div class="task-title">${task.title}</div>
                     <div class="task-meta">Location: ${task.location} | Time: ${task.time}</div>
@@ -140,9 +144,7 @@
         <h2><i class="fas fa-user-shield"></i> Staff Panel</h2>
         <nav class="sidebar-nav">
             <a href="/staff-dashboard/" class="active"><i class="fas fa-home"></i> My Dashboard</a>
-            <a href="#"><i class="fas fa-list-check"></i> My Assigned Tasks</a>
-            <a href="#"><i class="fas fa-clipboard-list"></i> Log Food Pickups</a>
-            <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="/staff/tasks"><i class="fas fa-list-check"></i> My Assigned Tasks</a> <a href="/staff/log-pickup"><i class="fas fa-clipboard-list"></i> Log Food Pickups</a> <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
