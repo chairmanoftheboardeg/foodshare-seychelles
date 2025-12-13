@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - FoodShare Seychelles</title>
-    
-    <link rel="icon" href="../image/logo.png" type="image/png">
-    
+    <link rel="icon" href="/image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ======================================================= */
-        /* 0. THEME VARIABLES & BASE STYLES */
-        /* ======================================================= */
+        /* [START STANDARD CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --accent-blue: #2196F3; --accent-orange: #FF9800;
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -28,71 +25,18 @@
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 1000px; margin: 0 auto; padding: 0 25px; }
 
-        /* ======================================================= */
-        /* 1. NAVIGATION BAR (Standard) */
-        /* ======================================================= */
-        #navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 25px; background-color: var(--neutral-card);
-            box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
-        }
+        /* NAVIGATION BAR */
+        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; } 
         .nav-links-container { display: flex; gap: 30px; align-items: center; }
         .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
         .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
         .nav-link:hover::after { width: 100%; }
-        .cta-button {
-            background-color: var(--primary-main); color: var(--neutral-card);
-            border-radius: 50px; padding: 10px 25px; font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color var(--transition-speed), transform 0.2s;
-        }
+        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
-        /* ======================================================= */
-        /* 2. ABOUT US CONTENT STYLING */
-        /* ======================================================= */
-        .section {
-            background-color: var(--neutral-card);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-subtle);
-            margin-bottom: 30px;
-        }
-        .section h2 { margin-bottom: 25px; color: var(--primary-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
-        
-        .mission-vision { display: flex; gap: 30px; margin-top: 20px; }
-        .mission-vision div { flex: 1; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
-        .mission-vision h3 { margin-top: 0; color: #2196F3; }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .team-member {
-            text-align: center;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: var(--neutral-bg);
-            border: 1px solid #ddd;
-        }
-        .team-member img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid var(--primary-main);
-        }
-        .team-member h4 { margin: 5px 0; font-size: 1.1em; }
-        .team-member p { color: var(--text-light); font-size: 0.9em; }
-
-        /* ======================================================= */
-        /* 3. FOOTER STYLING (Standard) */
-        /* ======================================================= */
+        /* FOOTER STYLING */
         #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
         .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
         .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
@@ -100,23 +44,35 @@
         .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
         .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+
+        /* About Us Specific Styles */
+        .section { background-color: var(--neutral-card); padding: 40px; border-radius: 12px; box-shadow: var(--shadow-subtle); margin-bottom: 30px; border-top: 5px solid var(--primary-main); }
+        .section h2 { margin-bottom: 25px; color: var(--primary-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
+        .mission-vision { display: flex; gap: 30px; margin-top: 20px; }
+        .mission-vision div { flex: 1; padding: 20px; border-radius: 8px; border: 1px solid #eee; }
+        .mission-vision h3 { margin-top: 0; color: var(--accent-blue); }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .team-member { text-align: center; padding: 15px; border-radius: 8px; background-color: var(--neutral-bg); border: 1px solid #ddd; }
+        .team-member img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--primary-main); }
+        .team-member h4 { margin: 5px 0; font-size: 1.1em; }
+        .team-member p { color: var(--text-light); font-size: 0.9em; }
+        /* [END STANDARD CSS BLOCK] */
     </style>
-    </head>
+</head>
 <body>
     <header id="navbar">
-        <a href="../index/index.html" class="logo-container">
-            <img src="../image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+        <a href="/" class="logo-container">
+            <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
             FoodShare <span style="color: var(--primary-main);">Seychelles</span>
         </a>
-
         <nav class="nav-links-container" id="navLinks">
-            <a href="../available-food/index.html" class="nav-link">Find Food</a>
-            <a href="../donate-food/index.html" class="nav-link">Donate</a>
-            <a href="../volunteer/index.html" class="nav-link">Volunteer</a>
-            <a href="../impact/index.html" class="nav-link">Impact</a>
-            <a href="../about/index.html" class="nav-link">About Us</a>
-            <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
-            <a href="../staff-login/index.html" class="staff-login nav-link">Staff Login</a>
+            <a href="/available-food/" class="nav-link">Find Food</a>
+            <a href="/donate-food/" class="nav-link">Donate</a>
+            <a href="/volunteer/" class="nav-link">Volunteer</a>
+            <a href="/impact/" class="nav-link">Impact</a>
+            <a href="/about/" class="nav-link">About Us</a>
+            <a href="/donate-food/" class="cta-button">DONATE NOW</a> 
+            <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
         </nav>
     </header>
 
@@ -129,7 +85,7 @@
 
             <div class="section">
                 <h2>Our Story & Purpose</h2>
-                <p>Founded in 2024, FoodShare Seychelles emerged from the urgent need to bridge the gap between perfectly good, surplus food and the communities experiencing food insecurity. We operate a streamlined logistics network dedicated to rescuing food from restaurants, farms, and markets before it goes to waste.</p>
+                <p>Founded in 2025, FoodShare Seychelles emerged from the urgent need to bridge the gap between perfectly good, surplus food and the communities experiencing food insecurity. We operate a streamlined logistics network dedicated to rescuing food from restaurants, farms, and markets before it goes to waste.</p>
                 <div class="mission-vision">
                     <div>
                         <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
@@ -142,40 +98,42 @@
                 </div>
             </div>
 
-            <div class="section">
+            <div class="section" style="border-top-color: var(--accent-orange);">
                 <h2>Meet the Team</h2>
                 <p>We are a dedicated group of staff and volunteers passionate about making a difference. Our core team manages the logistics, technology, and community outreach.</p>
                 <div class="team-grid">
                     <div class="team-member">
-                        <img src="../image/setta-alicindor.png" alt="CEO Placeholder">
-                        <h4>Rossetta Alcindor</h4>
-                        <p>Founder & Administrator</p>
+                        <img src="/image/placeholder-ceo.jpg" alt="CEO Placeholder">
+                        <h4>Aisha Lablache</h4>
+                        <p>Executive Director</p>
                     </div>
                     <div class="team-member">
-                        <img src="../image/tyler-nicholas.png" alt="Logistics Manager Placeholder">
-                        <h4>Tyler Nicholas</h4>
-                        <p>Technical Coordinator & Volunteer Coordinator</p>
+                        <img src="/image/placeholder-logistics.jpg" alt="Logistics Manager Placeholder">
+                        <h4>Jean-Paul Pierre</h4>
+                        <p>Logistics Manager</p>
                     </div>
                     <div class="team-member">
-                        <img src="../image/bertrand-tirant.png" alt="Volunteer Coordinator Placeholder">
-                        <h4>Bertrant Tirant</h4>
-                        <p>Volunteer Member</p>
-                    </div>    
+                        <img src="/image/placeholder-volunteer.jpg" alt="Volunteer Coordinator Placeholder">
+                        <h4>Marie-Claire Savy</h4>
+                        <p>Volunteer Coordinator</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="/image/placeholder-admin.jpg" alt="Admin Staff Placeholder">
+                        <h4>David Faure</h4>
+                        <p>Administrative Staff</p>
+                    </div>
                 </div>
             </div>
 
-            <div class="section" style="text-align: center; border-left: 5px solid #2196F3;">
+            <div class="section" style="text-align: center; border-top-color: var(--primary-main);">
                 <h2>How You Can Help</h2>
-                <p>We rely on community support to keep our operations running.</p>
+                <p>We rely on community support to keep our operations running. Join the movement!</p>
                 <div style="display: flex; justify-content: center; gap: 30px; margin-top: 20px;">
-                    <a href="../donate-food/index.html" class="cta-button" style="background-color: #FF9800;">
+                    <a href="/donate-food/" class="cta-button" style="background-color: var(--accent-orange);">
                         <i class="fas fa-hand-holding-usd"></i> Donate Food
                     </a>
-                    <a href="../volunteer/index.html" class="cta-button" style="background-color: #2196F3;">
+                    <a href="/volunteer/" class="cta-button" style="background-color: var(--accent-blue);">
                         <i class="fas fa-users"></i> Become a Volunteer
-                    </a>
-                    <a href="../donate-now/index.html" class="cta-button">
-                        <i class="fas fa-money-check-alt"></i> Financial Donation
                     </a>
                 </div>
             </div>
@@ -184,10 +142,14 @@
 
     <footer id="main-footer">
         <div class="content-container footer-content">
-            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="../available-food/index.html">Find Food</a></li><li><a href="../donate-food/index.html">Donate Food</a></li><li><a href="../volunteer/index.html">Volunteer</a></li><li><a href="../impact/index.html">Impact & Reports</a></li><li><a href="../contact-general/index.html">General Contact</a></li></ul></div>
-            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="../about/index.html">About FoodShare</a></li><li><a href="../our-partners/index.html">Our Partners</a></li><li><a href="../learn/safety.html">Food Safety Protocol</a></li><li><a href="../learn/faq.html">General FAQ</a></li></ul></div>
-            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="../privacy-policy/index.html">Privacy Policy</a></li><li><a href="../terms-of-use/index.html">Terms of Use</a></li><li><a href="../sitemap/index.html">Site Structure</a></li><li><a href="../staff-login/index.html">Staff Login</a></li></ul></div>
-            <div class="footer-section"><h3>Get In Touch</h3><p>Email: admin@foodshare-seychelles.online</p><p>Phone: [Your Contact Number]</p><p>Follow us on <a href="../social/index.html">Social Media</a></p></div>
+            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+            <div class="footer-section">
+                <h3>Get In Touch</h3>
+                <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+                <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
+            </div>
         </div>
         <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
     </footer>
