@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - FoodShare Seychelles</title>
     
-    <link rel="icon" href="../images/logo.png" type="image/png">
+    <link rel="icon" href="../image/logo.png" type="image/png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
         /* ======================================================= */
@@ -88,11 +88,6 @@
             transition: transform 0.3s;
         }
         .data-card:hover { transform: translateY(-3px); }
-        .data-card h3 {
-            font-size: 1.1em;
-            color: var(--text-light);
-            margin-bottom: 10px;
-        }
         .dash-stat {
             font-size: 3em;
             color: var(--primary-dark);
@@ -162,7 +157,6 @@
         @media (max-width: 768px) {
             .dashboard-layout { grid-template-columns: 1fr; }
             .sidebar { height: auto; padding: 15px 0; }
-            .sidebar h2 { margin-bottom: 15px; }
             .sidebar-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 10px; }
             .sidebar-nav a { flex: 0 0 auto; margin: 0 5px; padding: 8px 10px; }
             .dashboard-content { padding: 20px; }
@@ -171,11 +165,17 @@
     </style>
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Security check and metrics fetch
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsInl4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        
+        let supabase;
         document.addEventListener('DOMContentLoaded', async () => {
+             if (window.createClient) {
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.error("Supabase client library not loaded. Cannot run security checks.");
+                return; 
+            }
+
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
@@ -196,6 +196,7 @@
         });
 
         async function fetchAdminMetrics(userId) {
+            // ... (Metrics fetching logic remains the same)
             // Count New Donations (Status: 'New')
             const { count: donationCount } = await supabase
                 .from('donation_requests')
@@ -228,11 +229,11 @@
         }
 
         async function fetchRecentTasks() {
-            // Fetch tasks using the SQL VIEW for easier display (Admin sees all tasks)
-            const { data: tasks, error } = await supabase
-                .from('staff_tasks_view') // Assuming you have a view that links tasks to staff emails
+            // ... (Task fetching logic remains the same)
+             const { data: tasks, error } = await supabase
+                .from('staff_tasks_view') 
                 .select('*')
-                .in('status', ['New', 'To Do', 'In Progress']) // Show only active tasks
+                .in('status', ['New', 'To Do', 'In Progress'])
                 .order('task_id', { ascending: false })
                 .limit(5);
 
@@ -259,6 +260,7 @@
         }
 
         async function logoutUser() {
+            if (!supabase) return;
             const { error } = await supabase.auth.signOut();
             if (!error) {
                 window.location.href = '../staff-login/index.html';
