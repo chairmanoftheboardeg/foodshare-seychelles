@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food - FoodShare Seychelles</title>
+    
+    <link rel="icon" href="../image/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <style>
+        /* ======================================================= */
+        /* 0. THEME VARIABLES & BASE STYLES */
+        /* ======================================================= */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        main { flex-grow: 1; padding: 40px 0; }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+        .content-container { max-width: 1000px; margin: 0 auto; padding: 0 25px; }
+
+        /* ======================================================= */
+        /* 1. NAVIGATION BAR */
+        /* ======================================================= */
+        #navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 25px; background-color: var(--neutral-card);
+            box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; } 
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+        .nav-link:hover::after { width: 100%; }
+        .cta-button {
+            background-color: var(--primary-main); color: var(--neutral-card);
+            border-radius: 50px; padding: 10px 25px; font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color var(--transition-speed), transform 0.2s;
+        }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .hamburger { display: none; }
+        
+        @media (max-width: 992px) {
+            /* Mobile styles for nav menu (omitted for brevity, assume responsive structure) */
+        }
+        
+        /* ======================================================= */
+        /* 2. DONATION FORM STYLING */
+        /* ======================================================= */
+        .form-container {
+            background-color: var(--neutral-card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+            margin-top: 30px;
+            border-top: 5px solid var(--primary-main);
+        }
+
+        .form-section { margin-bottom: 30px; padding: 20px; border: 1px dashed #eee; border-radius: 8px; }
+        .form-section h3 { margin-top: 0; margin-bottom: 20px; color: var(--primary-dark); }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
+        .form-group input[type="text"], 
+        .form-group input[type="email"], 
+        .form-group input[type="tel"], 
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px;
+            box-sizing: border-box; 
+            font-size: 1em; 
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); outline: none; box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); }
+        .form-group textarea { min-height: 120px; resize: vertical; }
+
+        .form-actions { text-align: center; margin-top: 30px; }
+        .submit-button {
+            padding: 15px 40px; 
+            background-color: var(--primary-main);
+            color: var(--neutral-card); 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 1.1em;
+            cursor: pointer; 
+            transition: background-color 0.3s, transform 0.2s; 
+            font-weight: bold;
+        }
+        .submit-button:hover:not(:disabled) { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .submit-button:disabled { background-color: #A5D6A7; cursor: not-allowed; }
+
+        .alert-message {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            text-align: left;
+        }
+        .alert-error { background-color: #FFCDD2; color: #C62828; border: 1px solid #E57373; }
+        .alert-success { background-color: #C8E6C9; color: #2E7D32; border: 1px solid #66BB6A; }
+
+        /* ======================================================= */
+        /* 3. FOOTER STYLING (Same as other pages) */
+        /* ======================================================= */
+        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+    </style>
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        
+        let supabase;
+        document.addEventListener('DOMContentLoaded', () => {
+             const messageEl = document.getElementById('formMessage');
+             const submitButton = document.getElementById('submitDonation');
+             const form = document.getElementById('donationForm');
+             
+             // Initialize Supabase Client
+             if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                messageEl.textContent = 'ERROR: Core services failed to load. Please check your network connection.';
+                messageEl.className = 'alert-message alert-error';
+                messageEl.style.display = 'block';
+                submitButton.disabled = true;
+                return;
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitButton.disabled = true;
+                messageEl.style.display = 'none';
+
+                // Collect Form Data
+                const donationData = {
+                    donor_name: document.getElementById('donorName').value,
+                    donor_email: document.getElementById('donorEmail').value,
+                    donor_phone: document.getElementById('donorPhone').value,
+                    organization_name: document.getElementById('organizationName').value,
+                    food_type: document.getElementById('foodType').value,
+                    quantity_kg: parseFloat(document.getElementById('quantityKg').value) || 0,
+                    expiration_date: document.getElementById('expDate').value,
+                    notes: document.getElementById('notes').value,
+                    // Set default status for new submissions
+                    status: 'New', 
+                    // Optional: You might want to automatically set a location ID here based on an input
+                };
+
+                // Validate critical fields
+                if (donationData.food_type === '' || donationData.quantity_kg <= 0) {
+                     messageEl.textContent = 'Please specify the food type and a valid quantity.';
+                     messageEl.className = 'alert-message alert-error';
+                     messageEl.style.display = 'block';
+                     submitButton.disabled = false;
+                     return;
+                }
+
+                // Insert data into the 'donation_requests' table
+                const { error } = await supabase
+                    .from('donation_requests')
+                    .insert([donationData]);
+
+                if (error) {
+                    messageEl.textContent = `Submission Failed: ${error.message}. Please try again or contact us directly.`;
+                    messageEl.className = 'alert-message alert-error';
+                    messageEl.style.display = 'block';
+                } else {
+                    messageEl.textContent = 'Thank you! Your donation request has been successfully submitted. Our logistics team will contact you shortly.';
+                    messageEl.className = 'alert-message alert-success';
+                    messageEl.style.display = 'block';
+                    form.reset(); // Clear the form on success
+                }
+
+                submitButton.disabled = false;
+            });
+        });
+        
+    </script>
+</head>
+<body>
+    <header id="navbar">
+        <a href="../index/index.html" class="logo-container">
+            <img src="../image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+        </a>
+
+        <nav class="nav-links-container" id="navLinks">
+            <a href="../available-food/index.html" class="nav-link">Find Food</a>
+            <a href="../donate-food/index.html" class="nav-link">Donate</a>
+            <a href="../volunteer/index.html" class="nav-link">Volunteer</a>
+            <a href="../impact/index.html" class="nav-link">Impact</a>
+            <a href="../about/index.html" class="nav-link">About Us</a>
+            <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
+            <a href="../staff-login/index.html" class="staff-login nav-link">Staff Login</a>
+        </nav>
+        <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    </header>
+
+    <main>
+        <div class="content-container">
+            <header style="text-align: center; margin-bottom: 40px;">
+                <h1>Share Your Surplus Food</h1>
+                <p>Help us fight waste! Use the form below to register food items you wish to donate.</p>
+                <div id="formMessage" class="alert-message"></div>
+            </header>
+
+            <div class="form-container">
+                <form id="donationForm">
+                    
+                    <div class="form-section">
+                        <h3>1. Donor Contact Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="donorName">Your Name/Contact Person *</label>
+                                <input type="text" id="donorName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="organizationName">Organization Name (If Applicable)</label>
+                                <input type="text" id="organizationName">
+                            </div>
+                            <div class="form-group">
+                                <label for="donorEmail">Email *</label>
+                                <input type="email" id="donorEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="donorPhone">Phone Number *</label>
+                                <input type="tel" id="donorPhone" required placeholder="+248 xxxxxxx">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>2. Donation Details</h3>
+                        <div class="form-grid">
+                             <div class="form-group">
+                                <label for="foodType">Type of Food *</label>
+                                <select id="foodType" required>
+                                    <option value="">Select Category</option>
+                                    <option value="produce">Fresh Produce (Fruits/Veggies)</option>
+                                    <option value="dairy">Dairy/Refrigerated Goods</option>
+                                    <option value="baked">Baked Goods/Bread</option>
+                                    <option value="canned">Canned/Non-Perishable</option>
+                                    <option value="prepared">Prepared/Cooked Food (Must meet safety rules)</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="quantityKg">Estimated Quantity (Kgs) *</label>
+                                <input type="number" id="quantityKg" step="0.5" min="0.5" required placeholder="e.g., 50">
+                            </div>
+                            <div class="form-group">
+                                <label for="expDate">Best Before/Expiration Date (or latest pickup date)</label>
+                                <input type="date" id="expDate">
+                            </div>
+                             <div class="form-group">
+                                <label for="location">Pickup Location (Island/Area)</label>
+                                <input type="text" id="location" required placeholder="e.g., Mahe, Victoria">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="notes">Special Instructions / Description (e.g., requires refrigeration, 5 crates of mangoes)</label>
+                            <textarea id="notes"></textarea>
+                        </div>
+                    </div>
+                    
+                    <p style="text-align: center; margin-bottom: 20px; font-size: 0.9em;"><i class="fas fa-exclamation-triangle" style="color: #FF9800;"></i> Note: All food items must adhere to our food safety guidelines. Our team will verify and arrange pickup.</p>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="submit-button" id="submitDonation">
+                            <i class="fas fa-upload"></i> Submit Donation Request
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="content-container footer-content">
+            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="../available-food/index.html">Find Food</a></li><li><a href="../donate-food/index.html">Donate Food</a></li><li><a href="../volunteer/index.html">Volunteer</a></li><li><a href="../impact/index.html">Impact & Reports</a></li><li><a href="../contact-general/index.html">General Contact</a></li></ul></div>
+            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="../about/index.html">About FoodShare</a></li><li><a href="../our-partners/index.html">Our Partners</a></li><li><a href="../learn/safety.html">Food Safety Protocol</a></li><li><a href="../learn/faq.html">General FAQ</a></li></ul></div>
+            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="../privacy-policy/index.html">Privacy Policy</a></li><li><a href="../terms-of-use/index.html">Terms of Use</a></li><li><a href="../sitemap/index.html">Site Structure</a></li><li><a href="../staff-login/index.html">Staff Login</a></li></ul></div>
+            <div class="footer-section"><h3>Get In Touch</h3><p>Email: admin@foodshare-seychelles.online</p><p>Phone: [Your Contact Number]</p><p>Follow us on <a href="../social/index.html">Social Media</a></p></div>
+        </div>
+        <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+    </footer>
+</body>
+</html>
