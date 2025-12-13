@@ -3,288 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Login - Foodshare Seychelles</title>
-    
-    <link rel="icon" type="image/png" href="../image/logo.png">
-
-    <style>
-        /* Theme Variables */
-        :root {
-            --primary: #4CAF50; /* Vibrant Green */
-            --secondary: #388E3C; /* Darker Green */
-            --neutral: #F5F5F5; /* Light Grey */
-            --dark: #212121; /* Dark Text */
-            --white: #ffffff;
-            --font-family: 'Helvetica', 'Arial', sans-serif;
-        }
-
-        /* Base and Layout */
-        body {
-            font-family: var(--font-family); margin: 0; background-color: var(--neutral);
-            color: var(--dark); display: flex; flex-direction: column; min-height: 100vh;
-        }
-        a { text-decoration: none; color: inherit; }
-        main { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px; }
-
-        /* --- Login Box Styling --- */
-        .login-container {
-            background-color: var(--white);
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .login-container h1 {
-            color: var(--secondary);
-            font-size: 2em;
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #444;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-
-        .login-button {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 12px 25px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: background-color 0.2s;
-        }
-
-        .login-button:hover {
-            background-color: var(--secondary);
-        }
-
-        .forgot-password {
-            display: block;
-            margin-top: 15px;
-            color: #777;
-            font-size: 0.9em;
-        }
-        .forgot-password a {
-            color: var(--secondary);
-        }
-        
-        /* ------------------------------------------- */
-        /* --- NAVIGATION BAR STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 30px; background-color: var(--neutral);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .logo-container { font-size: 1.5em; font-weight: bold; }
-        .logo-share { color: var(--dark); }
-        .logo-feed { color: var(--primary); }
-        .nav-links-container { display: flex; align-items: center; }
-        .nav-link {
-            padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s;
-        }
-        .nav-link:hover { color: var(--secondary); }
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content {
-            display: none; position: absolute; background-color: var(--neutral);
-            min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;
-            top: 35px; left: 0; border-radius: 4px;
-        }
-        .dropdown-content a {
-            color: var(--dark); padding: 12px 16px; text-decoration: none;
-            display: block; text-align: left;
-        }
-        .dropdown-content a:hover { background-color: #ddd; color: var(--secondary); }
-        .dropdown:hover .dropdown-content { display: block; }
-        .cta-button {
-            background-color: var(--primary); color: white; border-radius: 4px;
-            margin-left: 15px; padding: 10px 20px; font-weight: bold;
-        }
-        .cta-button:hover { background-color: var(--secondary); color: white; }
-        .staff-login { margin-left: 10px; font-weight: bold; }
-        .hamburger {
-            display: none; font-size: 1.8em; background: none; border: none;
-            cursor: pointer; color: var(--dark); z-index: 1001;
-        }
-
-        @media (max-width: 768px) {
-            #navbar { padding: 10px 20px; }
-            .nav-links-container {
-                position: absolute; top: 60px; left: 0; width: 100%;
-                flex-direction: column; background-color: var(--neutral);
-                border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                display: none; z-index: 999;
-            }
-            .nav-links-container.open { display: flex; }
-            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
-            .hamburger { display: block; }
-            .dropdown { width: 100%; }
-            .dropdown-content { position: relative; width: 100%; top: 0; box-shadow: none; border-top: 1px solid #eee; }
-        }
-
-        /* ------------------------------------------- */
-        /* --- FOOTER STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #main-footer {
-            margin-top: auto; background-color: var(--dark); color: var(--neutral);
-            padding: 40px 30px 15px; font-size: 0.9em;
-        }
-        .footer-content {
-            display: flex; justify-content: space-between; flex-wrap: wrap; 
-            max-width: 1200px; margin: 0 auto 20px;
-        }
-        .footer-section { width: 23%; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
-        .footer-section p, .footer-section li { margin: 5px 0; }
-        .footer-section a { color: var(--neutral); transition: color 0.3s; }
-        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
-        .footer-section ul { list-style: none; padding: 0; }
-
-        .footer-bottom {
-            max-width: 1200px; margin: 0 auto; text-align: center;
-            padding-top: 15px; border-top: 1px solid #444; color: #999;
-            font-size: 0.8em;
-        }
-        .footer-credit a { color: var(--primary); }
-        .footer-credit a:hover { text-decoration: underline; }
-
-        @media (max-width: 600px) {
-            .footer-content { flex-direction: column; padding: 0 20px; }
-            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
-            .footer-section:last-child { border-bottom: none; }
-        }
-    </style>
+    <title>Staff Login - FoodShare Seychelles</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
     <header id="navbar">
-        <div class="logo-container">
-            <a href="/">
-                <span class="logo-share">Share Food.</span>
-                <span class="logo-feed">Feed Seychelles.</span>
-            </a>
-        </div>
-        
-        <button class="hamburger" aria-label="Toggle navigation" id="hamburger-btn">☰</button>
-        
-        <nav class="nav-links-container" id="nav-menu">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About Us</a>
-            <a href="/available-food" class="nav-link">Available Food</a>
-            <a href="/donate" class="nav-link cta-button">Donate Food</a>
-            <a href="/learn" class="nav-link">Learn</a>
+        <a href="index.html" class="logo-container">
+            <img src="Green and Black Modern Green Energy Logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+        </a>
+        <nav class="nav-links-container" id="navLinks">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="contact-general.html" class="nav-link">Contact</a>
             
-            <div class="dropdown">
-                <a href="#" class="nav-link">Volunteer</a>
-                <div class="dropdown-content">
-                    <a href="/volunteer">Volunteer Now</a>
-                    <a href="/volunteers">Our Volunteers</a>
-                </div>
+            <div class="search-container">
+                <input type="text" placeholder="Search the site..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
             </div>
             
-            <a href="/staff" class="nav-link staff-login">Staff Login</a>
+            <a href="donate-now.html" class="cta-button">DONATE NOW</a>
         </nav>
+        <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
     </header>
 
     <main>
-        <div class="login-container">
-            <h1>Staff & Volunteer Login</h1>
-            <p style="color: #666; margin-bottom: 30px;">Access the Foodshare Management Dashboard.</p>
+        <div class="content-container">
             
-            <form action="/dashboard" method="POST">
-                
-                <div class="form-group">
-                    <label for="username">Username / Email</label>
-                    <input type="text" id="username" name="username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                
-                <button type="submit" class="login-button">Log In</button>
-                
-                <p class="forgot-password">
-                    <a href="/reset-password">Forgot your password?</a>
-                </p>
-            </form>
+            <div class="page-header">
+                <h1>Staff Access Portal</h1>
+                <p>Login with your authorized FoodShare Seychelles email and password.</p>
+            </div>
+
+            <div class="form-card">
+                <div id="loginMessage" class="alert-banner" style="display: none;"></div>
+
+                <form id="staffLoginForm">
+                    <div class="form-group">
+                        <label for="email">Staff Email Address</label>
+                        <input type="email" id="email" required placeholder="name@foodshare-seychelles.org">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="• • • • • • • •">
+                    </div>
+
+                    <button type="submit" class="submit-button" id="loginButton">
+                        <i class="fas fa-sign-in-alt"></i> Secure Login
+                    </button>
+                    
+                    <p style="text-align: center; margin-top: 20px; font-size: 0.9em;">
+                        <a href="#" style="color: var(--primary-dark);">Forgot Password?</a>
+                    </p>
+                </form>
+            </div>
         </div>
     </main>
 
     <footer id="main-footer">
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Our Mission</h3>
-                <p>Connecting surplus food with those who need it across the Seychelles islands to eliminate food waste and nourish our community.</p>
-            </div>
-            
-            <div class="footer-section links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/available-food">Available Food</a></li>
-                    <li><a href="/volunteer">Volunteer Now</a></li>
-                    <li><a href="/donate">Donate Food</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section contact">
-                <h3>Contact & Support</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a></p>
-            </div>
-            
-            <div class="footer-section legal">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                    <li><a href="/terms">Terms of Use</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p class="footer-credit">
-                Website by 
-                <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener noreferrer">Tyler Nicholas</a> | 
-                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </p>
-            &copy; 2025 Foodshare Seychelles. All Rights Reserved.
-        </div>
-    </footer>
+        </footer>
 
     <script>
-        // JavaScript for mobile navigation toggle
-        document.getElementById('hamburger-btn').addEventListener('click', function() {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.classList.toggle('open');
+        // REPLACE with your actual Supabase URL and Key
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('staffLoginForm');
+        const messageEl = document.getElementById('loginMessage');
+        const loginButton = document.getElementById('loginButton');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            loginButton.disabled = true;
+            messageEl.style.display = 'none';
+
+            // 1. Authenticate User
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                messageEl.textContent = `Login Failed: ${error.message}`;
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                loginButton.disabled = false;
+                return;
+            }
+
+            // 2. Get User ID and Check Role from the 'profiles' table
+            const user = data.user;
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role_id')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError) {
+                // If profile lookup fails (user exists but no role assigned)
+                messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                await supabase.auth.signOut(); // Log out the user immediately
+                loginButton.disabled = false;
+                return;
+            }
+
+            // 3. Redirect based on Role ID
+            const roleId = profileData.role_id;
+            
+            if (roleId === 1) { // Admin Role
+                window.location.href = 'admin-dashboard.html';
+            } else if (roleId === 2 || roleId === 3) { // Logistics or Volunteer Role
+                window.location.href = 'staff-dashboard.html';
+            } else {
+                messageEl.textContent = 'User role not recognized. Access denied.';
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                await supabase.auth.signOut();
+            }
         });
     </script>
-
 </body>
 </html>
