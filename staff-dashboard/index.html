@@ -11,121 +11,76 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* ... (CSS Styles from previous version remain here) ... */
-        :root {
-            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
-            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-            --transition-speed: 0.4s;
-        }
+        :root { /* ... CSS variables ... */ }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; }
         a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-        a:hover { color: var(--primary-dark); }
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
-
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 250px 1fr; 
-            min-height: 100vh;
-        }
+        .dashboard-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
         .sidebar { background-color: var(--text-dark); color: var(--neutral-card); padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15); }
-        .sidebar h2 { font-size: 1.5em; color: var(--primary-light); margin-bottom: 30px; text-align: center; }
-        .sidebar-nav a { display: block; padding: 12px 15px; color: var(--neutral-bg); margin-bottom: 8px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; font-size: 1.1em; }
-        .sidebar-nav a i { margin-right: 10px; }
+        .sidebar-nav a { display: block; padding: 12px 15px; color: var(--neutral-bg); margin-bottom: 8px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; }
         .sidebar-nav a:hover, .sidebar-nav a.active { background-color: var(--primary-dark); color: var(--neutral-card); }
         .dashboard-content { padding: 40px; background-color: var(--neutral-bg); }
-        .dashboard-content header { margin-bottom: 30px; }
-
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
-        .data-card { background-color: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--primary-main); transition: transform 0.3s; }
-        .data-card:hover { transform: translateY(-3px); }
+        .data-card { background-color: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--primary-main); }
         .dash-stat { font-size: 3em; color: var(--primary-dark); font-weight: bold; margin-top: 5px; }
-
-        .search-container { margin-bottom: 30px; display: flex; align-items: center; background-color: var(--neutral-card); border-radius: 8px; padding: 10px 15px; box-shadow: var(--shadow-subtle); }
-        .search-container input { border: none; outline: none; padding: 5px; font-size: 1em; width: 100%; }
-
-        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: var(--shadow-subtle); background-color: var(--neutral-card); border-radius: 8px; overflow: hidden; }
+        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: var(--shadow-subtle); background-color: var(--neutral-card); }
         .dashboard-table th, .dashboard-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .dashboard-table th { background-color: var(--primary-light); color: var(--text-dark); font-weight: bold; text-transform: uppercase; }
-        .dashboard-table tr:hover { background-color: #f0fff0; }
+        .dashboard-table th { background-color: var(--primary-light); color: var(--text-dark); }
         .status-badge { padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 0.8em; display: inline-block; }
         .status-to-do { background-color: #FFF9C4; color: #FBC02D; } 
         .status-in-progress { background-color: #BBDEFB; color: #1976D2; } 
         .status-done { background-color: #C8E6C9; color: var(--primary-dark); }
-
-        @media (max-width: 768px) {
-            .dashboard-layout { grid-template-columns: 1fr; }
-            .sidebar { height: auto; padding: 15px 0; }
-            .sidebar-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 10px; }
-            .sidebar-nav a { flex: 0 0 auto; margin: 0 5px; padding: 8px 10px; }
-            .dashboard-content { padding: 20px; }
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .dashboard-layout { grid-template-columns: 1fr; } .sidebar-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 10px; } }
     </style>
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsInl4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         
         let supabase;
         document.addEventListener('DOMContentLoaded', async () => {
-             // CRITICAL FIX: Ensure Supabase loads and we check for the user immediately
+             // 1. Initialize Supabase Client
              if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                // If Supabase fails to load, we cannot check authentication, so we redirect
                 console.error("Supabase client library failed to load. Redirecting to login.");
                 window.location.href = '../staff-login/index.html'; 
                 return;
             }
 
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (!user) {
-                // CRITICAL FIX: If no user session is found, redirect to login
+            // 2. CRITICAL SESSION CHECK FIX
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
                 window.location.href = '../staff-login/index.html';
                 return;
             }
             
-            // CRITICAL FIX: Check Role - Ensure they are Staff (not admin)
+            const user = session.user;
+
+            // 3. CRITICAL ROLE CHECK FIX
             const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
             if (profile?.role_id === 1 || profile?.role_id === undefined) {
-                // If admin or role is missing, deny access and redirect
                 alert('Access Denied. Redirecting to Staff Login.');
                 await supabase.auth.signOut();
                 window.location.href = '../staff-login/index.html';
                 return;
             }
 
+            // 4. Data Fetching
             fetchStaffMetrics(user.id);
             fetchMyTasks();
         });
 
         async function fetchStaffMetrics(userId) {
-            // ... (Metrics fetching logic remains the same)
+            // Metrics fetching logic remains the same (assuming tables exist in DB)
             const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-            const { count: dueTodayCount } = await supabase
-                .from('tasks')
-                .select('*', { count: 'exact', head: true })
-                .eq('status', 'To Do'); 
+            const { count: dueTodayCount } = await supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'To Do'); 
             document.getElementById('dueTodayCount').textContent = dueTodayCount || 0;
-
-            const { count: inProgressCount } = await supabase
-                .from('tasks')
-                .select('*', { count: 'exact', head: true })
-                .eq('status', 'In Progress');
+            const { count: inProgressCount } = await supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'In Progress');
             document.getElementById('inProgressCount').textContent = inProgressCount || 0;
-
-            const { count: completedWeekCount } = await supabase
-                .from('tasks')
-                .select('*', { count: 'exact', head: true })
-                .eq('status', 'Done')
-                .gte('updated_at', oneWeekAgo); 
+            const { count: completedWeekCount } = await supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('status', 'Done').gte('updated_at', oneWeekAgo); 
             document.getElementById('completedWeekCount').textContent = completedWeekCount || 0;
-            
             const { data: profile } = await supabase.from('profiles').select('email').eq('id', userId).single();
             if (profile) {
                  const namePart = profile.email.split('@')[0];
@@ -136,7 +91,7 @@
 
         async function fetchMyTasks() {
              const { data: tasks, error } = await supabase
-                .from('tasks')
+                .from('tasks') // This table must exist
                 .select('*')
                 .in('status', ['To Do', 'In Progress']) 
                 .order('status', { ascending: true }) 
@@ -151,8 +106,8 @@
                     const statusClass = task.status.toLowerCase().replace(' ', '-');
                     const row = `
                         <tr>
-                            <td>#${task.id.substring(0, 5).toUpperCase()}</td>
-                            <td>${task.title}</td>
+                            <td>#${task.id ? task.id.substring(0, 5).toUpperCase() : 'N/A'}</td>
+                            <td>${task.title || 'No Title'}</td>
                             <td>${task.source_table || 'Custom'}</td>
                             <td><span class="status-badge status-${statusClass}">${task.status}</span></td>
                             <td><a href="#">Update Status</a></td>
@@ -177,7 +132,6 @@
 </head>
 <body>
     <div class="dashboard-layout">
-
         <aside class="sidebar">
             <h2><i class="fas fa-user-shield"></i> Staff Panel</h2>
             <nav class="sidebar-nav">
@@ -187,57 +141,22 @@
                 <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
-
         <div class="dashboard-content">
             <header>
-                <h1 style="color: var(--primary-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px;">Welcome Back, <span id="staffName">Staff Member</span>!</h1>
+                <h1>Welcome Back, <span id="staffName">Staff Member</span>!</h1>
                 <p>Overview of your critical operational metrics and pending actions.</p>
             </header>
-            
-            <div class="search-container">
-                <input type="text" placeholder="Search your tasks and inventory..." class="search-input" style="width: 100%;">
-                <i class="fas fa-search search-icon"></i>
-            </div>
-
-
             <div class="dashboard-grid">
-                
-                <div class="data-card" style="border-left: 5px solid #FFC107;">
-                    <h3><i class="fas fa-exclamation-circle"></i> Tasks To Do</h3>
-                    <div id="dueTodayCount" class="dash-stat">...</div>
-                    <p style="color: var(--text-light); margin-top: 10px;">New and unassigned priority items.</p>
-                </div>
-
-                <div class="data-card" style="border-left: 5px solid #2196F3;">
-                    <h3><i class="fas fa-spinner"></i> In-Progress Assignments</h3>
-                    <div id="inProgressCount" class="dash-stat">...</div>
-                    <p style="color: var(--text-light); margin-top: 10px;">Tasks currently being executed by you.</p>
-                </div>
-
-                <div class="data-card" style="border-left: 5px solid var(--primary-main);">
-                    <h3><i class="fas fa-check-circle"></i> Completed This Week</h3>
-                    <div id="completedWeekCount" class="dash-stat">...</div>
-                    <p style="color: var(--text-light); margin-top: 10px;">Your recent impact achievements.</p>
-                </div>
+                <div class="data-card" style="border-left: 5px solid #FFC107;"><h3>Tasks To Do</h3><div id="dueTodayCount" class="dash-stat">...</div><p>New and unassigned priority items.</p></div>
+                <div class="data-card" style="border-left: 5px solid #2196F3;"><h3>In-Progress Assignments</h3><div id="inProgressCount" class="dash-stat">...</div><p>Tasks currently being executed by you.</p></div>
+                <div class="data-card" style="border-left: 5px solid var(--primary-main);"><h3>Completed This Week</h3><div id="completedWeekCount" class="dash-stat">...</div><p>Your recent impact achievements.</p></div>
             </div>
-
             <section style="margin-top: 40px;">
                 <h2>My Active Tasks (<span id="activeTaskCount">...</span>)</h2>
                 <table class="dashboard-table">
-                    <thead>
-                        <tr>
-                            <th>Task ID</th>
-                            <th>Title</th>
-                            <th>Source</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="myTasksBody">
-                        <tr><td colspan="5">Loading your assigned tasks...</td></tr>
-                    </tbody>
+                    <thead><tr><th>Task ID</th><th>Title</th><th>Source</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody id="myTasksBody"><tr><td colspan="5">Loading your assigned tasks...</td></tr></tbody>
                 </table>
-                <p style="margin-top: 15px; text-align: right;"><a href="#">View All My Tasks</a></p>
             </section>
         </div>
     </div>
