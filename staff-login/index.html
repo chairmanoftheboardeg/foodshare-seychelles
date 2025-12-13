@@ -16,6 +16,7 @@
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --font-sans: 'Helvetica Neue', Arial, sans-serif;
             --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --alert-red: #C62828; /* Added for error styling */
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -29,7 +30,7 @@
         .login-button { width: 100%; padding: 12px; background-color: var(--primary-main); color: var(--neutral-card); border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s; font-weight: bold; }
         .login-button:hover { background-color: var(--primary-dark); }
         .alert-message { padding: 10px; margin-top: 15px; border-radius: 6px; font-weight: bold; display: none; }
-        .alert-error { background-color: #FFCDD2; color: #C62828; display: block; }
+        .alert-error { background-color: #FFCDD2; color: var(--alert-red); display: block; }
         .back-link { display: block; margin-top: 20px; color: var(--primary-main); font-weight: 500; }
         /* [END LOGIN CSS BLOCK] */
     </style>
@@ -48,11 +49,14 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                 messageEl.textContent = 'ERROR: Core services failed to load.';
+                messageEl.className = 'alert-message alert-error';
                 messageEl.style.display = 'block';
                 return;
             }
 
             // --- Pre-check for existing session and redirect ---
+            // This is crucial for users who navigate directly to /staff-login/ 
+            // but already have an active session.
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 const user = session.user;
@@ -67,6 +71,8 @@
                         return;
                     }
                 }
+                // If session exists but no valid role is found, force sign out before proceeding.
+                await supabase.auth.signOut();
             }
             // --- End Pre-check ---
 
@@ -94,11 +100,11 @@
                         .single();
 
                     if (roleError || !profile || !profile.role_id) {
-                         messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
-                         messageEl.className = 'alert-message alert-error';
-                         messageEl.style.display = 'block';
-                         await supabase.auth.signOut();
-                         return;
+                        messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
+                        messageEl.className = 'alert-message alert-error';
+                        messageEl.style.display = 'block';
+                        await supabase.auth.signOut();
+                        return;
                     }
 
                     if (profile.role_id === 1) { // Admin
@@ -106,7 +112,8 @@
                     } else if (profile.role_id === 2) { // Staff
                         window.location.href = '/staff-dashboard/';
                     } else {
-                        messageEl.textContent = 'Login successful, but role is unrecognized.';
+                        // Unauthorized role, sign out and show error
+                        messageEl.textContent = 'Login successful, but role is unauthorized. Please contact your administrator.';
                         messageEl.className = 'alert-message alert-error';
                         messageEl.style.display = 'block';
                         await supabase.auth.signOut();
