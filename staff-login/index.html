@@ -94,21 +94,23 @@
         
         let supabase;
         document.addEventListener('DOMContentLoaded', () => {
-             if (window.createClient) {
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+             const messageEl = document.getElementById('loginMessage');
+             const loginButton = document.getElementById('loginButton');
+             
+             // Check if Supabase client is loaded on the window object
+             if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                // If Supabase failed to load (e.g., blocked CDN), display error
-                const messageEl = document.getElementById('loginMessage');
-                messageEl.textContent = 'ERROR: Required services failed to load. Please check your network connection.';
+                // Supabase failed to load (CDN issue or network block)
+                messageEl.textContent = 'ERROR: Core services failed to load. Please check your network connection and retry.';
                 messageEl.className = 'alert-banner alert-error';
                 messageEl.style.display = 'block';
-                document.getElementById('loginButton').disabled = true;
+                loginButton.disabled = true;
                 return;
             }
 
             const form = document.getElementById('staffLoginForm');
-            const messageEl = document.getElementById('loginMessage');
-            const loginButton = document.getElementById('loginButton');
+            
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -156,19 +158,13 @@
                 } else {
                     messageEl.textContent = 'User role not recognized. Access denied.';
                     messageEl.className = 'alert-banner alert-error';
-                    messageEl.style.display = 'block';
                     await supabase.auth.signOut();
                 }
+                 messageEl.style.display = 'block';
+                 loginButton.disabled = false;
             });
         });
         
-        // Basic Search Handler (Non-blocking as this is only for a click/keypress event)
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (query) {
-                alert(`Searching site for: "${query}".`);
-            }
-        }
     </script>
 </head>
 <body>
