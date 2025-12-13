@@ -4,10 +4,211 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoodShare Seychelles - Share Food. Feed Seychelles.</title>
-    <link rel="stylesheet" href="style.css"> 
+    
+    <link rel="icon" href="../images/logo.png" type="image/png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <style>
+        /* ======================================================= */
+        /* 0. THEME VARIABLES & BASE STYLES */
+        /* ======================================================= */
+        :root {
+            --primary-light: #81C784; /* Soft Green */
+            --primary-main: #4CAF50; /* Vibrant Green (Core Brand) */
+            --primary-dark: #388E3C; /* Darker Green */
+            --neutral-bg: #F9F9F9; /* Off-White Background */
+            --neutral-card: #FFFFFF; /* Pure White Cards */
+            --text-dark: #333333; /* Dark Grey Text */
+            --text-light: #666666; /* Light Grey Text */
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; 
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
+        }
+
+        /* Base Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        main { flex-grow: 1; padding: 40px 0; }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+
+        /* --- Global Content Container --- */
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
+
+        /* ======================================================= */
+        /* 1. LOADING SCREEN (PRELOADER) */
+        /* ======================================================= */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--primary-main); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 1; transition: opacity 1s ease-out, visibility 1s;
+        }
+        #preloader.hidden { opacity: 0; visibility: hidden; }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid var(--neutral-card);
+            border-top-color: var(--primary-dark); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ======================================================= */
+        /* 2. NAVIGATION BAR & SEARCH */
+        /* ======================================================= */
+        #navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 25px; background-color: var(--neutral-card);
+            box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
+        }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; animation: logo-pulse 3s infinite alternate; }
+        @keyframes logo-pulse { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.05); opacity: 1; } }
+
+        /* Simplified Nav Links */
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+        .nav-link:hover::after { width: 100%; }
+        .cta-button {
+            background-color: var(--primary-main); color: var(--neutral-card);
+            border-radius: 50px; padding: 10px 25px; font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color var(--transition-speed), transform 0.2s;
+        }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+
+        /* Search Bar Styling */
+        .search-container {
+            margin-left: 30px; display: flex; align-items: center;
+            background-color: var(--neutral-bg); border-radius: 50px;
+            padding: 5px 15px; border: 1px solid #eee; transition: border-color var(--transition-speed);
+        }
+        .search-container:focus-within { border-color: var(--primary-light); box-shadow: 0 0 5px rgba(76, 175, 80, 0.3); }
+        .search-input { border: none; background: none; padding: 5px; outline: none; font-size: 1em; width: 180px; color: var(--text-dark); }
+        .search-icon { color: var(--primary-dark); cursor: pointer; font-size: 1.1em; }
+
+        /* Mobile Menu */
+        .hamburger { display: none; }
+        @media (max-width: 992px) {
+            .nav-links-container { display: none; flex-direction: column; width: 100%; position: absolute; top: 76px; left: 0; background-color: var(--neutral-card); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 10px 0; }
+            .nav-links-container.open { display: flex; }
+            .nav-link, .cta-button, .staff-login { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+            .nav-link::after { display: none; }
+            .cta-button { border-radius: 0; margin-top: 10px; }
+            .search-container { margin: 10px 20px; width: auto; }
+            .hamburger { display: block; font-size: 1.8em; background: none; border: none; cursor: pointer; color: var(--text-dark); z-index: 1001; }
+        }
+
+        /* ======================================================= */
+        /* 3. HOME PAGE SECTIONS & ANIMATIONS */
+        /* ======================================================= */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-main));
+            color: var(--neutral-card); padding: 100px 0; text-align: center;
+            position: relative; overflow: hidden; animation: fade-in 1s ease-out;
+        }
+        .hero-content { max-width: 800px; margin: 0 auto; }
+        .hero-content h1 {
+            font-size: 4.5em; margin-bottom: 15px; color: var(--neutral-card);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); animation: slide-up 1s ease-out 0.5s both;
+        }
+        .hero-content p {
+            font-size: 1.5em; margin-bottom: 40px; color: rgba(255, 255, 255, 0.9);
+            animation: slide-up 1s ease-out 0.7s both;
+        }
+        .hero-ctas { display: flex; justify-content: center; gap: 20px; }
+        .hero-cta {
+            padding: 15px 35px; font-size: 1.1em; border: 2px solid var(--neutral-card);
+            background-color: transparent; transition: all var(--transition-speed);
+        }
+        .hero-cta:hover { background-color: var(--neutral-card); color: var(--primary-main); }
+
+        /* Dynamic Animation Keyframes */
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Announcement Banner */
+        .announcement-banner {
+            background-color: var(--primary-dark); color: var(--neutral-card);
+            padding: 10px 0; text-align: center; font-weight: 500;
+            animation: bounce-in 1.5s ease-out;
+        }
+        @keyframes bounce-in {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Feature Cards Section */
+        .feature-cards-section { padding: 60px 0; }
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px; margin-top: 40px;
+        }
+        .feature-card {
+            background-color: var(--neutral-card); padding: 30px;
+            border-radius: 12px; box-shadow: var(--shadow-subtle);
+            text-align: center; border-top: 5px solid var(--primary-main);
+            transition: transform 0.3s, box-shadow 0.3s; animation: fade-in 1s ease-out;
+        }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
+        .card-icon { font-size: 3em; color: var(--primary-main); margin-bottom: 15px; animation: rotate-icon 4s infinite linear; }
+        @keyframes rotate-icon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Section Headings */
+        .section-heading { text-align: center; margin-bottom: 50px; }
+        .section-heading h2 { font-size: 2.5em; margin-bottom: 10px; }
+        .section-heading p { color: var(--text-light); font-size: 1.1em; }
+
+        /* Detailed Statistics Section */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+            margin-top: 30px; text-align: center;
+        }
+        .stat-item {
+            background: var(--neutral-card); padding: 20px; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); border-left: 3px solid var(--primary-light);
+        }
+        .stat-item h3 { font-size: 2.5em; margin: 0 0 5px; color: var(--primary-dark); }
+        .stat-item p { font-size: 1em; color: var(--text-light); }
+
+
+        /* ======================================================= */
+        /* 4. FOOTER STYLING */
+        /* ======================================================= */
+        #main-footer {
+            margin-top: auto; background-color: var(--text-dark);
+            color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em;
+        }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 {
+            color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px;
+        }
+        .footer-section ul { list-style: none; padding: 0; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom {
+            text-align: center; padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em;
+        }
+
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer-content { justify-content: flex-start; }
+            .footer-section { width: 45%; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 480px) {
+            .footer-section { width: 100%; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
@@ -27,14 +228,25 @@
                     .eq('key', 'home_announcement')
                     .single();
 
-                if (data) {
+                if (data && data.value) {
                     document.getElementById('announcementBanner').textContent = data.value;
-                } else if (error) {
-                    console.error('Error fetching banner:', error);
-                    document.getElementById('announcementBanner').style.display = 'none'; // Hide if failed
+                } else if (error || !data) {
+                    console.error('Error fetching banner or no announcement set:', error);
+                    document.getElementById('announcementBanner').style.display = 'none'; // Hide if failed or empty
                 }
             }
             fetchBanner();
+
+            // Basic Search Handler (Client-side redirect)
+            document.querySelector('.search-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    const query = e.target.value.trim();
+                    if (query) {
+                        // In a real application, this would go to a search results page
+                        alert(`Searching for: "${query}". (Future feature: Will search database content)`);
+                    }
+                }
+            });
         });
     </script>
 </head>
@@ -45,26 +257,25 @@
     </div>
 
     <header id="navbar">
-        <a href="index.html" class="logo-container">
-            <img src="Green and Black Modern Green Energy Logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+        <a href="../index/index.html" class="logo-container">
+            <img src="../images/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
             FoodShare <span style="color: var(--primary-main);">Seychelles</span>
         </a>
 
         <nav class="nav-links-container" id="navLinks">
-            <a href="available-food.html" class="nav-link">Find Food</a>
-            <a href="donate-food.html" class="nav-link">Donate</a>
-            <a href="volunteer-now.html" class="nav-link">Volunteer</a>
-            <a href="impact.html" class="nav-link">Impact</a>
-            <a href="about-us.html" class="nav-link">About Us</a>
-            <a href="contact-general.html" class="nav-link">Contact</a>
+            <a href="../available-food/index.html" class="nav-link">Find Food</a>
+            <a href="../donate-food/index.html" class="nav-link">Donate</a>
+            <a href="../volunteer/index.html" class="nav-link">Volunteer</a>
+            <a href="../impact/index.html" class="nav-link">Impact</a>
+            <a href="../about/index.html" class="nav-link">About Us</a>
             
             <div class="search-container">
                 <input type="text" placeholder="Search the site..." class="search-input">
                 <i class="fas fa-search search-icon"></i>
             </div>
             
-            <a href="donate-now.html" class="cta-button">DONATE NOW</a>
-            <a href="staff-login.html" class="staff-login nav-link">Staff Login</a>
+            <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
+            <a href="../staff-login/index.html" class="staff-login nav-link">Staff Login</a>
         </nav>
         <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
     </header>
@@ -81,8 +292,8 @@
                 <p>We are dedicated to eliminating food waste and nourishing our community across the Seychelles islands. Join our movement!</p>
                 
                 <div class="hero-ctas">
-                    <a href="available-food.html" class="hero-cta cta-button">FIND FOOD NOW</a>
-                    <a href="donate-food.html" class="hero-cta cta-button">SHARE SURPLUS FOOD</a>
+                    <a href="../available-food/index.html" class="hero-cta cta-button">FIND FOOD NOW</a>
+                    <a href="../donate-food/index.html" class="hero-cta cta-button">SHARE SURPLUS FOOD</a>
                 </div>
             </div>
         </section>
@@ -90,44 +301,114 @@
         <section class="feature-cards-section">
             <div class="content-container">
                 <div class="section-heading">
-                    <h2>Our Dual Mission</h2>
-                    <p>Addressing both the environmental challenge of waste and the social need for nourishment.</p>
+                    <h2>Our Impact in Numbers</h2>
+                    <p>See the direct results of our collective effort in reducing waste and feeding our neighbors.</p>
                 </div>
                 
-                <div class="card-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-trash-restore card-icon"></i>
-                        <h3>Stop Food Waste</h3>
-                        <p>We intercept high-quality food that would otherwise be discarded, redirecting it to productive use.</p>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <i class="fas fa-seedling" style="color: var(--primary-main);"></i>
+                        <h3 id="stat-kgs">2,500+</h3>
+                        <p>Kgs of Food Redirected</p>
                     </div>
-
-                    <div class="feature-card">
-                        <i class="fas fa-hand-holding-heart card-icon"></i>
-                        <h3>Feed the Community</h3>
-                        <p>Our network ensures the safe and timely distribution of food to families and organizations in need.</p>
+                    <div class="stat-item">
+                        <i class="fas fa-users" style="color: #2196F3;"></i>
+                        <h3 id="stat-families">500+</h3>
+                        <p>Families Nourished</p>
                     </div>
-
-                    <div class="feature-card">
-                        <i class="fas fa-people-carry-box card-icon"></i>
-                        <h3>Powered by Volunteers</h3>
-                        <p>Logistics, sorting, and delivery are managed by dedicated volunteers—the heart of our operation.</p>
+                    <div class="stat-item">
+                        <i class="fas fa-globe-africa" style="color: #FF9800;"></i>
+                        <h3 id="stat-co2">15,000+</h3>
+                        <p>Kgs CO2 Emissions Saved</p>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-calendar-check" style="color: #9C27B0;"></i>
+                        <h3 id="stat-partners">35+</h3>
+                        <p>Active Donor Partners</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section style="background-color: var(--neutral-card); padding: 50px 0;">
-            <div class="content-container" style="text-align: center;">
-                <h2>Ready to Make an Impact?</h2>
-                <p style="font-size: 1.2em; margin: 20px 0;">There are many ways you can help us achieve our mission.</p>
-                <a href="volunteer-now.html" class="cta-button" style="margin: 0 10px;">Become a Volunteer</a>
-                <a href="our-partners.html" class="cta-button" style="margin: 0 10px; background-color: var(--primary-light);">See Our Partners</a>
+        <section class="feature-cards-section" style="padding-top: 0;">
+            <div class="content-container">
+                <div class="section-heading" style="margin-top: 60px;">
+                    <h2>How FoodShare Works</h2>
+                </div>
+                
+                <div class="card-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-hand-holding-usd card-icon"></i>
+                        <h3>Donor Submission</h3>
+                        <p>Hotels, supermarkets, and farmers submit surplus food details via our easy online form.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-truck-moving card-icon"></i>
+                        <h3>Logistics & Pick-up</h3>
+                        <p>Our staff and volunteer logistics team coordinate rapid, refrigerated transport across the islands.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <i class="fas fa-people-carry-box card-icon"></i>
+                        <h3>Community Distribution</h3>
+                        <p>Food is immediately listed for collection by approved NGOs and community members in need.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
     <footer id="main-footer">
-        </footer>
+        <div class="content-container footer-content">
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="../available-food/index.html">Find Food</a></li>
+                    <li><a href="../donate-food/index.html">Donate Food</a></li>
+                    <li><a href="../volunteer/index.html">Volunteer</a></li>
+                    <li><a href="../impact/index.html">Impact & Reports</a></li>
+                    <li><a href="../contact-general/index.html">General Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Learn More</h3>
+                <ul>
+                    <li><a href="../about/index.html">About FoodShare</a></li>
+                    <li><a href="../our-partners/index.html">Our Partners</a></li>
+                    <li><a href="../learn/safety.html">Food Safety Protocol</a></li>
+                    <li><a href="../learn/faq.html">General FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Support & Legal</h3>
+                <ul>
+                    <li><a href="../privacy-policy/index.html">Privacy Policy</a></li>
+                    <li><a href="../terms-of-use/index.html">Terms of Use</a></li>
+                    <li><a href="../sitemap/index.html">Site Structure</a></li>
+                    <li><a href="../staff-login/index.html">Staff Login</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Get In Touch</h3>
+                <p>Email: admin@foodshare-seychelles.online</p>
+                <p>Follow us on <a href="../social/index.html">Social Media</a></p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            &copy; 2025 Foodshare Seychelles. All Rights Reserved. 
+            <span class="footer-credit">
+                Website by 
+                <a href="https://tylernicholasgroup.com/staff/tyler/" target="_blank" style="color: var(--primary-main);">Tyler Nicholas</a> | 
+                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a/" target="_blank" style="color: var(--primary-main);">LinkedIn</a>
+            </span>
+        </div>
+    </footer>
 </body>
 </html>
