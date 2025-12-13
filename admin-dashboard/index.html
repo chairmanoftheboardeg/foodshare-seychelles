@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FoodShare Seychelles</title>
+    
+    <link rel="icon" href="../images/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* ======================================================= */
+        /* 0. THEME VARIABLES & BASE STYLES */
+        /* ======================================================= */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
+
+        /* ======================================================= */
+        /* 1. DASHBOARD LAYOUT */
+        /* ======================================================= */
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr; 
+            min-height: 100vh;
+        }
+        .sidebar {
+            background-color: var(--text-dark);
+            color: var(--neutral-card);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+        }
+        .sidebar h2 {
+            font-size: 1.5em;
+            color: var(--primary-light);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .sidebar-nav a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--neutral-bg);
+            margin-bottom: 8px;
+            border-radius: 6px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 1.1em;
+        }
+        .sidebar-nav a i { margin-right: 10px; }
+        .sidebar-nav a:hover, .sidebar-nav a.active {
+            background-color: var(--primary-dark);
+            color: var(--neutral-card);
+        }
+        .dashboard-content {
+            padding: 40px;
+            background-color: var(--neutral-bg);
+        }
+        .dashboard-content header {
+            margin-bottom: 30px;
+        }
+
+        /* ======================================================= */
+        /* 2. DASHBOARD CARDS & GRIDS */
+        /* ======================================================= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .data-card {
+            background-color: var(--neutral-card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+            border-left: 5px solid var(--primary-main);
+            transition: transform 0.3s;
+        }
+        .data-card:hover { transform: translateY(-3px); }
+        .data-card h3 {
+            font-size: 1.1em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        .dash-stat {
+            font-size: 3em;
+            color: var(--primary-dark);
+            font-weight: bold;
+            margin-top: 5px;
+            animation: grow-in 0.8s ease-out;
+        }
+        @keyframes grow-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Dashboard Search */
+        .search-container {
+            margin-bottom: 30px; 
+            display: flex; 
+            align-items: center; 
+            background-color: var(--neutral-card); 
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: var(--shadow-subtle);
+        }
+        .search-container input {
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        /* ======================================================= */
+        /* 3. TABLE STYLING */
+        /* ======================================================= */
+        .dashboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: var(--shadow-subtle);
+            background-color: var(--neutral-card);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .dashboard-table th, .dashboard-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .dashboard-table th {
+            background-color: var(--primary-light);
+            color: var(--text-dark);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .dashboard-table tr:hover {
+            background-color: #f0fff0;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8em;
+            display: inline-block;
+        }
+        .status-new { background-color: #FFF9C4; color: #FBC02D; } 
+        .status-in-progress { background-color: #BBDEFB; color: #1976D2; } 
+        .status-done { background-color: #C8E6C9; color: var(--primary-dark); }
+        .status-to-do { background-color: #FFCDD2; color: #C62828; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-layout { grid-template-columns: 1fr; }
+            .sidebar { height: auto; padding: 15px 0; }
+            .sidebar h2 { margin-bottom: 15px; }
+            .sidebar-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 10px; }
+            .sidebar-nav a { flex: 0 0 auto; margin: 0 5px; padding: 8px 10px; }
+            .dashboard-content { padding: 20px; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Security check and metrics fetch
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                window.location.href = '../staff-login/index.html';
+                return;
+            }
+            
+            // Check Role - CRITICAL: Ensure only Admin can access
+            const { data: profile, error } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
+            if (profile?.role_id !== 1) {
+                alert('Authorization Failed: You do not have Admin privileges. Redirecting to Staff Dashboard.');
+                window.location.href = '../staff-dashboard/index.html';
+                return;
+            }
+
+            fetchAdminMetrics(user.id);
+            fetchRecentTasks();
+        });
+
+        async function fetchAdminMetrics(userId) {
+            // Count New Donations (Status: 'New')
+            const { count: donationCount } = await supabase
+                .from('donation_requests')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'New');
+            document.getElementById('newDonationCount').textContent = donationCount || 0;
+
+            // Count Pending Applications (Status: 'Pending')
+            const { count: appCount } = await supabase
+                .from('applications')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'Pending');
+            document.getElementById('newAppCount').textContent = appCount || 0;
+
+            // Count Urgent Inquiries (Type: 'transport' AND Status: 'New')
+             const { count: inquiryCount } = await supabase
+                .from('inquiries')
+                .select('*', { count: 'exact', head: true })
+                .eq('type', 'transport')
+                .eq('status', 'New');
+            document.getElementById('urgentInquiries').textContent = inquiryCount || 0;
+            
+             // Fetch name for greeting
+            const { data: profile } = await supabase.from('profiles').select('email').eq('id', userId).single();
+            if (profile) {
+                 const namePart = profile.email.split('@')[0];
+                 const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+                 document.getElementById('adminName').textContent = displayName;
+            }
+        }
+
+        async function fetchRecentTasks() {
+            // Fetch tasks using the SQL VIEW for easier display (Admin sees all tasks)
+            const { data: tasks, error } = await supabase
+                .from('staff_tasks_view') // Assuming you have a view that links tasks to staff emails
+                .select('*')
+                .in('status', ['New', 'To Do', 'In Progress']) // Show only active tasks
+                .order('task_id', { ascending: false })
+                .limit(5);
+
+            const tbody = document.getElementById('recentTasksBody');
+            tbody.innerHTML = ''; 
+
+            if (tasks && tasks.length > 0) {
+                tasks.forEach(task => {
+                    const statusClass = task.status.toLowerCase().replace(' ', '-');
+                    const row = `
+                        <tr>
+                            <td>#${task.task_id.substring(0, 5).toUpperCase()}</td>
+                            <td>${task.title}</td>
+                            <td>${task.assigned_staff_email.split('@')[0]}</td>
+                            <td><span class="status-badge status-${statusClass}">${task.status}</span></td>
+                            <td><a href="#">View Details</a></td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                });
+            } else {
+                 tbody.innerHTML = '<tr><td colspan="5">No active tasks found.</td></tr>';
+            }
+        }
+
+        async function logoutUser() {
+            const { error } = await supabase.auth.signOut();
+            if (!error) {
+                window.location.href = '../staff-login/index.html';
+            }
+        }
+        
+        // Basic Search Handler
+        document.querySelector('.search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                alert(`Searching Admin Panel for: "${e.target.value.trim()}".`);
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="dashboard-layout">
+
+        <aside class="sidebar">
+            <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
+            <nav class="sidebar-nav">
+                <a href="../admin-dashboard/index.html" class="active"><i class="fas fa-home"></i> Dashboard Home</a>
+                <a href="#"><i class="fas fa-boxes"></i> Inventory Management</a>
+                <a href="#"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
+                <a href="#"><i class="fas fa-tasks"></i> Staff Tasks</a>
+                <a href="#"><i class="fas fa-users"></i> Volunteer Apps</a>
+                <a href="#"><i class="fas fa-cog"></i> Site Settings</a>
+                <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <div class="dashboard-content">
+            <header>
+                <h1 style="color: var(--primary-dark); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px;">Welcome, <span id="adminName">Admin</span>!</h1>
+                <p>Overview of critical operational metrics and pending actions.</p>
+            </header>
+            
+            <div class="search-container">
+                <input type="text" placeholder="Global search tasks, inventory, or users..." class="search-input" style="width: 100%;">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <div class="data-card" style="border-left: 5px solid #FF9800;">
+                    <h3><i class="fas fa-hand-holding-usd"></i> New Donations Pending</h3>
+                    <div id="newDonationCount" class="dash-stat">...</div>
+                    <p style="color: var(--text-light); margin-top: 10px;">Review and assign pick-up logistics.</p>
+                </div>
+
+                <div class="data-card" style="border-left: 5px solid #2196F3;">
+                    <h3><i class="fas fa-user-plus"></i> New Volunteer Applications</h3>
+                    <div id="newAppCount" class="dash-stat">...</div>
+                    <p style="color: var(--text-light); margin-top: 10px;">Schedule interviews for new applicants.</p>
+                </div>
+
+                <div class="data-card" style="border-left: 5px solid #FF5722;">
+                    <h3><i class="fas fa-truck"></i> Urgent Transport Inquiries</h3>
+                    <div id="urgentInquiries" class="dash-stat">...</div>
+                    <p style="color: var(--text-light); margin-top: 10px;">Needs immediate staff assignment.</p>
+                </div>
+            </div>
+
+            <section style="margin-top: 40px;">
+                <h2>Top 5 Pending Staff Tasks</h2>
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Task ID</th>
+                            <th>Title</th>
+                            <th>Assigned To</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTasksBody">
+                        <tr><td colspan="5">Loading global tasks...</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; text-align: right;"><a href="#">View All Global Tasks</a></p>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
