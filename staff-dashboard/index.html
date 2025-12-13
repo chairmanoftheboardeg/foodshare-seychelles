@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard - FoodShare Seychelles</title>
     
-    <link rel="icon" href="../images/logo.png" type="image/png">
+    <link rel="icon" href="../image/logo.png" type="image/png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
         /* ======================================================= */
@@ -33,7 +33,7 @@
         /* ======================================================= */
         .dashboard-layout {
             display: grid;
-            grid-template-columns: 250px 1fr; /* Sidebar fixed width, Content flex */
+            grid-template-columns: 250px 1fr; 
             min-height: 100vh;
         }
         .sidebar {
@@ -102,6 +102,24 @@
         }
         @keyframes grow-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+        /* Dashboard Search */
+        .search-container {
+            margin-bottom: 30px; 
+            display: flex; 
+            align-items: center; 
+            background-color: var(--neutral-card); 
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: var(--shadow-subtle);
+        }
+        .search-container input {
+            border: none;
+            outline: none;
+            padding: 5px;
+            font-size: 1em;
+            width: 100%;
+        }
+
         /* ======================================================= */
         /* 3. TABLE STYLING */
         /* ======================================================= */
@@ -126,7 +144,7 @@
             text-transform: uppercase;
         }
         .dashboard-table tr:hover {
-            background-color: #f0fff0; /* Very light green hover */
+            background-color: #f0fff0;
         }
         .status-badge {
             padding: 5px 10px;
@@ -142,7 +160,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .dashboard-layout {
-                grid-template-columns: 1fr; /* Stack sidebar and content */
+                grid-template-columns: 1fr;
             }
             .sidebar {
                 height: auto;
@@ -163,10 +181,16 @@
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // Security check and metrics fetch
+        let supabase;
         document.addEventListener('DOMContentLoaded', async () => {
+             if (window.createClient) {
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                console.error("Supabase client library not loaded. Cannot run security checks.");
+                return; 
+            }
+
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
@@ -187,6 +211,7 @@
         });
 
         async function fetchStaffMetrics(userId) {
+            // ... (Metrics fetching logic remains the same)
             const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
             // Total To Do Tasks (Due Today is a simplification)
@@ -221,11 +246,11 @@
         }
 
         async function fetchMyTasks() {
-            // RLS automatically limits this query to the current user's assigned tasks
-            const { data: tasks, error } = await supabase
+            // ... (Task fetching logic remains the same)
+             const { data: tasks, error } = await supabase
                 .from('tasks')
                 .select('*')
-                .in('status', ['To Do', 'In Progress']) // Only show active tasks
+                .in('status', ['To Do', 'In Progress']) 
                 .order('status', { ascending: true }) 
                 .limit(10);
 
@@ -254,6 +279,7 @@
         }
 
         async function logoutUser() {
+            if (!supabase) return;
             const { error } = await supabase.auth.signOut();
             if (!error) {
                 window.location.href = '../staff-login/index.html';
@@ -287,7 +313,7 @@
                 <p>Overview of your critical operational metrics and pending actions.</p>
             </header>
             
-            <div class="search-container" style="margin-bottom: 30px; border: none; box-shadow: var(--shadow-subtle); background-color: var(--neutral-card);">
+            <div class="search-container">
                 <input type="text" placeholder="Search your tasks and inventory..." class="search-input" style="width: 100%;">
                 <i class="fas fa-search search-icon"></i>
             </div>
