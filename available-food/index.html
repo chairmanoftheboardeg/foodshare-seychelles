@@ -3,487 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Available Food - Foodshare Seychelles</title>
+    <title>Find Available Food - FoodShare Seychelles</title>
     
-    <link rel="icon" type="image/png" href="../image/logo.png">
-
+    <link rel="icon" href="../image/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
     <style>
-        /* Theme Variables */
+        /* ======================================================= */
+        /* 0. THEME VARIABLES & BASE STYLES */
+        /* ======================================================= */
         :root {
-            --primary: #4CAF50; /* Vibrant Green */
-            --secondary: #388E3C; /* Darker Green */
-            --neutral: #F5F5F5; /* Light Grey */
-            --dark: #212121; /* Dark Text */
-            --white: #ffffff;
-            --font-family: 'Helvetica', 'Arial', sans-serif;
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
         }
-
-        /* Base and Layout */
-        body {
-            font-family: var(--font-family); margin: 0; background-color: var(--white);
-            color: var(--dark); display: flex; flex-direction: column; min-height: 100vh;
-        }
-        a { text-decoration: none; color: inherit; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
         main { flex-grow: 1; padding: 40px 0; }
-        .content-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
 
-        /* --- Page-Specific Heading --- */
-        .page-header h1 {
-            color: var(--dark);
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-align: center;
+        /* ======================================================= */
+        /* 1. NAVIGATION BAR (Standard) */
+        /* ======================================================= */
+        #navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 25px; background-color: var(--neutral-card);
+            box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
         }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; } 
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+        .nav-link:hover::after { width: 100%; }
+        .cta-button {
+            background-color: var(--primary-main); color: var(--neutral-card);
+            border-radius: 50px; padding: 10px 25px; font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color var(--transition-speed), transform 0.2s;
+        }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .hamburger { display: none; }
         
-        /* --- Food Listing Cards (Hidden) --- */
-        .food-listings {
+        /* ======================================================= */
+        /* 2. INVENTORY DISPLAY */
+        /* ======================================================= */
+        .filter-bar {
+            background-color: var(--neutral-card); padding: 15px 25px; 
+            border-radius: 8px; box-shadow: var(--shadow-subtle);
+            margin-bottom: 30px; display: flex; gap: 20px; align-items: center;
+        }
+        .filter-bar label { font-weight: bold; margin-right: 10px; }
+        .filter-bar select { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; }
+
+        #inventory-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
 
         .food-card {
-            background-color: var(--white);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            background-color: var(--neutral-card); padding: 25px;
+            border-radius: 12px; box-shadow: var(--shadow-subtle);
+            border-top: 5px solid var(--primary-light);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
+        .food-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
         
-        .category-tag {
-            display: flex;
-            align-items: center;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 0.9em;
+        .food-card h3 { 
+            font-size: 1.8em; margin-bottom: 10px; 
+            color: var(--primary-dark);
+            border-bottom: 1px solid #eee; padding-bottom: 5px;
         }
-        .category-tag span {
-            margin-left: 5px;
-            color: #666;
-            font-weight: normal;
+        .food-details { margin-top: 15px; font-size: 1em; }
+        .food-details p { margin-bottom: 8px; }
+        .food-details span { font-weight: bold; color: var(--primary-main); }
+
+        .call-to-action { margin-top: 20px; text-align: center; }
+        .reserve-button {
+             background-color: #2196F3; color: white; padding: 10px 20px;
+             border: none; border-radius: 50px; cursor: pointer;
+             transition: background-color 0.3s;
         }
-        
-        .food-card h3 {
-            color: var(--dark);
-            font-size: 1.4em;
-            margin: 5px 0 15px 0;
-            line-height: 1.3;
+        .reserve-button:hover { background-color: #1976D2; }
+
+        #loading-indicator, #no-food-message {
+            text-align: center; font-size: 1.2em; padding: 50px; color: var(--text-light);
         }
 
-        .details-row {
-            display: flex;
-            align-items: center;
-            color: #777;
-            font-size: 0.95em;
-            margin-bottom: 10px;
-        }
-
-        .claim-button {
-            background-color: #8DED7C; 
-            color: var(--dark);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-            transition: background-color 0.2s;
-        }
-
-        .claim-button:hover {
-            background-color: var(--secondary);
-            color: var(--white);
-        }
-        
-        /* --- No Listings Message (Default View) --- */
-        #no-listings {
-            text-align: center;
-            padding: 80px 30px;
-            background-color: var(--neutral);
-            border-radius: 8px;
-            border: 2px dashed var(--primary);
-            color: #666;
-            max-width: 600px;
-            margin: 40px auto;
-        }
-        #no-listings h2 {
-            color: var(--secondary);
-            font-size: 2em;
-        }
-        #no-listings p {
-            font-size: 1.1em;
-            margin-bottom: 20px;
-        }
-
-
-        /* ------------------------------------------- */
-        /* --- Claim Modal (Simplified for New Logic) --- */
-        /* ------------------------------------------- */
-        .modal-overlay {
-            display: none; 
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: var(--white);
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .modal-content h3 {
-            color: var(--primary);
-        }
-
-        .modal-option {
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-        }
-
-        .modal-option h4 {
-            color: var(--dark);
-            margin-top: 0;
-        }
-
-        .modal-option button, .modal-option a {
-            display: block;
-            width: 100%;
-            padding: 10px 15px;
-            margin-top: 15px;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .btn-transport {
-            background-color: #FFC107; /* Amber */
-            color: var(--dark);
-            border: none;
-        }
-        .btn-transport:hover {
-            background-color: #FFA000;
-        }
-
-        .btn-pickup {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-        }
-        .btn-pickup:hover {
-            background-color: var(--secondary);
-        }
-
-        .modal-close-btn {
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            color: #aaa;
-            cursor: pointer;
-        }
-        .modal-close-btn:hover {
-            color: var(--dark);
-        }
-
-        /* ------------------------------------------- */
-        /* --- NAVIGATION BAR STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 30px; background-color: var(--neutral);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .logo-container { font-size: 1.5em; font-weight: bold; }
-        .logo-share { color: var(--dark); }
-        .logo-feed { color: var(--primary); }
-        .nav-links-container { display: flex; align-items: center; }
-        .nav-link {
-            padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s;
-        }
-        .nav-link:hover { color: var(--secondary); }
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content {
-            display: none; position: absolute; background-color: var(--neutral);
-            min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;
-            top: 35px; left: 0; border-radius: 4px;
-        }
-        .dropdown-content a {
-            color: var(--dark); padding: 12px 16px; text-decoration: none;
-            display: block; text-align: left;
-        }
-        .dropdown-content a:hover { background-color: #ddd; color: var(--secondary); }
-        .dropdown:hover .dropdown-content { display: block; }
-        .cta-button {
-            background-color: var(--primary); color: white; border-radius: 4px;
-            margin-left: 15px; padding: 10px 20px; font-weight: bold;
-        }
-        .cta-button:hover { background-color: var(--secondary); color: white; }
-        .staff-login { margin-left: 10px; font-weight: bold; }
-        .hamburger {
-            display: none; font-size: 1.8em; background: none; border: none;
-            cursor: pointer; color: var(--dark); z-index: 1001;
-        }
-
-        @media (max-width: 768px) {
-            #navbar { padding: 10px 20px; }
-            .nav-links-container {
-                position: absolute; top: 60px; left: 0; width: 100%;
-                flex-direction: column; background-color: var(--neutral);
-                border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                display: none; z-index: 999;
-            }
-            .nav-links-container.open { display: flex; }
-            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
-            .hamburger { display: block; }
-            .dropdown { width: 100%; }
-            .dropdown-content { position: relative; width: 100%; top: 0; box-shadow: none; border-top: 1px solid #eee; }
-        }
-
-        /* ------------------------------------------- */
-        /* --- FOOTER STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #main-footer {
-            margin-top: auto; background-color: var(--dark); color: var(--neutral);
-            padding: 40px 30px 15px; font-size: 0.9em;
-        }
-        .footer-content {
-            display: flex; justify-content: space-between; flex-wrap: wrap; 
-            max-width: 1200px; margin: 0 auto 20px;
-        }
-        .footer-section { width: 23%; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
-        .footer-section p, .footer-section li { margin: 5px 0; }
-        .footer-section a { color: var(--neutral); transition: color 0.3s; }
-        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
-        .footer-section ul { list-style: none; padding: 0; }
-
-        .footer-bottom {
-            max-width: 1200px; margin: 0 auto; text-align: center;
-            padding-top: 15px; border-top: 1px solid #444; color: #999;
-            font-size: 0.8em;
-        }
-        .footer-credit a { color: var(--primary); }
-        .footer-credit a:hover { text-decoration: underline; }
-
-        @media (max-width: 600px) {
-            .footer-content { flex-direction: column; padding: 0 20px; }
-            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
-            .footer-section:last-child { border-bottom: none; }
-        }
+        /* ======================================================= */
+        /* 3. FOOTER STYLING (Same as other pages) */
+        /* ======================================================= */
+        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
     </style>
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        
+        let supabase;
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initialize Supabase Client
+             if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                fetchInventory();
+            } else {
+                document.getElementById('loading-indicator').textContent = 'Error: Data services failed to load. Please check your network.';
+            }
+
+            // Add event listeners for filters
+            document.getElementById('islandFilter').addEventListener('change', fetchInventory);
+            document.getElementById('categoryFilter').addEventListener('change', fetchInventory);
+        });
+
+        async function fetchInventory() {
+            const inventoryGrid = document.getElementById('inventory-grid');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const noFoodMessage = document.getElementById('no-food-message');
+
+            inventoryGrid.innerHTML = '';
+            loadingIndicator.style.display = 'block';
+            noFoodMessage.style.display = 'none';
+
+            const island = document.getElementById('islandFilter').value;
+            const category = document.getElementById('categoryFilter').value;
+
+            let query = supabase
+                .from('available_inventory') // CONCEPTUAL TABLE: Assumes a table called 'available_inventory' exists and is public
+                .select('*')
+                .gt('quantity_kg', 0) // Only show items with quantity > 0
+                .order('best_before_date', { ascending: true }); // Prioritize items that expire sooner
+
+            // Apply filters
+            if (island) {
+                query = query.eq('location_island', island);
+            }
+            if (category) {
+                query = query.eq('food_category', category);
+            }
+
+            const { data, error } = await query;
+
+            loadingIndicator.style.display = 'none';
+
+            if (error) {
+                inventoryGrid.innerHTML = `<div style="grid-column: 1 / -1; color: #C62828;">Error loading inventory: ${error.message}</div>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                noFoodMessage.style.display = 'block';
+            } else {
+                data.forEach(item => {
+                    inventoryGrid.insertAdjacentHTML('beforeend', createFoodCard(item));
+                });
+            }
+        }
+
+        function createFoodCard(item) {
+            const expDate = item.best_before_date ? new Date(item.best_before_date).toLocaleDateString() : 'N/A';
+            const icon = getCategoryIcon(item.food_category);
+
+            return `
+                <div class="food-card">
+                    <h3>${icon} ${item.item_name}</h3>
+                    <p style="color: var(--text-light);">${item.description || 'Fresh surplus item ready for collection.'}</p>
+                    <div class="food-details">
+                        <p><i class="fas fa-box-open"></i> Available: <span>${item.quantity_kg} Kgs</span></p>
+                        <p><i class="fas fa-map-marker-alt"></i> Location: <span>${item.location_island || 'Unknown'}</span></p>
+                        <p><i class="fas fa-calendar-alt"></i> Best Before: <span>${expDate}</span></p>
+                        <p><i class="fas fa-tag"></i> Category: <span>${item.food_category}</span></p>
+                    </div>
+                    <div class="call-to-action">
+                         <button class="reserve-button" onclick="alert('Reservation for ${item.item_name} requested. Our team will contact you!')">
+                            <i class="fas fa-clipboard-check"></i> Reserve / Contact
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryIcon(category) {
+            switch (category.toLowerCase()) {
+                case 'produce': return '<i class="fas fa-leaf" style="color: green;"></i>';
+                case 'dairy': return '<i class="fas fa-cheese" style="color: blue;"></i>';
+                case 'baked': return '<i class="fas fa-bread-slice" style="color: brown;"></i>';
+                case 'canned': return '<i class="fas fa-box" style="color: gray;"></i>';
+                case 'prepared': return '<i class="fas fa-utensils" style="color: orange;"></i>';
+                default: return '<i class="fas fa-question-circle" style="color: #666;"></i>';
+            }
+        }
+    </script>
 </head>
 <body>
-
     <header id="navbar">
-        <div class="logo-container">
-            <a href="/">
-                <span class="logo-share">Share Food.</span>
-                <span class="logo-feed">Feed Seychelles.</span>
-            </a>
-        </div>
-        
-        <button class="hamburger" aria-label="Toggle navigation" id="hamburger-btn">☰</button>
-        
-        <nav class="nav-links-container" id="nav-menu">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About Us</a>
-            <a href="/available-food" class="nav-link">Available Food</a>
-            <a href="/donate" class="nav-link cta-button">Donate Food</a>
-            <a href="/learn" class="nav-link">Learn</a>
-            
-            <div class="dropdown">
-                <a href="#" class="nav-link">Volunteer</a>
-                <div class="dropdown-content">
-                    <a href="/volunteer">Volunteer Now</a>
-                    <a href="/volunteers">Our Volunteers</a>
-                </div>
-            </div>
-            
-            <a href="/staff" class="nav-link staff-login">Staff Login</a>
+        <a href="../index/index.html" class="logo-container">
+            <img src="../image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+        </a>
+
+        <nav class="nav-links-container" id="navLinks">
+            <a href="../available-food/index.html" class="nav-link">Find Food</a>
+            <a href="../donate-food/index.html" class="nav-link">Donate</a>
+            <a href="../volunteer/index.html" class="nav-link">Volunteer</a>
+            <a href="../impact/index.html" class="nav-link">Impact</a>
+            <a href="../about/index.html" class="nav-link">About Us</a>
+            <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
+            <a href="../staff-login/index.html" class="staff-login nav-link">Staff Login</a>
         </nav>
+        <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
     </header>
 
     <main>
         <div class="content-container">
-            <section class="page-header">
-                <h1>Available Food Listings</h1>
-                <p>Browse surplus food listings available for claiming right now from businesses and donors across Seychelles.</p>
-            </section>
+            <header style="text-align: center; margin-bottom: 40px;">
+                <h1>Available Food Inventory</h1>
+                <p>Browse fresh food surplus available for collection by registered NGOs and community members in need.</p>
+            </header>
 
-            <section id="no-listings">
-                <p style="font-size: 3em;">😔</p>
-                <h2>No Food Available Right Now</h2>
-                <p>We are sorry, but there are currently **no food listings** available for claim. Please check back later, as our inventory updates throughout the day.</p>
-                <a href="/learn" class="cta-button" style="background-color: var(--secondary);">Learn About Our Mission</a>
-            </section>
+            <div class="filter-bar">
+                <label for="islandFilter"><i class="fas fa-globe"></i> Island:</label>
+                <select id="islandFilter">
+                    <option value="">All Islands</option>
+                    <option value="Mahe">Mahé</option>
+                    <option value="Praslin">Praslin</option>
+                    <option value="La Digue">La Digue</option>
+                </select>
 
+                <label for="categoryFilter"><i class="fas fa-utensils"></i> Category:</label>
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="produce">Fresh Produce</option>
+                    <option value="dairy">Dairy/Refrigerated</option>
+                    <option value="baked">Baked Goods</option>
+                    <option value="canned">Non-Perishable</option>
+                </select>
+            </div>
 
-            <section class="food-listings" style="display: none;"> 
-                
-                <div class="food-card" data-listing-id="LST001" data-location="Beau Vallon Bakery, Mahé" data-contact="admin@foodshare-seychelles.com">
-                    <div>
-                        <div class="category-tag">
-                            <i class="fas fa-bread-slice"></i> <span>Bread/Pastry</span>
-                        </div>
-                        <h3>Surplus Baguettes and Rolls (5kg)</h3>
-                        
-                        <div class="details-row">
-                            <i class="fas fa-calendar-times"></i> <span>Expires: Today, 7 PM</span>
-                        </div>
-                        <div class="details-row">
-                            <i class="fas fa-map-marker-alt"></i> <span>Beau Vallon Bakery, Mahé</span>
-                        </div>
-                    </div>
-                    <button class="claim-button" onclick="openClaimModal('Surplus Baguettes and Rolls (5kg)', 'LST001', 'Beau Vallon Bakery, Mahé', 'admin@foodshare-seychelles.com')">Claim Food</button>
+            <div id="inventory-grid">
                 </div>
 
-                </section>
+            <div id="loading-indicator">
+                <i class="fas fa-sync fa-spin"></i> Loading available food items...
+            </div>
+            
+             <div id="no-food-message" style="display: none;">
+                <i class="fas fa-sad-tear"></i> Sorry, there are currently no food items listed. Please check back soon!
+            </div>
         </div>
     </main>
 
-    <div id="claimModal" class="modal-overlay">
-        <div class="modal-content">
-            <span class="modal-close-btn" onclick="closeClaimModal()">&times;</span>
-            <h3 id="modalTitle">Claim Item Name Placeholder</h3>
-            
-            <p>Please select your logistics preference:</p>
-            
-            <div class="modal-option">
-                <h4>I will collect it myself (Recommended)</h4>
-                <p>Go directly to the **Location** below and identify yourself as a Foodshare claimant. **No further form needed.**</p>
-                <p><strong>Location:</strong> <span id="modalLocation"></span></p>
-                <p style="font-size: 0.9em;">*Advised: Contact Admin (<span id="modalContactEmail"></span>) just in case of last-minute changes.</p>
-                <button class="btn-pickup" onclick="closeClaimModal()">Proceed to Pickup Location</button>
-            </div>
-            
-            <div class="modal-option">
-                <h4>I need support from Admin (Transport)</h4>
-                <p>Fill out the detailed transport request form. Our team will coordinate delivery scheduling, subject to volunteer availability.</p>
-                <a id="transportLink" href="/contact/transport-assistance?listing=LST001" class="btn-transport">Go to Transport Request Form</a>
-            </div>
-            
-        </div>
-    </div>
-
     <footer id="main-footer">
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Our Mission</h3>
-                <p>Connecting surplus food with those who need it across the Seychelles islands to eliminate food waste and nourish our community.</p>
-            </div>
-            
-            <div class="footer-section links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/available-food">Available Food</a></li>
-                    <li><a href="/volunteer">Volunteer Now</a></li>
-                    <li><a href="/donate">Donate Food</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section contact">
-                <h3>Contact & Support</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a></p>
-            </div>
-            
-            <div class="footer-section legal">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                    <li><a href="/terms">Terms of Use</a></li>
-                </ul>
-            </div>
+        <div class="content-container footer-content">
+            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="../available-food/index.html">Find Food</a></li><li><a href="../donate-food/index.html">Donate Food</a></li><li><a href="../volunteer/index.html">Volunteer</a></li><li><a href="../impact/index.html">Impact & Reports</a></li><li><a href="../contact-general/index.html">General Contact</a></li></ul></div>
+            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="../about/index.html">About FoodShare</a></li><li><a href="../our-partners/index.html">Our Partners</a></li><li><a href="../learn/safety.html">Food Safety Protocol</a></li><li><a href="../learn/faq.html">General FAQ</a></li></ul></div>
+            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="../privacy-policy/index.html">Privacy Policy</a></li><li><a href="../terms-of-use/index.html">Terms of Use</a></li><li><a href="../sitemap/index.html">Site Structure</a></li><li><a href="../staff-login/index.html">Staff Login</a></li></ul></div>
+            <div class="footer-section"><h3>Get In Touch</h3><p>Email: admin@foodshare-seychelles.online</p><p>Phone: [Your Contact Number]</p><p>Follow us on <a href="../social/index.html">Social Media</a></p></div>
         </div>
-        
-        <div class="footer-bottom">
-            <p class="footer-credit">
-                Website by 
-                <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener noreferrer">Tyler Nicholas</a> | 
-                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </p>
-            &copy; 2025 Foodshare Seychelles. All Rights Reserved.
-        </div>
+        <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
     </footer>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    
-    <script>
-        // Store current listing details
-        let currentListingId = null;
-        let currentListingLocation = null;
-        let currentListingContact = null;
-
-        // Function to open the modal
-        function openClaimModal(itemName, listingId, location, contactEmail) {
-            currentListingId = listingId;
-            currentListingLocation = location;
-            currentListingContact = contactEmail;
-            
-            document.getElementById('modalTitle').textContent = itemName;
-            document.getElementById('modalLocation').textContent = location;
-            document.getElementById('modalContactEmail').textContent = contactEmail;
-            
-            // Update the link for Transport Assistance with the correct listing ID
-            const transportLink = document.getElementById('transportLink');
-            transportLink.href = `/contact/transport-assistance?listing=${listingId}`;
-            
-            document.getElementById('claimModal').style.display = 'flex';
-        }
-
-        // Function to close the modal
-        function closeClaimModal() {
-            document.getElementById('claimModal').style.display = 'none';
-        }
-
-        // JavaScript for mobile navigation toggle
-        document.getElementById('hamburger-btn').addEventListener('click', function() {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.classList.toggle('open');
-        });
-        
-        // Close modal if user clicks outside of it
-        window.onclick = function(event) {
-            const modal = document.getElementById('claimModal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-
-        // TEMP: Logic to show listings if needed for testing (Set to 'none' by default)
-        document.addEventListener('DOMContentLoaded', () => {
-            // const hasListings = true; // Set to true to show examples
-            // if (hasListings) {
-            //     document.getElementById('no-listings').style.display = 'none';
-            //     document.querySelector('.food-listings').style.display = 'grid';
-            // }
-        });
-    </script>
-
 </body>
 </html>
