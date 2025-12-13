@@ -1,276 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Use - Foodshare Seychelles</title>
-    
-    <link rel="icon" type="image/png" href="../image/logo.png">
+<main>
+    <section class="content-section">
+        <h1>Terms of Use</h1>
+        <p><strong>Last Updated: December 13, 2025</strong></p>
 
-    <style>
-        /* Theme Variables */
-        :root {
-            --primary: #4CAF50; /* Vibrant Green */
-            --secondary: #388E3C; /* Darker Green */
-            --neutral: #F5F5F5; /* Light Grey */
-            --dark: #212121; /* Dark Text */
-            --white: #ffffff;
-            --font-family: 'Helvetica', 'Arial', sans-serif;
-        }
+        <p>Welcome to FoodShare Seychelles. By accessing and using our website and services, you agree to comply with and be bound by the following terms and conditions.</p>
 
-        /* Base and Layout */
-        body {
-            font-family: var(--font-family); margin: 0; background-color: var(--white);
-            color: var(--dark); display: flex; flex-direction: column; min-height: 100vh;
-        }
-        a { text-decoration: none; color: inherit; }
-        main { flex-grow: 1; padding: 40px 0; }
-        .content-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px;
-            line-height: 1.6;
-        }
-
-        /* --- Page-Specific Heading --- */
-        .page-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        .page-header h1 {
-            color: var(--secondary);
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        .page-header p {
-            font-size: 1.0em;
-            color: #666;
-        }
-
-        /* --- Policy Content Styling --- */
-        .policy-section h2 {
-            color: var(--primary);
-            border-bottom: 2px solid var(--neutral);
-            padding-bottom: 5px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-        .policy-section ol {
-            padding-left: 20px;
-        }
-        .policy-section li {
-            margin-bottom: 10px;
-        }
-
-        /* ------------------------------------------- */
-        /* --- NAVIGATION BAR STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 30px; background-color: var(--neutral);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .logo-container { font-size: 1.5em; font-weight: bold; }
-        .logo-share { color: var(--dark); }
-        .logo-feed { color: var(--primary); }
-        .nav-links-container { display: flex; align-items: center; }
-        .nav-link {
-            padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s;
-        }
-        .nav-link:hover { color: var(--secondary); }
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content {
-            display: none; position: absolute; background-color: var(--neutral);
-            min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;
-            top: 35px; left: 0; border-radius: 4px;
-        }
-        .dropdown-content a {
-            color: var(--dark); padding: 12px 16px; text-decoration: none;
-            display: block; text-align: left;
-        }
-        .dropdown-content a:hover { background-color: #ddd; color: var(--secondary); }
-        .dropdown:hover .dropdown-content { display: block; }
-        .cta-button {
-            background-color: var(--primary); color: white; border-radius: 4px;
-            margin-left: 15px; padding: 10px 20px; font-weight: bold;
-        }
-        .cta-button:hover { background-color: var(--secondary); color: white; }
-        .staff-login { margin-left: 10px; font-weight: bold; }
-        .hamburger {
-            display: none; font-size: 1.8em; background: none; border: none;
-            cursor: pointer; color: var(--dark); z-index: 1001;
-        }
-
-        @media (max-width: 768px) {
-            #navbar { padding: 10px 20px; }
-            .nav-links-container {
-                position: absolute; top: 60px; left: 0; width: 100%;
-                flex-direction: column; background-color: var(--neutral);
-                border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                display: none; z-index: 999;
-            }
-            .nav-links-container.open { display: flex; }
-            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
-            .hamburger { display: block; }
-            .dropdown { width: 100%; }
-            .dropdown-content { position: relative; width: 100%; top: 0; box-shadow: none; border-top: 1px solid #eee; }
-        }
-
-        /* ------------------------------------------- */
-        /* --- FOOTER STYLING (Copy/Paste) --- */
-        /* ------------------------------------------- */
-        #main-footer {
-            margin-top: auto; background-color: var(--dark); color: var(--neutral);
-            padding: 40px 30px 15px; font-size: 0.9em;
-        }
-        .footer-content {
-            display: flex; justify-content: space-between; flex-wrap: wrap; 
-            max-width: 1200px; margin: 0 auto 20px;
-        }
-        .footer-section { width: 23%; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
-        .footer-section p, .footer-section li { margin: 5px 0; }
-        .footer-section a { color: var(--neutral); transition: color 0.3s; }
-        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
-        .footer-section ul { list-style: none; padding: 0; }
-
-        .footer-bottom {
-            max-width: 1200px; margin: 0 auto; text-align: center;
-            padding-top: 15px; border-top: 1px solid #444; color: #999;
-            font-size: 0.8em;
-        }
-        .footer-credit a { color: var(--primary); }
-        .footer-credit a:hover { text-decoration: underline; }
-
-        @media (max-width: 600px) {
-            .footer-content { flex-direction: column; padding: 0 20px; }
-            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
-            .footer-section:last-child { border-bottom: none; }
-        }
-    </style>
-</head>
-<body>
-
-    <header id="navbar">
-        <div class="logo-container">
-            <a href="/">
-                <span class="logo-share">Share Food.</span>
-                <span class="logo-feed">Feed Seychelles.</span>
-            </a>
-        </div>
+        <h2>1. User Obligations</h2>
+        <p>You agree to use the website only for lawful purposes. All users, including volunteers and donors, must provide accurate and complete information.</p>
         
-        <button class="hamburger" aria-label="Toggle navigation" id="hamburger-btn">☰</button>
-        
-        <nav class="nav-links-container" id="nav-menu">
-            <a href="/" class="nav-link">Home</a>
-            <a href="/about" class="nav-link">About Us</a>
-            <a href="/available-food" class="nav-link">Available Food</a>
-            <a href="/donate" class="nav-link cta-button">Donate Food</a>
-            <a href="/learn" class="nav-link">Learn</a>
-            
-            <div class="dropdown">
-                <a href="#" class="nav-link">Volunteer</a>
-                <div class="dropdown-content">
-                    <a href="/volunteer">Volunteer Now</a>
-                    <a href="/volunteers">Our Volunteers</a>
-                </div>
-            </div>
-            
-            <a href="/staff" class="nav-link staff-login">Staff Login</a>
-        </nav>
-    </header>
+        <h2>2. Disclaimer of Liability (Food Quality and Safety)</h2>
+        <p>FoodShare Seychelles acts as a connector between surplus food providers (donors) and recipients. **We do not inspect, prepare, or guarantee the safety, quality, or freshness of any donated food item.**</p>
+        <ul>
+            <li><strong>Donors:</strong> By donating, you certify that the food is safe and fit for human consumption and that you have followed all applicable food safety guidelines and local laws.</li>
+            <li><strong>Recipients:</strong> By receiving food, you acknowledge that you consume the food at your own risk. FoodShare Seychelles, its staff, and volunteers shall not be liable for any injury, illness, or damages resulting from the consumption of donated food.</li>
+        </ul>
 
-    <main>
-        <div class="content-container">
-            <section class="page-header">
-                <h1>Terms of Use</h1>
-                <p>Effective Date: December 8, 2025</p>
-            </section>
+        <h2>3. Volunteer Agreement</h2>
+        <p>By submitting a volunteer application, you agree to abide by all organizational policies, including food handling protocols and liability waivers, which must be signed prior to active service.</p>
 
-            <section class="policy-section">
-                <p>Welcome to Foodshare Seychelles. These Terms of Use govern your access to and use of our website and services. By accessing or using our services, you agree to be bound by these Terms.</p>
+        <h2>4. Modifications to Terms</h2>
+        <p>FoodShare Seychelles reserves the right to modify these Terms of Use at any time. Your continued use of the website after any changes constitutes your acceptance of the new terms.</p>
 
-                <h2>1. Acceptance of Terms</h2>
-                <p>By using the Foodshare Seychelles website, you acknowledge that you have read, understood, and agreed to these Terms of Use and our Privacy Policy.</p>
+        <h2>5. Contact Information</h2>
+        <p>For any questions regarding these Terms, please contact us at:</p>
+        <p><strong>Email:</strong> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></p>
 
-                <h2>2. Donor Obligations (Food Quality)</h2>
-                <ol>
-                    <li>All food donated must be safe, edible, and fit for human consumption according to Seychelles food safety standards.</li>
-                    <li>Donors are responsible for maintaining the correct temperature of food items until the point of transfer to a Foodshare representative or recipient.</li>
-                    <li>Foodshare Seychelles and its recipients are released from liability regarding the quality or condition of food once it is transferred, provided the food was handled according to standard food safety guidelines upon receipt.</li>
-                </ol>
-
-                <h2>3. Limitation of Liability</h2>
-                <p>Foodshare Seychelles acts solely as an intermediary matching surplus food with registered recipients. We are not responsible for:</p>
-                <ul>
-                    <li>Any damage, injury, or loss resulting from the consumption of donated food.</li>
-                    <li>Failures in communication or delays in pickup that lead to spoilage or waste.</li>
-                    <li>The quality, safety, or legality of any products posted by users.</li>
-                </ul>
-
-                <h2>4. Intellectual Property</h2>
-                <p>The content, design, logo, and intellectual property on this website are owned by Foodshare Seychelles or its licensors and are protected by copyright laws.</p>
-                
-                <h2>5. Governing Law</h2>
-                <p>These Terms shall be governed by and construed in accordance with the laws of the Republic of Seychelles.</p>
-                
-                <h2>6. Changes to Terms</h2>
-                <p>We reserve the right to revise these Terms at any time. The most current version will always be posted on this page.</p>
-
-                <h2>7. Contact Information</h2>
-                <p>For any questions regarding these Terms, please contact us at <a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a>.</p>
-            </section>
-        </div>
-    </main>
-
-    <footer id="main-footer">
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Our Mission</h3>
-                <p>Connecting surplus food with those who need it across the Seychelles islands to eliminate food waste and nourish our community.</p>
-            </div>
-            
-            <div class="footer-section links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/available-food">Available Food</a></li>
-                    <li><a href="/volunteer">Volunteer Now</a></li>
-                    <li><a href="/donate">Donate Food</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section contact">
-                <h3>Contact & Support</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.com">admin@foodshare-seychelles.com</a></p>
-            </div>
-            
-            <div class="footer-section legal">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                    <li><a href="/terms">Terms of Use</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p class="footer-credit">
-                Website by 
-                <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener noreferrer">Tyler Nicholas</a> | 
-                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </p>
-            &copy; 2025 Foodshare Seychelles. All Rights Reserved.
-        </div>
-    </footer>
-
-    <script>
-        // JavaScript for mobile navigation toggle
-        document.getElementById('hamburger-btn').addEventListener('click', function() {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.classList.toggle('open');
-        });
-    </script>
-</body>
-</html>
+    </section>
+</main>
