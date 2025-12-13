@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Login - FoodShare Seychelles</title>
     
-    <link rel="icon" href="../images/logo.png" type="image/png">
+    <link rel="icon" href="../image/logo.png" type="image/png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
         /* ======================================================= */
@@ -35,14 +36,10 @@
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; }
-        .nav-links-container { display: flex; gap: 30px; align-items: center; }
-        .nav-link { font-weight: 500; padding: 8px 0; color: var(--text-dark); }
+        .nav-links-container { display: none; }
         .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-        .search-container { margin-left: 30px; display: flex; align-items: center; background-color: var(--neutral-bg); border-radius: 50px; padding: 5px 15px; border: 1px solid #eee; }
-        .search-input { border: none; background: none; padding: 5px; outline: none; font-size: 1em; width: 180px; color: var(--text-dark); }
-        .search-icon { color: var(--primary-dark); cursor: pointer; font-size: 1.1em; }
-        .hamburger { display: none; } /* Hide on desktop */
+        .hamburger { display: none; } 
 
         /* ======================================================= */
         /* 2. FORM & BUTTON STYLING (REFINED) */
@@ -70,7 +67,7 @@
         .submit-button:hover:not(:disabled) { background-color: var(--primary-dark); transform: translateY(-1px); }
         .submit-button:disabled { background-color: #A5D6A7; cursor: not-allowed; }
 
-        .alert-banner { padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: bold; }
+        .alert-banner { padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: bold; display: none; }
         .alert-error { background-color: #FFCDD2; color: #C62828; border: 1px solid #E57373; }
         .alert-success { background-color: #C8E6C9; color: #2E7D32; border: 1px solid #66BB6A; }
         
@@ -89,98 +86,101 @@
         
         @media (max-width: 992px) {
             .nav-links-container { display: none; }
-            .hamburger { display: block; }
         }
     </style>
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const form = document.getElementById('staffLoginForm');
-        const messageEl = document.getElementById('loginMessage');
-        const loginButton = document.getElementById('loginButton');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            loginButton.disabled = true;
-            messageEl.style.display = 'none';
-
-            // 1. Authenticate User
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                messageEl.textContent = `Login Failed: ${error.message}`;
-                messageEl.className = 'alert-banner alert-error';
-                messageEl.style.display = 'block';
-                loginButton.disabled = false;
-                return;
-            }
-
-            // 2. Get User ID and Check Role from the 'profiles' table
-            const user = data.user;
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('role_id')
-                .eq('id', user.id)
-                .single();
-
-            if (profileError) {
-                messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
-                messageEl.className = 'alert-banner alert-error';
-                messageEl.style.display = 'block';
-                await supabase.auth.signOut();
-                loginButton.disabled = false;
-                return;
-            }
-
-            // 3. Redirect based on Role ID
-            const roleId = profileData.role_id;
-            
-            if (roleId === 1) { // Admin Role
-                window.location.href = '../admin-dashboard/index.html';
-            } else if (roleId === 2 || roleId === 3) { // Logistics or Volunteer Staff Role
-                window.location.href = '../staff-dashboard/index.html';
+        let supabase;
+        document.addEventListener('DOMContentLoaded', () => {
+             if (window.createClient) {
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                messageEl.textContent = 'User role not recognized. Access denied.';
+                // If Supabase failed to load (e.g., blocked CDN), display error
+                const messageEl = document.getElementById('loginMessage');
+                messageEl.textContent = 'ERROR: Required services failed to load. Please check your network connection.';
                 messageEl.className = 'alert-banner alert-error';
                 messageEl.style.display = 'block';
-                await supabase.auth.signOut();
+                document.getElementById('loginButton').disabled = true;
+                return;
             }
+
+            const form = document.getElementById('staffLoginForm');
+            const messageEl = document.getElementById('loginMessage');
+            const loginButton = document.getElementById('loginButton');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                loginButton.disabled = true;
+                messageEl.style.display = 'none';
+
+                // 1. Authenticate User
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+                if (error) {
+                    messageEl.textContent = `Login Failed: ${error.message}`;
+                    messageEl.className = 'alert-banner alert-error';
+                    messageEl.style.display = 'block';
+                    loginButton.disabled = false;
+                    return;
+                }
+
+                // 2. Get User ID and Check Role from the 'profiles' table
+                const user = data.user;
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role_id')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profileError) {
+                    messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
+                    messageEl.className = 'alert-banner alert-error';
+                    messageEl.style.display = 'block';
+                    await supabase.auth.signOut();
+                    loginButton.disabled = false;
+                    return;
+                }
+
+                // 3. Redirect based on Role ID
+                const roleId = profileData.role_id;
+                
+                if (roleId === 1) { // Admin Role
+                    window.location.href = '../admin-dashboard/index.html';
+                } else if (roleId === 2 || roleId === 3) { // Logistics or Volunteer Staff Role
+                    window.location.href = '../staff-dashboard/index.html';
+                } else {
+                    messageEl.textContent = 'User role not recognized. Access denied.';
+                    messageEl.className = 'alert-banner alert-error';
+                    messageEl.style.display = 'block';
+                    await supabase.auth.signOut();
+                }
+            });
         });
         
-        // Basic Search Handler
-        document.querySelector('.search-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                alert(`Searching for: "${e.target.value.trim()}".`);
+        // Basic Search Handler (Non-blocking as this is only for a click/keypress event)
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                alert(`Searching site for: "${query}".`);
             }
-        });
+        }
     </script>
 </head>
 <body>
     <header id="navbar">
         <a href="../index/index.html" class="logo-container">
-            <img src="../images/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            <img src="../image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
             FoodShare <span style="color: var(--primary-main);">Seychelles</span>
         </a>
 
-        <nav class="nav-links-container" id="navLinks">
-            <a href="../available-food/index.html" class="nav-link">Find Food</a>
-            <a href="../donate-food/index.html" class="nav-link">Donate</a>
-            <a href="../impact/index.html" class="nav-link">Impact</a>
-            
-            <div class="search-container">
-                <input type="text" placeholder="Search the site..." class="search-input">
-                <i class="fas fa-search search-icon"></i>
-            </div>
-            
+        <div class="nav-links-container">
             <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
-        </nav>
-        <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+        </div>
     </header>
 
     <main>
@@ -192,7 +192,7 @@
             </div>
 
             <div class="form-card">
-                <div id="loginMessage" class="alert-banner" style="display: none;"></div>
+                <div id="loginMessage" class="alert-banner"></div>
 
                 <form id="staffLoginForm">
                     <div class="form-group">
@@ -254,6 +254,7 @@
             <div class="footer-section">
                 <h3>Get In Touch</h3>
                 <p>Email: admin@foodshare-seychelles.online</p>
+                <p>Phone: [Your Contact Number]</p>
                 <p>Follow us on <a href="../social/index.html">Social Media</a></p>
             </div>
         </div>
