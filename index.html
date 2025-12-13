@@ -58,8 +58,8 @@
             box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
         }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-        .logo-img { height: 40px; margin-right: 10px; animation: logo-pulse 3s infinite alternate; }
-        @keyframes logo-pulse { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.05); opacity: 1; } }
+        /* Removed logo-pulse animation */
+        .logo-img { height: 40px; margin-right: 10px; } 
         .nav-links-container { display: flex; gap: 30px; align-items: center; }
         .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
         .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
@@ -73,11 +73,7 @@
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
         /* Search Bar Styling */
-        .search-container {
-            margin-left: 30px; display: flex; align-items: center;
-            background-color: var(--neutral-bg); border-radius: 50px;
-            padding: 5px 15px; border: 1px solid #eee; transition: border-color var(--transition-speed);
-        }
+        .search-container { margin-left: 30px; display: flex; align-items: center; background-color: var(--neutral-bg); border-radius: 50px; padding: 5px 15px; border: 1px solid #eee; transition: border-color var(--transition-speed); }
         .search-container:focus-within { border-color: var(--primary-light); box-shadow: 0 0 5px rgba(76, 175, 80, 0.3); }
         .search-input { border: none; background: none; padding: 5px; outline: none; font-size: 1em; width: 180px; color: var(--text-dark); }
         .search-icon { color: var(--primary-dark); cursor: pointer; font-size: 1.1em; }
@@ -147,8 +143,8 @@
             transition: transform 0.3s, box-shadow 0.3s; animation: fade-in 1s ease-out;
         }
         .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); }
-        .card-icon { font-size: 3em; color: var(--primary-main); margin-bottom: 15px; animation: rotate-icon 4s infinite linear; }
-        @keyframes rotate-icon { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* Removed rotate-icon animation */
+        .card-icon { font-size: 3em; color: var(--primary-main); margin-bottom: 15px; } 
 
         /* Section Headings and Stats */
         .section-heading { text-align: center; margin-bottom: 50px; }
@@ -189,20 +185,33 @@
         }
     </style>
     <script>
-        // Supabase client creation is deferred until the DOM is loaded
-        let supabase;
+        // Supabase client creation must be globally available for the function
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        let supabase;
 
         document.addEventListener('DOMContentLoaded', () => {
-             // Initialize Supabase only after DOM is ready
-            if (window.createClient) {
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+             // 1. Initialize Supabase Client
+            if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                fetchBanner();
             } else {
-                console.error("Supabase client library not loaded. Check CDN link.");
+                console.warn("Supabase client library not yet available. Waiting or failed.");
+                // Fallback check after a short delay
+                setTimeout(() => {
+                    if (window.supabase && window.supabase.createClient) {
+                        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                        fetchBanner();
+                    } else {
+                         console.error("Supabase client failed to load completely.");
+                         document.getElementById('announcementBanner').textContent = 'Error loading announcements. Please check network connection.';
+                         document.getElementById('announcementBanner').style.display = 'block';
+                         document.getElementById('announcementBanner').style.backgroundColor = '#FF5722'; // Orange error color
+                    }
+                }, 1000);
             }
 
-            // Preloader Logic
+            // 2. Preloader Logic
             setTimeout(() => {
                 const preloader = document.getElementById('preloader');
                 if (preloader) {
@@ -210,28 +219,7 @@
                 }
             }, 1500); 
 
-            // Fetch Dynamic Announcement Banner
-            async function fetchBanner() {
-                if (!supabase) return; // Wait for Supabase to initialize
-                const { data, error } = await supabase
-                    .from('settings')
-                    .select('value')
-                    .eq('key', 'home_announcement')
-                    .single();
-
-                const bannerEl = document.getElementById('announcementBanner');
-                if (data && data.value && bannerEl) {
-                    bannerEl.textContent = data.value;
-                    bannerEl.style.display = 'block';
-                } else {
-                    bannerEl.style.display = 'none'; // Hide if failed or empty
-                }
-            }
-            // Add a slight delay to ensure the Supabase library loads asynchronously
-            setTimeout(fetchBanner, 500); 
-            
-
-            // Basic Search Handler (Client-side redirect)
+            // 3. Basic Search Handler (Client-side redirect)
             document.querySelector('.search-input').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     const query = e.target.value.trim();
@@ -241,6 +229,32 @@
                 }
             });
         });
+
+        // Function to Fetch Dynamic Announcement Banner
+        async function fetchBanner() {
+            if (!supabase) return; // Must be initialized
+            const bannerEl = document.getElementById('announcementBanner');
+
+            const { data, error } = await supabase
+                .from('settings')
+                .select('value')
+                .eq('key', 'home_announcement')
+                .single();
+
+            if (error) {
+                 console.error("Supabase error fetching announcement:", error);
+                 bannerEl.textContent = 'Operational announcement service unavailable.';
+                 bannerEl.style.display = 'block';
+                 return;
+            }
+            
+            if (data && data.value) {
+                bannerEl.textContent = data.value;
+                bannerEl.style.display = 'block';
+            } else {
+                bannerEl.style.display = 'none'; // Hide if no active announcement
+            }
+        }
     </script>
 </head>
 <body>
@@ -301,22 +315,22 @@
                 <div class="stats-grid">
                     <div class="stat-item">
                         <i class="fas fa-seedling" style="color: var(--primary-main);"></i>
-                        <h3 id="stat-kgs">2,500+</h3>
+                        <h3 id="stat-kgs">N/A</h3>
                         <p>Kgs of Food Redirected</p>
                     </div>
                     <div class="stat-item">
                         <i class="fas fa-users" style="color: #2196F3;"></i>
-                        <h3 id="stat-families">500+</h3>
+                        <h3 id="stat-families">N/A</h3>
                         <p>Families Nourished</p>
                     </div>
                     <div class="stat-item">
                         <i class="fas fa-globe-africa" style="color: #FF9800;"></i>
-                        <h3 id="stat-co2">15,000+</h3>
+                        <h3 id="stat-co2">N/A</h3>
                         <p>Kgs CO2 Emissions Saved</p>
                     </div>
                     <div class="stat-item">
                         <i class="fas fa-calendar-check" style="color: #9C27B0;"></i>
-                        <h3 id="stat-partners">35+</h3>
+                        <h3 id="stat-partners">N/A</h3>
                         <p>Active Donor Partners</p>
                     </div>
                 </div>
@@ -337,13 +351,13 @@
                     </div>
 
                     <div class="feature-card">
-                        <i class="fas fa-truck-moving card-icon"></i>
+                         <i class="fas fa-truck-moving card-icon"></i>
                         <h3>Logistics & Pick-up</h3>
                         <p>Our staff and volunteer logistics team coordinate rapid, refrigerated transport across the islands.</p>
                     </div>
 
                     <div class="feature-card">
-                        <i class="fas fa-people-carry-box card-icon"></i>
+                         <i class="fas fa-people-carry-box card-icon"></i>
                         <h3>Community Distribution</h3>
                         <p>Food is immediately listed for collection by approved NGOs and community members in need.</p>
                     </div>
