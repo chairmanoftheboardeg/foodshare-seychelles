@@ -6,16 +6,35 @@
     <title>FoodShare Seychelles - Share Food. Feed Seychelles.</title>
     <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait for 1.5 seconds or until all key resources are loaded
+            // Preloader Logic
             setTimeout(() => {
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.classList.add('hidden');
-                }
+                document.getElementById('preloader').classList.add('hidden');
             }, 1500); 
+
+            // Fetch Dynamic Announcement Banner
+            async function fetchBanner() {
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('value')
+                    .eq('key', 'home_announcement')
+                    .single();
+
+                if (data) {
+                    document.getElementById('announcementBanner').textContent = data.value;
+                } else if (error) {
+                    console.error('Error fetching banner:', error);
+                    document.getElementById('announcementBanner').style.display = 'none'; // Hide if failed
+                }
+            }
+            fetchBanner();
         });
     </script>
 </head>
@@ -51,7 +70,7 @@
     </header>
 
     <div id="announcementBanner" class="announcement-banner">
-        Operational Update: We are excited to announce our official launch date is coming soon! Check back for updates.
+        Loading operational announcements...
     </div>
 
     <main>
@@ -109,51 +128,6 @@
     </main>
 
     <footer id="main-footer">
-        <div class="content-container footer-content">
-            
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="available-food.html">Find Food</a></li>
-                    <li><a href="donate-food.html">Donate Food</a></li>
-                    <li><a href="volunteer-now.html">Volunteer</a></li>
-                    <li><a href="impact.html">Impact & Reports</a></li>
-                    <li><a href="contact-general.html">General Contact</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Learn More</h3>
-                <ul>
-                    <li><a href="about-us.html">About FoodShare</a></li>
-                    <li><a href="our-partners.html">Our Partners</a></li>
-                    <li><a href="learn/safety.html">Food Safety Protocol</a></li>
-                    <li><a href="learn/faq.html">General FAQ</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Support & Legal</h3>
-                <ul>
-                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                    <li><a href="terms-of-use.html">Terms of Use</a></li>
-                    <li><a href="sitemap.html">Site Structure</a></li>
-                    <li><a href="staff-login.html">Staff Login</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-section">
-                <h3>Get In Touch</h3>
-                <p>Email: admin@foodshare-seychelles.online</p>
-                <p>Phone: [Your Contact Number]</p>
-                <p>Follow us on <a href="social.html">Social Media</a></p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            &copy; 2025 Foodshare Seychelles. All Rights Reserved. 
-            <span class="footer-credit">Website by Tyler Nicholas | <a href="#">LinkedIn</a></span>
-        </div>
-    </footer>
+        </footer>
 </body>
 </html>
