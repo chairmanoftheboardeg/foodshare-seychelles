@@ -10,10 +10,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START ADMIN DASHBOARD CSS BLOCK] */
+        /* [START ADMIN DASHBOARD CSS BLOCK] - Slightly refactored for clarity */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #E53935; /* Added for alerts/metrics */
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -67,7 +67,8 @@
             const user = session.user;
             const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
             
-            if (!profile || profile.role_id !== 1) { // Only Admin (role_id=1) proceeds
+            // SECURITY FIX: Only allow role_id=1 (Admin) to proceed.
+            if (!profile || profile.role_id !== 1) { 
                 alert('Authorization Failed: You are not authorized as an Admin. Redirecting to Staff Login.');
                 await supabase.auth.signOut();
                 window.location.href = '/staff-login/';
@@ -125,12 +126,7 @@
         <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
         <nav class="sidebar-nav">
             <a href="/admin-dashboard/" class="active"><i class="fas fa-home"></i> Dashboard Home</a>
-            <a href="#"><i class="fas fa-boxes"></i> Inventory Management</a>
-            <a href="#"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
-            <a href="#"><i class="fas fa-tasks"></i> Staff Tasks</a>
-            <a href="#"><i class="fas fa-users"></i> Volunteer Apps</a>
-            <a href="#"><i class="fas fa-cog"></i> Site Settings</a>
-            <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="/admin/inventory"><i class="fas fa-boxes"></i> Inventory Management</a> <a href="/admin/donations"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a> <a href="/admin/staff-tasks"><i class="fas fa-tasks"></i> Staff Tasks</a> <a href="/admin/volunteer-apps"><i class="fas fa-users"></i> Volunteer Apps</a> <a href="/admin/settings"><i class="fas fa-cog"></i> Site Settings</a> <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
