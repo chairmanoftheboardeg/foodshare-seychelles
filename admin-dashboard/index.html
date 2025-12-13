@@ -4,175 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - FoodShare Seychelles</title>
-    
-    <link rel="icon" href="../image/logo.png" type="image/png">
+    <link rel="icon" href="/image/logo.png" type="image/png">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
+        /* [START ADMIN DASHBOARD CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --accent-blue: #2196F3; --accent-orange: #FF9800;
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-            --transition-speed: 0.4s;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; }
-        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-        a:hover { color: var(--primary-dark); }
-        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .dashboard-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
-        .sidebar { background-color: var(--text-dark); color: var(--neutral-card); padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15); }
-        .sidebar h2 { font-size: 1.5em; color: var(--primary-light); margin-bottom: 30px; text-align: center; }
-        .sidebar-nav a { display: block; padding: 12px 15px; color: var(--neutral-bg); margin-bottom: 8px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; font-size: 1.1em; }
-        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: var(--primary-dark); color: var(--neutral-card); }
-        .dashboard-content { padding: 40px; background-color: var(--neutral-bg); }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
-        .data-card { background-color: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--primary-main); }
-        .dash-stat { font-size: 3em; color: var(--primary-dark); font-weight: bold; margin-top: 5px; }
-        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: var(--shadow-subtle); background-color: var(--neutral-card); }
-        .dashboard-table th, .dashboard-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
-        .dashboard-table th { background-color: var(--primary-light); color: var(--text-dark); }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 0.8em; display: inline-block; }
-        .status-new { background-color: #FFF9C4; color: #FBC02D; } 
-        .status-in-progress { background-color: #BBDEFB; color: #1976D2; } 
-        .status-done { background-color: #C8E6C9; color: var(--primary-dark); }
-        .status-to-do { background-color: #FFCDD2; color: #C62828; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; min-height: 100vh; }
+        
+        /* Layout */
+        .sidebar { width: 280px; background-color: #1A237E; /* Deep Indigo for Admin */ color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        
+        /* Sidebar */
+        .sidebar h2 { color: #BBDEFB; margin-bottom: 30px; font-family: var(--font-serif); font-size: 1.6em; }
+        .sidebar-nav a { display: block; color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 12px 10px; margin-bottom: 5px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #283593; color: white; }
+        .sidebar-nav a i { margin-right: 10px; }
 
-        @media (max-width: 768px) {
-             .dashboard-layout { grid-template-columns: 1fr; }
-             .sidebar-nav { display: flex; overflow-x: auto; white-space: nowrap; padding: 0 10px; }
-             .sidebar-nav a { flex: 0 0 auto; margin: 0 5px; padding: 8px 10px; }
-        }
+        /* Metrics */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .metric-card { background-color: var(--neutral-card); padding: 25px; border-radius: 10px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--accent-blue); }
+        .metric-card h3 { font-size: 1em; color: var(--text-light); margin-bottom: 10px; }
+        .metric-value { font-size: 2em; font-weight: bold; color: #1A237E; }
+        
+        /* Recent Activity */
+        .section-header { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+        .activity-item { background-color: var(--neutral-card); padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid var(--accent-orange); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
+        .activity-title { font-weight: bold; margin-bottom: 5px; }
+        .activity-meta { font-size: 0.9em; color: var(--text-light); }
+        /* [END ADMIN DASHBOARD CSS BLOCK] */
     </style>
+    
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsInl4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
-        document.addEventListener('DOMContentLoaded', async () => {
-             // 1. Initialize Supabase Client
-             if (window.supabase && window.supabase.createClient) {
+
+        async function checkAuthAndRedirect() {
+            if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                console.error("Supabase client library failed to load. Redirecting to login.");
-                window.location.href = '../staff-login/index.html'; 
-                return;
+                return; 
             }
 
-            // 2. CRITICAL SESSION CHECK FIX
             const { data: { session } } = await supabase.auth.getSession();
             
             if (!session) {
-                window.location.href = '../staff-login/index.html';
+                window.location.href = '/staff-login/';
                 return;
             }
             
-            const user = session.user; 
-
-            // 3. CRITICAL ROLE CHECK FIX
+            const user = session.user;
             const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
-            if (profile?.role_id !== 1) {
-                alert('Authorization Failed: You do not have Admin privileges. Redirecting to Staff Login.');
+            
+            if (!profile || profile.role_id !== 1) { // Only Admin (role_id=1) proceeds
+                alert('Authorization Failed: You are not authorized as an Admin. Redirecting to Staff Login.');
                 await supabase.auth.signOut();
-                window.location.href = '../staff-login/index.html';
+                window.location.href = '/staff-login/';
                 return;
             }
-
-            // 4. Data Fetching
-            fetchAdminMetrics(user.id);
-            fetchRecentTasks();
-        });
-
-        async function fetchAdminMetrics(userId) {
-            // Metrics fetching logic remains the same (assuming tables exist in DB)
-            const { count: donationCount } = await supabase.from('donation_requests').select('*', { count: 'exact', head: true }).eq('status', 'New');
-            document.getElementById('newDonationCount').textContent = donationCount || 0;
-            const { count: appCount } = await supabase.from('applications').select('*', { count: 'exact', head: true }).eq('status', 'Pending');
-            document.getElementById('newAppCount').textContent = appCount || 0;
-            const { count: inquiryCount } = await supabase.from('inquiries').select('*', { count: 'exact', head: true }).eq('type', 'transport').eq('status', 'New');
-            document.getElementById('urgentInquiries').textContent = inquiryCount || 0;
-            const { data: profile } = await supabase.from('profiles').select('email').eq('id', userId).single();
-            if (profile) {
-                 const namePart = profile.email.split('@')[0];
-                 const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-                 document.getElementById('adminName').textContent = displayName;
-            }
+            
+            // If role is 1 (Admin), proceed to load data
+            fetchAdminMetrics();
+            fetchRecentActivity();
         }
 
-        async function fetchRecentTasks() {
-             const { data: tasks, error } = await supabase
-                .from('staff_tasks_view') // This table/view must exist
-                .select('*')
-                .in('status', ['New', 'To Do', 'In Progress'])
-                .order('task_id', { ascending: false })
-                .limit(5);
+        async function fetchAdminMetrics() {
+            // Placeholder function to fetch overall system metrics
+            document.getElementById('totalKgRescued').textContent = '2,450'; 
+            document.getElementById('pendingRequests').textContent = '5';
+            document.getElementById('activeVolunteers').textContent = '22';
+            document.getElementById('newVolunteers').textContent = '3';
+        }
 
-            const tbody = document.getElementById('recentTasksBody');
-            tbody.innerHTML = ''; 
+        async function fetchRecentActivity() {
+            // Placeholder function to fetch and display recent system activity
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+            
+            const mockActivity = [
+                { id: 1, title: "NEW Donation Request from Marie-Claire", type: "Donation", time: "5 minutes ago" },
+                { id: 2, title: "Volunteer Application received: David Faure", type: "Volunteer", time: "1 hour ago" },
+                { id: 3, title: "Inventory Updated: 50kg Fresh Fish", type: "Inventory", time: "3 hours ago" }
+            ];
 
-            if (tasks && tasks.length > 0) {
-                tasks.forEach(task => {
-                    const statusClass = task.status.toLowerCase().replace(' ', '-');
-                    const row = `
-                        <tr>
-                            <td>#${task.task_id ? task.task_id.substring(0, 5).toUpperCase() : 'N/A'}</td>
-                            <td>${task.title || 'No Title'}</td>
-                            <td>${task.assigned_staff_email ? task.assigned_staff_email.split('@')[0] : 'Unassigned'}</td>
-                            <td><span class="status-badge status-${statusClass}">${task.status}</span></td>
-                            <td><a href="#">View Details</a></td>
-                        </tr>
-                    `;
-                    tbody.insertAdjacentHTML('beforeend', row);
-                });
-            } else {
-                 tbody.innerHTML = '<tr><td colspan="5">No active tasks found.</td></tr>';
-            }
+            mockActivity.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                item.innerHTML = `
+                    <div class="activity-title">${activity.title}</div>
+                    <div class="activity-meta">Type: ${activity.type} | Time: ${activity.time}</div>
+                `;
+                activityList.appendChild(item);
+            });
         }
 
         async function logoutUser() {
             if (!supabase) return;
             const { error } = await supabase.auth.signOut();
             if (!error) {
-                window.location.href = '../staff-login/index.html';
+                window.location.href = '/staff-login/';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
     </script>
 </head>
 <body>
-    <div class="dashboard-layout">
-        <aside class="sidebar">
-            <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
-            <nav class="sidebar-nav">
-                <a href="../admin-dashboard/index.html" class="active"><i class="fas fa-home"></i> Dashboard Home</a>
-                <a href="#"><i class="fas fa-boxes"></i> Inventory Management</a>
-                <a href="#"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
-                <a href="#"><i class="fas fa-tasks"></i> Staff Tasks</a>
-                <a href="#"><i class="fas fa-users"></i> Volunteer Apps</a>
-                <a href="#"><i class="fas fa-cog"></i> Site Settings</a>
-                <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </nav>
-        </aside>
-        <div class="dashboard-content">
-            <header>
-                <h1>Welcome, <span id="adminName">Admin</span>!</h1>
-                <p>Overview of critical operational metrics and pending actions.</p>
-            </header>
-            <div class="dashboard-grid">
-                <div class="data-card" style="border-left: 5px solid #FF9800;"><h3>New Donations Pending</h3><div id="newDonationCount" class="dash-stat">...</div><p>Review and assign pick-up logistics.</p></div>
-                <div class="data-card" style="border-left: 5px solid #2196F3;"><h3>New Volunteer Applications</h3><div id="newAppCount" class="dash-stat">...</div><p>Schedule interviews for new applicants.</p></div>
-                <div class="data-card" style="border-left: 5px solid #FF5722;"><h3>Urgent Transport Inquiries</h3><div id="urgentInquiries" class="dash-stat">...</div><p>Needs immediate staff assignment.</p></div>
+    <div class="sidebar">
+        <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a href="/admin-dashboard/" class="active"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="#"><i class="fas fa-boxes"></i> Inventory Management</a>
+            <a href="#"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
+            <a href="#"><i class="fas fa-tasks"></i> Staff Tasks</a>
+            <a href="#"><i class="fas fa-users"></i> Volunteer Apps</a>
+            <a href="#"><i class="fas fa-cog"></i> Site Settings</a>
+            <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1>Admin Overview</h1>
+        <p>System-wide metrics and recent activity feed.</p>
+
+        <section class="section">
+            <h2 class="section-header">System Health Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card" style="border-left-color: var(--primary-main);">
+                    <h3>Total Kg Rescued (YTD)</h3>
+                    <div id="totalKgRescued" class="metric-value">0</div>
+                </div>
+                <div class="metric-card" style="border-left-color: var(--accent-orange);">
+                    <h3>Pending Requests</h3>
+                    <div id="pendingRequests" class="metric-value">0</div>
+                </div>
+                <div class="metric-card" style="border-left-color: var(--accent-blue);">
+                    <h3>Active Volunteers</h3>
+                    <div id="activeVolunteers" class="metric-value">0</div>
+                </div>
+                <div class="metric-card" style="border-left-color: #BBDEFB;">
+                    <h3>New Volunteer Apps (7D)</h3>
+                    <div id="newVolunteers" class="metric-value">0</div>
+                </div>
             </div>
-            <section style="margin-top: 40px;">
-                <h2>Top 5 Pending Staff Tasks</h2>
-                <table class="dashboard-table">
-                    <thead><tr><th>Task ID</th><th>Title</th><th>Assigned To</th><th>Status</th><th>Action</th></tr></thead>
-                    <tbody id="recentTasksBody"><tr><td colspan="5">Loading global tasks...</td></tr></tbody>
-                </table>
-            </section>
-        </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-header">Recent System Activity</h2>
+            <div id="activityList">
+                <div class="activity-item">Loading recent activity...</div>
+            </div>
+        </section>
     </div>
 </body>
 </html>
