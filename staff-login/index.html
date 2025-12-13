@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login - FoodShare Seychelles</title>
+    
+    <link rel="icon" href="../images/logo.png" type="image/png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* ======================================================= */
+        /* 0. THEME VARIABLES & BASE STYLES */
+        /* ======================================================= */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        main { flex-grow: 1; padding: 40px 0; }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
+
+        /* ======================================================= */
+        /* 1. NAVIGATION BAR (Simplified for Login Page) */
+        /* ======================================================= */
+        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; }
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; color: var(--text-dark); }
+        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, transform 0.2s; }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .search-container { margin-left: 30px; display: flex; align-items: center; background-color: var(--neutral-bg); border-radius: 50px; padding: 5px 15px; border: 1px solid #eee; }
+        .search-input { border: none; background: none; padding: 5px; outline: none; font-size: 1em; width: 180px; color: var(--text-dark); }
+        .search-icon { color: var(--primary-dark); cursor: pointer; font-size: 1.1em; }
+        .hamburger { display: none; } /* Hide on desktop */
+
+        /* ======================================================= */
+        /* 2. FORM & BUTTON STYLING (REFINED) */
+        /* ======================================================= */
+        .page-header { text-align: center; margin-bottom: 30px; }
+        .page-header h1 { font-size: 2.8em; }
+        .form-card {
+            background-color: var(--neutral-card); padding: 40px;
+            border-radius: 12px; box-shadow: var(--shadow-subtle);
+            max-width: 450px; margin: 30px auto; border-top: 5px solid var(--primary-main);
+            animation: fade-in 1s ease-out;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary-dark); }
+        .form-group input {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+            box-sizing: border-box; font-size: 1em; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus { border-color: var(--primary-light); outline: none; box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); }
+        .submit-button {
+            display: block; width: 100%; padding: 15px; background-color: var(--primary-main);
+            color: var(--neutral-card); border: none; border-radius: 8px; font-size: 1.1em;
+            cursor: pointer; transition: background-color 0.3s, transform 0.2s; font-weight: bold;
+        }
+        .submit-button:hover:not(:disabled) { background-color: var(--primary-dark); transform: translateY(-1px); }
+        .submit-button:disabled { background-color: #A5D6A7; cursor: not-allowed; }
+
+        .alert-banner { padding: 15px; margin-bottom: 20px; border-radius: 8px; font-weight: bold; }
+        .alert-error { background-color: #FFCDD2; color: #C62828; border: 1px solid #E57373; }
+        .alert-success { background-color: #C8E6C9; color: #2E7D32; border: 1px solid #66BB6A; }
+        
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ======================================================= */
+        /* 3. FOOTER STYLING */
+        /* ======================================================= */
+        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+        
+        @media (max-width: 992px) {
+            .nav-links-container { display: none; }
+            .hamburger { display: block; }
+        }
+    </style>
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('staffLoginForm');
+        const messageEl = document.getElementById('loginMessage');
+        const loginButton = document.getElementById('loginButton');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            loginButton.disabled = true;
+            messageEl.style.display = 'none';
+
+            // 1. Authenticate User
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                messageEl.textContent = `Login Failed: ${error.message}`;
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                loginButton.disabled = false;
+                return;
+            }
+
+            // 2. Get User ID and Check Role from the 'profiles' table
+            const user = data.user;
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role_id')
+                .eq('id', user.id)
+                .single();
+
+            if (profileError) {
+                messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                await supabase.auth.signOut();
+                loginButton.disabled = false;
+                return;
+            }
+
+            // 3. Redirect based on Role ID
+            const roleId = profileData.role_id;
+            
+            if (roleId === 1) { // Admin Role
+                window.location.href = '../admin-dashboard/index.html';
+            } else if (roleId === 2 || roleId === 3) { // Logistics or Volunteer Staff Role
+                window.location.href = '../staff-dashboard/index.html';
+            } else {
+                messageEl.textContent = 'User role not recognized. Access denied.';
+                messageEl.className = 'alert-banner alert-error';
+                messageEl.style.display = 'block';
+                await supabase.auth.signOut();
+            }
+        });
+        
+        // Basic Search Handler
+        document.querySelector('.search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                alert(`Searching for: "${e.target.value.trim()}".`);
+            }
+        });
+    </script>
+</head>
+<body>
+    <header id="navbar">
+        <a href="../index/index.html" class="logo-container">
+            <img src="../images/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+        </a>
+
+        <nav class="nav-links-container" id="navLinks">
+            <a href="../available-food/index.html" class="nav-link">Find Food</a>
+            <a href="../donate-food/index.html" class="nav-link">Donate</a>
+            <a href="../impact/index.html" class="nav-link">Impact</a>
+            
+            <div class="search-container">
+                <input type="text" placeholder="Search the site..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            
+            <a href="../donate-now/index.html" class="cta-button">DONATE NOW</a>
+        </nav>
+        <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('open')">&#9776;</button>
+    </header>
+
+    <main>
+        <div class="content-container">
+            
+            <div class="page-header">
+                <h1>Staff Access Portal</h1>
+                <p>Login with your authorized FoodShare Seychelles email and password to access the operational dashboard.</p>
+            </div>
+
+            <div class="form-card">
+                <div id="loginMessage" class="alert-banner" style="display: none;"></div>
+
+                <form id="staffLoginForm">
+                    <div class="form-group">
+                        <label for="email">Staff Email Address</label>
+                        <input type="email" id="email" required placeholder="name@foodshare-seychelles.org">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="• • • • • • • •">
+                    </div>
+
+                    <button type="submit" class="submit-button" id="loginButton">
+                        <i class="fas fa-sign-in-alt"></i> Secure Login
+                    </button>
+                    
+                    <p style="text-align: center; margin-top: 20px; font-size: 0.9em;">
+                        <a href="#" style="color: var(--primary-dark);">Forgot Password?</a> (Contact Admin)
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="content-container footer-content">
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="../available-food/index.html">Find Food</a></li>
+                    <li><a href="../donate-food/index.html">Donate Food</a></li>
+                    <li><a href="../volunteer/index.html">Volunteer</a></li>
+                    <li><a href="../impact/index.html">Impact & Reports</a></li>
+                    <li><a href="../contact-general/index.html">General Contact</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Learn More</h3>
+                <ul>
+                    <li><a href="../about/index.html">About FoodShare</a></li>
+                    <li><a href="../our-partners/index.html">Our Partners</a></li>
+                    <li><a href="../learn/safety.html">Food Safety Protocol</a></li>
+                    <li><a href="../learn/faq.html">General FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Support & Legal</h3>
+                <ul>
+                    <li><a href="../privacy-policy/index.html">Privacy Policy</a></li>
+                    <li><a href="../terms-of-use/index.html">Terms of Use</a></li>
+                    <li><a href="../sitemap/index.html">Site Structure</a></li>
+                    <li><a href="../staff-login/index.html">Staff Login</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Get In Touch</h3>
+                <p>Email: admin@foodshare-seychelles.online</p>
+                <p>Follow us on <a href="../social/index.html">Social Media</a></p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            &copy; 2025 Foodshare Seychelles. All Rights Reserved. 
+            <span class="footer-credit">
+                Website by 
+                <a href="https://tylernicholasgroup.com/staff/tyler/" target="_blank" style="color: var(--primary-main);">Tyler Nicholas</a> | 
+                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a/" target="_blank" style="color: var(--primary-main);">LinkedIn</a>
+            </span>
+        </div>
+    </footer>
+</body>
+</html>
