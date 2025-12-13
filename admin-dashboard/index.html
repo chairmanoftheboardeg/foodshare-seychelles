@@ -11,9 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* ======================================================= */
-        /* 0. THEME VARIABLES & BASE STYLES */
-        /* ======================================================= */
+        /* ... (CSS Styles from previous version remain here) ... */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
@@ -28,132 +26,33 @@
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
 
-        /* ======================================================= */
-        /* 1. DASHBOARD LAYOUT */
-        /* ======================================================= */
-        .dashboard-layout {
-            display: grid;
-            grid-template-columns: 250px 1fr; 
-            min-height: 100vh;
-        }
-        .sidebar {
-            background-color: var(--text-dark);
-            color: var(--neutral-card);
-            padding: 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
-        }
-        .sidebar h2 {
-            font-size: 1.5em;
-            color: var(--primary-light);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .sidebar-nav a {
-            display: block;
-            padding: 12px 15px;
-            color: var(--neutral-bg);
-            margin-bottom: 8px;
-            border-radius: 6px;
-            transition: background-color 0.3s, color 0.3s;
-            font-size: 1.1em;
-        }
+        .dashboard-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+        .sidebar { background-color: var(--text-dark); color: var(--neutral-card); padding: 20px; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15); }
+        .sidebar h2 { font-size: 1.5em; color: var(--primary-light); margin-bottom: 30px; text-align: center; }
+        .sidebar-nav a { display: block; padding: 12px 15px; color: var(--neutral-bg); margin-bottom: 8px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; font-size: 1.1em; }
         .sidebar-nav a i { margin-right: 10px; }
-        .sidebar-nav a:hover, .sidebar-nav a.active {
-            background-color: var(--primary-dark);
-            color: var(--neutral-card);
-        }
-        .dashboard-content {
-            padding: 40px;
-            background-color: var(--neutral-bg);
-        }
-        .dashboard-content header {
-            margin-bottom: 30px;
-        }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: var(--primary-dark); color: var(--neutral-card); }
+        .dashboard-content { padding: 40px; background-color: var(--neutral-bg); }
+        .dashboard-content header { margin-bottom: 30px; }
 
-        /* ======================================================= */
-        /* 2. DASHBOARD CARDS & GRIDS */
-        /* ======================================================= */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        .data-card {
-            background-color: var(--neutral-card);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-subtle);
-            border-left: 5px solid var(--primary-main);
-            transition: transform 0.3s;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .data-card { background-color: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--primary-main); transition: transform 0.3s; }
         .data-card:hover { transform: translateY(-3px); }
-        .dash-stat {
-            font-size: 3em;
-            color: var(--primary-dark);
-            font-weight: bold;
-            margin-top: 5px;
-            animation: grow-in 0.8s ease-out;
-        }
-        @keyframes grow-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .dash-stat { font-size: 3em; color: var(--primary-dark); font-weight: bold; margin-top: 5px; }
         
-        /* Dashboard Search */
-        .search-container {
-            margin-bottom: 30px; 
-            display: flex; 
-            align-items: center; 
-            background-color: var(--neutral-card); 
-            border-radius: 8px;
-            padding: 10px 15px;
-            box-shadow: var(--shadow-subtle);
-        }
-        .search-container input {
-            border: none;
-            outline: none;
-            padding: 5px;
-            font-size: 1em;
-            width: 100%;
-        }
+        .search-container { margin-bottom: 30px; display: flex; align-items: center; background-color: var(--neutral-card); border-radius: 8px; padding: 10px 15px; box-shadow: var(--shadow-subtle); }
+        .search-container input { border: none; outline: none; padding: 5px; font-size: 1em; width: 100%; }
 
-        /* ======================================================= */
-        /* 3. TABLE STYLING */
-        /* ======================================================= */
-        .dashboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: var(--shadow-subtle);
-            background-color: var(--neutral-card);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .dashboard-table th, .dashboard-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        .dashboard-table th {
-            background-color: var(--primary-light);
-            color: var(--text-dark);
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .dashboard-table tr:hover {
-            background-color: #f0fff0;
-        }
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.8em;
-            display: inline-block;
-        }
+        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: var(--shadow-subtle); background-color: var(--neutral-card); border-radius: 8px; overflow: hidden; }
+        .dashboard-table th, .dashboard-table td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .dashboard-table th { background-color: var(--primary-light); color: var(--text-dark); font-weight: bold; text-transform: uppercase; }
+        .dashboard-table tr:hover { background-color: #f0fff0; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 0.8em; display: inline-block; }
         .status-new { background-color: #FFF9C4; color: #FBC02D; } 
         .status-in-progress { background-color: #BBDEFB; color: #1976D2; } 
         .status-done { background-color: #C8E6C9; color: var(--primary-dark); }
         .status-to-do { background-color: #FFCDD2; color: #C62828; }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .dashboard-layout { grid-template-columns: 1fr; }
             .sidebar { height: auto; padding: 15px 0; }
@@ -169,25 +68,31 @@
         
         let supabase;
         document.addEventListener('DOMContentLoaded', async () => {
-             if (window.createClient) {
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+             // CRITICAL FIX: Ensure Supabase loads and we check for the user immediately
+             if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
-                console.error("Supabase client library not loaded. Cannot run security checks.");
-                return; 
+                // If Supabase fails to load, we cannot check authentication, so we redirect
+                console.error("Supabase client library failed to load. Redirecting to login.");
+                window.location.href = '../staff-login/index.html'; 
+                return;
             }
 
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
+                // CRITICAL FIX: If no user session is found, redirect to login
                 window.location.href = '../staff-login/index.html';
                 return;
             }
             
-            // Check Role - CRITICAL: Ensure only Admin can access
-            const { data: profile, error } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
+            // CRITICAL FIX: Check Role - Ensure only Admin (role_id = 1) can access
+            const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
             if (profile?.role_id !== 1) {
-                alert('Authorization Failed: You do not have Admin privileges. Redirecting to Staff Dashboard.');
-                window.location.href = '../staff-dashboard/index.html';
+                // If not admin, deny access and redirect
+                alert('Authorization Failed: You do not have Admin privileges. Redirecting to Staff Login.');
+                await supabase.auth.signOut();
+                window.location.href = '../staff-login/index.html';
                 return;
             }
 
@@ -197,21 +102,18 @@
 
         async function fetchAdminMetrics(userId) {
             // ... (Metrics fetching logic remains the same)
-            // Count New Donations (Status: 'New')
             const { count: donationCount } = await supabase
                 .from('donation_requests')
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'New');
             document.getElementById('newDonationCount').textContent = donationCount || 0;
 
-            // Count Pending Applications (Status: 'Pending')
             const { count: appCount } = await supabase
                 .from('applications')
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'Pending');
             document.getElementById('newAppCount').textContent = appCount || 0;
 
-            // Count Urgent Inquiries (Type: 'transport' AND Status: 'New')
              const { count: inquiryCount } = await supabase
                 .from('inquiries')
                 .select('*', { count: 'exact', head: true })
@@ -219,7 +121,6 @@
                 .eq('status', 'New');
             document.getElementById('urgentInquiries').textContent = inquiryCount || 0;
             
-             // Fetch name for greeting
             const { data: profile } = await supabase.from('profiles').select('email').eq('id', userId).single();
             if (profile) {
                  const namePart = profile.email.split('@')[0];
@@ -229,7 +130,6 @@
         }
 
         async function fetchRecentTasks() {
-            // ... (Task fetching logic remains the same)
              const { data: tasks, error } = await supabase
                 .from('staff_tasks_view') 
                 .select('*')
@@ -266,13 +166,6 @@
                 window.location.href = '../staff-login/index.html';
             }
         }
-        
-        // Basic Search Handler
-        document.querySelector('.search-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                alert(`Searching Admin Panel for: "${e.target.value.trim()}".`);
-            }
-        });
     </script>
 </head>
 <body>
