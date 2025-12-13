@@ -5,12 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Login - FoodShare Seychelles</title>
     <link rel="icon" href="/image/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <style> /* ... (Your existing CSS for the login page) ... */ </style>
+    
+    <style>
+        /* [START LOGIN CSS BLOCK] */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); }
+        .login-container { background-color: var(--neutral-card); padding: 40px; border-radius: 12px; box-shadow: var(--shadow-subtle); width: 100%; max-width: 400px; text-align: center; border-top: 5px solid var(--primary-dark); }
+        .login-container h2 { color: var(--primary-dark); margin-bottom: 25px; font-family: 'Georgia', serif; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-dark); }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1em; transition: border-color 0.3s; }
+        .form-group input:focus { border-color: var(--primary-main); outline: none; }
+        .login-button { width: 100%; padding: 12px; background-color: var(--primary-main); color: var(--neutral-card); border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s; font-weight: bold; }
+        .login-button:hover { background-color: var(--primary-dark); }
+        .alert-message { padding: 10px; margin-top: 15px; border-radius: 6px; font-weight: bold; display: none; }
+        .alert-error { background-color: #FFCDD2; color: #C62828; display: block; }
+        .back-link { display: block; margin-top: 20px; color: var(--primary-main); font-weight: 500; }
+        /* [END LOGIN CSS BLOCK] */
+    </style>
     
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsInl4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         
         let supabase;
 
@@ -22,10 +48,11 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             } else {
                 messageEl.textContent = 'ERROR: Core services failed to load.';
+                messageEl.style.display = 'block';
                 return;
             }
 
-            // --- Pre-check for existing session and direct navigation fix ---
+            // --- Pre-check for existing session and redirect ---
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 const user = session.user;
@@ -33,11 +60,9 @@
                 
                 if (profile) {
                     if (profile.role_id === 1) {
-                        // FIX: Redirect using clean directory path
                         window.location.href = '/admin-dashboard/';
                         return;
                     } else if (profile.role_id === 2) {
-                        // FIX: Redirect using clean directory path
                         window.location.href = '/staff-dashboard/';
                         return;
                     }
@@ -49,18 +74,19 @@
                 e.preventDefault();
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
+                messageEl.style.display = 'none';
 
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
                 if (error) {
                     messageEl.textContent = `Login failed: ${error.message}`;
                     messageEl.className = 'alert-message alert-error';
+                    messageEl.style.display = 'block';
                     return;
                 }
                 
                 if (data.user) {
                     const user = data.user;
-                    // Step 2: Check the user's role in the profiles table
                     const { data: profile, error: roleError } = await supabase
                         .from('profiles')
                         .select('role_id')
@@ -70,29 +96,42 @@
                     if (roleError || !profile || !profile.role_id) {
                          messageEl.textContent = 'Account found, but role assignment missing. Contact Admin.';
                          messageEl.className = 'alert-message alert-error';
-                         // Crucial: Log out immediately if role check fails for security
+                         messageEl.style.display = 'block';
                          await supabase.auth.signOut();
                          return;
                     }
 
-                    // Step 3: Redirect based on role
-                    if (profile.role_id === 1) {
-                         // FIX: Clean Redirect
+                    if (profile.role_id === 1) { // Admin
                         window.location.href = '/admin-dashboard/';
-                    } else if (profile.role_id === 2) {
-                         // FIX: Clean Redirect
+                    } else if (profile.role_id === 2) { // Staff
                         window.location.href = '/staff-dashboard/';
                     } else {
                         messageEl.textContent = 'Login successful, but role is unrecognized.';
                         messageEl.className = 'alert-message alert-error';
+                        messageEl.style.display = 'block';
                         await supabase.auth.signOut();
                     }
                 }
             });
         });
     </script>
-
 </head>
 <body>
-    </body>
+    <div class="login-container">
+        <h2><i class="fas fa-user-shield"></i> FoodShare Staff Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required placeholder="staff@foodshare-seychelles.online">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit" class="login-button">Log In</button>
+            <div id="message" class="alert-message"></div>
+        </form>
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Homepage</a>
+    </div>
+</body>
 </html>
