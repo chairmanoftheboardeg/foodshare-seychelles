@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Volunteer Applications</title>
+    <link rel="icon" href="/assets/image/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* --- CSS OMITTED FOR BREVITY --- */
+        /* (Identical CSS to home.html) */
+
+        :root {
+            --color-primary: #4CAF50;
+            --color-primary-dark: #388E3C;
+            --color-secondary: #2196F3;
+            --color-danger: #D32F2F;
+            --color-warning: #FF9800;
+            --color-sidebar-bg: #2c3e50;
+            --color-sidebar-text: #ecf0f1;
+            --color-sidebar-hover: #34495e;
+            --color-background: #f4f7f6;
+            --color-card-bg: #ffffff;
+            --color-text-dark: #333333;
+        }
+        /* ... (CSS for general layout and buttons) */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--color-background); color: var(--color-text-dark); display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background-color: var(--color-sidebar-bg); color: var(--color-sidebar-text); padding: 20px 0; position: fixed; height: 100%; display: flex; flex-direction: column; z-index: 1000; }
+        .sidebar-header { text-align: center; padding: 0 20px 20px 20px; border-bottom: 1px solid #3c526a; margin-bottom: 20px; }
+        .sidebar-header img { width: 40px; height: auto; margin-bottom: 10px; }
+        .sidebar-header h2 { font-size: 1.2em; color: var(--color-primary); }
+        .nav-menu ul { list-style: none; }
+        .nav-menu li a { display: block; padding: 12px 20px; color: var(--color-sidebar-text); text-decoration: none; font-size: 0.95em; transition: background-color 0.3s, color 0.3s; }
+        .nav-menu li a:hover, .nav-menu li.active a { background-color: var(--color-sidebar-hover); color: var(--color-primary); }
+        .nav-menu li a .fas { margin-right: 10px; width: 20px; }
+        .logout-container { margin-top: auto; padding: 20px; border-top: 1px solid #3c526a; }
+        #logout-btn { width: 100%; background-color: var(--color-danger); color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: background-color 0.3s; }
+        #logout-btn:hover { background-color: #a02020; }
+        .main-content { margin-left: 250px; flex-grow: 1; padding: 20px; }
+        .page-header { margin-bottom: 30px; padding-bottom: 10px; border-bottom: 2px solid var(--color-primary); }
+        .page-header h1 { font-size: 2em; color: var(--color-text-dark); }
+        .card { background-color: var(--color-card-bg); padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); margin-bottom: 20px; }
+
+        .app-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .app-table th, .app-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        .app-table th { background-color: #eaf0e8; color: var(--color-primary-dark); font-weight: 600; text-transform: uppercase; font-size: 0.85em; }
+        .app-table tr:hover { background-color: #fafafa; }
+        
+        .contact-info-display {
+            background-color: #f0f8ff; /* Light Blue BG */
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            display: none;
+            margin-top: 5px;
+        }
+        .contact-info-display.show { display: block; }
+        
+        .status-New { background-color: #e3f2fd; color: var(--color-secondary); }
+        .status-Accepted { background-color: #e8f5e9; color: var(--color-primary); }
+        .status-Denied { background-color: #ffeaea; color: var(--color-danger); }
+        
+        .action-btn { border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-right: 8px; transition: background-color 0.3s; }
+        .btn-accept { background-color: var(--color-primary); color: white; }
+        .btn-accept:hover { background-color: var(--color-primary-dark); }
+        .btn-deny { background-color: var(--color-danger); color: white; }
+        .btn-deny:hover { background-color: #a02020; }
+        .btn-contact { background-color: var(--color-warning); color: var(--color-text-dark); margin-top: 5px;}
+
+    </style>
+</head>
+<body>
+
+    <div id="loader" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; z-index: 2000;">
+        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--color-primary);"></i>
+        <p style="margin-left: 15px; font-size: 1.2em;">Loading Volunteer Applications...</p>
+    </div>
+
+    <div class="sidebar" id="adminSidebar" style="display: none;">
+        <div class="sidebar-header">
+            <img src="/assets/image/logo.png" alt="FSS Logo">
+            <h2>Admin Panel</h2>
+        </div>
+        
+        <nav class="nav-menu">
+            <ul>
+                <li><a href="/admin/dashboard/home.html"><i class="fas fa-chart-line"></i> Overview (Home)</a></li>
+                <li><a href="/admin/dashboard/claims-review.html"><i class="fas fa-clipboard-list"></i> Claims Review</a></li>
+                <li><a href="/admin/dashboard/donations-intake.html"><i class="fas fa-box-open"></i> Donations Intake</a></li>
+                <li class="active"><a href="/admin/dashboard/volunteer-apps.html"><i class="fas fa-handshake"></i> Volunteer Apps</a></li>
+                <li><a href="/admin/dashboard/inquiries.html"><i class="fas fa-envelope-open-text"></i> General Inquiries</a></li>
+                <li><a href="/admin/dashboard/inventory.html"><i class="fas fa-warehouse"></i> Inventory</a></li>
+                <li><a href="/admin/dashboard/user-management.html"><i class="fas fa-users"></i> User Management</a></li>
+                <li><a href="/admin/dashboard/assign-task.html"><i class="fas fa-tasks"></i> Assign Task</a></li>
+                <li><a href="/admin/dashboard/settings.html"><i class="fas fa-cogs"></i> Settings</a></li>
+            </ul>
+        </nav>
+        
+        <div class="logout-container">
+            <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content" id="adminMainContent" style="display: none;">
+        <div class="page-header">
+            <h1><i class="fas fa-handshake"></i> Volunteer Applications</h1>
+            <p style="color: var(--color-text-light);">Review, approve, and contact new volunteer applicants.</p>
+        </div>
+
+        <div class="card">
+            <h2>New Applications</h2>
+            <div class="table-responsive">
+                <table class="app-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Area of Interest</th>
+                            <th>Available Hours</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="apps-list-body">
+                        <tr><td colspan="5" style="text-align: center;">Loading applications...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Supabase Client Initialization (YOUR CREDENTIALS) ---
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        // ----------------------------------------
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const ROLE_ADMIN = 1;
+        const appsListBody = document.getElementById('apps-list-body');
+        
+        // --- AUTH GUARD & INITIALIZATION ---
+        async function authGuard() {
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data: profile, error } = await supabase.from('profiles').select('role_id').eq('id', user ? user.id : null).single();
+
+            if (!user || error || profile.role_id !== ROLE_ADMIN) {
+                await supabase.auth.signOut();
+                window.location.href = '/staff-login/index.html';
+                return;
+            }
+
+            await fetchAndRenderApplications();
+            loader.style.display = 'none';
+            adminSidebar.style.display = 'flex';
+            adminMainContent.style.display = 'block';
+        }
+
+        // --- FETCH & RENDER APPLICATIONS ---
+        async function fetchAndRenderApplications() {
+            appsListBody.innerHTML = '<tr><td colspan="5" style="text-align: center;"><i class="fas fa-spinner fa-spin"></i> Loading applications...</td></tr>';
+            
+            // Fetch all applications
+            const { data: apps, error } = await supabase
+                .from('volunteer_applications')
+                .select('*')
+                .order('submitted_at', { ascending: true });
+
+            if (error) { appsListBody.innerHTML = '<tr><td colspan="5" style="color: var(--color-danger); text-align: center;">Failed to load applications.</td></tr>'; return; }
+
+            appsListBody.innerHTML = '';
+            if (apps.length === 0) { appsListBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-text-light);">No volunteer applications found.</td></tr>'; return; }
+
+            apps.forEach(app => {
+                const isNew = app.application_status === 'New';
+                const statusClass = `status-${app.application_status}`;
+                
+                const row = document.createElement('tr');
+                row.setAttribute('data-app-id', app.id);
+                row.innerHTML = `
+                    <td>${app.full_name}</td>
+                    <td>${app.area_of_interest}</td>
+                    <td>${app.available_hours}</td>
+                    <td><span class="status-badge ${statusClass}">${app.application_status}</span></td>
+                    <td id="actions-cell-${app.id}">
+                        ${isNew ? `
+                            <div class="initial-actions">
+                                <button class="action-btn btn-accept" onclick="updateAppStatus('${app.id}', 'Accepted', '${app.email}', '${app.phone}', this)">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                                <button class="action-btn btn-deny" onclick="updateAppStatus('${app.id}', 'Denied', '${app.email}', '${app.phone}', this)">
+                                    <i class="fas fa-times"></i> Deny
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="contact-area">
+                            <button class="action-btn btn-contact" 
+                                style="display: ${isNew ? 'none' : 'block'};" 
+                                onclick="toggleContactInfo('${app.id}', '${app.email}', '${app.phone}')">
+                                <i class="fas fa-user-circle"></i> Contact
+                            </button>
+                            <div id="contact-info-${app.id}" class="contact-info-display">
+                                Email: ${app.email}<br>Phone: ${app.phone}
+                            </div>
+                        </div>
+                    </td>
+                `;
+                appsListBody.appendChild(row);
+            });
+        }
+        
+        // --- UPDATE APP STATUS & TOGGLE CONTACT ---
+        async function updateAppStatus(appId, newStatus, email, phone, buttonElement) {
+            const initialActions = buttonElement.closest('.initial-actions');
+            const contactButton = document.querySelector(`#actions-cell-${appId} .btn-contact`);
+            
+            // 1. Update status in Supabase
+            const { error } = await supabase
+                .from('volunteer_applications')
+                .update({ application_status: newStatus })
+                .eq('id', appId);
+
+            if (error) {
+                alert(`Failed to ${newStatus} application: ` + error.message);
+                return;
+            }
+            
+            // 2. SUCCESS: Apply visual update
+            alert(`Application ${appId} successfully ${newStatus}. Contact details unlocked.`);
+            
+            // Hide the initial action buttons
+            if (initialActions) initialActions.style.display = 'none';
+            
+            // Show the contact button
+            if (contactButton) {
+                contactButton.style.display = 'block';
+                contactButton.textContent = `Contact ${newStatus}`;
+                if (newStatus === 'Accepted') contactButton.style.backgroundColor = 'var(--color-primary)';
+                if (newStatus === 'Denied') contactButton.style.backgroundColor = 'var(--color-danger)';
+            }
+            
+            // Optionally, re-render the row or just the status badge
+            await fetchAndRenderApplications();
+        }
+
+        // --- CONTACT INFO TOGGLE ---
+        function toggleContactInfo(appId, email, phone) {
+            const contactDisplay = document.getElementById(`contact-info-${appId}`);
+            contactDisplay.classList.toggle('show');
+        }
+
+        // --- LOGOUT FUNCTION ---
+        async function handleLogout() { await supabase.auth.signOut(); window.location.href = '/staff-login/index.html'; }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            authGuard();
+            logoutBtn.addEventListener('click', handleLogout);
+            window.updateAppStatus = updateAppStatus;
+            window.toggleContactInfo = toggleContactInfo;
+        });
+    </script>
+
+</body>
+</html>
