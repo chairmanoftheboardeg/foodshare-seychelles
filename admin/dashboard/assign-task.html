@@ -1,0 +1,137 @@
+<script>
+        // ... (Same CONSTS and Utility functions as claims.html) ...
+
+        async function checkAccessAndRedirect() {
+            // ... (Same Auth/Access check as claims.html) ...
+            fetchStaffForAssignment(); 
+        }
+
+        async function fetchStaffForAssignment() {
+            const assigneeSelect = document.getElementById('assignedTo');
+            assigneeSelect.innerHTML = '<option value="" disabled>Loading staff...</option>';
+
+            const { data: staff, error } = await supabase
+                .from('profiles')
+                .select(`id, full_name, role`)
+                .neq('role', 1) // Exclude Admin (Role 1) from tasks
+                .order('full_name', { ascending: true });
+
+            if (error) {
+                assigneeSelect.innerHTML = '<option value="" disabled>Error loading staff.</option>';
+                console.error("Staff load error:", error);
+                return;
+            }
+
+            assigneeSelect.innerHTML = '<option value="" disabled selected>Select Staff Member</option>';
+            staff.forEach(s => {
+                const roleName = s.role === 2 ? 'Driver/Staff' : 'Volunteer Coordinator';
+                assigneeSelect.innerHTML += `<option value="${s.id}">${s.full_name} (${roleName})</option>`;
+            });
+        }
+        
+        async function handleTaskAssignment(event) {
+            event.preventDefault();
+
+            const assigned_to = document.getElementById('assignedTo').value;
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const priority = document.getElementById('taskPriority').value;
+            const created_by = (await supabase.auth.getSession()).data.session.user.id; // Get current Admin ID
+
+            if (!assigned_to || !title || !description || !priority) {
+                alert('Please fill out all task fields.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('taskSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Assigning...';
+
+            const { error } = await supabase
+                .from('tasks')
+                .insert([{
+                    assigned_to,
+                    title,
+                    description,
+                    priority,
+                    created_by,
+                    status: 'Assigned'
+                }]);
+
+            if (error) {
+                alert('Error assigning task: ' + error.message);
+            } else {
+                alert(`Task "${title}" successfully assigned!`);
+                document.getElementById('taskForm').reset(); // Clear form
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Assign Task';
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+    </script>
+    <style>
+        /* ... (Include base styles) ... */
+        .task-form-container { max-width: 800px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em;
+        }
+        .form-group textarea { resize: vertical; }
+        .priority-high { color: #D32F2F; font-weight: bold; }
+        .priority-medium { color: #FF9800; font-weight: bold; }
+        .priority-low { color: #4CAF50; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+    <nav id="adminSidebar">
+        <h2><i class="fas fa-database"></i> Management</h2>
+        <a href="/admin/assign-task.html" class="sidebar-link active"><i class="fas fa-tasks"></i> Assign Task</a>
+        </nav>
+    
+    <div id="mainContent">
+        <header id="topbar">
+            <h1>New Task Assignment</h1>
+            </header>
+
+        <div class="dashboard-body">
+            <div class="content-card task-form-container">
+                <h2>Create a New Task for Staff (Table: `tasks`)</h2>
+                <form id="taskForm" onsubmit="handleTaskAssignment(event)">
+                    <div class="form-group">
+                        <label for="assignedTo"><i class="fas fa-user-tag"></i> Assign To</label>
+                        <select id="assignedTo" required>
+                            </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskTitle"><i class="fas fa-heading"></i> Task Title</label>
+                        <input type="text" id="taskTitle" required placeholder="e.g., Collect Donation from Donor X">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDescription"><i class="fas fa-file-alt"></i> Description</label>
+                        <textarea id="taskDescription" rows="5" required placeholder="Provide address, contact info, and specific instructions."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskPriority"><i class="fas fa-exclamation-triangle"></i> Priority</label>
+                        <select id="taskPriority" required>
+                            <option value="Low" class="priority-low">Low</option>
+                            <option value="Medium" class="priority-medium">Medium</option>
+                            <option value="High" class="priority-high">High</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="taskSubmitBtn" class="action-button" style="width: 100%; margin-top: 20px; background: #2196F3;">
+                        <i class="fas fa-share-square"></i> Assign Task
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
