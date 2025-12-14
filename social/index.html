@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Media - FoodShare Seychelles</title>
+
+  <link rel="icon" href="/image/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* [START STANDARD SITE-WIDE CSS BLOCK] */
+    :root {
+      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
+      --accent-blue: #2196F3; --accent-orange: #FF9800;
+      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF;
+      --text-dark: #333333; --text-light: #666666;
+      --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-serif: 'Georgia', serif;
+      --font-sans: 'Helvetica Neue', Arial, sans-serif;
+      --transition-speed: 0.4s;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--text-dark);
+      background-color: var(--neutral-bg);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+    a:hover { color: var(--primary-dark); }
+    main { flex-grow: 1; padding: 40px 0; }
+    h1, h2 { font-family: var(--font-serif); color: var(--primary-dark); }
+    .content-container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
+
+    /* NAVBAR */
+    #navbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 25px; background-color: var(--neutral-card);
+      box-shadow: var(--shadow-subtle);
+      position: sticky; top: 0; z-index: 1000;
+    }
+    .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+    .logo-img { height: 40px; margin-right: 10px; }
+    .nav-links-container { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; }
+    .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+    .nav-link::after {
+      content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0;
+      background-color: var(--primary-main); transition: width var(--transition-speed);
+    }
+    .nav-link:hover::after { width: 100%; }
+    .cta-button {
+      background-color: var(--primary-main); color: var(--neutral-card);
+      border-radius: 50px; padding: 10px 25px; font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background-color var(--transition-speed), transform 0.2s;
+    }
+    .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+
+    /* FOOTER */
+    #main-footer {
+      margin-top: auto;
+      background-color: var(--text-dark);
+      color: var(--neutral-bg);
+      padding: 50px 0 20px;
+      font-size: 0.9em;
+    }
+    .footer-content {
+      display: flex; justify-content: space-between; flex-wrap: wrap;
+      margin-bottom: 30px;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      padding: 0 25px;
+    }
+    .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+    .footer-section h3 {
+      color: var(--primary-light);
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 5px;
+    }
+    .footer-section a {
+      color: var(--neutral-bg);
+      transition: color 0.3s;
+      display: block;
+      padding: 3px 0;
+    }
+    .footer-section a:hover {
+      color: var(--primary-main);
+      text-decoration: underline;
+    }
+    .footer-bottom {
+      text-align: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #aaa;
+      font-size: 0.8em;
+    }
+
+    /* SOCIAL PAGE */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .page-header p {
+      color: var(--text-light);
+      margin-top: 10px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 30px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .social-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .social-card {
+      background-color: var(--neutral-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow-subtle);
+      padding: 25px;
+      border-top: 5px solid var(--primary-main);
+    }
+
+    .social-card h2 {
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .linkedin-embed {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+
+    .follow-box {
+      text-align: center;
+    }
+    .follow-box p {
+      color: var(--text-light);
+      margin-bottom: 15px;
+    }
+    .follow-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #0A66C2;
+      color: white;
+      padding: 12px 22px;
+      border-radius: 50px;
+      font-weight: bold;
+      transition: transform 0.2s, background-color 0.3s;
+    }
+    .follow-btn:hover {
+      background-color: #004182;
+      transform: translateY(-2px);
+    }
+    .external-note {
+      font-size: 0.85em;
+      color: var(--text-light);
+      margin-top: 12px;
+    }
+    /* [END STANDARD SITE-WIDE CSS BLOCK] */
+  </style>
+</head>
+
+<body>
+
+<header id="navbar">
+  <a href="/" class="logo-container">
+    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
+    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+  </a>
+  <nav class="nav-links-container">
+    <a href="/available-food/" class="nav-link">Find Food</a>
+    <a href="/donate-food/" class="nav-link">Donate</a>
+    <a href="/volunteer/" class="nav-link">Volunteer</a>
+    <a href="/impact/" class="nav-link">Impact</a>
+    <a href="/about/" class="nav-link">About Us</a>
+    <a href="/donate-food/" class="cta-button">DONATE NOW</a>
+    <a href="/staff-login/" class="nav-link">Staff Login</a>
+  </nav>
+</header>
+
+<main>
+  <div class="content-container">
+    <div class="page-header">
+      <h1>Follow Our Journey</h1>
+      <p>
+        Stay connected with FoodShare Seychelles. Follow our work, community impact,
+        and volunteer opportunities through our official LinkedIn page.
+      </p>
+    </div>
+
+    <div class="social-grid">
+      <!-- LEFT: EMBED -->
+      <div class="social-card">
+        <h2><i class="fab fa-linkedin"></i> Latest Update</h2>
+
+        <div class="linkedin-embed">
+          <!-- LINKEDIN EMBED -->
+          <iframe
+            src="https://www.linkedin.com/embed/feed/update/urn:li:share:7406069833823641600"
+            height="1027"
+            width="504"
+            frameborder="0"
+            allowfullscreen
+            title="FoodShare Seychelles LinkedIn Post">
+          </iframe>
+        </div>
+      </div>
+
+      <!-- RIGHT: FOLLOW -->
+      <div class="social-card follow-box">
+        <h2><i class="fas fa-bullhorn"></i> Join the Conversation</h2>
+        <p>
+          Follow FoodShare Seychelles on LinkedIn to stay updated on
+          volunteer calls, food rescue milestones, and community impact.
+        </p>
+
+        <a
+          href="https://www.linkedin.com/company/foodshare-seychelles"
+          target="_blank"
+          rel="noopener"
+          class="follow-btn">
+          <i class="fab fa-linkedin"></i>
+          Follow FoodShare Seychelles
+        </a>
+
+        <div class="external-note">
+          You will be redirected to LinkedIn
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer id="main-footer">
+  <div class="content-container footer-content">
+    <div class="footer-section">
+      <h3>Quick Links</h3>
+      <a href="/available-food/">Find Food</a>
+      <a href="/donate-food/">Donate Food</a>
+      <a href="/volunteer/">Volunteer</a>
+      <a href="/impact/">Impact & Reports</a>
+      <a href="/contact-general/">General Contact</a>
+    </div>
+    <div class="footer-section">
+      <h3>Learn More</h3>
+      <a href="/about/">About FoodShare</a>
+      <a href="/our-partners/">Our Partners</a>
+      <a href="/learn/safety/">Food Safety Protocol</a>
+      <a href="/learn/faq/">General FAQ</a>
+    </div>
+    <div class="footer-section">
+      <h3>Support & Legal</h3>
+      <a href="/privacy-policy/">Privacy Policy</a>
+      <a href="/terms-of-use/">Terms of Use</a>
+      <a href="/sitemap/">Site Structure</a>
+      <a href="/staff-login/">Staff Login</a>
+    </div>
+    <div class="footer-section">
+      <h3>Get In Touch</h3>
+      <p>Email:
+        <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">
+          admin@foodshare-seychelles.online
+        </a>
+      </p>
+      <p>Follow us on <a href="/social/" style="color: var(--primary-main);">Social Media</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 FoodShare Seychelles. All Rights Reserved.</div>
+</footer>
+
+</body>
+</html>
