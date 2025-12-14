@@ -1,469 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodShare Seychelles - Staff Dashboard</title>
-    <link rel="icon" href="/assets/image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        /* --- Color Palette --- */
-        :root {
-            --color-primary: #4CAF50; /* Base Green */
-            --color-primary-dark: #388E3C; /* Darker Green */
-            --color-secondary: #2196F3; /* Blue */
-            --color-background: #f4f7f6;
-            --color-card-bg: #ffffff;
-            --color-text-dark: #333333;
-            --color-text-light: #6c757d;
-            --color-alert-orange: #FF9800; /* Orange for priority */
-            --color-danger-red: #D32F2F; /* Red for high priority */
-        }
+  <meta charset="UTF-8" />
+  <title>Staff Dashboard | FoodShare Seychelles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        /* --- Global Styling --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <!-- Correct favicon -->
+  <link rel="icon" type="image/png" href="/image/logo.png" />
 
-        body {
-            background-color: var(--color-background);
-            color: var(--color-text-dark);
-            line-height: 1.6;
-            padding: 20px;
-        }
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+  />
 
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            gap: 20px;
-            grid-template-columns: 1fr;
-        }
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        /* Responsive grid layout */
-        @media (min-width: 992px) {
-            .dashboard-container {
-                grid-template-columns: 300px 1fr; /* Profile card width and main content */
-            }
-        }
+  <style>
+    :root {
+      --green: #4CAF50;
+      --dark-green: #388E3C;
+      --blue: #2196F3;
+      --bg: #f4f6f8;
+      --danger: #D32F2F;
+    }
 
-        /* --- Header and Greeting --- */
-        .header {
-            grid-column: 1 / -1;
-            margin-bottom: 20px;
-        }
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
 
-        .header h1 {
-            color: var(--color-primary-dark);
-            font-size: 2em;
-            border-bottom: 2px solid var(--color-primary);
-            padding-bottom: 5px;
-        }
+    body {
+      margin: 0;
+      background: var(--bg);
+    }
 
-        /* --- Card Styling --- */
-        .card {
-            background-color: var(--color-card-bg);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
+    /* LOADING */
+    #loading {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--green);
+      font-weight: 600;
+    }
 
-        .card h2 {
-            margin-bottom: 15px;
-            font-size: 1.4em;
-            color: var(--color-primary-dark);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
+    header {
+      background: var(--green);
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .card h2 .fas {
-            margin-right: 10px;
-        }
+    main {
+      padding: 24px;
+      max-width: 1100px;
+      margin: auto;
+    }
 
-        /* --- Profile Card --- */
-        #profile-card {
-            text-align: center;
-        }
+    .profile-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-        #profile-card img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #e0e0e0;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid var(--color-primary);
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
 
-        #profile-name {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+    th, td {
+      padding: 14px;
+      font-size: 0.9rem;
+    }
 
-        .profile-role {
-            font-size: 1em;
-            color: var(--color-primary-dark);
-            background-color: #e8f5e9;
-            padding: 5px 10px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
+    th {
+      background: #e8f5e9;
+    }
 
-        .contact-info p {
-            font-size: 0.9em;
-            color: var(--color-text-light);
-            margin-bottom: 5px;
-        }
-        
-        /* --- Task Table (Main Content) --- */
-        .main-content {
-            grid-column: 2 / 3;
-        }
-
-        @media (max-width: 991px) {
-            .main-content {
-                grid-column: 1 / -1;
-            }
-        }
-
-        .task-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .task-table th, .task-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .task-table th {
-            background-color: #f8f8f8;
-            color: var(--color-text-dark);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85em;
-        }
-
-        .task-table tr:hover {
-            background-color: #fafafa;
-        }
-        
-        /* Status Badges */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-            text-transform: capitalize;
-        }
-
-        .status-assigned {
-            background-color: #e3f2fd; /* Light Blue */
-            color: var(--color-secondary);
-        }
-
-        .status-inprogress {
-            background-color: #fff3e0; /* Light Orange */
-            color: var(--color-alert-orange);
-        }
-        
-        /* Priority Tags */
-        .priority-tag {
-            font-weight: bold;
-            font-size: 0.85em;
-        }
-        
-        .priority-high { color: var(--color-danger-red); }
-        .priority-medium { color: var(--color-alert-orange); }
-        .priority-low { color: var(--color-primary); }
-
-        /* Complete Button */
-        .complete-btn {
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background-color 0.3s;
-        }
-
-        .complete-btn:hover {
-            background-color: var(--color-primary-dark);
-        }
-
-        /* --- Logout Button --- */
-        .logout-btn-container {
-            margin-top: 20px;
-        }
-
-        #logout-btn {
-            background-color: #e0e0e0;
-            color: var(--color-text-dark);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        #logout-btn:hover {
-            background-color: #bdbdbd;
-        }
-
-    </style>
+    .btn-complete {
+      background: var(--green);
+      border: none;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
-    <div id="loader" style="text-align: center; padding: 50px; display: block;">Loading Dashboard...</div>
+<div id="loading">
+  <img src="/image/logo.png" height="70" alt="FoodShare Seychelles">
+  <p>Loading dashboard…</p>
+</div>
 
-    <div class="dashboard-container" style="display: none;">
-        <div class="header">
-            <h1><i class="fas fa-route"></i> Staff Operational Dashboard</h1>
-        </div>
+<div id="app" style="display:none;">
+  <header>
+    <h1>Staff Dashboard</h1>
+    <button onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </header>
 
-        <div class="sidebar">
-            <div id="profile-card" class="card">
-                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
-                <img id="profile-picture" src="https://via.placeholder.com/100/4CAF50/ffffff?text=FSS" alt="Profile Picture">
-                <div id="profile-name"></div>
-                <div class="profile-role" id="profile-role"></div>
-                <div class="contact-info">
-                    <p><i class="fas fa-envelope"></i> <span id="profile-email"></span></p>
-                    <p><i class="fas fa-phone"></i> <span id="profile-phone"></span></p>
-                </div>
+  <main>
+    <div class="profile-card" id="profileCard"></div>
 
-                <div class="logout-btn-container">
-                    <button id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                </div>
-            </div>
-        </div>
+    <h3><i class="fa-solid fa-list-check"></i> My Tasks</h3>
 
-        <div class="main-content">
-            <div id="assignments-card" class="card">
-                <h2><i class="fas fa-tasks"></i> My Current Assignments</h2>
-                <div class="table-responsive">
-                    <table class="task-table">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tasks-list">
-                            <tr><td colspan="5" style="text-align: center;">Loading assignments...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tasksBody"></tbody>
+    </table>
+  </main>
+</div>
 
-    <script>
-        // --- Supabase Client Initialization (YOUR CREDENTIALS) ---
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        // ----------------------------------------
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+<script>
+  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
 
-        // Role IDs
-        const ROLE_ADMIN = 1;
-        const ROLE_STAFF_DRIVER = 2;
-        const ROLE_STAFF_COORDINATOR = 3;
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // DOM Elements
-        const dashboardContainer = document.querySelector('.dashboard-container');
-        const loader = document.getElementById('loader');
-        const tasksList = document.getElementById('tasks-list');
-        const logoutBtn = document.getElementById('logout-btn');
-        let currentUserId = null;
+  document.addEventListener('DOMContentLoaded', init);
 
+  async function init() {
+    const { data: sessionData } = await supabase.auth.getSession();
 
-        // --- 1. AUTH GUARD and Redirection ---
-        async function authGuard() {
-            const { data: { user } } = await supabase.auth.getUser();
+    if (!sessionData.session) {
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
 
-            if (!user) {
-                // Not logged in: Redirect to login page
-                window.location.href = '/staff-login/index.html';
-                return;
-            }
+    const user = sessionData.session.user;
 
-            // Fetch user profile (including role name via join)
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('role_id, full_name, email, phone, profile_picture_url, role(name)') // 'role(name)' performs a join
-                .eq('id', user.id)
-                .single();
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-            if (error || !profile) {
-                console.error('Failed to load profile:', error);
-                await supabase.auth.signOut();
-                window.location.href = '/staff-login/index.html';
-                return;
-            }
+    if (error || !profile) {
+      await supabase.auth.signOut();
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
 
-            currentUserId = user.id;
+    if (profile.role === 1) {
+      window.location.href = '/admin/dashboard/home.html';
+      return;
+    }
 
-            // Check role-based access
-            if (profile.role_id === ROLE_ADMIN) {
-                // Admin: Redirect to Admin Dashboard
-                window.location.href = '/admin/dashboard/home.html';
-                return;
-            } else if (profile.role_id !== ROLE_STAFF_DRIVER && profile.role_id !== ROLE_STAFF_COORDINATOR) {
-                // Invalid role for Staff Dashboard
-                await supabase.auth.signOut();
-                window.location.href = '/staff-login/index.html';
-                return;
-            }
+    renderProfile(profile);
+    await loadTasks(user.id);
 
-            // Access granted: Initialize dashboard features
-            renderProfile(profile);
-            await fetchAndRenderTasks();
-            
-            // Hide loader, show dashboard
-            loader.style.display = 'none';
-            dashboardContainer.style.display = 'grid';
-        }
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
 
+  function renderProfile(profile) {
+    document.getElementById('profileCard').innerHTML = `
+      <div><strong>Name:</strong> ${profile.full_name || '—'}</div>
+      <div><strong>Email:</strong> ${profile.email || '—'}</div>
+      <div><strong>Role:</strong> ${profile.role === 2 ? 'Staff' : 'Volunteer Coordinator'}</div>
+      <div><strong>ID:</strong> ${profile.id}</div>
+    `;
+  }
 
-        // --- 2. PROFILE RENDERING ---
-        function renderProfile(profile) {
-            document.getElementById('profile-name').textContent = profile.full_name;
-            document.getElementById('profile-role').textContent = profile.role.name; // Display role name from join
-            document.getElementById('profile-email').textContent = profile.email;
-            document.getElementById('profile-phone').textContent = profile.phone || 'N/A';
-            
-            const profilePicElement = document.getElementById('profile-picture');
-            if (profile.profile_picture_url) {
-                profilePicElement.src = profile.profile_picture_url;
-            }
-        }
+  async function loadTasks(userId) {
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('assigned_to', userId)
+      .in('status', ['Assigned', 'InProgress']);
 
+    const body = document.getElementById('tasksBody');
+    body.innerHTML = '';
 
-        // --- 3. TASK MANAGEMENT ---
-        
-        /**
-         * Fetches and renders the current user's assignments.
-         */
-        async function fetchAndRenderTasks() {
-            if (!currentUserId) return;
+    if (!tasks || tasks.length === 0) {
+      body.innerHTML = `<tr><td colspan="5">No tasks assigned.</td></tr>`;
+      return;
+    }
 
-            const { data: tasks, error } = await supabase
-                .from('tasks')
-                .select('*')
-                // Filter for tasks assigned to the current user AND status is 'Assigned' or 'InProgress'
-                .eq('assigned_to', currentUserId)
-                .in('status', ['Assigned', 'InProgress'])
-                .order('priority', { ascending: false }); // Show high priority first
+    tasks.forEach(task => {
+      body.innerHTML += `
+        <tr>
+          <td>${task.title}</td>
+          <td>${task.description}</td>
+          <td>${task.priority}</td>
+          <td>${task.status}</td>
+          <td>
+            <button class="btn-complete" onclick="completeTask('${task.id}')">
+              Complete
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  }
 
-            if (error) {
-                console.error('Error fetching tasks:', error);
-                tasksList.innerHTML = '<tr><td colspan="5" style="color: var(--color-danger-red); text-align: center;">Failed to load tasks.</td></tr>';
-                return;
-            }
+  async function completeTask(id) {
+    await supabase.from('tasks').update({ status: 'Completed' }).eq('id', id);
+    init();
+  }
 
-            tasksList.innerHTML = ''; // Clear existing tasks
-
-            if (tasks.length === 0) {
-                tasksList.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-text-light);">You have no active assignments. Well done!</td></tr>';
-                return;
-            }
-
-            tasks.forEach(task => {
-                const priorityLower = task.priority ? task.priority.toLowerCase() : 'low';
-                const statusLower = task.status ? task.status.toLowerCase() : 'assigned';
-                
-                const priorityClass = priorityLower === 'high' ? 'priority-high' 
-                                     : priorityLower === 'medium' ? 'priority-medium' 
-                                     : 'priority-low';
-                
-                const statusClass = statusLower === 'assigned' ? 'status-assigned' 
-                                    : 'status-inprogress';
-
-                const row = `
-                    <tr>
-                        <td>${task.title}</td>
-                        <td>${task.description ? task.description.substring(0, 50) + (task.description.length > 50 ? '...' : '') : 'No description'}</td>
-                        <td><span class="priority-tag ${priorityClass}">${task.priority || 'Low'}</span></td>
-                        <td><span class="status-badge ${statusClass}">${task.status}</span></td>
-                        <td>
-                            <button class="complete-btn" data-task-id="${task.id}" 
-                                onclick="markTaskComplete(event, '${task.id}')">
-                                <i class="fas fa-check-circle"></i> Complete
-                            </button>
-                        </td>
-                    </tr>
-                `;
-                tasksList.insertAdjacentHTML('beforeend', row);
-            });
-        }
-        
-        /**
-         * Updates the task status to 'Completed'.
-         */
-        async function markTaskComplete(event, taskId) {
-            const button = event.target.closest('button'); // Ensure we get the button element
-            if (!button) return;
-            
-            button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
-
-            const { error } = await supabase
-                .from('tasks')
-                .update({ status: 'Completed', completed_at: new Date().toISOString() })
-                .eq('id', taskId);
-
-            if (error) {
-                console.error('Error marking task complete:', error);
-                alert('Failed to mark task complete: ' + error.message);
-                button.disabled = false;
-                button.innerHTML = '<i class="fas fa-check-circle"></i> Complete';
-                return;
-            }
-
-            // Success: Re-fetch and render the task list to remove the completed task
-            await fetchAndRenderTasks();
-        }
-        
-        // --- 4. LOGOUT FUNCTION ---
-        async function handleLogout() {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Logout error:', error);
-            }
-            window.location.href = '/staff-login/index.html';
-        }
-
-        // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Attach listener to the global window object for dynamic buttons
-            window.markTaskComplete = markTaskComplete; 
-            
-            authGuard();
-            logoutBtn.addEventListener('click', handleLogout);
-        });
-
-    </script>
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = '/staff-login/index.html';
+  }
+</script>
 
 </body>
 </html>
