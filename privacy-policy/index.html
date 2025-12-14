@@ -1,270 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodshare Seychelles - Privacy Policy</title>
-    
-    <link rel="icon" type="image/png" href="../image/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - FoodShare Seychelles</title>
 
-    <style>
-        /* Theme Variables */
-        :root {
-            --primary: #4CAF50; /* Vibrant Green */
-            --secondary: #388E3C; /* Darker Green */
-            --tertiary: #FFC107; /* Amber/Warning */
-            --neutral: #F5F5F5; /* Light Grey */
-            --dark: #212121; /* Dark Text */
-            --white: #ffffff;
-            --font-family: 'Helvetica', 'Arial', sans-serif;
-        }
+  <link rel="icon" href="/image/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-        /* ------------------------------------------- */
-        /* --- 0. LOADER STYLING & ANIMATION --- */
-        /* ------------------------------------------- */
-        #loader-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--primary); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-            opacity: 1; transition: opacity 0.5s ease-out, visibility 0.5s;
-        }
-        .loader-logo-image {
-            width: 100px; height: 100px; margin-bottom: 20px; background-color: var(--white);
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-        .loader-logo-image img { width: 70px; height: 70px; object-fit: contain; }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3); border-top: 4px solid var(--white);
-            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
-        }
-        .loader-message { color: var(--white); font-size: 1.2em; font-weight: bold; margin-top: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* ------------------------------------------- */
-        /* --- GLOBAL STYLING --- */
-        /* ------------------------------------------- */
-        body {
-            font-family: var(--font-family); margin: 0; background-color: var(--white);
-            color: var(--dark); display: flex; flex-direction: column; min-height: 100vh;
-            opacity: 0; transition: opacity 0.5s;
-        }
-        body.loaded { opacity: 1; }
-        a { text-decoration: none; color: inherit; }
-        main { flex-grow: 1; padding: 20px 0; }
+  <style>
+    :root {
+      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
+      --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
+      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333;
+      --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+      --transition-speed: 0.4s;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+    a:hover { color: var(--primary-dark); }
+    main { flex-grow: 1; padding: 40px 0; }
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+    .content-container { max-width: 1000px; margin: 0 auto; padding: 0 25px; }
 
-        /* Navigation Styles (Copied from index.html) */
-        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: var(--neutral); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-        .logo-container { font-size: 1.5em; font-weight: bold; }
-        .logo-share { color: var(--dark); }
-        .logo-feed { color: var(--primary); }
-        .nav-links-container { display: flex; align-items: center; }
-        .nav-link { padding: 8px 15px; color: var(--dark); font-weight: 500; transition: color 0.3s, background-color 0.3s; }
-        .nav-link:hover { color: var(--secondary); }
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content { display: none; position: absolute; background-color: var(--neutral); min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1; top: 35px; left: 0; border-radius: 4px; }
-        .dropdown-content a { color: var(--dark); padding: 12px 16px; text-decoration: none; display: block; text-align: left; }
-        .dropdown-content a:hover { background-color: #ddd; color: var(--secondary); }
-        .dropdown:hover .dropdown-content { display: block; }
-        .cta-button { background-color: var(--primary); color: white; border-radius: 4px; margin-left: 15px; padding: 10px 20px; font-weight: bold; }
-        .cta-button:hover { background-color: var(--secondary); color: white; }
-        .staff-login { margin-left: 10px; font-weight: bold; }
-        .hamburger { display: none; font-size: 1.8em; background: none; border: none; cursor: pointer; color: var(--dark); z-index: 1001; }
+    #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
+    .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+    .logo-img { height: 40px; margin-right: 10px; }
+    .nav-links-container { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+    .nav-link:hover::after { width: 100%; }
+    .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
+    .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
-        @media (max-width: 768px) {
-            #navbar { padding: 10px 20px; }
-            .nav-links-container { position: absolute; top: 60px; left: 0; width: 100%; flex-direction: column; background-color: var(--neutral); border-top: 1px solid #ccc; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); display: none; z-index: 999; }
-            .nav-links-container.open { display: flex; }
-            .nav-link { width: 100%; text-align: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-            .cta-button, .staff-login { margin: 10px 0; border-radius: 0; width: 100%; box-sizing: border-box; }
-            .hamburger { display: block; }
-            .dropdown { width: 100%; }
-            .dropdown-content { position: relative; width: 100%; top: 0; box-shadow: none; border-top: 1px solid #eee; }
-        }
+    #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+    .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+    .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+    .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+    .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+    .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+    .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
 
-        /* --- 4. FOOTER STYLING --- */
-        #main-footer { margin-top: auto; background-color: var(--dark); color: var(--neutral); padding: 40px 30px 15px; font-size: 0.9em; }
-        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; max-width: 1200px; margin: 0 auto 20px; }
-        .footer-section { width: 23%; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary); margin-bottom: 15px; font-size: 1.1em; }
-        .footer-section p, .footer-section li { margin: 5px 0; }
-        .footer-section a { color: var(--neutral); transition: color 0.3s; }
-        .footer-section a:hover { color: var(--primary); text-decoration: underline; }
-        .footer-section ul { list-style: none; padding: 0; }
-        .footer-bottom { max-width: 1200px; margin: 0 auto; text-align: center; padding-top: 15px; border-top: 1px solid #444; color: #999; font-size: 0.8em; }
-        .footer-credit a { color: var(--primary); }
-        .footer-credit a:hover { text-decoration: underline; }
-
-        @media (max-width: 600px) {
-            .footer-content { flex-direction: column; padding: 0 20px; }
-            .footer-section { width: 100%; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; }
-            .footer-section:last-child { border-bottom: none; }
-        }
-        
-        /* ------------------------------------------- */
-        /* --- PAGE-SPECIFIC & ANIMATION STYLING --- */
-        /* ------------------------------------------- */
-        .content-section { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        .content-section h2 { color: var(--primary); border-bottom: 2px solid var(--neutral); padding-bottom: 10px; margin-top: 30px; }
-        .content-section h3 { color: var(--secondary); margin-top: 20px; }
-        .content-section ul { list-style: disc; margin-left: 20px; }
-        .content-section p, .content-section li { line-height: 1.6; }
-        
-        /* Perk: Fade-in animation for main content */
-        .content-fade-in {
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        .content-fade-in.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
+    .doc {
+      background: var(--neutral-card);
+      border-radius: 14px;
+      box-shadow: var(--shadow-subtle);
+      padding: 30px;
+      border: 1px solid #efefef;
+      border-top: 5px solid var(--accent-blue);
+    }
+    .meta { color: var(--text-light); margin-top: 6px; }
+    .doc h2 { margin-top: 22px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px; }
+    .doc p, .doc li { color: var(--text-light); }
+    ul { padding-left: 18px; margin-top: 8px; }
+  </style>
 </head>
 <body>
+<header id="navbar">
+  <a href="/" class="logo-container">
+    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
+    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+  </a>
+  <nav class="nav-links-container" id="navLinks">
+    <a href="/available-food/" class="nav-link">Find Food</a>
+    <a href="/donate-food/" class="nav-link">Donate</a>
+    <a href="/volunteer/" class="nav-link">Volunteer</a>
+    <a href="/impact/" class="nav-link">Impact</a>
+    <a href="/about/" class="nav-link">About Us</a>
+    <a href="/donate-food/" class="cta-button">DONATE NOW</a>
+    <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
+  </nav>
+</header>
 
-    <div id="loader-screen">
-        <div class="loader-logo-image">
-            <img src="../image/logo.png" alt="Foodshare Seychelles Logo">
-        </div>
-        <div class="spinner"></div>
-        <div class="loader-message">Loading Foodshare Services...</div>
+<main>
+  <div class="content-container">
+    <section class="doc">
+      <h1>Privacy Policy</h1>
+      <div class="meta">Effective date: 2025-01-01 (update as needed)</div>
+
+      <p style="margin-top:12px;">
+        FoodShare Seychelles (“we”, “our”, “us”) respects your privacy. This policy explains what information we collect, how we use it,
+        and the choices you have when using our website and services.
+      </p>
+
+      <h2>Information We Collect</h2>
+      <ul>
+        <li><b>Donation submissions:</b> name/organization, email, phone (optional), food details, pickup location and timing.</li>
+        <li><b>Volunteer applications:</b> contact details, skills, availability, and interest area.</li>
+        <li><b>Claims & inquiries:</b> contact details and message content submitted through forms.</li>
+        <li><b>Technical data:</b> basic analytics/diagnostic data (e.g., device/browser) where available.</li>
+      </ul>
+
+      <h2>How We Use Information</h2>
+      <ul>
+        <li>To coordinate donation pickups, logistics, and communication.</li>
+        <li>To review volunteer applications and coordinate volunteer operations.</li>
+        <li>To respond to inquiries and provide support.</li>
+        <li>To maintain platform security and operational integrity.</li>
+      </ul>
+
+      <h2>Data Sharing</h2>
+      <p>
+        We do not sell your personal data. We may share limited information only when needed to fulfill operations (e.g., logistics coordination),
+        or when required by law.
+      </p>
+
+      <h2>Data Storage & Security</h2>
+      <p>
+        We use reasonable safeguards to protect data. Access to internal dashboards is restricted and role-based.
+        However, no method of transmission or storage is 100% secure.
+      </p>
+
+      <h2>Retention</h2>
+      <p>
+        We retain data only as long as needed for operational purposes and compliance. We may anonymize data for reporting (impact metrics).
+      </p>
+
+      <h2>Your Choices</h2>
+      <ul>
+        <li>You may request access, correction, or deletion of your submitted information where feasible.</li>
+        <li>You may opt out of non-essential communications.</li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>
+        For privacy questions, contact: <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a>
+      </p>
+
+      <p style="margin-top:18px; font-size:.92em;">
+        This policy is provided for transparency and general information and may be updated as the platform evolves.
+      </p>
+    </section>
+  </div>
+</main>
+
+<footer id="main-footer">
+  <div class="content-container footer-content">
+    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+    <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+    <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+    <div class="footer-section">
+      <h3>Get In Touch</h3>
+      <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+      <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
     </div>
-
-    <header>
-        <div id="navbar">
-            <div class="logo-container">
-                <a href="/">
-                    <span class="logo-share">Share Food.</span>
-                    <span class="logo-feed">Feed Seychelles.</span>
-                </a>
-            </div>
-            
-            <button class="hamburger" aria-label="Toggle navigation" id="hamburger-btn">☰</button>
-            
-            <nav class="nav-links-container" id="nav-menu">
-                <a href="/" class="nav-link">Home</a>
-                <a href="/about" class="nav-link">About Us</a>
-                <a href="/available-food" class="nav-link">Available Food</a>
-                <a href="/donate" class="nav-link cta-button">Donate Food</a>
-                <a href="/learn" class="nav-link">Learn</a>
-                
-                <div class="dropdown">
-                    <a href="#" class="nav-link">Volunteer</a>
-                    <div class="dropdown-content">
-                        <a href="/volunteer">Volunteer Now</a>
-                        <a href="/volunteers">Our Volunteers</a>
-                    </div>
-                </div>
-                
-                <a href="/staff" class="nav-link staff-login">Staff Login</a>
-            </nav>
-        </div>
-        </header>
-
-    <main>
-        <section class="content-section content-fade-in" id="main-content-area">
-            <h1>Privacy Policy</h1>
-            <p><strong>Last Updated: December 13, 2025</strong></p>
-
-            <p>FoodShare Seychelles is committed to protecting your privacy. This policy explains how we collect, use, and safeguard personal data when you interact with our services, including submitting volunteer applications or general inquiries.</p>
-
-            <h2>1. Information We Collect</h2>
-            <p>We collect information you voluntarily provide to us when you use our services:</p>
-            <ul>
-                <li><strong>Volunteer Data:</strong> Name, contact details (email, phone, address), availability, skills, and emergency contact information collected via the Volunteer Form.</li>
-                <li><strong>Inquiry Data:</strong> Name, email address, and the content of your message submitted through the Contact or General Inquiry forms.</li>
-                <li><strong>Future Beneficiary Data:</strong> (Upon activation of the "Available Food" service) Sensitive information related to your needs and location, subject to strict anonymity protocols.</li>
-            </ul>
-
-            <h2>2. How We Use Your Information</h2>
-            <p>We use the data collected for the following purposes:</p>
-            <ul>
-                <li>To process and manage your volunteer application, including vetting and scheduling.</li>
-                <li>To respond to your inquiries and provide support.</li>
-                <li>To manage and coordinate the logistical flow of food distribution (once operational).</li>
-                <li>To comply with legal and safety requirements relevant to food handling and volunteer management in the Seychelles.</li>
-            </ul>
-
-            <h2>3. Data Security and Storage</h2>
-            <p>Your data is stored securely using cloud-based services (Google Firebase/Firestore). We employ technical and organizational security measures to protect against unauthorized access, disclosure, alteration, or destruction of your personal data. Access to sensitive data is strictly limited to authorized Staff Login accounts.</p>
-            
-            <h2>4. Contact Us</h2>
-            <p>For any questions or concerns regarding this Privacy Policy or your data, please contact us at the canonical administrative email address:</p>
-            <p><strong>Email:</strong> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></p>
-        </section>
-    </main>
-
-    <footer id="main-footer">
-        <div class="footer-content">
-            <div class="footer-section about">
-                <h3>Our Mission</h3>
-                <p>Connecting surplus food with those who need it across the Seychelles islands to eliminate food waste and nourish our community.</p>
-            </div>
-            
-            <div class="footer-section links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/available-food">Available Food</a></li>
-                    <li><a href="/volunteer">Volunteer Now</a></li>
-                    <li><a href="/donate">Donate Food</a></li>
-                </ul>
-            </div>
-            
-            <div class="footer-section contact">
-                <h3>Contact & Support</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></p>
-            </div>
-            
-            <div class="footer-section legal">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                    <li><a href="/terms">Terms of Use</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p class="footer-credit">
-                Website by 
-                <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener noreferrer">Tyler Nicholas</a> | 
-                <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </p>
-            &copy; 2025 Foodshare Seychelles. All Rights Reserved.
-        </div>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loader = document.getElementById('loader-screen');
-            const body = document.body;
-            const mainContent = document.getElementById('main-content-area'); // Get the new content area
-
-            const delayTime = 3000; 
-
-            setTimeout(() => {
-                // 1. Fade out the loader
-                loader.style.opacity = '0'; 
-
-                // 2. After the fade-out transition completes (0.5s), hide loader and show content
-                setTimeout(() => {
-                    loader.style.display = 'none'; 
-                    body.classList.add('loaded');
-                    mainContent.classList.add('active'); // Activate the fade-in animation
-                }, 500); 
-
-            }, delayTime);
-        });
-
-        // JavaScript for mobile navigation toggle
-        document.getElementById('hamburger-btn').addEventListener('click', function() {
-            const navMenu = document.getElementById('nav-menu');
-            navMenu.classList.toggle('open');
-        });
-    </script>
-
+  </div>
+  <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+</footer>
 </body>
 </html>
