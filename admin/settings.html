@@ -57,7 +57,7 @@
             background-color: var(--neutral-card); padding: 30px; border-radius: 8px;
             box-shadow: var(--shadow-subtle); margin-bottom: 25px;
         }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-light); }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--text-dark); }
         textarea, input[type="text"] {
             width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
             border-radius: 4px; font-size: 1em; resize: vertical; min-height: 100px;
@@ -87,12 +87,12 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
         
-        const ADMIN_ROLE_ID = 1; // Admin role ID based on your database schema
+        const ADMIN_ROLE_ID = 1;
 
         function showMessage(type, message) {
             const statusEl = document.getElementById('status-message');
             statusEl.textContent = message;
-            statusEl.className = ''; // Clear existing classes
+            statusEl.className = '';
             statusEl.classList.add(type);
             statusEl.style.display = 'block';
             setTimeout(() => {
@@ -116,29 +116,29 @@
 
                 const user = session.user;
 
-                // ... inside checkAdminAuth()
                 // 2. Fetch the user's profile to get the role_id
+                // *** FIX APPLIED: Using 'id' column as the foreign key in profiles table ***
                 const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('role_id')
-                .eq('id', user.id) // <-- CORRECTED to use 'id'
-                .single();
+                    .from('profiles')
+                    .select('role_id')
+                    .eq('id', user.id) // <--- CRITICAL FIX based on your table schema
+                    .single();
 
                 if (profileError || !profile || profile.role_id !== ADMIN_ROLE_ID) {
                     console.error("Authorization failed. Role is not Admin.", profileError || 'Role mismatch');
-                    // Redirect unauthorized users (e.g., Staff/Volunteers)
+                    // Redirect unauthorized users
                     window.location.href = '../../staff-login/index.html'; 
                     return;
                 }
 
-                // Authentication successful, hide preloader and load data
+                // Authentication successful
                 preloader.classList.add('hidden');
                 document.getElementById('admin-content').classList.remove('hidden');
                 fetchAnnouncementSettings();
             
             } catch (e) {
                 console.error("Authentication check failed:", e);
-                window.location.href = '../../staff-login/index.html'; // Fallback redirect
+                window.location.href = '../../staff-login/index.html';
             }
         }
 
@@ -153,7 +153,8 @@
 
             if (error) {
                 console.error("Error fetching current setting:", error);
-                textarea.value = "ERROR: Failed to load current announcement value.";
+                // Fallback message if fetch fails
+                textarea.value = "ERROR: Failed to load current announcement value."; 
                 return;
             }
             
@@ -165,10 +166,11 @@
             event.preventDefault();
             const newAnnouncement = document.getElementById('announcement-value').value.trim();
             
+            // Update the specific setting key
             const { error } = await supabase
                 .from('settings')
                 .update({ value: newAnnouncement, updated_at: new Date().toISOString() })
-                .eq('key', 'home_announcement'); // Update the specific setting key
+                .eq('key', 'home_announcement');
 
             if (error) {
                 console.error("Error updating announcement:", error);
@@ -189,15 +191,13 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Supabase Client
             if (window.supabase && window.supabase.createClient) {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                checkAdminAuth(); // Start the security check
+                checkAdminAuth();
             } else {
                 console.error("Supabase client failed to load.");
             }
 
-            // Attach event listener for the update form
             document.getElementById('announcement-form').addEventListener('submit', updateAnnouncement);
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
         });
@@ -210,11 +210,12 @@
     <aside id="sidebar">
         <div class="logo-admin">FoodShare Admin</div>
         <nav>
-            <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="inventory.html"><i class="fas fa-boxes"></i> Inventory</a>
-            <a href="requests.html"><i class="fas fa-list-alt"></i> Requests & Tasks</a>
-            <a href="volunteers.html"><i class="fas fa-hand-holding-heart"></i> Volunteers</a>
-            <a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a>
+            <a href="dashboard.html"><i class="fas fa-chart-line"></i> Dashboard Home</a>
+            <a href="inventory.html"><i class="fas fa-boxes"></i> Inventory Management</a>
+            <a href="requests.html"><i class="fas fa-list-alt"></i> Donation Requests</a>
+            <a href="tasks.html"><i class="fas fa-tasks"></i> Staff Tasks</a>
+            <a href="volunteers.html"><i class="fas fa-user-friends"></i> Volunteer Apps</a>
+            <a href="settings.html" class="active"><i class="fas fa-cog"></i> Site Settings</a>
         </nav>
         <button id="logout-btn">Logout</button>
     </aside>
@@ -228,7 +229,7 @@
             <div class="card">
                 <h2><i class="fas fa-bullhorn"></i> Home Page Announcement Banner</h2>
                 <form id="announcement-form">
-                    <p style="margin-bottom: 20px; color: var(--text-light);">This message appears at the top of the public Home Page. **Leave the text box empty to hide the banner completely.**</p>
+                    <p style="margin-bottom: 20px; color: var(--text-dark);">This message appears at the top of the public Home Page. **Leave the text box empty to hide the banner completely.**</p>
                     
                     <label for="announcement-value">Announcement Content:</label>
                     <textarea id="announcement-value" placeholder="Enter your key operational announcement here..."></textarea>
@@ -239,7 +240,7 @@
 
             <div class="card">
                 <h2><i class="fas fa-envelope"></i> Default Email Notifications</h2>
-                <p style="color: var(--text-light);">*Future feature: Configure default subject lines and body text for automated emails sent to donors and volunteers.</p>
+                <p style="color: var(--text-dark);">*Future feature: Configure default subject lines and body text for automated emails sent to donors and volunteers.</p>
             </div>
 
         </div>
