@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START STANDARD CSS BLOCK] */
+        /* [START STANDARD SITE-WIDE CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
             --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
@@ -26,7 +26,25 @@
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
 
-        /* NAVIGATION BAR & FOOTER (Omitted for brevity - assuming they work) */
+        /* NAVIGATION BAR */
+        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; }
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+        .nav-link:hover::after { width: 100%; }
+        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+
+        /* FOOTER STYLING */
+        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
 
         /* Find Food Specific Styles */
         .inventory-list {
@@ -64,12 +82,8 @@
             transition: background-color 0.3s;
         }
         .claim-btn:hover { background-color: #E68900; }
-        .out-of-stock {
-            background-color: #BDBDBD;
-            cursor: not-allowed;
-        }
-
-        /* Modal Styles */
+        
+        /* Modal Styles (New) */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.7); display: none; 
@@ -77,7 +91,7 @@
         }
         .modal-content {
             background: var(--neutral-card); padding: 30px; border-radius: 8px;
-            width: 90%; max-width: 450px; text-align: center;
+            width: 90%; max-width: 450px; text-align: center; position: relative;
             box-shadow: var(--shadow-subtle);
         }
         .modal-content h3 { margin-bottom: 20px; color: var(--text-dark); }
@@ -86,20 +100,18 @@
             font-size: 1.1em; border: none; border-radius: 5px; cursor: pointer;
             transition: transform 0.2s;
         }
-        .modal-content .option-btn:hover { transform: translateY(-2px); }
         #transportBtn { background-color: var(--accent-red); color: white; }
         #pickupBtn { background-color: var(--primary-main); color: white; }
         #transportBtn:hover { background-color: #B71C1C; }
         #pickupBtn:hover { background-color: var(--primary-dark); }
         .close-btn { position: absolute; top: 10px; right: 20px; font-size: 1.5em; cursor: pointer; color: var(--text-light); }
+        /* [END STANDARD CSS BLOCK] */
     </style>
     
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
-
-        // Global variable to hold the ID of the listing being claimed
         let currentListingId = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -110,7 +122,7 @@
                 console.error("Supabase client library failed to load.");
             }
             
-            // Attach event listeners for the modal buttons
+            // Attach event listeners for the modal
             document.getElementById('transportBtn').addEventListener('click', redirectToTransportForm);
             document.getElementById('pickupBtn').addEventListener('click', redirectToPickupForm);
             document.querySelector('.close-btn').addEventListener('click', closeModal);
@@ -134,14 +146,12 @@
 
         function redirectToTransportForm() {
             if (currentListingId) {
-                // Redirects to the form for transport, passing the item ID
                 window.location.href = `/claim/transport.html?listing_id=${currentListingId}`;
             }
         }
 
         function redirectToPickupForm() {
             if (currentListingId) {
-                // Redirects to the form for self-pickup, passing the item ID
                 window.location.href = `/claim/pickup.html?listing_id=${currentListingId}`;
             }
         }
@@ -150,7 +160,7 @@
             const inventoryList = document.getElementById('inventoryList');
             inventoryList.innerHTML = '<p style="text-align: center; color: var(--text-light);">Loading available food...</p>';
 
-            // CRITICAL FIX: Querying the correct table 'food_listings' as per the schema
+            // FIX: Querying the correct table 'food_listings'
             const { data, error } = await supabase
                 .from('food_listings')
                 .select('id, title, description, location, quantity, is_available')
@@ -158,6 +168,7 @@
                 .order('posted_at', { ascending: false });
 
             if (error) {
+                // IMPORTANT: The policy recursion error is not shown here, but this catch handles DB connection issues.
                 inventoryList.innerHTML = `<p style="text-align: center; color: var(--accent-red);">Error loading food listings: ${error.message}</p>`;
                 return;
             }
@@ -172,7 +183,6 @@
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 
-                // Use the correct column names from the 'food_listings' table: 'title', 'quantity', 'location', 'description'
                 card.innerHTML = `
                     <h4><i class="fas fa-box-open"></i> ${item.title}</h4>
                     <p>Location: ${item.location || 'Central Location'}</p>
