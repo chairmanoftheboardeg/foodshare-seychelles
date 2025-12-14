@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate Food - FoodShare Seychelles</title>
+    
     <link rel="icon" href="/image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START STANDARD CSS BLOCK] */
+        /* [START STANDARD SITE-WIDE CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -24,9 +25,9 @@
         a:hover { color: var(--primary-dark); }
         main { flex-grow: 1; padding: 40px 0; }
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .content-container { max-width: 900px; margin: 0 auto; padding: 0 25px; }
+        .content-container { max-width: 800px; margin: 0 auto; padding: 0 25px; }
 
-        /* NAVIGATION BAR */
+        /* NAVIGATION BAR (omitted for brevity) */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; } 
@@ -37,7 +38,7 @@
         .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
-        /* FOOTER STYLING */
+        /* FOOTER STYLING (omitted for brevity) */
         #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
         .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
         .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
@@ -47,76 +48,106 @@
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
 
         /* Form Specific Styles */
-        .form-card { background-color: var(--neutral-card); padding: 40px; border-radius: 12px; box-shadow: var(--shadow-subtle); margin-top: 30px; border-top: 5px solid var(--accent-orange); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .form-section h3 { margin-bottom: 20px; color: var(--accent-orange); border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; transition: border-color 0.3s, box-shadow 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-light); outline: none; box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); }
-        .submit-button { padding: 15px 40px; background-color: var(--accent-orange); color: var(--neutral-card); border: none; border-radius: 50px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s, transform 0.2s; font-weight: bold; }
-        .submit-button:hover:not(:disabled) { background-color: #E65100; transform: translateY(-2px); }
-        .submit-button:disabled { background-color: #FFCC80; cursor: not-allowed; }
-        .alert-message { padding: 15px; margin-top: 20px; border-radius: 8px; font-weight: bold; display: none; text-align: left; }
-        .alert-error { background-color: #FFCDD2; color: #C62828; border: 1px solid #E57373; }
-        .alert-success { background-color: #C8E6C9; color: #2E7D32; border: 1px solid #66BB6A; }
-        /* [END STANDARD CSS BLOCK] */
+        .form-card {
+            background-color: var(--neutral-card); padding: 35px; border-radius: 8px;
+            box-shadow: var(--shadow-subtle); margin-top: 30px;
+        }
+        h1 { text-align: center; color: var(--primary-dark); margin-bottom: 10px; }
+        h2 { font-size: 1.3em; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary-main); padding-bottom: 5px;}
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 1em;
+        }
+        .form-row { display: flex; gap: 20px; }
+        .form-row > div { flex: 1; }
+        
+        .submit-btn {
+            background-color: var(--primary-main);
+            color: white; padding: 12px 25px;
+            border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
+            transition: background-color var(--transition-speed); width: 100%;
+            margin-top: 25px;
+        }
+        .submit-btn:hover { background-color: var(--primary-dark); }
+        
+        #statusMessage {
+            padding: 20px; border-radius: 8px; margin-top: 20px;
+            text-align: center; font-weight: bold; display: none;
+        }
+        .success { background-color: var(--primary-light); color: var(--primary-dark); }
+        .error { background-color: var(--accent-red); color: white; }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .form-row { flex-direction: column; gap: 0; }
+        }
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
+        
+        function showMessage(type, message) {
+            const msgEl = document.getElementById('statusMessage');
+            msgEl.className = type;
+            msgEl.innerHTML = message;
+            msgEl.style.display = 'block';
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-             if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else {
-                console.error("Supabase client library failed to load.");
+        async function handleDonationSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            
+            // Get data from form and ensure quantity is parsed as a number
+            const donationData = {
+                donor_name: formData.get('donor_name'),
+                donor_email: formData.get('donor_email'),
+                donor_phone: formData.get('donor_phone'), // Matches renamed column
+                food_type: formData.get('food_type'),
+                quantity_kg: parseFloat(formData.get('quantity_kg')), // CRITICAL: Parse as float for NUMERIC type
+                expiry_date: formData.get('expiry_date') || null,
+                storage_type: formData.get('storage_type'),
+                description: formData.get('description'),
+                pickup_address: formData.get('pickup_address'),
+                pickup_island: formData.get('pickup_island'),
+                preferred_pickup_time: formData.get('preferred_pickup_time'),
+                status: 'New'
+            };
+
+            // Basic validation
+            if (isNaN(donationData.quantity_kg) || donationData.quantity_kg <= 0) {
+                showMessage('error', `<i class="fas fa-exclamation-triangle"></i> Please enter a valid quantity (kg) greater than zero.`);
+                return;
             }
             
-            const form = document.getElementById('donationForm');
-            const messageEl = document.getElementById('formMessage');
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Submitting Request...';
+            showMessage('statusMessage', ''); // Clear previous message
 
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                messageEl.style.display = 'none';
-                
-                const data = {
-                    donor_name: document.getElementById('donorName').value,
-                    donor_email: document.getElementById('donorEmail').value,
-                    donor_phone: document.getElementById('donorPhone').value,
-                    organization_name: document.getElementById('organizationName').value,
-                    food_type: document.getElementById('foodType').value,
-                    quantity_kg: parseFloat(document.getElementById('quantityKg').value),
-                    expiration_date: document.getElementById('expirationDate').value,
-                    location: document.getElementById('location').value,
-                    notes: document.getElementById('notes').value,
-                    status: 'New' 
-                };
-                
-                if (data.quantity_kg <= 0 || isNaN(data.quantity_kg)) {
-                     messageEl.textContent = 'Please enter a valid quantity in kg.';
-                     messageEl.className = 'alert-message alert-error';
-                     messageEl.style.display = 'block';
-                     return;
-                }
+            const { error } = await supabase
+                .from('donations') // <-- USING YOUR EXISTING TABLE NAME
+                .insert([donationData]);
 
-                const { error } = await supabase
-                    .from('donation_requests')
-                    .insert([data]);
+            if (error) {
+                console.error('Donation Submission Error:', error);
+                showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: ${error.message}. Please check your inputs and try again.`);
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Submit Donation Request';
+            } else {
+                showMessage('success', 
+                    `<i class="fas fa-check-circle"></i> **Thank you, ${donationData.donor_name}!**<br>
+                     Your generous donation request has been successfully submitted. Our team will contact you shortly to schedule pickup.`);
+                document.getElementById('donationForm').reset();
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+        }
 
-                if (error) {
-                    messageEl.textContent = `Submission Failed: ${error.message}. Please check your inputs and try again.`;
-                    messageEl.className = 'alert-message alert-error';
-                    messageEl.style.display = 'block';
-                } else {
-                    messageEl.textContent = 'Thank you! Your donation request has been submitted. A staff member will contact you shortly to coordinate pickup.';
-                    messageEl.className = 'alert-message alert-success';
-                    messageEl.style.display = 'block';
-                    form.reset();
-                }
-            });
+        document.addEventListener('DOMContentLoaded', () => {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            document.getElementById('donationForm').addEventListener('submit', handleDonationSubmit);
         });
     </script>
 </head>
@@ -139,49 +170,103 @@
 
     <main>
         <div class="content-container">
-            <header style="text-align: center; margin-bottom: 40px;">
-                <h1>Submit a Food Donation</h1>
-                <p>Fill out the form below to request a pickup for your surplus food. We handle all logistics.</p>
-                <div id="formMessage" class="alert-message"></div>
-            </header>
+            <h1><i class="fas fa-leaf"></i> Donate Surplus Food</h1>
+            <p style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">
+                Help us rescue food that would otherwise go to waste. Fill out the form below and we'll arrange collection.
+            </p>
+            <p style="text-align: center; font-size: 0.9em; color: var(--accent-red); font-weight: bold;">
+                Note: We only accept food that is safe, unexpired (or near-expiry), and suitable for distribution.
+            </p>
+
+            <div id="statusMessage" style="display: none;"></div>
 
             <div class="form-card">
                 <form id="donationForm">
+                    <h2><i class="fas fa-user-circle"></i> Donor Contact Details</h2>
                     
-                    <div class="form-section">
-                        <h3>1. Donor Information</h3>
-                        <div class="form-grid">
-                            <div class="form-group"><label for="donorName">Your Name *</label><input type="text" id="donorName" required></div>
-                            <div class="form-group"><label for="donorEmail">Email *</label><input type="email" id="donorEmail" required></div>
-                            <div class="form-group"><label for="donorPhone">Phone Number</label><input type="tel" id="donorPhone"></div>
-                            <div class="form-group"><label for="organizationName">Organization (If applicable)</label><input type="text" id="organizationName"></div>
+                    <label for="donor_name">Your Name or Organization Name *</label>
+                    <input type="text" id="donor_name" name="donor_name" required>
+
+                    <div class="form-row">
+                        <div>
+                            <label for="donor_email">Email Address *</label>
+                            <input type="email" id="donor_email" name="donor_email" required>
+                        </div>
+                        <div>
+                            <label for="donor_phone">Phone Number</label>
+                            <input type="tel" id="donor_phone" name="donor_phone" placeholder="e.g., 251-0000">
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3>2. Donation Details</h3>
-                        <div class="form-grid">
-                            <div class="form-group"><label for="foodType">Type of Food *</label><input type="text" id="foodType" required placeholder="e.g., Fresh Produce, Bakery Items, Canned Goods"></div>
-                            <div class="form-group"><label for="quantityKg">Approximate Quantity (kg) *</label><input type="number" id="quantityKg" step="0.1" min="1" required></div>
-                            <div class="form-group"><label for="expirationDate">Best Before Date</label><input type="date" id="expirationDate"></div>
-                            <div class="form-group"><label for="location">Pickup Location (Island/Area) *</label><input type="text" id="location" required placeholder="e.g., Mahé / Beau Vallon"></div>
+                    <h2 style="margin-top: 30px;"><i class="fas fa-boxes"></i> Food Donation Details</h2>
+                    
+                    <div class="form-row">
+                        <div>
+                            <label for="food_type">Type of Food *</label>
+                            <select id="food_type" name="food_type" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="Produce">Fresh Fruits & Vegetables</option>
+                                <option value="Packaged">Dry & Packaged Goods (Cans, Pasta, Rice)</option>
+                                <option value="Baked">Baked Goods (Bread, Pastries)</option>
+                                <option value="Meat">Meat & Poultry (Frozen/Chilled)</option>
+                                <option value="Dairy">Dairy & Eggs (Chilled)</option>
+                                <option value="Beverages">Non-Alcoholic Beverages</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="quantity_kg">Estimated Quantity (Kilograms - kg) *</label>
+                            <input type="number" id="quantity_kg" name="quantity_kg" step="0.5" min="1" placeholder="Minimum 1 kg" required>
                         </div>
                     </div>
 
-                    <div class="form-section">
-                        <h3>3. Additional Notes</h3>
-                        <div class="form-group">
-                            <label for="notes">Notes for Pickup Staff (e.g., parking, accessibility, specific instructions)</label>
-                            <textarea id="notes"></textarea>
+                    <div class="form-row">
+                        <div>
+                            <label for="expiry_date">Best Before / Expiry Date</label>
+                            <input type="date" id="expiry_date" name="expiry_date" title="Please enter the closest expiry date if batch varies">
+                        </div>
+                        <div>
+                            <label for="storage_type">Current Storage Condition</label>
+                            <select id="storage_type" name="storage_type">
+                                <option value="Ambient">Ambient (Room Temperature)</option>
+                                <option value="Refrigerated">Refrigerated (Chilled)</option>
+                                <option value="Frozen">Frozen</option>
+                            </select>
                         </div>
                     </div>
                     
-                    <div style="text-align: center; margin-top: 30px;">
-                        <button type="submit" class="submit-button">
-                            <i class="fas fa-calendar-alt"></i> Request Pickup
-                        </button>
+                    <label for="description">Detailed Description of Food Items</label>
+                    <textarea id="description" name="description" rows="3" placeholder="e.g., 20 kgs of mixed tomatoes and cucumbers, 5 boxes of canned beans, must be picked up by 4 PM."></textarea>
+
+                    <h2 style="margin-top: 30px;"><i class="fas fa-truck-pickup"></i> Pickup Location & Timing</h2>
+                    
+                    <label for="pickup_address">Full Pickup Address *</label>
+                    <input type="text" id="pickup_address" name="pickup_address" required>
+
+                    <div class="form-row">
+                        <div>
+                            <label for="pickup_island">Island Location *</label>
+                            <select id="pickup_island" name="pickup_island" required>
+                                <option value="">-- Select Island --</option>
+                                <option value="Mahe">Mahé</option>
+                                <option value="Praslin">Praslin</option>
+                                <option value="La Digue">La Digue</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="preferred_pickup_time">Preferred Pickup Timeframe</label>
+                            <input type="text" id="preferred_pickup_time" name="preferred_pickup_time" placeholder="e.g., Tomorrow between 10am-12pm">
+                        </div>
                     </div>
 
+                    <button type="submit" id="submitBtn" class="submit-btn">
+                        <i class="fas fa-check-circle"></i> Submit Donation Request
+                    </button>
+                    
+                    <p style="font-size: 0.8em; color: var(--text-light); text-align: center; margin-top: 15px;">
+                        All donations are subject to review to ensure food safety standards are met.
+                    </p>
                 </form>
             </div>
         </div>
