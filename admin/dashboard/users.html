@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - User Management</title>
+    <link rel="icon" href="../../image/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <style> /* CSS from 2a goes here for consistency */ </style>
+    <style>
+        /* Shared Admin Styles from 2a (for brevity, imagine them here) */
+        :root {
+            --primary-main: #4CAF50; 
+            --primary-dark: #388E3C;
+            --accent-blue: #2196F3;
+            --accent-red: #D32F2F;
+            --neutral-bg: #F5F7FA; 
+            --neutral-card: #FFFFFF;
+            --text-dark: #2C3E50; 
+            --text-light: #7f8c8d;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: var(--neutral-bg); color: var(--text-dark); display: flex; }
+        #sidebar { /* ... same as 2a ... */ width: 250px; background: var(--text-dark); color: white; height: 100vh; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); position: sticky; top: 0; flex-shrink: 0; }
+        #sidebar h2 { padding: 0 20px 20px; border-bottom: 1px solid #444; margin-bottom: 20px; }
+        #sidebar a { display: block; padding: 12px 20px; text-decoration: none; color: #ddd; transition: background 0.2s, color 0.2s; border-left: 5px solid transparent; }
+        #sidebar a:hover { background: #3c4a5c; color: white; }
+        #sidebar a.active { background: #3c4a5c; color: var(--primary-main); border-left-color: var(--primary-main); }
+        #main-content { flex-grow: 1; padding: 40px; }
+        .dashboard-header { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+        .dashboard-header h1 { color: var(--accent-blue); }
+
+        /* Page specific CSS */
+        .user-table { width: 100%; border-collapse: separate; border-spacing: 0 15px; }
+        .user-table th { text-align: left; padding: 10px 15px; background: var(--neutral-bg); font-weight: 600; }
+        .user-table td { background: var(--neutral-card); padding: 15px; border-radius: 8px; box-shadow: var(--shadow-subtle); }
+        .role-tag { padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8em; }
+        .role-Admin { background: #fbe5e6; color: var(--accent-red); }
+        .role-Staff { background: #e3f2fd; color: var(--accent-blue); }
+        .role-Volunteer { background: #e8f5e9; color: var(--primary-dark); }
+        .action-btn { background: var(--accent-blue); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+    </style>
+    
+    <script>
+        // JS configuration and authGuard remain the same as 2a
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        let supabase;
+        const ADMIN_ROLE_ID = 1;
+        const STAFF_ROLES = [2, 3]; 
+        const ROLE_MAP = {
+            1: 'Admin',
+            2: 'Driver/Staff',
+            3: 'Volunteer Coordinator',
+            4: 'General Volunteer'
+        };
+        
+        async function authGuard(allowedRoles) { /* ... same as 2a ... */
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) { window.location.href = '/staff-login/index.html'; return null; }
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles').select('role').eq('id', session.user.id).single();
+            if (profileError || !profileData) { await supabase.auth.signOut(); window.location.href = '/staff-login/index.html'; return null; }
+            if (!allowedRoles.includes(profileData.role)) {
+                if (STAFF_ROLES.includes(profileData.role)) { window.location.href = '/staff/dashboard.html'; return null; }
+                await supabase.auth.signOut(); window.location.href = '/staff-login/index.html'; return null;
+            }
+            return profileData;
+        }
+
+        async function fetchUsers() {
+            const usersBody = document.getElementById('usersTableBody');
+            usersBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">Loading users...</td></tr>';
+
+            // Fetches all profiles with their associated role
+            const { data: profiles, error } = await supabase
+                .from('profiles')
+                .select(`id, full_name, email, role, phone`);
+
+            if (error) {
+                usersBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 30px;">Error loading users: ${error.message}</td></tr>`;
+                return;
+            }
+
+            usersBody.innerHTML = profiles.map(p => {
+                const roleName = ROLE_MAP[p.role] || 'Unknown';
+                const roleClass = roleName.split('/')[0].trim().replace(/\s/g, ''); // Simplifies to Admin, Staff, Volunteer
+                
+                return `
+                    <tr>
+                        <td>${p.full_name}</td>
+                        <td>${p.email}</td>
+                        <td>${p.phone || 'N/A'}</td>
+                        <td><span class="role-tag role-${roleClass}">${roleName}</span></td>
+                        <td style="width: 250px;">
+                            <button class="action-btn" onclick="openEditModal('${p.id}')"><i class="fas fa-edit"></i> Edit Role</button>
+                            <button class="action-btn" style="background: var(--accent-red);" onclick="deleteUser('${p.id}', '${p.full_name}')"><i class="fas fa-trash"></i> Delete</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function openEditModal(userId) {
+            alert(`Feature not fully implemented: Opening edit modal for user ${userId}.`);
+        }
+        async function deleteUser(userId, name) {
+            if (userId === currentUserId) {
+                alert("You cannot delete your own account while logged in.");
+                return;
+            }
+            if (confirm(`Are you SURE you want to DELETE user: ${name}? This action is irreversible.`)) {
+                // In a real application, you'd use the Admin API or a Supabase Function here.
+                alert(`Pretending to delete user ${name} (${userId}). Deletion requires Supabase Admin API/Function.`);
+                fetchUsers(); // Refresh
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const profile = await authGuard([ADMIN_ROLE_ID]);
+            if (profile) {
+                currentUserId = profile.id; 
+                fetchUsers();
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="sidebar">
+        <h2><i class="fas fa-crown" style="color: var(--primary-main);"></i> FoodShare Admin</h2>
+        <a href="home.html"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a>
+        <a href="users.html" class="active"><i class="fas fa-users"></i> User Management</a>
+        <a href="tasks.html"><i class="fas fa-tasks"></i> Assign & Manage Tasks</a>
+        <a href="inventory.html"><i class="fas fa-warehouse"></i> Inventory</a>
+        <a href="donations.html"><i class="fas fa-boxes"></i> Donations Intake</a>
+        <a href="claims.html"><i class="fas fa-clipboard-list"></i> Claims Review</a>
+        <a href="volunteer_apps.html"><i class="fas fa-handshake"></i> Volunteer Apps</a>
+        <a href="inquiries.html"><i class="fas fa-envelope-open-text"></i> General Inquiries</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <hr style="border-color: #444; margin: 15px 20px;">
+        <a href="#" onclick="supabase.auth.signOut().then(() => { window.location.href = '/staff-login/index.html'; })"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <div id="main-content">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-users"></i> User Management</h1>
+            <p style="color: var(--text-light);">View, edit roles, and manage all staff, admin, and volunteer profiles.</p>
+        </div>
+
+        <div style="background: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle);">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Name</th>
+                        <th style="width: 25%;">Email</th>
+                        <th style="width: 15%;">Phone</th>
+                        <th style="width: 15%;">Role</th>
+                        <th style="width: 25%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
