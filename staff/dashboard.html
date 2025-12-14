@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [CSS from previous version remains here for brevity] */
+        /* [START Staff Dashboard CSS] */
         :root {
             --primary-main: #4CAF50; /* Green */
             --primary-dark: #388E3C;
@@ -103,6 +103,7 @@
         
         .action-button { background-color: var(--accent-blue); color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em; margin-top: 5px; display: block; width: 100%; text-align: center; text-decoration: none; }
         .action-button.grey { background-color: var(--text-light); }
+        /* [END Staff Dashboard CSS] */
     </style>
     
     <script>
@@ -112,7 +113,7 @@
         let supabase;
 
         const ADMIN_ROLE_ID = 1;
-        const STAFF_ROLES = [2, 3]; 
+        const STAFF_ROLES = [2, 3]; // Driver/Staff, Volunteer Coordinator
         const ROLE_MAP = {
             1: 'Admin',
             2: 'Driver/Staff',
@@ -127,7 +128,7 @@
         function formatDate(dateString) { return new Date(dateString).toLocaleDateString(); }
 
 
-        // --- Core Access Control (REINFORCED) ---
+        // --- Core Access Control (REINFORCED & FIXED) ---
         async function checkAccessAndRedirect() {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             
@@ -135,7 +136,7 @@
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError || !session) {
-                console.error("No session found. Redirecting to login.");
+                // No session means they need to log in
                 window.location.href = '/staff-login/index.html';
                 return;
             }
@@ -150,8 +151,9 @@
                 .single();
 
             if (profileError || !profileData) {
-                console.error("Profile fetch error or profile missing:", profileError || "No data");
-                alert("Account profile error. Please contact admin.");
+                // *** THIS IS THE CRITICAL FAILURE POINT ***
+                // It fails if the profile row is missing OR RLS blocks the SELECT.
+                alert("ACCESS DENIED: Profile data could not be loaded. Please ensure your profile exists and RLS policies allow reading. Logging out.");
                 await supabase.auth.signOut();
                 window.location.href = '/staff-login/index.html';
                 return;
@@ -159,22 +161,21 @@
             
             const userRole = profileData.role;
             
-            // 3. Enforce Role Specific Redirection (The critical check)
+            // 3. Enforce Role Specific Redirection
             if (userRole === ADMIN_ROLE_ID) {
-                // Should not happen if coming from a correct login, but must enforce redirect
-                console.warn("Admin detected. Redirecting to Admin dashboard.");
+                // If they are Admin, redirect them to the Admin dashboard
                 window.location.href = '/admin/dashboard/home.html';
                 return;
             } else if (!STAFF_ROLES.includes(userRole)) {
-                 // Unauthorized roles log out and redirect
-                 console.error("Unauthorized role detected. Redirecting to login.");
+                 // If they are unauthorized (e.g., Role 4), log out and redirect
+                 alert("ACCESS DENIED: Your role is not authorized for the Staff Portal. Logging out.");
                  await supabase.auth.signOut();
                  window.location.href = '/staff-login/index.html';
                  return;
             }
 
             // SUCCESS: User is valid Staff (Role 2 or 3)
-            console.log("Access Granted. Role:", ROLE_MAP[userRole]);
+            // Continue loading the dashboard content
             displayProfile(profileData);
             fetchAssignedTasks();
         }
@@ -236,8 +237,7 @@
         }
 
         async function updateTaskStatus(taskId, newStatus) {
-            // ... (Task update logic remains the same) ...
-             const statusText = newStatus === 'Completed' ? 'Complete' : newStatus;
+            const statusText = newStatus === 'Completed' ? 'Complete' : newStatus;
             
             if (!confirm(`Confirm you are ready to mark task ${taskId.substring(0, 8)} as "${statusText}"?`)) {
                 return;
@@ -304,7 +304,7 @@
                             <tr>
                                 <th style="width: 100px;">Task ID</th>
                                 <th>Assignment Details</th>
-                                <th style="width: 150px;">Status / Priority</th>
+                                <th>Status / Priority</th>
                                 <th style="width: 100px;">Assigned Date</th>
                                 <th style="width: 150px;">Actions</th>
                             </tr>
