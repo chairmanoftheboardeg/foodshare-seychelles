@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [Staff Dashboard CSS] */
+        /* CSS for Staff Dashboard */
         :root {
             --primary-main: #4CAF50; /* Green */
             --primary-dark: #388E3C;
@@ -124,19 +124,20 @@
         function updateStatusBadge(status) { return `<span class="status-badge status-${status.replace(/\s/g, '')}">${status}</span>`; }
         function formatDate(dateString) { return new Date(dateString).toLocaleDateString(); }
 
-
-        // --- Core Access Control: The Staff Dashboard Guard ---
+        // --- Core Access Control: Staff Dashboard Guard ---
         async function authGuard(allowedRoles) {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
+                // No session found: Redirect to login
                 window.location.href = '/staff-login/index.html';
                 return null;
             }
 
             currentUserId = session.user.id;
             
+            // Critical check: Fetch profile data (Failures here cause the loop)
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('role, full_name, email, phone, profile_picture_url')
@@ -144,9 +145,9 @@
                 .single();
 
             if (profileError || !profileData) {
-                // RLS or Missing Profile error: Kicks user back to login
+                // If profile fails to load (due to RLS or missing profile): Log out and redirect
                 await supabase.auth.signOut();
-                window.location.href = '/staff-login/index.html?error=profile_access_denied';
+                window.location.href = '/staff-login/index.html';
                 return null;
             }
             
@@ -159,9 +160,9 @@
             }
             
             if (!allowedRoles.includes(userRole)) {
-                 // Unauthorized role for this page
+                 // Unauthorized role for this page: Log out and redirect
                  await supabase.auth.signOut();
-                 window.location.href = '/staff-login/index.html?error=unauthorized_role';
+                 window.location.href = '/staff-login/index.html';
                  return null;
             }
 
