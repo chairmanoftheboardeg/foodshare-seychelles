@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START Staff Dashboard CSS] */
+        /* [Staff Dashboard CSS] */
         :root {
             --primary-main: #4CAF50; /* Green */
             --primary-dark: #388E3C;
@@ -103,17 +103,15 @@
         
         .action-button { background-color: var(--accent-blue); color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em; margin-top: 5px; display: block; width: 100%; text-align: center; text-decoration: none; }
         .action-button.grey { background-color: var(--text-light); }
-        /* [END Staff Dashboard CSS] */
     </style>
     
     <script>
-        // --- Confirmed Working Keys ---
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
 
         const ADMIN_ROLE_ID = 1;
-        const STAFF_ROLES = [2, 3]; // Driver/Staff, Volunteer Coordinator
+        const STAFF_ROLES = [2, 3]; 
         const ROLE_MAP = {
             1: 'Admin',
             2: 'Driver/Staff',
@@ -123,27 +121,22 @@
         
         let currentUserId = null;
 
-        // --- Utility Functions ---
         function updateStatusBadge(status) { return `<span class="status-badge status-${status.replace(/\s/g, '')}">${status}</span>`; }
         function formatDate(dateString) { return new Date(dateString).toLocaleDateString(); }
 
 
-        // --- Core Access Control (REINFORCED & FIXED) ---
-        async function checkAccessAndRedirect() {
+        // --- Core Access Control: The Staff Dashboard Guard ---
+        async function authGuard(allowedRoles) {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             
-            // 1. Check for active session
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            
-            if (sessionError || !session) {
-                // No session means they need to log in
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
                 window.location.href = '/staff-login/index.html';
-                return;
+                return null;
             }
 
             currentUserId = session.user.id;
             
-            // 2. Check user's role from the 'profiles' table
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('role, full_name, email, phone, profile_picture_url')
@@ -151,33 +144,28 @@
                 .single();
 
             if (profileError || !profileData) {
-                // *** THIS IS THE CRITICAL FAILURE POINT ***
-                // It fails if the profile row is missing OR RLS blocks the SELECT.
-                alert("ACCESS DENIED: Profile data could not be loaded. Please ensure your profile exists and RLS policies allow reading. Logging out.");
+                // RLS or Missing Profile error: Kicks user back to login
                 await supabase.auth.signOut();
-                window.location.href = '/staff-login/index.html';
-                return;
+                window.location.href = '/staff-login/index.html?error=profile_access_denied';
+                return null;
             }
             
             const userRole = profileData.role;
             
-            // 3. Enforce Role Specific Redirection
             if (userRole === ADMIN_ROLE_ID) {
-                // If they are Admin, redirect them to the Admin dashboard
+                // Redirect Admin users to their correct dashboard
                 window.location.href = '/admin/dashboard/home.html';
-                return;
-            } else if (!STAFF_ROLES.includes(userRole)) {
-                 // If they are unauthorized (e.g., Role 4), log out and redirect
-                 alert("ACCESS DENIED: Your role is not authorized for the Staff Portal. Logging out.");
+                return null;
+            }
+            
+            if (!allowedRoles.includes(userRole)) {
+                 // Unauthorized role for this page
                  await supabase.auth.signOut();
-                 window.location.href = '/staff-login/index.html';
-                 return;
+                 window.location.href = '/staff-login/index.html?error=unauthorized_role';
+                 return null;
             }
 
-            // SUCCESS: User is valid Staff (Role 2 or 3)
-            // Continue loading the dashboard content
-            displayProfile(profileData);
-            fetchAssignedTasks();
+            return profileData;
         }
 
         // --- Profile Display ---
@@ -206,7 +194,7 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                tasksBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 15px;">Error loading tasks: ${error.message}</td></tr>`;
+                tasksBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 15px;">Error loading tasks.</td></tr>`;
                 return;
             }
             
@@ -251,12 +239,18 @@
             if (error) {
                 alert(`Failed to update task status: ${error.message}`);
             } else {
-                fetchAssignedTasks(); // Refresh the task list
+                fetchAssignedTasks(); 
             }
         }
 
         // --- Initialization ---
-        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+        document.addEventListener('DOMContentLoaded', async () => {
+            const profile = await authGuard(STAFF_ROLES); 
+            if (profile) {
+                displayProfile(profile);
+                fetchAssignedTasks();
+            }
+        });
     </script>
 </head>
 <body>
