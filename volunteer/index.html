@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volunteer Application - FoodShare Seychelles</title>
+    
     <link rel="icon" href="/image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START STANDARD CSS BLOCK] */
+        /* [START STANDARD SITE-WIDE CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -24,12 +25,12 @@
         a:hover { color: var(--primary-dark); }
         main { flex-grow: 1; padding: 40px 0; }
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .content-container { max-width: 900px; margin: 0 auto; padding: 0 25px; }
+        .content-container { max-width: 800px; margin: 0 auto; padding: 0 25px; }
 
         /* NAVIGATION BAR */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-        .logo-img { height: 40px; margin-right: 10px; } 
+        .logo-img { height: 40px; margin-right: 10px; }
         .nav-links-container { display: flex; gap: 30px; align-items: center; }
         .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
         .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
@@ -45,68 +46,108 @@
         .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
         .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+        /* [END STANDARD SITE-WIDE CSS BLOCK] */
 
-        /* Form Specific Styles */
-        .form-card { background-color: var(--neutral-card); padding: 40px; border-radius: 12px; box-shadow: var(--shadow-subtle); margin-top: 30px; border-top: 5px solid var(--accent-blue); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .form-section h3 { margin-bottom: 20px; color: var(--accent-blue); border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; transition: border-color 0.3s, box-shadow 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-light); outline: none; box-shadow: 0 0 8px rgba(76, 175, 80, 0.2); }
-        .submit-button { padding: 15px 40px; background-color: var(--accent-blue); color: var(--neutral-card); border: none; border-radius: 50px; font-size: 1.1em; cursor: pointer; transition: background-color 0.3s, transform 0.2s; font-weight: bold; }
-        .submit-button:hover:not(:disabled) { background-color: #0076c4; transform: translateY(-2px); }
-        .submit-button:disabled { background-color: #81D4FA; cursor: not-allowed; }
-        .alert-message { padding: 15px; margin-top: 20px; border-radius: 8px; font-weight: bold; display: none; text-align: left; }
-        .alert-error { background-color: #FFCDD2; color: #C62828; border: 1px solid #E57373; }
-        .alert-success { background-color: #C8E6C9; color: #2E7D32; border: 1px solid #66BB6A; }
-        /* [END STANDARD CSS BLOCK] */
+        /* Form Specific Styles (Green/Volunteer theme) */
+        .form-card {
+            background-color: var(--neutral-card); padding: 35px; border-radius: 8px;
+            box-shadow: var(--shadow-subtle); margin-top: 30px;
+        }
+        h1 { text-align: center; color: var(--primary-dark); margin-bottom: 10px; }
+        h2 { font-size: 1.3em; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary-main); padding-bottom: 5px;}
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
+        input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 1em;
+        }
+        .submit-btn {
+            background-color: var(--accent-blue); /* Use a helpful blue for volunteer CTA */
+            color: white; padding: 12px 25px;
+            border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
+            transition: background-color var(--transition-speed); width: 100%;
+            margin-top: 25px;
+        }
+        .submit-btn:hover { background-color: #1565C0; }
+
+        /* Checkbox/Radio styling for transport */
+        .checkbox-group { margin-bottom: 20px; }
+        .checkbox-group label { display: inline-block; font-weight: normal; }
+        
+        /* Success/Error Message */
+        #statusMessage {
+            padding: 20px; border-radius: 8px; margin-top: 20px;
+            text-align: center; font-weight: bold; display: none;
+        }
+        .success { background-color: var(--primary-light); color: var(--primary-dark); }
+        .error { background-color: var(--accent-red); color: white; }
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
+        
+        function showMessage(type, message) {
+            const msgEl = document.getElementById('statusMessage');
+            msgEl.className = type;
+            msgEl.innerHTML = message;
+            msgEl.style.display = 'block';
+        }
+
+        async function handleApplicationSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const name = formData.get('full_name');
+            const email = formData.get('email');
+            const phone = formData.get('phone');
+            const island = formData.get('location_island');
+            const hours = formData.get('available_hours');
+            const transport = formData.get('transport_access') === 'on';
+            const skills = formData.get('skills');
+            const reason = formData.get('reason_for_joining');
+            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Submitting Application...';
+            showMessage('statusMessage', ''); // Clear previous message
+
+            const { error } = await supabase
+                .from('volunteers')
+                .insert([{
+                    full_name: name,
+                    email: email,
+                    phone: phone,
+                    location_island: island,
+                    available_hours: hours,
+                    transport_access: transport,
+                    skills: skills,
+                    reason_for_joining: reason,
+                    application_status: 'New'
+                }]);
+
+            if (error) {
+                console.error('Application Submission Error:', error);
+                // Check for unique constraint violation (email already exists)
+                if (error.code === '23505') {
+                    showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: An application with this email already exists.`);
+                } else {
+                    showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: ${error.message}. Please try again.`);
+                }
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Submit Application';
+            } else {
+                showMessage('success', 
+                    `<i class="fas fa-check-circle"></i> **Thank you, ${name}!**<br>
+                     Your volunteer application has been successfully submitted. 
+                     Our team will review your details and contact you within 48 hours.`);
+                document.getElementById('volunteerForm').reset();
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
-             if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else {
-                console.error("Supabase client library failed to load.");
-            }
-            
-            const form = document.getElementById('volunteerForm');
-            const messageEl = document.getElementById('formMessage');
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                messageEl.style.display = 'none';
-                
-                const data = {
-                    name: document.getElementById('fullName').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    island: document.getElementById('island').value,
-                    availability: document.getElementById('availability').value,
-                    notes: document.getElementById('skills').value,
-                    status: 'New'
-                };
-                
-                const { error } = await supabase
-                    .from('volunteer_applications')
-                    .insert([data]);
-
-                if (error) {
-                    messageEl.textContent = `Submission Failed: ${error.message}. Please try again.`;
-                    messageEl.className = 'alert-message alert-error';
-                    messageEl.style.display = 'block';
-                } else {
-                    messageEl.textContent = 'Thank you! Your volunteer application has been submitted. We will review your details and be in touch soon.';
-                    messageEl.className = 'alert-message alert-success';
-                    messageEl.style.display = 'block';
-                    form.reset();
-                }
-            });
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            document.getElementById('volunteerForm').addEventListener('submit', handleApplicationSubmit);
         });
     </script>
 </head>
@@ -129,40 +170,63 @@
 
     <main>
         <div class="content-container">
-            <header style="text-align: center; margin-bottom: 40px;">
-                <h1>Join Our Volunteer Team!</h1>
-                <p>Your time and effort are essential to fighting food waste in Seychelles. Apply below.</p>
-                <div id="formMessage" class="alert-message"></div>
-            </header>
+            <h1><i class="fas fa-hands-helping"></i> Become a FoodShare Volunteer</h1>
+            <p style="text-align: center; margin-bottom: 20px; color: var(--text-light);">
+                Your time and effort are crucial! Join us in reducing food waste and feeding our community.
+            </p>
+
+            <div id="statusMessage" style="display: none;"></div>
 
             <div class="form-card">
                 <form id="volunteerForm">
+                    <h2><i class="fas fa-id-card"></i> Personal Details</h2>
                     
-                    <div class="form-section">
-                        <h3>1. Personal Details</h3>
-                        <div class="form-grid">
-                            <div class="form-group"><label for="fullName">Full Name *</label><input type="text" id="fullName" required></div>
-                            <div class="form-group"><label for="email">Email *</label><input type="email" id="email" required></div>
-                            <div class="form-group"><label for="phone">Phone Number *</label><input type="tel" id="phone" required></div>
-                            <div class="form-group"><label for="island">Island of Residence *</label><input type="text" id="island" required placeholder="e.g., Mahé, Praslin, La Digue"></div>
-                        </div>
+                    <label for="full_name">Full Name *</label>
+                    <input type="text" id="full_name" name="full_name" required>
+
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                    
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" placeholder="e.g., 251-0000" required>
+                    
+                    <label for="location_island">Current Island Location *</label>
+                    <select id="location_island" name="location_island" required>
+                        <option value="">-- Select Your Island --</option>
+                        <option value="Mahe">Mahé</option>
+                        <option value="Praslin">Praslin</option>
+                        <option value="La Digue">La Digue</option>
+                        <option value="Other">Other Outer Island</option>
+                    </select>
+
+                    <h2 style="margin-top: 30px;"><i class="fas fa-calendar-alt"></i> Availability & Skills</h2>
+                    
+                    <label for="available_hours">Estimated Weekly Availability (Hours)</label>
+                    <select id="available_hours" name="available_hours">
+                        <option value="0-2 hours">0-2 hours (Occasional)</option>
+                        <option value="3-5 hours">3-5 hours (Flexible)</option>
+                        <option value="6-10 hours">6-10 hours (Regular)</option>
+                        <option value="10+ hours">10+ hours (Committed)</option>
+                    </select>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="transport_access" name="transport_access">
+                        <label for="transport_access">I have access to personal transport (car/van/pickup) for collection/delivery.</label>
                     </div>
 
-                    <div class="form-section">
-                        <h3>2. Availability & Skills</h3>
-                        <div class="form-group"><label for="availability">Typical Weekly Availability *</label><input type="text" id="availability" required placeholder="e.g., Mon/Wed afternoons, Weekends only"></div>
-                        <div class="form-group">
-                            <label for="skills">Relevant Skills / Notes (e.g., Driver's License, Logistics Experience, specific availability)</label>
-                            <textarea id="skills" rows="4"></textarea>
-                        </div>
-                    </div>
+                    <label for="skills">Relevant Skills or Areas of Interest (e.g., Driving, Admin, Sorting, Social Media, IT)</label>
+                    <input type="text" id="skills" name="skills" placeholder="e.g., Driving, Logistics, Data Entry">
                     
-                    <div style="text-align: center; margin-top: 30px;">
-                        <button type="submit" class="submit-button">
-                            <i class="fas fa-handshake"></i> Submit Application
-                        </button>
-                    </div>
+                    <label for="reason_for_joining">Why do you want to volunteer with FoodShare Seychelles? *</label>
+                    <textarea id="reason_for_joining" name="reason_for_joining" rows="4" required></textarea>
 
+                    <button type="submit" id="submitBtn" class="submit-btn">
+                        <i class="fas fa-sign-in-alt"></i> Submit Volunteer Application
+                    </button>
+                    
+                    <p style="font-size: 0.8em; color: var(--text-light); text-align: center; margin-top: 15px;">
+                        All applications are reviewed by our administration team. Background checks may apply for logistics roles.
+                    </p>
                 </form>
             </div>
         </div>
