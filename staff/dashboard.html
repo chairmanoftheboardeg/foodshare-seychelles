@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START Staff Dashboard CSS] */
+        /* [CSS from previous version remains here for brevity] */
         :root {
             --primary-main: #4CAF50; /* Green */
             --primary-dark: #388E3C;
@@ -29,13 +29,11 @@
         main { flex-grow: 1; padding: 30px 0; }
         .content-container { max-width: 1300px; margin: 0 auto; padding: 0 25px; } 
 
-        /* Navigation Bar */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: var(--neutral-card); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
         .logo-container { font-size: 1.5em; font-weight: bold; color: var(--text-dark); }
         .logout-btn { background-color: var(--accent-red); color: white; border: none; border-radius: 5px; padding: 8px 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .logout-btn:hover { background-color: #C62828; }
         
-        /* Dashboard Layout */
         .dashboard-grid { 
             display: grid; 
             grid-template-columns: 300px 1fr; 
@@ -43,7 +41,6 @@
             margin-top: 30px;
         }
         
-        /* Profile Card */
         .profile-card {
             background: var(--neutral-card);
             padding: 25px;
@@ -72,7 +69,6 @@
         }
         .profile-card p { margin: 8px 0; font-size: 0.9em; color: var(--text-light); }
         
-        /* Task List */
         .task-list-card {
             background: var(--neutral-card);
             padding: 30px;
@@ -87,7 +83,6 @@
         
         .task-table tr:hover td { background-color: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); }
         
-        /* Task Status Styling */
         .status-badge { padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
         .status-Assigned { background-color: var(--accent-orange); color: white; }
         .status-InProgress { background-color: var(--accent-blue); color: white; }
@@ -108,16 +103,16 @@
         
         .action-button { background-color: var(--accent-blue); color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em; margin-top: 5px; display: block; width: 100%; text-align: center; text-decoration: none; }
         .action-button.grey { background-color: var(--text-light); }
-        /* [END Staff Dashboard CSS] */
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJisp...'; // Placeholder key
+        // --- Confirmed Working Keys ---
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
 
         const ADMIN_ROLE_ID = 1;
-        const STAFF_ROLES = [2, 3]; // Driver/Staff, Volunteer Coordinator
+        const STAFF_ROLES = [2, 3]; 
         const ROLE_MAP = {
             1: 'Admin',
             2: 'Driver/Staff',
@@ -132,18 +127,22 @@
         function formatDate(dateString) { return new Date(dateString).toLocaleDateString(); }
 
 
-        // --- Core Access Control ---
+        // --- Core Access Control (REINFORCED) ---
         async function checkAccessAndRedirect() {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            // 1. Check for active session
             const { data: { session }, error: sessionError } = await supabase.auth.getSession();
             
             if (sessionError || !session) {
+                console.error("No session found. Redirecting to login.");
                 window.location.href = '/staff-login/index.html';
                 return;
             }
 
             currentUserId = session.user.id;
             
+            // 2. Check user's role from the 'profiles' table
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('role, full_name, email, phone, profile_picture_url')
@@ -151,6 +150,7 @@
                 .single();
 
             if (profileError || !profileData) {
+                console.error("Profile fetch error or profile missing:", profileError || "No data");
                 alert("Account profile error. Please contact admin.");
                 await supabase.auth.signOut();
                 window.location.href = '/staff-login/index.html';
@@ -159,18 +159,22 @@
             
             const userRole = profileData.role;
             
+            // 3. Enforce Role Specific Redirection (The critical check)
             if (userRole === ADMIN_ROLE_ID) {
-                // Admin (Role 1) redirect
+                // Should not happen if coming from a correct login, but must enforce redirect
+                console.warn("Admin detected. Redirecting to Admin dashboard.");
                 window.location.href = '/admin/dashboard/home.html';
                 return;
             } else if (!STAFF_ROLES.includes(userRole)) {
-                 // Non-staff roles log out
+                 // Unauthorized roles log out and redirect
+                 console.error("Unauthorized role detected. Redirecting to login.");
                  await supabase.auth.signOut();
                  window.location.href = '/staff-login/index.html';
                  return;
             }
 
-            // User is valid Staff (Role 2 or 3): Load dashboard content
+            // SUCCESS: User is valid Staff (Role 2 or 3)
+            console.log("Access Granted. Role:", ROLE_MAP[userRole]);
             displayProfile(profileData);
             fetchAssignedTasks();
         }
@@ -183,7 +187,6 @@
             document.getElementById('profilePhone').textContent = profile.phone || 'N/A';
             
             const imgElement = document.getElementById('profileImage');
-            // FIX: Using the correct 'profile_picture_url' column from your schema
             imgElement.src = profile.profile_picture_url || '/image/default-staff-avatar.png'; 
             imgElement.onerror = () => { imgElement.src = '/image/default-staff-avatar.png'; };
         }
@@ -197,7 +200,7 @@
                 .from('tasks')
                 .select(`id, title, description, priority, created_at, status`)
                 .eq('assigned_to', currentUserId)
-                .in('status', ['Assigned', 'InProgress']) // Only show active tasks
+                .in('status', ['Assigned', 'InProgress']) 
                 .order('priority', { ascending: true })
                 .order('created_at', { ascending: false });
 
@@ -233,7 +236,8 @@
         }
 
         async function updateTaskStatus(taskId, newStatus) {
-            const statusText = newStatus === 'Completed' ? 'Complete' : newStatus;
+            // ... (Task update logic remains the same) ...
+             const statusText = newStatus === 'Completed' ? 'Complete' : newStatus;
             
             if (!confirm(`Confirm you are ready to mark task ${taskId.substring(0, 8)} as "${statusText}"?`)) {
                 return;
@@ -247,7 +251,6 @@
             if (error) {
                 alert(`Failed to update task status: ${error.message}`);
             } else {
-                alert(`Task marked as ${statusText}. Your dashboard is refreshing.`);
                 fetchAssignedTasks(); // Refresh the task list
             }
         }
