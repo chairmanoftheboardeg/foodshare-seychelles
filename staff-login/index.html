@@ -3,229 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Portal Login</title>
-    <link rel="icon" href="../image/logo.png" type="image/png">
+    <title>FoodShare Seychelles - Staff Login</title>
+    <link rel="icon" href="/assets/image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* Modern, clean aesthetic */
+        /* --- Color Palette --- */
         :root {
-            --primary-main: #4CAF50; /* Green */
-            --primary-dark: #388E3C;
-            --accent-blue: #2196F3;
-            --neutral-bg: #EAEFF2; /* Very light cool gray */
-            --neutral-card: #FFFFFF;
-            --text-dark: #2C3E50; /* Dark slate blue */
-            --shadow-lift: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --color-primary: #4CAF50; /* Base Green */
+            --color-primary-dark: #388E3C; /* Darker Green for hover/accents */
+            --color-secondary: #2196F3; /* Blue for reliability */
+            --color-background: #f4f7f6; /* Light gray background */
+            --color-card-bg: #ffffff; /* White card background */
+            --color-text-dark: #333333;
+            --color-error: #D32F2F; /* Red for errors */
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* --- Global Reset and Body Styling --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--neutral-bg);
+            background-color: var(--color-background);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: var(--text-dark);
         }
-        .login-box {
-            background-color: var(--neutral-card);
-            padding: 45px;
+
+        /* --- Login Container (The main card) --- */
+        .login-container {
+            background-color: var(--color-card-bg);
             border-radius: 12px;
-            box-shadow: var(--shadow-lift);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
+            padding: 40px;
             text-align: center;
-            transition: transform 0.3s ease;
         }
-        .login-box:hover {
-            transform: translateY(-3px);
+
+        /* --- Logo and Header Styling --- */
+        .logo-area img {
+            width: 80px;
+            height: auto;
+            margin-bottom: 20px;
         }
-        .logo-header {
+
+        .logo-area h1 {
             font-size: 1.8em;
-            font-weight: 700;
-            color: var(--text-dark);
+            color: var(--color-text-dark);
             margin-bottom: 5px;
         }
-        .logo-header i { 
-            color: var(--primary-main); 
-            margin-right: 8px;
-        }
-        .subtitle {
-            font-size: 1em;
-            color: #7f8c8d;
+
+        .logo-area p {
+            color: #6c757d;
             margin-bottom: 30px;
+            font-size: 0.95em;
         }
-        .form-group {
-            margin-bottom: 25px;
+
+        /* --- Form and Input Styling --- */
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
             text-align: left;
         }
-        .input-icon-group {
-            position: relative;
-        }
-        .input-icon-group i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #bdc3c7;
-            font-size: 1.1em;
-        }
-        .form-group input {
+
+        .input-group input {
             width: 100%;
-            padding: 15px 15px 15px 45px;
-            border: 1px solid #e0e6e9;
+            padding: 12px 12px 12px 45px;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             font-size: 1em;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color 0.3s;
         }
-        .form-group input:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+
+        .input-group input:focus {
+            border-color: var(--color-primary);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
-        .login-btn {
+
+        .input-group .icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        /* --- Button Styling --- */
+        #loginButton {
             width: 100%;
-            padding: 14px;
-            background-color: var(--accent-blue);
+            padding: 15px;
+            background-color: var(--color-primary);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1.1em;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s, opacity 0.3s;
+            transition: background-color 0.3s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .login-btn:hover {
-            background-color: #1a7bd8;
+
+        #loginButton:hover {
+            background-color: var(--color-primary-dark);
         }
-        .login-btn:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-            opacity: 0.8;
+
+        #loginButton:active {
+            transform: scale(0.99);
         }
-        #message {
+
+        #loginButton .fas {
+            margin-right: 10px;
+        }
+
+        /* --- Error Message Styling --- */
+        .error-message {
             margin-top: 20px;
-            padding: 12px;
+            padding: 10px;
+            background-color: #ffeaea;
+            color: var(--color-error);
+            border: 1px solid var(--color-error);
             border-radius: 8px;
-            font-size: 0.95em;
-            display: none;
-            border: 1px solid;
+            font-size: 0.9em;
+            text-align: left;
         }
-        .success { background-color: #e8f5e9; color: var(--primary-dark); border-color: var(--primary-dark); }
-        .error { background-color: #ffebee; color: #D32F2F; border-color: #D32F2F; }
     </style>
-    
-    <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        let supabase;
+</head>
+<body>
 
-        const ADMIN_ROLE_ID = 1;
-        const STAFF_ROLES = [2, 3]; 
+    <div class="login-container">
+        <div class="logo-area">
+            <img src="/assets/image/logo.png" alt="FoodShare Seychelles Logo">
+            <h1>Staff & Admin Login</h1>
+            <p>Access the operational dashboard.</p>
+        </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            const loginForm = document.getElementById('loginForm');
+        <form id="loginForm" class="login-form">
+            <div class="input-group">
+                <i class="fas fa-envelope icon"></i>
+                <input type="email" id="email" placeholder="Work Email" required>
+            </div>
             
-            checkSessionAndRedirect();
-            loginForm.addEventListener('submit', handleLogin);
-        });
+            <div class="input-group">
+                <i class="fas fa-lock icon"></i>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+            
+            <button type="submit" id="loginButton">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
 
-        // Redirects users who are already logged in
-        async function checkSessionAndRedirect() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                await checkUserRole(session.user.id);
-            }
+            <div id="error-message" class="error-message" style="display: none;"></div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // --- Supabase Client Initialization ---
+        // !!! IMPORTANT: REPLACE THESE PLACEHOLDERS !!!
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // ----------------------------------------
+
+        // Initialize Supabase client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Role IDs as defined in the brief
+        const ROLE_ADMIN = 1;
+        const ROLE_STAFF_DRIVER = 2;
+        const ROLE_STAFF_COORDINATOR = 3;
+
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+
+        /**
+         * Displays an error message to the user.
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
         }
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginButton = document.getElementById('loginButton');
-            const messageDiv = document.getElementById('message');
-
-            loginButton.disabled = true;
-            loginButton.textContent = 'Authenticating...';
-            messageDiv.style.display = 'none';
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                showMessage(messageDiv, 'error', `Login failed: Invalid credentials or account issue.`);
-                loginButton.disabled = false;
-                loginButton.textContent = 'Log In';
-                return;
-            }
-
-            if (data.user) {
-                await checkUserRole(data.user.id, messageDiv, loginButton);
-            }
+        /**
+         * Hides the error message.
+         */
+        function hideError() {
+            errorMessage.textContent = '';
+            errorMessage.style.display = 'none';
         }
 
-        // The core redirection logic based on user role (Crucial for preventing login loop)
-        async function checkUserRole(userId, messageDiv = null, loginButton = null) {
+        /**
+         * Handles the login and role-based redirection.
+         */
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideError();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // 1. Authenticate the user against Supabase auth.users
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (authError) {
+                console.error('Authentication Error:', authError.message);
+                return showError('Login failed: Invalid email or password.');
+            }
+
+            // Get the user ID from the successful authentication data
+            const userId = authData.user.id;
+
+            // 2. Fetch the user's role from the 'profiles' table
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('role_id')
                 .eq('id', userId)
                 .single();
 
-            // RLS FAILURE OR MISSING PROFILE: This handles the error that caused the loop
-            if (profileError || !profileData || (![ADMIN_ROLE_ID, ...STAFF_ROLES].includes(profileData.role))) {
-                if (messageDiv) showMessage(messageDiv, 'error', "Login succeeded, but profile access failed. Contact admin.");
+            if (profileError || !profileData) {
+                console.error('Profile/Role Fetch Error:', profileError ? profileError.message : 'No profile found.');
+                // Log out the user since we can't determine their access level
                 await supabase.auth.signOut();
-                if (loginButton) loginButton.disabled = false;
-                if (loginButton) loginButton.textContent = 'Log In';
-                return;
+                return showError('Profile configuration error. Please contact an administrator.');
             }
 
-            const userRole = profileData.role;
-            let destination = '/staff-login/index.html'; // Default to login if checks fail
-
-            if (userRole === ADMIN_ROLE_ID) {
-                destination = '/admin/dashboard/home.html';
-            } else if (STAFF_ROLES.includes(userRole)) {
-                destination = '/staff/dashboard.html';
-            }
+            const roleId = profileData.role_id;
             
-            window.location.href = destination;
+            // --- 3. REDIRECTION LOGIC (using absolute paths from root) ---
+            if (roleId === ROLE_ADMIN) {
+                // Role 1: Admin Dashboard -> www.foodshare-seychelles.online/admin/dashboard/home.html
+                window.location.href = '/admin/dashboard/home.html';
+            } else if (roleId === ROLE_STAFF_DRIVER || roleId === ROLE_STAFF_COORDINATOR) {
+                // Roles 2 & 3: Staff Dashboard -> www.foodshare-seychelles.online/staff/dashboard.html
+                window.location.href = '/staff/dashboard.html';
+            } else {
+                // Unknown or invalid role
+                console.warn('User logged in with an unrecognized role ID:', roleId);
+                await supabase.auth.signOut();
+                showError('Access Denied: Unrecognized user role.');
+            }
         }
 
-        function showMessage(element, type, message) {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-        }
+        // Attach the event listener to the form
+        loginForm.addEventListener('submit', handleLogin);
     </script>
-</head>
-<body>
-    <div class="login-box">
-        <div class="logo-header"><i class="fas fa-hand-holding-heart"></i> FoodShare</div>
-        <p class="subtitle">Staff and Administrator Portal Access</p>
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <div class="input-icon-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" required autocomplete="email" placeholder="Email Address">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="input-icon-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" required autocomplete="current-password" placeholder="Password">
-                </div>
-            </div>
-            <button type="submit" id="loginButton" class="login-btn">
-                <i class="fas fa-sign-in-alt"></i> Log In
-            </button>
-        </form>
-        
-        <div id="message" class="error"></div>
-    </div>
+
 </body>
 </html>
