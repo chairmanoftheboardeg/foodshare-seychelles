@@ -1,0 +1,105 @@
+<script>
+        // ... (Same CONSTS and Utility functions as claims.html) ...
+
+        async function checkAccessAndRedirect() {
+            // ... (Same Auth/Access check as claims.html) ...
+            fetchAnnouncement(); // CHANGE: Fetch Settings
+            
+            // Attach listener for the Settings form
+            const settingsForm = document.getElementById('settingsForm');
+            if(settingsForm) settingsForm.addEventListener('submit', handleAnnouncementSubmit);
+        }
+
+        // --- SETTINGS MODULE (Table: settings) ---
+        async function fetchAnnouncement() {
+            const { data, error } = await supabase
+                .from('settings')
+                .select('*')
+                .eq('key', 'public_announcement') 
+                .limit(1)
+                .single();
+
+            if (error && error.code !== 'PGRST116') { 
+                 console.warn("Could not fetch announcement:", error);
+                 document.getElementById('announcementText').value = "Error loading previous announcement.";
+                 return;
+            }
+            
+            if (data) {
+                document.getElementById('announcementText').value = data.value || '';
+                document.getElementById('currentAnnouncementId').value = data.id;
+            } else {
+                 document.getElementById('announcementText').value = '';
+                 document.getElementById('currentAnnouncementId').value = '';
+            }
+        }
+        
+        async function handleAnnouncementSubmit(event) {
+            event.preventDefault();
+            
+            const content = document.getElementById('announcementText').value;
+            const id = document.getElementById('currentAnnouncementId').value;
+            
+            const submitBtn = document.getElementById('announcementSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            let response;
+
+            if (id) {
+                // Update existing setting
+                response = await supabase
+                    .from('settings')
+                    .update({ value: content, updated_at: new Date() })
+                    .eq('id', id);
+            } else {
+                // Insert new setting (First time)
+                 response = await supabase
+                    .from('settings')
+                    .insert([{ key: 'public_announcement', value: content, description: 'Text for the main public banner.' }]);
+            }
+
+            if (response.error) { 
+                alert('Error updating Settings (Announcement): ' + response.error.message); 
+            } else { 
+                alert('Settings (Announcement) saved successfully!'); 
+                fetchAnnouncement(); // Refresh to ensure new ID is captured
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save Settings';
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+    </script>
+</head>
+<body>
+    <nav id="adminSidebar">
+        <h2><i class="fas fa-database"></i> Management</h2>
+        <a href="/admin/dashboard/settings.html" class="sidebar-link active"><i class="fas fa-cogs"></i> Settings</a>
+        </nav>
+    
+    <div id="mainContent">
+        <header id="topbar">
+            <h1>System Settings Management</h1>
+            </header>
+
+        <div class="dashboard-body">
+            <div class="content-card">
+                <h2>Public Announcement Banner (Table: `settings`)</h2>
+                <p>Manage the main announcement shown to the public on the homepage.</p>
+                <form id="settingsForm" style="max-width: 800px; margin-top: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 8px;">
+                    <input type="hidden" id="currentAnnouncementId" value="">
+
+                    <label for="announcementText" style="display: block; font-weight: bold; margin-bottom: 5px;">Announcement Content</label>
+                    <textarea id="announcementText" name="announcementText" rows="4" required placeholder="Enter the announcement text here..."></textarea>
+                    
+                    <button type="submit" id="announcementSubmitBtn" class="action-button" style="width: 100%; margin-top: 15px; background: #2196F3;">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
