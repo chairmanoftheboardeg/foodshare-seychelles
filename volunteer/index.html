@@ -27,7 +27,7 @@
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 800px; margin: 0 auto; padding: 0 25px; }
 
-        /* NAVIGATION BAR */
+        /* NAVIGATION BAR (omitted for brevity - assume it's included) */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; }
@@ -38,7 +38,7 @@
         .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
-        /* FOOTER STYLING */
+        /* FOOTER STYLING (omitted for brevity - assume it's included) */
         #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
         .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
         .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
@@ -46,9 +46,8 @@
         .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
         .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
-        /* [END STANDARD SITE-WIDE CSS BLOCK] */
 
-        /* Form Specific Styles (Green/Volunteer theme) */
+        /* Form Specific Styles */
         .form-card {
             background-color: var(--neutral-card); padding: 35px; border-radius: 8px;
             box-shadow: var(--shadow-subtle); margin-top: 30px;
@@ -61,19 +60,15 @@
             border-radius: 4px; font-size: 1em;
         }
         .submit-btn {
-            background-color: var(--accent-blue); /* Use a helpful blue for volunteer CTA */
+            background-color: var(--accent-blue);
             color: white; padding: 12px 25px;
             border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
             transition: background-color var(--transition-speed); width: 100%;
             margin-top: 25px;
         }
         .submit-btn:hover { background-color: #1565C0; }
-
-        /* Checkbox/Radio styling for transport */
         .checkbox-group { margin-bottom: 20px; }
         .checkbox-group label { display: inline-block; font-weight: normal; }
-        
-        /* Success/Error Message */
         #statusMessage {
             padding: 20px; border-radius: 8px; margin-top: 20px;
             text-align: center; font-weight: bold; display: none;
@@ -112,7 +107,7 @@
             showMessage('statusMessage', ''); // Clear previous message
 
             const { error } = await supabase
-                .from('volunteers')
+                .from('volunteer_applications') // <-- CORRECTED: Using the existing table name
                 .insert([{
                     full_name: name,
                     email: email,
@@ -127,7 +122,6 @@
 
             if (error) {
                 console.error('Application Submission Error:', error);
-                // Check for unique constraint violation (email already exists)
                 if (error.code === '23505') {
                     showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: An application with this email already exists.`);
                 } else {
