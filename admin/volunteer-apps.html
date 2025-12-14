@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Applications - FoodShare Seychelles</title>
+    <link rel="icon" href="/image/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <style>
+        /* [START SHARED CSS VARIABLES & BASE STYLES] */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --admin-main: #1A237E; /* Deep Indigo */ --admin-light: #BBDEFB;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #E53935;
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; min-height: 100vh; }
+        
+        /* Layout */
+        .sidebar { width: 280px; background-color: var(--admin-main); color: white; padding: 20px; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        
+        /* Sidebar Navigation */
+        .sidebar h2 { color: var(--admin-light); margin-bottom: 30px; font-size: 1.6em; }
+        .sidebar-nav a { display: block; color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 12px 10px; margin-bottom: 5px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #283593; color: white; }
+        .sidebar-nav a i { margin-right: 10px; }
+
+        /* General Sections */
+        .section-header { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        /* [START VOLUNTEER SPECIFIC CSS] */
+        .apps-table { width: 100%; border-collapse: collapse; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); border-radius: 8px; overflow: hidden; margin-top: 10px; }
+        .apps-table th, .apps-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .apps-table th { background-color: var(--admin-light); color: var(--admin-main); font-weight: bold; }
+        .apps-table tr:hover { background-color: #f5f5f5; }
+
+        .status-new { color: var(--accent-orange); font-weight: bold; }
+        .status-approved { color: var(--primary-dark); }
+        
+        .action-btns button { 
+            border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; 
+            font-size: 0.9em; transition: opacity 0.2s;
+        }
+        .btn-accept { background-color: var(--primary-main); color: white; }
+        .btn-reject { background-color: var(--accent-red); color: white; }
+        .btn-view { background-color: var(--accent-blue); color: white; }
+        .btn-accept:hover, .btn-reject:hover, .btn-view:hover { opacity: 0.8; }
+        /* [END VOLUNTEER SPECIFIC CSS] */
+    </style>
+    
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        let supabase;
+
+        async function checkAuthAndRedirect() {
+            if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                return; 
+            }
+
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = '/staff-login/';
+                return;
+            }
+            
+            const user = session.user;
+            const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
+            
+            if (!profile || profile.role_id !== 1) { 
+                alert('Authorization Failed: You are not authorized as an Admin. Redirecting.');
+                await supabase.auth.signOut();
+                window.location.href = '/staff-login/';
+                return;
+            }
+            
+            fetchVolunteerApps();
+        }
+
+        async function fetchVolunteerApps() {
+            const tableBody = document.getElementById('appsTableBody');
+            tableBody.innerHTML = '';
+            
+            // --- Placeholder Mock Data (Replace with actual Supabase query) ---
+            const mockApplications = [
+                { id: 401, name: "David Faure", email: "david.f@email.com", skills: "Driving, Heavy Lifting", status: "New", date: "Dec 14" },
+                { id: 402, name: "Chloe Dupont", email: "chloe.d@email.com", skills: "Sorting, Data Entry", status: "New", date: "Dec 13" },
+                { id: 403, name: "Marc André", email: "marc.a@email.com", skills: "IT Support", status: "Approved", date: "Dec 10" },
+            ];
+            // --- End Mock Data ---
+
+            mockApplications.forEach(app => {
+                const tr = document.createElement('tr');
+                const statusClass = app.status.toLowerCase();
+                const actionsHtml = app.status === 'New' 
+                    ? `<button class="btn-view" onclick="viewApplication(${app.id})"><i class="fas fa-eye"></i> View</button>
+                       <button class="btn-accept" onclick="handleApplication(${app.id}, 'Accept')"><i class="fas fa-check"></i> Accept</button>
+                       <button class="btn-reject" onclick="handleApplication(${app.id}, 'Reject')"><i class="fas fa-times"></i> Reject</button>`
+                    : `<button class="btn-view" onclick="viewApplication(${app.id})"><i class="fas fa-eye"></i> Profile</button>`;
+
+                tr.innerHTML = `
+                    <td>${app.name}</td>
+                    <td>${app.email}</td>
+                    <td>${app.skills}</td>
+                    <td><span class="status-${statusClass}">${app.status}</span></td>
+                    <td class="action-btns">${actionsHtml}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+        
+        function viewApplication(appId) {
+            alert(`Viewing full application details for App ID ${appId}.`);
+            // This would open a detailed view or modal.
+        }
+
+        function handleApplication(appId, action) {
+            if (action === 'Accept') {
+                alert(`Application ID ${appId} ACCEPTED. (Supabase role update or welcome email triggered).`);
+            } else {
+                alert(`Application ID ${appId} REJECTED.`);
+            }
+            // In a real application, you would make a Supabase update call here and refresh the table.
+            fetchVolunteerApps(); 
+        }
+
+        async function logoutUser() {
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (!error) {
+                window.location.href = '/staff-login/';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a href="/admin-dashboard/"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="/admin/inventory"><i class="fas fa-boxes"></i> Inventory Management</a>
+            <a href="/admin/donations"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
+            <a href="/admin/staff-tasks"><i class="fas fa-tasks"></i> Staff Tasks</a>
+            <a href="/admin/volunteer-apps" class="active"><i class="fas fa-users"></i> Volunteer Apps</a>
+            <a href="/admin/settings"><i class="fas fa-cog"></i> Site Settings</a>
+            <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1>Volunteer Applications</h1>
+        <p>Review and manage incoming volunteer applications and the active volunteer base.</p>
+
+        <section class="section">
+            <h2 class="section-header">New Volunteer Applications</h2>
+            
+            <table class="apps-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Key Skills</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appsTableBody">
+                    <tr><td colspan="5">Loading applications...</td></tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section class="section" style="margin-top: 40px;">
+            <h2 class="section-header">Active Volunteers</h2>
+            <p> (This section would typically display a list or table of all approved volunteers, their roles, and contact information.) </p>
+        </section>
+    </div>
+</body>
+</html>
