@@ -1,271 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard | FoodShare Seychelles</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>Admin Dashboard | FoodShare Seychelles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/image/logo.png">
 
-  <link rel="icon" type="image/png" href="/image/logo.png" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-  />
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    :root {
-      --green: #4CAF50;
-      --dark-green: #388E3C;
-      --blue: #2196F3;
-      --danger: #D32F2F;
-      --orange: #FF9800;
-      --bg: #f3f6f9;
-      --card: #ffffff;
-      --text: #2e2e2e;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Tahoma, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    /* HEADER */
-    header {
-      background: linear-gradient(90deg, var(--green), var(--dark-green));
-      color: #fff;
-      padding: 18px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header img {
-      height: 42px;
-    }
-
-    header .admin-info {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
-    header button {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    /* MAIN */
-    main {
-      padding: 32px;
-      max-width: 1400px;
-      margin: auto;
-    }
-
-    .section {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 28px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    }
-
-    .section h2 {
-      margin: 0 0 18px 0;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* STATS */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
-
-    .stat-card {
-      background: #f9fbfc;
-      padding: 20px;
-      border-radius: 12px;
-      border-left: 6px solid var(--green);
-    }
-
-    .stat-card span {
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    .stat-card h3 {
-      margin: 6px 0 0;
-      font-size: 1.8rem;
-      color: var(--green);
-    }
-
-    /* TABLES */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      padding: 14px;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-
-    th {
-      background: #eef4f0;
-      font-weight: 700;
-    }
-
-    tr:not(:last-child) {
-      border-bottom: 1px solid #eee;
-    }
-
-    .action-btn {
-      border: none;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .approve { background: var(--green); color: #fff; }
-    .reject { background: var(--danger); color: #fff; }
-    .edit { background: var(--blue); color: #fff; }
-  </style>
+<style>
+:root{
+  --green:#4CAF50;
+  --dark:#388E3C;
+  --blue:#2196F3;
+  --red:#D32F2F;
+  --bg:#f3f6f9;
+}
+*{box-sizing:border-box;font-family:Segoe UI,Tahoma}
+body{margin:0;background:var(--bg)}
+header{
+  background:linear-gradient(90deg,var(--green),var(--dark));
+  color:#fff;padding:18px 32px;
+  display:flex;justify-content:space-between;align-items:center
+}
+header img{height:42px}
+header button{
+  background:rgba(255,255,255,.15);
+  border:none;color:#fff;
+  padding:10px 14px;border-radius:8px;
+  cursor:pointer;font-weight:600
+}
+main{max-width:1400px;margin:auto;padding:32px}
+.section{
+  background:#fff;border-radius:14px;
+  padding:24px;margin-bottom:28px;
+  box-shadow:0 6px 18px rgba(0,0,0,.08)
+}
+.section h2{margin:0 0 16px;display:flex;gap:10px;align-items:center}
+table{width:100%;border-collapse:collapse}
+th,td{padding:12px;font-size:.9rem}
+th{background:#eef4f0}
+tr:not(:last-child){border-bottom:1px solid #eee}
+.btn{
+  border:none;border-radius:6px;
+  padding:6px 10px;
+  font-weight:600;cursor:pointer
+}
+.approve{background:var(--green);color:#fff}
+.reject{background:var(--red);color:#fff}
+.edit{background:var(--blue);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.stat{background:#f9fbfc;padding:20px;border-radius:12px;border-left:6px solid var(--green)}
+.stat span{font-size:.85rem;color:#666}
+.stat h3{margin:6px 0 0;font-size:1.8rem;color:var(--green)}
+input,select,textarea{
+  padding:10px;border-radius:6px;
+  border:1px solid #ccc;width:100%
+}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+</style>
 </head>
 
 <body>
 
 <header>
-  <img src="/staff-login/image/logo.png" alt="FoodShare Seychelles">
-  <div class="admin-info">
-    <span id="adminName">Admin</span>
-    <button onclick="logout()">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </button>
-  </div>
+  <img src="/image/logo.png">
+  <button onclick="logout()">Logout</button>
 </header>
 
 <main>
 
-  <!-- HOME / STATS -->
-  <section class="section">
-    <h2><i class="fa-solid fa-chart-line"></i> Overview</h2>
-    <div class="stats" id="stats">
-      <div class="stat-card"><span>Pending Claims</span><h3 id="claimsCount">—</h3></div>
-      <div class="stat-card"><span>New Donations</span><h3 id="donationsCount">—</h3></div>
-      <div class="stat-card"><span>Volunteer Applications</span><h3 id="volunteerCount">—</h3></div>
-      <div class="stat-card"><span>Unread Inquiries</span><h3 id="inquiryCount">—</h3></div>
-    </div>
-  </section>
+<!-- OVERVIEW -->
+<section class="section">
+<h2><i class="fa-solid fa-chart-line"></i> Overview</h2>
+<div class="stats">
+  <div class="stat"><span>Pending Claims</span><h3 id="cClaims">0</h3></div>
+  <div class="stat"><span>Donations</span><h3 id="cDonations">0</h3></div>
+  <div class="stat"><span>Volunteer Apps</span><h3 id="cVolunteers">0</h3></div>
+  <div class="stat"><span>Unread Inquiries</span><h3 id="cInquiries">0</h3></div>
+</div>
+</section>
 
-  <!-- PLACEHOLDER SECTIONS -->
-  <section class="section">
-    <h2><i class="fa-solid fa-truck"></i> Claims Review</h2>
-    <p>Pending claim requests will appear here.</p>
-  </section>
+<!-- CLAIMS -->
+<section class="section">
+<h2><i class="fa-solid fa-truck"></i> Claims Review</h2>
+<table><thead>
+<tr><th>Name</th><th>Method</th><th>Status</th><th>Action</th></tr>
+</thead><tbody id="claimsTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-hand-holding-heart"></i> Donations</h2>
-    <p>Donation submissions from the public.</p>
-  </section>
+<!-- DONATIONS -->
+<section class="section">
+<h2><i class="fa-solid fa-hand-holding-heart"></i> Donations</h2>
+<table><thead>
+<tr><th>Donor</th><th>Food</th><th>Qty</th><th>Status</th></tr>
+</thead><tbody id="donationsTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-users"></i> Volunteer Applications</h2>
-    <p>Review volunteer signups.</p>
-  </section>
+<!-- VOLUNTEERS -->
+<section class="section">
+<h2><i class="fa-solid fa-users"></i> Volunteer Applications</h2>
+<table><thead>
+<tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>
+</thead><tbody id="volunteerTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-boxes-stacked"></i> Inventory</h2>
-    <p>Manage food listings.</p>
-  </section>
+<!-- INQUIRIES -->
+<section class="section">
+<h2><i class="fa-solid fa-envelope"></i> Inquiries</h2>
+<table><thead>
+<tr><th>Name</th><th>Subject</th><th>Status</th></tr>
+</thead><tbody id="inquiryTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-user-gear"></i> User Management</h2>
-    <p>Manage staff roles.</p>
-  </section>
+<!-- INVENTORY -->
+<section class="section">
+<h2><i class="fa-solid fa-boxes-stacked"></i> Inventory</h2>
+<table><thead>
+<tr><th>Item</th><th>Location</th><th>Qty</th><th>Available</th></tr>
+</thead><tbody id="inventoryTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-list-check"></i> Assign Tasks</h2>
-    <p>Create and assign tasks.</p>
-  </section>
+<!-- USERS -->
+<section class="section">
+<h2><i class="fa-solid fa-user-gear"></i> User Management</h2>
+<table><thead>
+<tr><th>Name</th><th>Email</th><th>Role</th></tr>
+</thead><tbody id="usersTable"></tbody></table>
+</section>
 
-  <section class="section">
-    <h2><i class="fa-solid fa-gear"></i> Settings</h2>
-    <p>Announcements and configuration.</p>
-  </section>
+<!-- TASKS -->
+<section class="section">
+<h2><i class="fa-solid fa-list-check"></i> Assign Task</h2>
+<div class="form-row">
+<input id="taskTitle" placeholder="Title">
+<input id="taskPriority" placeholder="Priority">
+<select id="taskUser"></select>
+</div>
+<textarea id="taskDesc" placeholder="Description"></textarea><br><br>
+<button class="btn approve" onclick="createTask()">Create Task</button>
+</section>
+
+<!-- SETTINGS -->
+<section class="section">
+<h2><i class="fa-solid fa-gear"></i> Settings</h2>
+<input id="announcement"><br><br>
+<button class="btn edit" onclick="saveSetting()">Save</button>
+</section>
 
 </main>
 
 <script>
-  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+const supabase=window.supabase.createClient(
+'https://edotvuleaydztulkxehe.supabase.co',
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw'
+);
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+(async()=>{
+const s=await supabase.auth.getSession();
+if(!s.data.session)location='/staff-login/index.html';
+const p=await supabase.from('profiles').select('role').eq('id',s.data.session.user.id).single();
+if(p.data.role!==1)location='/staff/dashboard.html';
+loadAll();
+})();
 
-  document.addEventListener('DOMContentLoaded', initAdmin);
+async function loadAll(){
+loadStats();loadClaims();loadDonations();loadVolunteers();
+loadInquiries();loadInventory();loadUsers();loadSettings();
+}
 
-  async function initAdmin() {
-    const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      window.location.href = '/staff-login/index.html';
-      return;
-    }
+async function loadStats(){
+cClaims.innerText=(await supabase.from('claims').select('*',{count:'exact',head:true})).count;
+cDonations.innerText=(await supabase.from('donations').select('*',{count:'exact',head:true})).count;
+cVolunteers.innerText=(await supabase.from('volunteer_applications').select('*',{count:'exact',head:true})).count;
+cInquiries.innerText=(await supabase.from('inquiries').select('*',{count:'exact',head:true})).count;
+}
 
-    const user = data.session.user;
+async function loadClaims(){
+const {data}=await supabase.from('claims').select('*');
+claimsTable.innerHTML=data.map(c=>`
+<tr>
+<td>${c.claimer_name}</td>
+<td>${c.method}</td>
+<td>${c.status}</td>
+<td>
+<button class="btn approve" onclick="updateClaim('${c.id}','Approved')">Approve</button>
+<button class="btn reject" onclick="updateClaim('${c.id}','Rejected')">Reject</button>
+</td></tr>`).join('');
+}
+async function updateClaim(id,status){
+await supabase.from('claims').update({status}).eq('id',id);loadClaims();
+}
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name, role')
-      .eq('id', user.id)
-      .single();
+async function loadDonations(){
+const {data}=await supabase.from('donations').select('*');
+donationsTable.innerHTML=data.map(d=>`
+<tr><td>${d.donor_name}</td><td>${d.food_type}</td><td>${d.quantity_kg}</td><td>${d.status}</td></tr>`).join('');
+}
 
-    if (!profile || profile.role !== 1) {
-      window.location.href = '/staff/dashboard.html';
-      return;
-    }
+async function loadVolunteers(){
+const {data}=await supabase.from('volunteer_applications').select('*');
+volunteerTable.innerHTML=data.map(v=>`
+<tr><td>${v.full_name}</td><td>${v.email}</td><td>${v.application_status}</td>
+<td>
+<button class="btn approve" onclick="updateVolunteer('${v.id}','Approved')">Approve</button>
+<button class="btn reject" onclick="updateVolunteer('${v.id}','Rejected')">Reject</button>
+</td></tr>`).join('');
+}
+async function updateVolunteer(id,status){
+await supabase.from('volunteer_applications').update({application_status:status}).eq('id',id);loadVolunteers();
+}
 
-    document.getElementById('adminName').textContent = profile.full_name;
-    loadStats();
-  }
+async function loadInquiries(){
+const {data}=await supabase.from('inquiries').select('*');
+inquiryTable.innerHTML=data.map(i=>`
+<tr><td>${i.sender_name}</td><td>${i.subject}</td><td>${i.status}</td></tr>`).join('');
+}
 
-  async function loadStats() {
-    const claims = await supabase.from('claims').select('*', { count: 'exact', head: true });
-    const donations = await supabase.from('donations').select('*', { count: 'exact', head: true });
-    const volunteers = await supabase.from('volunteer_applications').select('*', { count: 'exact', head: true });
-    const inquiries = await supabase.from('inquiries').select('*', { count: 'exact', head: true });
+async function loadInventory(){
+const {data}=await supabase.from('food_listings').select('*');
+inventoryTable.innerHTML=data.map(i=>`
+<tr><td>${i.title}</td><td>${i.location}</td><td>${i.quantity}</td><td>${i.is_available}</td></tr>`).join('');
+}
 
-    document.getElementById('claimsCount').textContent = claims.count || 0;
-    document.getElementById('donationsCount').textContent = donations.count || 0;
-    document.getElementById('volunteerCount').textContent = volunteers.count || 0;
-    document.getElementById('inquiryCount').textContent = inquiries.count || 0;
-  }
+async function loadUsers(){
+const {data}=await supabase.from('profiles').select('*');
+usersTable.innerHTML=data.map(u=>`
+<tr><td>${u.full_name}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
+taskUser.innerHTML=data.map(u=>`<option value="${u.id}">${u.full_name}</option>`).join('');
+}
 
-  async function logout() {
-    await supabase.auth.signOut();
-    window.location.href = '/staff-login/index.html';
-  }
+async function createTask(){
+await supabase.from('tasks').insert({
+title:taskTitle.value,
+description:taskDesc.value,
+priority:taskPriority.value,
+assigned_to:taskUser.value,
+status:'Assigned'
+});
+alert('Task created');
+}
+
+async function loadSettings(){
+const {data}=await supabase.from('settings').select('*').eq('key','announcement').single();
+announcement.value=data?.value||'';
+}
+
+async function saveSetting(){
+await supabase.from('settings').update({value:announcement.value}).eq('key','announcement');
+alert('Saved');
+}
+
+async function logout(){
+await supabase.auth.signOut();
+location='/staff-login/index.html';
+}
 </script>
 
 </body>
