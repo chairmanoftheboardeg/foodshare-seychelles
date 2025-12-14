@@ -1,30 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>General Inquiries - FoodShare Admin</title>
-    <link rel="icon" href="../../image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    
-    <style>
-        /* (Shared CSS omitted for brevity, assume the same as claims.html) */
-        :root {
-            --primary-main: #2196F3; /* Pluto primary blue */
-            --primary-dark: #1976D2;
-            --accent-green: #4CAF50; 
-            --accent-red: #F44336;
-            --accent-orange: #FF9800;
-            --neutral-bg: #F0F2F5; 
-            --neutral-card: #FFFFFF;
-            --text-dark: #333; 
-            --text-light: #777; 
-            --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.05);
+<script>
+        // ... (Same CONSTS and Utility functions as claims.html) ...
+
+        async function checkAccessAndRedirect() {
+            // ... (Same Auth/Access check as claims.html) ...
+            fetchInquiries(); // CHANGE: Fetch Inquiries
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; background-color: var(--neutral-bg); min-height: 100vh; }
-        
-        #adminSidebar { width: 250px; background-color: #2c3e50; color: white; padding: 20px 0; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); position: fixed; height: 100%; overflow-y: auto; }
-        #adminSidebar h2 { font-size: 1em; color: #bdc3c7; padding: 15px 20px 5px; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sidebar
+
+        // --- INQUIRIES MODULE (Table: inquiries) ---
+        async function fetchInquiries() {
+            const inquiriesBody = document.getElementById('inquiriesTableBody');
+            showLoading('inquiriesTableBody', 7);
+
+            const { data: inquiries, error } = await supabase
+                .from('inquiries')
+                .select(`id, received_at, sender_name, sender_email, subject, message, status`)
+                .order('received_at', { ascending: false });
+
+            if (error) { showLoading('inquiriesTableBody', 7, `Error: ${error.message}`); return; }
+            if (inquiries.length === 0) { showLoading('inquiriesTableBody', 7, `No general inquiries found.`); return; }
+
+            inquiriesBody.innerHTML = inquiries.map(i => `
+                <tr>
+                    <td>${formatDate(i.received_at)}</td>
+                    <td>${i.sender_name}</td>
+                    <td>${i.sender_email}</td>
+                    <td>${i.subject}</td>
+                    <td><div style="max-width: 250px; max-height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${i.message}</div></td>
+                    <td>${updateStatusBadge(i.status)}</td>
+                    <td>
+                        <button class="action-button" onclick="updateStatus('inquiries', '${i.id}', 'Resolved', ${i.status !== 'Resolved'})">Resolve</button>
+                        <button class="action-button reject" onclick="updateStatus('inquiries', '${i.id}', 'Closed', ${i.status !== 'Closed'})">Close</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- GENERIC STATUS UPDATE ---
+        async function updateStatus(tableName, id, newStatus, isConfirmRequired = true) {
+            // ... (Same confirmation logic) ...
+            
+            const { error } = await supabase
+                .from(tableName)
+                .update({ status: newStatus })
+                .eq('id', id);
+                
+            if (error) {
+                alert(`Failed to update status in ${tableName}: ` + error.message);
+            } else {
+                fetchInquiries(); // Refresh table
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+    </script>
+</head>
+<body>
+    <nav id="adminSidebar">
+        <h2><i class="fas fa-tasks"></i> Workflow</h2>
+        <a href="/admin/dashboard/inquiries.html" class="sidebar-link active"><i class="fas fa-question-circle"></i> Inquiries</a>
+        </nav>
+    
+    <div id="mainContent">
+        <header id="topbar">
+            <h1>General Contact Inquiries Review</h1>
+            </header>
+
+        <div class="dashboard-body">
+            <div class="content-card">
+                <h2>Customer and General Inquiries (Table: `inquiries`)</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Received At</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message Snippet</th>
+                            <th>Status</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inquiriesTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
