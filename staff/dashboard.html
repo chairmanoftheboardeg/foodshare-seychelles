@@ -4,178 +4,319 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Dashboard - FoodShare Seychelles</title>
-    <link rel="icon" href="/image/logo.png" type="image/png">
     
+    <link rel="icon" href="../image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START STAFF DASHBOARD CSS BLOCK] - Added accent-orange for status */
+        /* [START Staff Dashboard CSS] */
         :root {
-            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800; /* Defined accent-orange */
-            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
-            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --primary-main: #4CAF50; /* Green */
+            --primary-dark: #388E3C;
+            --accent-blue: #2196F3;
+            --accent-orange: #FF9800;
+            --accent-red: #D32F2F;
+            --neutral-bg: #F0F2F5; 
+            --neutral-card: #FFFFFF;
+            --text-dark: #333333; 
+            --text-light: #666666; 
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.3s;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; min-height: 100vh; }
-        
-        /* Layout */
-        .sidebar { width: 250px; background-color: var(--primary-dark); color: white; padding: 20px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); flex-shrink: 0; }
-        .main-content { flex-grow: 1; padding: 40px; }
-        
-        /* Sidebar */
-        .sidebar h2 { color: var(--primary-light); margin-bottom: 30px; font-family: var(--font-serif); font-size: 1.4em; }
-        .sidebar-nav a { display: block; color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 12px 10px; margin-bottom: 5px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; }
-        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: var(--primary-main); color: white; }
-        .sidebar-nav a i { margin-right: 10px; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex-grow: 1; padding: 30px 0; }
+        .content-container { max-width: 1300px; margin: 0 auto; padding: 0 25px; } 
 
-        /* Metrics */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .metric-card { background-color: var(--neutral-card); padding: 25px; border-radius: 10px; box-shadow: var(--shadow-subtle); border-left: 5px solid var(--accent-blue); }
-        .metric-card h3 { font-size: 1em; color: var(--text-light); margin-bottom: 10px; }
-        .metric-value { font-size: 2em; font-weight: bold; color: var(--primary-dark); }
+        /* Navigation Bar */
+        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: var(--neutral-card); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        .logo-container { font-size: 1.5em; font-weight: bold; color: var(--text-dark); }
+        .logout-btn { background-color: var(--accent-red); color: white; border: none; border-radius: 5px; padding: 8px 15px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .logout-btn:hover { background-color: #C62828; }
+        
+        /* Dashboard Layout */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 300px 1fr; 
+            gap: 30px; 
+            margin-top: 30px;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: var(--neutral-card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+            text-align: center;
+        }
+        #profileImage {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid var(--primary-main);
+        }
+        .profile-card h2 { margin-bottom: 5px; color: var(--primary-dark); }
+        .role-tag {
+            display: inline-block;
+            background: var(--accent-blue);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .profile-card p { margin: 8px 0; font-size: 0.9em; color: var(--text-light); }
         
         /* Task List */
-        .section-header { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
-        .task-list { list-style: none; padding: 0; }
-        .task-list li { background-color: var(--neutral-card); padding: 15px; margin-bottom: 10px; border-radius: 6px; border-left: 4px solid var(--accent-blue); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
-        /* Ensure accent-orange is used here - it was missing from :root in your original staff CSS */
-        .task-list .status-new { border-left-color: var(--accent-orange); } 
-        .task-list .status-pending { border-left-color: var(--accent-blue); }
-        .task-list .status-completed { border-left-color: var(--primary-main); opacity: 0.8; }
-        .task-title { font-weight: bold; margin-bottom: 5px; }
-        .task-meta { font-size: 0.9em; color: var(--text-light); }
-        /* [END STAFF DASHBOARD CSS BLOCK] */
+        .task-list-card {
+            background: var(--neutral-card);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+        }
+        .task-list-card h2 { margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .task-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .task-table th { background-color: transparent; color: var(--text-dark); font-weight: 600; text-align: left; padding: 0 15px 5px 15px; }
+        .task-table td { background-color: #f8f8f8; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
+        
+        .task-table tr:hover td { background-color: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); }
+        
+        /* Task Status Styling */
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
+        .status-Assigned { background-color: var(--accent-orange); color: white; }
+        .status-InProgress { background-color: var(--accent-blue); color: white; }
+        .status-Completed { background-color: var(--primary-main); color: white; }
+        .status-Cancelled { background-color: var(--accent-red); color: white; }
+
+        .complete-task-btn { 
+            background: var(--primary-main); 
+            color: white; 
+            padding: 8px 15px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: background 0.2s;
+            font-size: 0.9em;
+        }
+        .complete-task-btn:hover { background: var(--primary-dark); }
+        
+        .action-button { background-color: var(--accent-blue); color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em; margin-top: 5px; display: block; width: 100%; text-align: center; text-decoration: none; }
+        .action-button.grey { background-color: var(--text-light); }
+        /* [END Staff Dashboard CSS] */
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJisp...'; // Placeholder key
         let supabase;
 
-        async function checkAuthAndRedirect() {
-            if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const ADMIN_ROLE_ID = 1;
+        const STAFF_ROLES = [2, 3]; // Driver/Staff, Volunteer Coordinator
+        const ROLE_MAP = {
+            1: 'Admin',
+            2: 'Driver/Staff',
+            3: 'Volunteer Coordinator',
+            4: 'General Volunteer'
+        };
+        
+        let currentUserId = null;
+
+        // --- Utility Functions ---
+        function updateStatusBadge(status) { return `<span class="status-badge status-${status.replace(/\s/g, '')}">${status}</span>`; }
+        function formatDate(dateString) { return new Date(dateString).toLocaleDateString(); }
+
+
+        // --- Core Access Control ---
+        async function checkAccessAndRedirect() {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            
+            if (sessionError || !session) {
+                window.location.href = '/staff-login/index.html';
+                return;
+            }
+
+            currentUserId = session.user.id;
+            
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role, full_name, email, phone, profile_picture_url')
+                .eq('id', currentUserId)
+                .single();
+
+            if (profileError || !profileData) {
+                alert("Account profile error. Please contact admin.");
+                await supabase.auth.signOut();
+                window.location.href = '/staff-login/index.html';
+                return;
+            }
+            
+            const userRole = profileData.role;
+            
+            if (userRole === ADMIN_ROLE_ID) {
+                // Admin (Role 1) redirect
+                window.location.href = '/admin/dashboard/home.html';
+                return;
+            } else if (!STAFF_ROLES.includes(userRole)) {
+                 // Non-staff roles log out
+                 await supabase.auth.signOut();
+                 window.location.href = '/staff-login/index.html';
+                 return;
+            }
+
+            // User is valid Staff (Role 2 or 3): Load dashboard content
+            displayProfile(profileData);
+            fetchAssignedTasks();
+        }
+
+        // --- Profile Display ---
+        function displayProfile(profile) {
+            document.getElementById('profileName').textContent = profile.full_name;
+            document.getElementById('profileRole').textContent = ROLE_MAP[profile.role];
+            document.getElementById('profileEmail').textContent = profile.email;
+            document.getElementById('profilePhone').textContent = profile.phone || 'N/A';
+            
+            const imgElement = document.getElementById('profileImage');
+            // FIX: Using the correct 'profile_picture_url' column from your schema
+            imgElement.src = profile.profile_picture_url || '/image/default-staff-avatar.png'; 
+            imgElement.onerror = () => { imgElement.src = '/image/default-staff-avatar.png'; };
+        }
+
+        // --- Task Management (Table: tasks) ---
+        async function fetchAssignedTasks() {
+            const tasksBody = document.getElementById('tasksTableBody');
+            tasksBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 15px;">Fetching your current assignments...</td></tr>';
+
+            const { data: tasks, error } = await supabase
+                .from('tasks')
+                .select(`id, title, description, priority, created_at, status`)
+                .eq('assigned_to', currentUserId)
+                .in('status', ['Assigned', 'InProgress']) // Only show active tasks
+                .order('priority', { ascending: true })
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                tasksBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 15px;">Error loading tasks: ${error.message}</td></tr>`;
+                return;
+            }
+            
+            if (tasks.length === 0) {
+                tasksBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 30px; font-style: italic;">No open tasks. Time to relax!</td></tr>`;
+                return;
+            }
+
+            tasksBody.innerHTML = tasks.map(t => `
+                <tr style="vertical-align: top;">
+                    <td>${t.id.substring(0, 8)}...</td>
+                    <td>
+                        <strong>${t.title}</strong><br>
+                        <span style="font-size: 0.9em; color: var(--text-light); white-space: pre-wrap;">${t.description}</span>
+                    </td>
+                    <td>
+                        ${updateStatusBadge(t.status)}<br>
+                        <small style="color: ${t.priority === 'High' ? 'var(--accent-red)' : 'var(--text-light)'}">${t.priority} Priority</small>
+                    </td>
+                    <td>${formatDate(t.created_at)}</td>
+                    <td style="width: 150px;">
+                        <button class="complete-task-btn" onclick="updateTaskStatus('${t.id}', 'Completed')">
+                            <i class="fas fa-check-circle"></i> Complete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateTaskStatus(taskId, newStatus) {
+            const statusText = newStatus === 'Completed' ? 'Complete' : newStatus;
+            
+            if (!confirm(`Confirm you are ready to mark task ${taskId.substring(0, 8)} as "${statusText}"?`)) {
+                return;
+            }
+            
+            const { error } = await supabase
+                .from('tasks')
+                .update({ status: newStatus, updated_at: new Date() })
+                .eq('id', taskId);
+
+            if (error) {
+                alert(`Failed to update task status: ${error.message}`);
             } else {
-                return; 
-            }
-
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (!session) {
-                window.location.href = '/staff-login/';
-                return;
-            }
-            
-            const user = session.user;
-            const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
-            
-            if (!profile || profile.role_id === undefined) {
-                await supabase.auth.signOut();
-                window.location.href = '/staff-login/';
-                return;
-            }
-            
-            // REDIRECT STAFF TO ADMIN DASHBOARD IF THEY ARE ADMIN (role_id=1)
-            if (profile.role_id === 1) { 
-                // Removed the redundant alert here as the login page already handles this redirect.
-                window.location.href = '/admin-dashboard/';
-                return;
-            }
-
-            // ONLY Staff (role_id=2) proceeds. Deny others (e.g., role_id=3, etc.)
-            if (profile.role_id !== 2) { 
-                alert('Authorization Failed: You do not have Staff privileges. Redirecting to Staff Login.');
-                await supabase.auth.signOut();
-                window.location.href = '/staff-login/';
-                return;
-            }
-            
-            // If role is 2 (Staff), proceed to load data
-            fetchStaffMetrics(user.id);
-            fetchMyTasks(user.id);
-        }
-
-        async function fetchStaffMetrics(staffId) {
-            // Placeholder function to fetch staff-specific metrics
-            document.getElementById('assignedTasks').textContent = '12'; 
-            document.getElementById('completedTasks').textContent = '5';
-            document.getElementById('nextPickup').textContent = 'Beau Vallon (10:00 AM)';
-        }
-
-        async function fetchMyTasks(staffId) {
-            // Placeholder function to fetch and display assigned tasks
-            const taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
-            
-            const mockTasks = [
-                { id: 1, title: "Pickup: Fresh Produce from Hilton", status: "New", location: "Beau Vallon, Mahé", time: "10:00 AM" },
-                { id: 2, title: "Delivery: Canned goods to NGO Centre", status: "Pending", location: "Victoria", time: "1:30 PM" },
-                { id: 3, title: "Pickup: Bakery items from Local Bakery", status: "Completed", location: "Praslin - Grand Anse", time: "Yesterday" }
-            ];
-
-            mockTasks.forEach(task => {
-                const li = document.createElement('li');
-                // Ensure status is correctly converted to lowercase for CSS class
-                li.className = `status-${task.status.toLowerCase()}`; 
-                li.innerHTML = `
-                    <div class="task-title">${task.title}</div>
-                    <div class="task-meta">Location: ${task.location} | Time: ${task.time}</div>
-                `;
-                taskList.appendChild(li);
-            });
-        }
-
-        async function logoutUser() {
-            if (!supabase) return;
-            const { error } = await supabase.auth.signOut();
-            if (!error) {
-                window.location.href = '/staff-login/';
+                alert(`Task marked as ${statusText}. Your dashboard is refreshing.`);
+                fetchAssignedTasks(); // Refresh the task list
             }
         }
 
-        document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
     </script>
 </head>
 <body>
-    <div class="sidebar">
-        <h2><i class="fas fa-user-shield"></i> Staff Panel</h2>
-        <nav class="sidebar-nav">
-            <a href="/staff-dashboard/" class="active"><i class="fas fa-home"></i> My Dashboard</a>
-            <a href="/staff/tasks"><i class="fas fa-list-check"></i> My Assigned Tasks</a> <a href="/staff/log-pickup"><i class="fas fa-clipboard-list"></i> Log Food Pickups</a> <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </nav>
-    </div>
+    <header id="navbar">
+        <a href="/staff/dashboard.html" class="logo-container">
+            <i class="fas fa-user-tag" style="color: var(--accent-blue);"></i> FoodShare <span style="font-weight: normal;">Staff Dashboard</span>
+        </a>
+        <button class="logout-btn" onclick="supabase.auth.signOut().then(() => { window.location.href = '/staff-login/index.html'; })">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button> 
+    </header>
 
-    <div class="main-content">
-        <h1>Welcome, Staff Member</h1>
-        <p>Your snapshot of today's essential tasks.</p>
+    <main>
+        <div class="content-container">
+            <h1><i class="fas fa-clipboard-list"></i> Welcome, <span id="profileName">Staff Member</span></h1>
+            <p style="text-align: center; color: var(--text-light); margin-bottom: 25px;">
+                View and manage the tasks assigned to you by the administrative team.
+            </p>
 
-        <section class="section">
-            <h2 class="section-header">Today's Key Metrics</h2>
-            <div class="metrics-grid">
-                <div class="metric-card" style="border-left-color: var(--accent-blue);">
-                    <h3>Assigned Tasks</h3>
-                    <div id="assignedTasks" class="metric-value">0</div>
+            <div class="dashboard-grid">
+                
+                <div class="profile-card">
+                    <img id="profileImage" src="/image/default-staff-avatar.png" alt="Staff Profile Picture">
+                    <h2 id="profileName">Loading Name...</h2>
+                    <span id="profileRole" class="role-tag">Loading Role...</span>
+                    
+                    <p><i class="fas fa-envelope"></i> <span id="profileEmail">...</span></p>
+                    <p><i class="fas fa-phone-alt"></i> <span id="profilePhone">...</span></p>
+                    
+                    <hr style="margin: 20px 0; border-color: #eee;">
+                    
+                    <p style="font-weight: bold; color: var(--primary-main);">Staff Tools</p>
+                    <a href="/staff/map-view.html" class="action-button" style="margin-top: 10px;">
+                        <i class="fas fa-map-marked-alt"></i> View Tasks on Map
+                    </a>
+                    <a href="/staff/profile-edit.html" class="action-button grey" style="margin-top: 10px;">
+                         <i class="fas fa-user-edit"></i> Edit Profile
+                    </a>
                 </div>
-                <div class="metric-card" style="border-left-color: var(--primary-main);">
-                    <h3>Completed This Week</h3>
-                    <div id="completedTasks" class="metric-value">0</div>
+
+                <div class="task-list-card">
+                    <h2><i class="fas fa-tasks"></i> My Current Assignments (Table: `tasks`)</h2>
+                    <table class="task-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Task ID</th>
+                                <th>Assignment Details</th>
+                                <th style="width: 150px;">Status / Priority</th>
+                                <th style="width: 100px;">Assigned Date</th>
+                                <th style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTableBody">
+                            </tbody>
+                    </table>
                 </div>
-                <div class="metric-card" style="border-left-color: var(--accent-orange);">
-                    <h3>Next Pickup Time</h3>
-                    <div id="nextPickup" class="metric-value">Loading...</div>
-                </div>
+
             </div>
-        </section>
+        </div>
+    </main>
 
-        <section class="section">
-            <h2 class="section-header">My Current Tasks</h2>
-            <ul id="taskList" class="task-list">
-                <li>Loading tasks...</li>
-            </ul>
-        </section>
-    </div>
+    <footer id="main-footer" style="padding: 20px; background: #333; color: white; text-align: center; margin-top: 40px;">
+        <p>© 2025 Foodshare Seychelles. Staff Portal.</p>
+    </footer>
 </body>
 </html>
