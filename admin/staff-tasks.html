@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Task Management - FoodShare Seychelles</title>
+    <link rel="icon" href="/image/logo.png" type="image/png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <style>
+        /* [START SHARED CSS VARIABLES & BASE STYLES] */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --admin-main: #1A237E; /* Deep Indigo */ --admin-light: #BBDEFB;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #E53935;
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; min-height: 100vh; }
+        
+        /* Layout */
+        .sidebar { width: 280px; background-color: var(--admin-main); color: white; padding: 20px; flex-shrink: 0; }
+        .main-content { flex-grow: 1; padding: 40px; }
+        
+        /* Sidebar Navigation */
+        .sidebar h2 { color: var(--admin-light); margin-bottom: 30px; font-size: 1.6em; }
+        .sidebar-nav a { display: block; color: rgba(255, 255, 255, 0.8); text-decoration: none; padding: 12px 10px; margin-bottom: 5px; border-radius: 6px; transition: background-color 0.3s, color 0.3s; }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background-color: #283593; color: white; }
+        .sidebar-nav a i { margin-right: 10px; }
+
+        /* General Sections */
+        .section-header { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* [START TASKS SPECIFIC CSS] */
+        .tasks-table { width: 100%; border-collapse: collapse; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); border-radius: 8px; overflow: hidden; margin-top: 10px; }
+        .tasks-table th, .tasks-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        .tasks-table th { background-color: var(--admin-light); color: var(--admin-main); font-weight: bold; }
+        .tasks-table tr:hover { background-color: #f5f5f5; }
+
+        .status-assigned { color: var(--accent-orange); font-weight: bold; }
+        .status-inprogress { color: var(--accent-blue); font-weight: bold; }
+        .status-completed { color: var(--primary-dark); }
+        .status-overdue { color: var(--accent-red); font-weight: bold; }
+
+        .filter-controls { margin-bottom: 20px; }
+        .filter-controls label { font-weight: bold; margin-right: 10px; }
+        .filter-controls select { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
+        /* [END TASKS SPECIFIC CSS] */
+    </style>
+    
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        let supabase;
+
+        async function checkAuthAndRedirect() {
+            if (window.supabase && window.supabase.createClient) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } else {
+                return; 
+            }
+
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = '/staff-login/';
+                return;
+            }
+            
+            const user = session.user;
+            const { data: profile } = await supabase.from('profiles').select('role_id').eq('id', user.id).single();
+            
+            if (!profile || profile.role_id !== 1) { 
+                alert('Authorization Failed: You are not authorized as an Admin. Redirecting.');
+                await supabase.auth.signOut();
+                window.location.href = '/staff-login/';
+                return;
+            }
+            
+            fetchAllStaffTasks();
+        }
+
+        async function fetchAllStaffTasks() {
+            const tableBody = document.getElementById('tasksTableBody');
+            tableBody.innerHTML = '';
+            
+            // --- Placeholder Mock Data (Replace with actual Supabase query) ---
+            const mockTasks = [
+                { id: 301, description: "Pickup: Fresh Produce from Sunset Resort", staff: "Staff A", area: "Anse Royale", due: "Today 11:00 AM", status: "Assigned" },
+                { id: 302, description: "Delivery: Meals to Mont Fleuri Charity", staff: "Staff B", area: "Mont Fleuri", due: "Today 1:00 PM", status: "In Progress" },
+                { id: 303, description: "Pickup: Canned Goods from Donor (Praslin)", staff: "Staff A", area: "Praslin", due: "Yesterday", status: "Overdue" },
+                { id: 304, description: "Pickup: Bakery items from Local Bakery", staff: "Staff C", area: "Victoria", due: "Yesterday", status: "Completed" },
+            ];
+            // --- End Mock Data ---
+
+            mockTasks.forEach(task => {
+                const tr = document.createElement('tr');
+                const statusClass = task.status.toLowerCase().replace(' ', '-');
+                const actionsHtml = task.status !== 'Completed' 
+                    ? `<button title="Re-assign Task" onclick="reassignTask(${task.id})"><i class="fas fa-user-edit"></i> Re-assign</button>`
+                    : `<span>No action needed</span>`;
+
+                tr.innerHTML = `
+                    <td>${task.description}</td>
+                    <td>${task.staff}</td>
+                    <td>${task.area}</td>
+                    <td>${task.due}</td>
+                    <td><span class="status-${statusClass}">${task.status}</span></td>
+                    <td>${actionsHtml}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+        
+        function reassignTask(taskId) {
+            const newStaff = prompt(`Re-assign Task ID ${taskId} to which Staff Member? (e.g., Staff B, Staff C)`);
+            if (newStaff) {
+                 alert(`Task ID ${taskId} re-assigned to ${newStaff}.`);
+            }
+            fetchAllStaffTasks(); 
+        }
+
+        async function logoutUser() {
+            if (!supabase) return;
+            const { error } = await supabase.auth.signOut();
+            if (!error) {
+                window.location.href = '/staff-login/';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuthAndRedirect);
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-chart-line"></i> Admin Panel</h2>
+        <nav class="sidebar-nav">
+            <a href="/admin-dashboard/"><i class="fas fa-home"></i> Dashboard Home</a>
+            <a href="/admin/inventory"><i class="fas fa-boxes"></i> Inventory Management</a>
+            <a href="/admin/donations"><i class="fas fa-hand-holding-heart"></i> Donation Requests</a>
+            <a href="/admin/staff-tasks" class="active"><i class="fas fa-tasks"></i> Staff Tasks</a>
+            <a href="/admin/volunteer-apps"><i class="fas fa-users"></i> Volunteer Apps</a>
+            <a href="/admin/settings"><i class="fas fa-cog"></i> Site Settings</a>
+            <a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h1>Staff Task Management</h1>
+        <p>Monitor the operational workflow, including pickups and deliveries.</p>
+
+        <section class="section">
+            <h2 class="section-header">Active & Completed Tasks</h2>
+            
+            <div class="filter-controls">
+                <label for="staffFilter">Filter by Staff Member:</label>
+                <select id="staffFilter" onchange="fetchAllStaffTasks()">
+                    <option value="all">All Staff</option>
+                    <option value="staffA">Staff A</option>
+                    <option value="staffB">Staff B</option>
+                </select>
+            </div>
+
+            <table class="tasks-table">
+                <thead>
+                    <tr>
+                        <th>Task Description</th>
+                        <th>Assigned To</th>
+                        <th>Location/Area</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                    <tr><td colspan="6">Loading staff tasks...</td></tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</body>
+</html>
