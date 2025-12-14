@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Structure - FoodShare Seychelles</title>
+
+  <link rel="icon" href="/image/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
+      --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
+      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333;
+      --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+      --transition-speed: 0.4s;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+    a:hover { color: var(--primary-dark); }
+    main { flex-grow: 1; padding: 40px 0; }
+    h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+    .content-container { max-width: 1050px; margin: 0 auto; padding: 0 25px; }
+
+    #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
+    .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+    .logo-img { height: 40px; margin-right: 10px; }
+    .nav-links-container { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+    .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+    .nav-link:hover::after { width: 100%; }
+    .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
+    .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+
+    #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+    .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+    .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+    .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+    .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+    .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+    .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+
+    .panel {
+      background: var(--neutral-card);
+      border-radius: 14px;
+      box-shadow: var(--shadow-subtle);
+      padding: 28px;
+      border: 1px solid #efefef;
+      border-top: 5px solid var(--primary-main);
+    }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
+
+    .box {
+      border: 1px solid #eee;
+      border-radius: 14px;
+      padding: 18px;
+      background:#fbfbfb;
+    }
+    .box h2 { margin-bottom: 8px; font-size: 1.25em; }
+    .muted { color: var(--text-light); }
+    ul { padding-left: 18px; margin-top: 8px; }
+    li { margin: 7px 0; }
+  </style>
+</head>
+<body>
+<header id="navbar">
+  <a href="/" class="logo-container">
+    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
+    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+  </a>
+  <nav class="nav-links-container" id="navLinks">
+    <a href="/available-food/" class="nav-link">Find Food</a>
+    <a href="/donate-food/" class="nav-link">Donate</a>
+    <a href="/volunteer/" class="nav-link">Volunteer</a>
+    <a href="/impact/" class="nav-link">Impact</a>
+    <a href="/about/" class="nav-link">About Us</a>
+    <a href="/donate-food/" class="cta-button">DONATE NOW</a>
+    <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
+  </nav>
+</header>
+
+<main>
+  <div class="content-container">
+    <section class="panel">
+      <h1>Site Structure</h1>
+      <p class="muted" style="margin-top:8px;">
+        This page provides a clear directory of public pages and key routes on FoodShare Seychelles.
+      </p>
+
+      <div class="grid">
+        <div class="box" style="border-top: 4px solid var(--accent-blue);">
+          <h2><i class="fas fa-globe"></i> Public Pages</h2>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/available-food/">Find Food</a></li>
+            <li><a href="/donate-food/">Donate Food</a></li>
+            <li><a href="/volunteer/">Volunteer</a></li>
+            <li><a href="/impact/">Impact</a></li>
+            <li><a href="/about/">About Us</a></li>
+            <li><a href="/our-partners/">Our Partners</a></li>
+            <li><a href="/social/">Social Media</a></li>
+          </ul>
+        </div>
+
+        <div class="box" style="border-top: 4px solid var(--accent-orange);">
+          <h2><i class="fas fa-book-open"></i> Learn & Support</h2>
+          <ul>
+            <li><a href="/learn/safety/">Food Safety Protocol</a></li>
+            <li><a href="/learn/faq/">General FAQ</a></li>
+            <li><a href="/privacy-policy/">Privacy Policy</a></li>
+            <li><a href="/terms-of-use/">Terms of Use</a></li>
+            <li><a href="/sitemap/">Site Structure</a></li>
+          </ul>
+        </div>
+
+        <div class="box" style="border-top: 4px solid var(--primary-main);">
+          <h2><i class="fas fa-lock"></i> Internal</h2>
+          <ul>
+            <li><a href="/staff-login/">Staff Login</a></li>
+            <li class="muted">/staff/dashboard.html</li>
+            <li class="muted">/admin/dashboard/home.html</li>
+          </ul>
+          <div class="muted" style="margin-top:10px;">Internal dashboards require authentication.</div>
+        </div>
+
+        <div class="box" style="border-top: 4px solid var(--accent-red);">
+          <h2><i class="fas fa-life-ring"></i> Contact</h2>
+          <ul>
+            <li class="muted">General Contact page (if enabled): /contact-general/</li>
+            <li>Email: <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer id="main-footer">
+  <div class="content-container footer-content">
+    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+    <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+    <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+    <div class="footer-section">
+      <h3>Get In Touch</h3>
+      <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+      <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+</footer>
+</body>
+</html>
