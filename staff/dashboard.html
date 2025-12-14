@@ -270,7 +270,7 @@
                             </tr>
                         </thead>
                         <tbody id="tasks-list">
-                            <tr><td colspan="5" style="text-align: center;">No active assignments found.</td></tr>
+                            <tr><td colspan="5" style="text-align: center;">Loading assignments...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -279,10 +279,9 @@
     </div>
 
     <script>
-        // --- Supabase Client Initialization ---
-        // !!! IMPORTANT: REPLACE THESE PLACEHOLDERS !!!
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // --- Supabase Client Initialization (YOUR CREDENTIALS) ---
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         // ----------------------------------------
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -304,15 +303,15 @@
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
-                // Not logged in: Redirect to login page (absolute path from root)
+                // Not logged in: Redirect to login page
                 window.location.href = '/staff-login/index.html';
                 return;
             }
 
-            // Fetch user profile to check role
+            // Fetch user profile (including role name via join)
             const { data: profile, error } = await supabase
                 .from('profiles')
-                .select('role_id, full_name, email, phone, profile_picture_url, role(name)')
+                .select('role_id, full_name, email, phone, profile_picture_url, role(name)') // 'role(name)' performs a join
                 .eq('id', user.id)
                 .single();
 
@@ -332,7 +331,6 @@
                 return;
             } else if (profile.role_id !== ROLE_STAFF_DRIVER && profile.role_id !== ROLE_STAFF_COORDINATOR) {
                 // Invalid role for Staff Dashboard
-                console.warn('Unauthorized role access:', profile.role_id);
                 await supabase.auth.signOut();
                 window.location.href = '/staff-login/index.html';
                 return;
@@ -373,7 +371,7 @@
             const { data: tasks, error } = await supabase
                 .from('tasks')
                 .select('*')
-                // Filter for tasks assigned to the current user AND status is not 'Completed'
+                // Filter for tasks assigned to the current user AND status is 'Assigned' or 'InProgress'
                 .eq('assigned_to', currentUserId)
                 .in('status', ['Assigned', 'InProgress'])
                 .order('priority', { ascending: false }); // Show high priority first
@@ -392,18 +390,21 @@
             }
 
             tasks.forEach(task => {
-                const priorityClass = task.priority.toLowerCase() === 'high' ? 'priority-high' 
-                                     : task.priority.toLowerCase() === 'medium' ? 'priority-medium' 
+                const priorityLower = task.priority ? task.priority.toLowerCase() : 'low';
+                const statusLower = task.status ? task.status.toLowerCase() : 'assigned';
+                
+                const priorityClass = priorityLower === 'high' ? 'priority-high' 
+                                     : priorityLower === 'medium' ? 'priority-medium' 
                                      : 'priority-low';
                 
-                const statusClass = task.status.toLowerCase() === 'assigned' ? 'status-assigned' 
+                const statusClass = statusLower === 'assigned' ? 'status-assigned' 
                                     : 'status-inprogress';
 
                 const row = `
                     <tr>
                         <td>${task.title}</td>
-                        <td>${task.description.substring(0, 50)}...</td>
-                        <td><span class="priority-tag ${priorityClass}">${task.priority}</span></td>
+                        <td>${task.description ? task.description.substring(0, 50) + (task.description.length > 50 ? '...' : '') : 'No description'}</td>
+                        <td><span class="priority-tag ${priorityClass}">${task.priority || 'Low'}</span></td>
                         <td><span class="status-badge ${statusClass}">${task.status}</span></td>
                         <td>
                             <button class="complete-btn" data-task-id="${task.id}" 
@@ -419,13 +420,13 @@
         
         /**
          * Updates the task status to 'Completed'.
-         * @param {Event} event The click event.
-         * @param {string} taskId The ID of the task to update.
          */
         async function markTaskComplete(event, taskId) {
-            const button = event.target;
+            const button = event.target.closest('button'); // Ensure we get the button element
+            if (!button) return;
+            
             button.disabled = true;
-            button.textContent = 'Completing...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
 
             const { error } = await supabase
                 .from('tasks')
@@ -434,9 +435,9 @@
 
             if (error) {
                 console.error('Error marking task complete:', error);
-                alert('Failed to mark task complete. Please try again.');
+                alert('Failed to mark task complete: ' + error.message);
                 button.disabled = false;
-                button.textContent = 'Complete';
+                button.innerHTML = '<i class="fas fa-check-circle"></i> Complete';
                 return;
             }
 
@@ -450,12 +451,14 @@
             if (error) {
                 console.error('Logout error:', error);
             }
-            // Redirect to login page regardless of error status for simplicity
             window.location.href = '/staff-login/index.html';
         }
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Attach listener to the global window object for dynamic buttons
+            window.markTaskComplete = markTaskComplete; 
+            
             authGuard();
             logoutBtn.addEventListener('click', handleLogout);
         });
