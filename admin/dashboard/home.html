@@ -1,261 +1,1728 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Admin Dashboard | FoodShare Seychelles</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="/image/logo.png">
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard | FoodShare Seychelles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Correct favicon -->
+  <link rel="icon" type="image/png" href="/image/logo.png" />
 
-<style>
-:root{
-  --green:#4CAF50;
-  --dark:#388E3C;
-  --blue:#2196F3;
-  --red:#D32F2F;
-  --bg:#f3f6f9;
-}
-*{box-sizing:border-box;font-family:Segoe UI,Tahoma}
-body{margin:0;background:var(--bg)}
-header{
-  background:linear-gradient(90deg,var(--green),var(--dark));
-  color:#fff;padding:18px 32px;
-  display:flex;justify-content:space-between;align-items:center
-}
-header img{height:42px}
-header button{
-  background:rgba(255,255,255,.15);
-  border:none;color:#fff;
-  padding:10px 14px;border-radius:8px;
-  cursor:pointer;font-weight:600
-}
-main{max-width:1400px;margin:auto;padding:32px}
-.section{
-  background:#fff;border-radius:14px;
-  padding:24px;margin-bottom:28px;
-  box-shadow:0 6px 18px rgba(0,0,0,.08)
-}
-.section h2{margin:0 0 16px;display:flex;gap:10px;align-items:center}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;font-size:.9rem}
-th{background:#eef4f0}
-tr:not(:last-child){border-bottom:1px solid #eee}
-.btn{
-  border:none;border-radius:6px;
-  padding:6px 10px;
-  font-weight:600;cursor:pointer
-}
-.approve{background:var(--green);color:#fff}
-.reject{background:var(--red);color:#fff}
-.edit{background:var(--blue);color:#fff}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
-.stat{background:#f9fbfc;padding:20px;border-radius:12px;border-left:6px solid var(--green)}
-.stat span{font-size:.85rem;color:#666}
-.stat h3{margin:6px 0 0;font-size:1.8rem;color:var(--green)}
-input,select,textarea{
-  padding:10px;border-radius:6px;
-  border:1px solid #ccc;width:100%
-}
-.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-</style>
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --green:#4CAF50;
+      --dark:#388E3C;
+      --blue:#2196F3;
+      --red:#D32F2F;
+      --orange:#FF9800;
+
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --card:#0f203a;
+      --card2:#0c1a30;
+      --border: rgba(255,255,255,0.08);
+      --text:#e7eefc;
+      --muted: rgba(231,238,252,0.72);
+      --shadow: 0 12px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
+    }
+
+    *{ box-sizing:border-box; font-family: "Segoe UI", Tahoma, sans-serif; }
+    body{ margin:0; background: radial-gradient(1200px 600px at 20% 0%, #123055 0%, var(--bg) 55%, #070b14 100%); color:var(--text); }
+
+    /* Topbar */
+    .topbar{
+      position: sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 22px;
+      background: rgba(15,26,46,0.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .brand img{ height:38px; width:auto; }
+    .brand .title{
+      display:flex; flex-direction:column; line-height:1.05;
+    }
+    .brand .title strong{ font-size: 1.0rem; }
+    .brand .title span{ font-size: 0.85rem; color:var(--muted); }
+
+    .topbar-right{ display:flex; gap:10px; align-items:center; }
+    .chip{
+      display:flex; align-items:center; gap:8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .btn{
+      border:none; cursor:pointer; font-weight:700;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: transform .08s ease, background .2s ease;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+    .btn.primary{ background: linear-gradient(90deg, var(--green), var(--dark)); border:none; }
+    .btn.primary:hover{ background: linear-gradient(90deg, var(--dark), var(--green)); }
+    .btn.blue{ background: rgba(33,150,243,0.16); border: 1px solid rgba(33,150,243,0.30); }
+    .btn.red{ background: rgba(211,50,47,0.16); border: 1px solid rgba(211,50,47,0.30); }
+    .btn.orange{ background: rgba(255,152,0,0.16); border: 1px solid rgba(255,152,0,0.30); }
+
+    /* Layout */
+    .wrap{ max-width: 1400px; margin: 0 auto; padding: 20px 20px 50px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 16px;
+    }
+    @media(max-width: 1050px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    /* Cards / Sections */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .card-header h2{
+      margin:0; font-size: 1.05rem;
+      display:flex; align-items:center; gap:10px;
+    }
+    .card-header h2 i{ color: rgba(255,255,255,0.75); }
+    .card-body{ padding: 16px; }
+
+    .muted{ color: var(--muted); }
+    .pill{
+      display:inline-flex; align-items:center; gap:7px;
+      padding: 7px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      font-size: 0.85rem; color: var(--muted);
+    }
+
+    /* Stats */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    @media(max-width: 900px){
+      .stats{ grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+    }
+    .stat{
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,32,58,0.9), rgba(12,26,48,0.9));
+    }
+    .stat .label{ color: var(--muted); font-size: 0.85rem; }
+    .stat .value{ font-size: 1.8rem; font-weight: 800; margin-top: 6px; }
+    .stat .hint{ color: rgba(231,238,252,0.58); font-size: 0.8rem; margin-top: 6px; }
+    .accent-green{ color: #9ef0a1; }
+    .accent-orange{ color: #ffd28a; }
+    .accent-blue{ color: #9bd2ff; }
+    .accent-red{ color: #ff9b9b; }
+
+    /* Controls */
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      margin-bottom: 12px;
+    }
+    .left-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      min-width: 210px;
+    }
+    .field label{ font-size: 0.82rem; color: var(--muted); }
+    input, select, textarea{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+    }
+    textarea{ min-height: 90px; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(231,238,252,0.40); }
+
+    /* Tables */
+    .table-wrap{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+      background: rgba(0,0,0,0.15);
+    }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    th, td{
+      padding: 12px 12px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top;
+    }
+    th{
+      text-align:left;
+      position: sticky; top:0; z-index: 1;
+      background: rgba(15,26,46,0.95);
+      color: rgba(231,238,252,0.85);
+      font-size: 0.82rem;
+      letter-spacing: .2px;
+    }
+    tr:hover td{ background: rgba(255,255,255,0.03); }
+
+    .tag{
+      display:inline-flex; align-items:center;
+      padding: 6px 10px; border-radius: 999px;
+      font-size: 0.82rem; font-weight: 700;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+    }
+
+    /* Status color helpers (best-effort) */
+    .s-new{ color: #9bd2ff; border-color: rgba(33,150,243,0.35); background: rgba(33,150,243,0.12); }
+    .s-pending{ color:#ffd28a; border-color: rgba(255,152,0,0.35); background: rgba(255,152,0,0.12); }
+    .s-approved{ color:#9ef0a1; border-color: rgba(76,175,80,0.35); background: rgba(76,175,80,0.12); }
+    .s-rejected{ color:#ff9b9b; border-color: rgba(211,50,47,0.35); background: rgba(211,50,47,0.12); }
+    .s-read{ color:#bdbdbd; border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.82rem; color: rgba(231,238,252,0.75); }
+
+    /* Two-column forms */
+    .form-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media(max-width: 900px){
+      .form-grid{ grid-template-columns: 1fr; }
+    }
+
+    /* Modal */
+    .modal-overlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display:none; align-items:center; justify-content:center;
+      z-index: 50;
+      padding: 18px;
+    }
+    .modal{
+      width: min(980px, 100%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,32,58,0.98), rgba(12,26,48,0.98));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .modal-head strong{ font-size: 1.0rem; }
+    .modal-body{ padding: 16px; }
+    .kv{
+      display:grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .kv .k{ color: var(--muted); }
+    .kv .v{ color: var(--text); word-break: break-word; }
+    .modal-foot{
+      display:flex; justify-content:flex-end; gap:10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* Loading / toast */
+    .loading{
+      position: fixed; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background: radial-gradient(1000px 600px at 20% 0%, #123055 0%, var(--bg) 55%, #070b14 100%);
+      z-index: 100;
+      gap: 14px;
+      color: var(--text);
+    }
+    .spinner{
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.18);
+      border-top-color: rgba(158,240,161,0.9);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast{
+      position: fixed; right: 16px; bottom: 16px;
+      background: rgba(15,26,46,0.92);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: 420px;
+      z-index: 120;
+    }
+    .toast .small{ color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+
+    .danger-text{ color: #ff9b9b; }
+  </style>
 </head>
 
 <body>
 
-<header>
-  <img src="/image/logo.png">
-  <button onclick="logout()">Logout</button>
-</header>
+  <!-- Loading -->
+  <div id="loading" class="loading">
+    <img src="/image/logo.png" alt="FoodShare Seychelles" style="height:70px;width:auto;" />
+    <div class="spinner"></div>
+    <div class="muted">Loading Admin Dashboard…</div>
+  </div>
 
-<main>
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <div id="toastTitle" style="font-weight:800;"></div>
+    <div id="toastMsg" class="small"></div>
+  </div>
 
-<!-- OVERVIEW -->
-<section class="section">
-<h2><i class="fa-solid fa-chart-line"></i> Overview</h2>
-<div class="stats">
-  <div class="stat"><span>Pending Claims</span><h3 id="cClaims">0</h3></div>
-  <div class="stat"><span>Donations</span><h3 id="cDonations">0</h3></div>
-  <div class="stat"><span>Volunteer Apps</span><h3 id="cVolunteers">0</h3></div>
-  <div class="stat"><span>Unread Inquiries</span><h3 id="cInquiries">0</h3></div>
-</div>
-</section>
+  <!-- Modal -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <strong id="modalTitle">Details</strong>
+        <button class="btn" onclick="hideModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot" id="modalFoot"></div>
+    </div>
+  </div>
 
-<!-- CLAIMS -->
-<section class="section">
-<h2><i class="fa-solid fa-truck"></i> Claims Review</h2>
-<table><thead>
-<tr><th>Name</th><th>Method</th><th>Status</th><th>Action</th></tr>
-</thead><tbody id="claimsTable"></tbody></table>
-</section>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <img src="/image/logo.png" alt="Logo" />
+      <div class="title">
+        <strong>FoodShare Seychelles</strong>
+        <span>Admin Control Center</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="chip"><i class="fa-solid fa-user-shield"></i> <span id="adminName">Admin</span></div>
+      <button class="btn" onclick="refreshAll()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      <button class="btn primary" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
 
-<!-- DONATIONS -->
-<section class="section">
-<h2><i class="fa-solid fa-hand-holding-heart"></i> Donations</h2>
-<table><thead>
-<tr><th>Donor</th><th>Food</th><th>Qty</th><th>Status</th></tr>
-</thead><tbody id="donationsTable"></tbody></table>
-</section>
+  <div class="wrap">
 
-<!-- VOLUNTEERS -->
-<section class="section">
-<h2><i class="fa-solid fa-users"></i> Volunteer Applications</h2>
-<table><thead>
-<tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr>
-</thead><tbody id="volunteerTable"></tbody></table>
-</section>
+    <!-- Overview + Settings quick -->
+    <div class="grid">
 
-<!-- INQUIRIES -->
-<section class="section">
-<h2><i class="fa-solid fa-envelope"></i> Inquiries</h2>
-<table><thead>
-<tr><th>Name</th><th>Subject</th><th>Status</th></tr>
-</thead><tbody id="inquiryTable"></tbody></table>
-</section>
+      <!-- Overview -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-chart-line"></i> Home Dashboard</h2>
+          <span class="pill"><i class="fa-solid fa-bolt"></i> Live</span>
+        </div>
+        <div class="card-body">
+          <div class="stats">
+            <div class="stat">
+              <div class="label">Claims requiring attention</div>
+              <div class="value accent-orange" id="statClaims">—</div>
+              <div class="hint">Based on status contains “pending/new”.</div>
+            </div>
+            <div class="stat">
+              <div class="label">Donations requiring attention</div>
+              <div class="value accent-blue" id="statDonations">—</div>
+              <div class="hint">Based on status contains “pending/new”.</div>
+            </div>
+            <div class="stat">
+              <div class="label">Volunteer applications to review</div>
+              <div class="value accent-green" id="statVolunteers">—</div>
+              <div class="hint">Based on status contains “pending/new”.</div>
+            </div>
+            <div class="stat">
+              <div class="label">Unread inquiries</div>
+              <div class="value accent-red" id="statInquiries">—</div>
+              <div class="hint">Based on status contains “unread/new”.</div>
+            </div>
+          </div>
 
-<!-- INVENTORY -->
-<section class="section">
-<h2><i class="fa-solid fa-boxes-stacked"></i> Inventory</h2>
-<table><thead>
-<tr><th>Item</th><th>Location</th><th>Qty</th><th>Available</th></tr>
-</thead><tbody id="inventoryTable"></tbody></table>
-</section>
+          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span class="pill"><i class="fa-solid fa-database"></i> Supabase Connected</span>
+            <span class="pill"><i class="fa-solid fa-lock"></i> Role: Admin (1)</span>
+            <span class="pill"><i class="fa-solid fa-layer-group"></i> Single-page Admin</span>
+          </div>
+        </div>
+      </div>
 
-<!-- USERS -->
-<section class="section">
-<h2><i class="fa-solid fa-user-gear"></i> User Management</h2>
-<table><thead>
-<tr><th>Name</th><th>Email</th><th>Role</th></tr>
-</thead><tbody id="usersTable"></tbody></table>
-</section>
+      <!-- Settings quick card -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-bullhorn"></i> Announcement</h2>
+          <button class="btn blue" onclick="loadSettings()"><i class="fa-solid fa-arrows-rotate"></i> Load</button>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label>Settings key: <span class="mono">announcement</span></label>
+            <textarea id="announcementInput" placeholder="Write the homepage announcement here…"></textarea>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;">
+            <button class="btn primary" onclick="saveAnnouncement()"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button class="btn" onclick="clearAnnouncement()"><i class="fa-solid fa-eraser"></i> Clear</button>
+          </div>
+          <div class="muted" style="margin-top:10px; font-size:0.9rem;">
+            This updates the <span class="mono">settings</span> table (<span class="mono">key/value</span>).
+          </div>
+        </div>
+      </div>
 
-<!-- TASKS -->
-<section class="section">
-<h2><i class="fa-solid fa-list-check"></i> Assign Task</h2>
-<div class="form-row">
-<input id="taskTitle" placeholder="Title">
-<input id="taskPriority" placeholder="Priority">
-<select id="taskUser"></select>
-</div>
-<textarea id="taskDesc" placeholder="Description"></textarea><br><br>
-<button class="btn approve" onclick="createTask()">Create Task</button>
-</section>
+    </div>
 
-<!-- SETTINGS -->
-<section class="section">
-<h2><i class="fa-solid fa-gear"></i> Settings</h2>
-<input id="announcement"><br><br>
-<button class="btn edit" onclick="saveSetting()">Save</button>
-</section>
+    <!-- Claims -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-truck"></i> Claims Review</h2>
+        <div class="left-controls">
+          <div class="field" style="min-width:260px;">
+            <label>Search</label>
+            <input id="claimsSearch" placeholder="Name, email, method, status, listing_id…" oninput="renderClaims()" />
+          </div>
+          <button class="btn" onclick="loadClaims()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Claim ID</th>
+                <th>Listing ID</th>
+                <th>Claimer</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Claimed</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="claimsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-</main>
+    <!-- Donations -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-hand-holding-heart"></i> Donations</h2>
+        <div class="left-controls">
+          <div class="field" style="min-width:260px;">
+            <label>Search</label>
+            <input id="donationsSearch" placeholder="Donor, email, island, status, food type…" oninput="renderDonations()" />
+          </div>
+          <button class="btn" onclick="loadDonations()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Donor</th>
+                <th>Food Type</th>
+                <th>Qty (kg)</th>
+                <th>Island</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="donationsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volunteer Apps -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-users"></i> Volunteer Applications</h2>
+        <div class="left-controls">
+          <div class="field" style="min-width:260px;">
+            <label>Search</label>
+            <input id="volSearch" placeholder="Name, email, island, skills, status…" oninput="renderVolunteerApps()" />
+          </div>
+          <button class="btn" onclick="loadVolunteerApps()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Application ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Island</th>
+                <th>Transport</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="volTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inquiries -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-envelope"></i> Inquiries</h2>
+        <div class="left-controls">
+          <div class="field" style="min-width:260px;">
+            <label>Search</label>
+            <input id="inqSearch" placeholder="Sender, email, subject, status…" oninput="renderInquiries()" />
+          </div>
+          <button class="btn" onclick="loadInquiries()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Inquiry ID</th>
+                <th>Sender</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Received</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inqTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-boxes-stacked"></i> Inventory (Food Listings)</h2>
+        <div class="left-controls">
+          <div class="field" style="min-width:260px;">
+            <label>Search</label>
+            <input id="invSearch" placeholder="Title, location, availability…" oninput="renderInventory()" />
+          </div>
+          <button class="btn" onclick="loadInventory()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <div class="card" style="background: rgba(255,255,255,0.02); box-shadow:none; margin-bottom:14px;">
+          <div class="card-header">
+            <h2 style="font-size:0.98rem;"><i class="fa-solid fa-plus"></i> Add New Listing</h2>
+            <span class="pill"><i class="fa-solid fa-circle-check"></i> CRUD Enabled</span>
+          </div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field">
+                <label>Title</label>
+                <input id="newTitle" placeholder="e.g., Fresh Bread" />
+              </div>
+              <div class="field">
+                <label>Location</label>
+                <input id="newLocation" placeholder="e.g., Victoria" />
+              </div>
+              <div class="field">
+                <label>Quantity</label>
+                <input id="newQuantity" type="number" step="1" placeholder="e.g., 10" />
+              </div>
+              <div class="field">
+                <label>Available</label>
+                <select id="newAvailable">
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </div>
+            </div>
+            <div class="field" style="margin-top:12px;">
+              <label>Description</label>
+              <textarea id="newDescription" placeholder="Short description…"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:12px;">
+              <button class="btn primary" onclick="createListing()"><i class="fa-solid fa-plus"></i> Create Listing</button>
+              <button class="btn" onclick="clearNewListing()"><i class="fa-solid fa-eraser"></i> Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Listing ID</th>
+                <th>Title</th>
+                <th>Location</th>
+                <th>Quantity</th>
+                <th>Available</th>
+                <th>Posted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invTbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Users + Assign Tasks -->
+    <div class="grid" style="margin-top:16px;">
+
+      <!-- Users -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-user-gear"></i> User Management</h2>
+          <div class="left-controls">
+            <div class="field" style="min-width:260px;">
+              <label>Search</label>
+              <input id="usersSearch" placeholder="Name, email, role…" oninput="renderUsers()" />
+            </div>
+            <button class="btn" onclick="loadUsers()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table style="min-width: 800px;">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Change Role</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+          <div class="muted" style="margin-top:10px; font-size:0.9rem;">
+            Roles: 1 = Admin, 2 = Staff/Driver, 3 = Volunteer Coordinator
+          </div>
+        </div>
+      </div>
+
+      <!-- Assign Tasks -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-list-check"></i> Assign Task</h2>
+          <button class="btn" onclick="loadUsers()"><i class="fa-solid fa-user-group"></i> Reload Staff</button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>Assign To (Staff)</label>
+              <select id="taskAssignTo"></select>
+            </div>
+            <div class="field">
+              <label>Priority</label>
+              <input id="taskPriority" placeholder="e.g., High / Medium / Low" />
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="taskStatus">
+                <option value="Assigned">Assigned</option>
+                <option value="InProgress">InProgress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Title</label>
+              <input id="taskTitle" placeholder="Task title…" />
+            </div>
+          </div>
+          <div class="field" style="margin-top:12px;">
+            <label>Description</label>
+            <textarea id="taskDescription" placeholder="Task details…"></textarea>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;">
+            <button class="btn primary" onclick="createTask()"><i class="fa-solid fa-paper-plane"></i> Create & Assign</button>
+            <button class="btn" onclick="clearTaskForm()"><i class="fa-solid fa-eraser"></i> Clear</button>
+          </div>
+
+          <div style="margin-top:14px; border-top: 1px solid var(--border); padding-top:14px;">
+            <div class="muted" style="font-weight:700; margin-bottom:8px;">
+              Recent tasks (latest 15)
+            </div>
+            <div class="table-wrap">
+              <table style="min-width: 820px;">
+                <thead>
+                  <tr>
+                    <th>Task ID</th>
+                    <th>Assigned To</th>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 
 <script>
-const supabase=window.supabase.createClient(
-'https://edotvuleaydztulkxehe.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw'
-);
+  // ========= CONFIG =========
+  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
 
-(async()=>{
-const s=await supabase.auth.getSession();
-if(!s.data.session)location='/staff-login/index.html';
-const p=await supabase.from('profiles').select('role').eq('id',s.data.session.user.id).single();
-if(p.data.role!==1)location='/staff/dashboard.html';
-loadAll();
-})();
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-async function loadAll(){
-loadStats();loadClaims();loadDonations();loadVolunteers();
-loadInquiries();loadInventory();loadUsers();loadSettings();
-}
+  // ========= STATE =========
+  let sessionUser = null;
 
-async function loadStats(){
-cClaims.innerText=(await supabase.from('claims').select('*',{count:'exact',head:true})).count;
-cDonations.innerText=(await supabase.from('donations').select('*',{count:'exact',head:true})).count;
-cVolunteers.innerText=(await supabase.from('volunteer_applications').select('*',{count:'exact',head:true})).count;
-cInquiries.innerText=(await supabase.from('inquiries').select('*',{count:'exact',head:true})).count;
-}
+  let claimsData = [];
+  let donationsData = [];
+  let volunteerData = [];
+  let inquiriesData = [];
+  let inventoryData = [];
+  let usersData = [];
+  let tasksData = [];
 
-async function loadClaims(){
-const {data}=await supabase.from('claims').select('*');
-claimsTable.innerHTML=data.map(c=>`
-<tr>
-<td>${c.claimer_name}</td>
-<td>${c.method}</td>
-<td>${c.status}</td>
-<td>
-<button class="btn approve" onclick="updateClaim('${c.id}','Approved')">Approve</button>
-<button class="btn reject" onclick="updateClaim('${c.id}','Rejected')">Reject</button>
-</td></tr>`).join('');
-}
-async function updateClaim(id,status){
-await supabase.from('claims').update({status}).eq('id',id);loadClaims();
-}
+  // ========= UTIL =========
+  const $ = (id) => document.getElementById(id);
 
-async function loadDonations(){
-const {data}=await supabase.from('donations').select('*');
-donationsTable.innerHTML=data.map(d=>`
-<tr><td>${d.donor_name}</td><td>${d.food_type}</td><td>${d.quantity_kg}</td><td>${d.status}</td></tr>`).join('');
-}
+  function showToast(title, msg){
+    $('toastTitle').textContent = title || 'Info';
+    $('toastMsg').textContent = msg || '';
+    const t = $('toast');
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3600);
+  }
 
-async function loadVolunteers(){
-const {data}=await supabase.from('volunteer_applications').select('*');
-volunteerTable.innerHTML=data.map(v=>`
-<tr><td>${v.full_name}</td><td>${v.email}</td><td>${v.application_status}</td>
-<td>
-<button class="btn approve" onclick="updateVolunteer('${v.id}','Approved')">Approve</button>
-<button class="btn reject" onclick="updateVolunteer('${v.id}','Rejected')">Reject</button>
-</td></tr>`).join('');
-}
-async function updateVolunteer(id,status){
-await supabase.from('volunteer_applications').update({application_status:status}).eq('id',id);loadVolunteers();
-}
+  function escapeHtml(v){
+    const s = (v ?? '').toString();
+    return s.replace(/[&<>"']/g, (c) => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
 
-async function loadInquiries(){
-const {data}=await supabase.from('inquiries').select('*');
-inquiryTable.innerHTML=data.map(i=>`
-<tr><td>${i.sender_name}</td><td>${i.subject}</td><td>${i.status}</td></tr>`).join('');
-}
+  function fmtDate(v){
+    if(!v) return '—';
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return escapeHtml(String(v));
+    return d.toLocaleString();
+  }
 
-async function loadInventory(){
-const {data}=await supabase.from('food_listings').select('*');
-inventoryTable.innerHTML=data.map(i=>`
-<tr><td>${i.title}</td><td>${i.location}</td><td>${i.quantity}</td><td>${i.is_available}</td></tr>`).join('');
-}
+  function statusClass(v){
+    const s = (v ?? '').toString().toLowerCase();
+    if (s.includes('unread') || s.includes('new')) return 'tag s-new';
+    if (s.includes('pending')) return 'tag s-pending';
+    if (s.includes('approved') || s.includes('accept')) return 'tag s-approved';
+    if (s.includes('reject') || s.includes('declin')) return 'tag s-rejected';
+    if (s.includes('read') || s.includes('done') || s.includes('complete')) return 'tag s-read';
+    return 'tag';
+  }
 
-async function loadUsers(){
-const {data}=await supabase.from('profiles').select('*');
-usersTable.innerHTML=data.map(u=>`
-<tr><td>${u.full_name}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
-taskUser.innerHTML=data.map(u=>`<option value="${u.id}">${u.full_name}</option>`).join('');
-}
+  function buildKV(obj, preferredOrder){
+    const entries = [];
+    const keys = preferredOrder?.length ? preferredOrder : Object.keys(obj || {});
+    keys.forEach(k => {
+      if (obj && Object.prototype.hasOwnProperty.call(obj, k)){
+        entries.push({k, v: obj[k]});
+      }
+    });
 
-async function createTask(){
-await supabase.from('tasks').insert({
-title:taskTitle.value,
-description:taskDesc.value,
-priority:taskPriority.value,
-assigned_to:taskUser.value,
-status:'Assigned'
-});
-alert('Task created');
-}
+    // add remaining keys
+    if (obj){
+      Object.keys(obj).forEach(k => {
+        if (!keys.includes(k)) entries.push({k, v: obj[k]});
+      });
+    }
 
-async function loadSettings(){
-const {data}=await supabase.from('settings').select('*').eq('key','announcement').single();
-announcement.value=data?.value||'';
-}
+    return entries.map(e => `
+      <div class="kv">
+        <div class="k">${escapeHtml(e.k)}</div>
+        <div class="v">${escapeHtml(e.v ?? '—')}</div>
+      </div>
+    `).join('');
+  }
 
-async function saveSetting(){
-await supabase.from('settings').update({value:announcement.value}).eq('key','announcement');
-alert('Saved');
-}
+  // ========= MODAL =========
+  function openModal(title, bodyHtml, footHtml){
+    $('modalTitle').textContent = title || 'Details';
+    $('modalBody').innerHTML = bodyHtml || '';
+    $('modalFoot').innerHTML = footHtml || `<button class="btn" onclick="hideModal()">Close</button>`;
+    $('modalOverlay').style.display = 'flex';
+  }
+  function hideModal(){
+    $('modalOverlay').style.display = 'none';
+  }
+  function closeModal(e){
+    if(e.target.id === 'modalOverlay') hideModal();
+  }
 
-async function logout(){
-await supabase.auth.signOut();
-location='/staff-login/index.html';
-}
+  // ========= AUTH GUARD =========
+  async function init(){
+    const { data: sData, error: sErr } = await supabase.auth.getSession();
+    if (sErr){
+      showToast('Auth error', sErr.message);
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
+    if (!sData.session){
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
+    sessionUser = sData.session.user;
+
+    // profiles has BOTH role_id and role in your screenshot.
+    // We'll accept either, prioritizing role.
+    const { data: profile, error: pErr } = await supabase
+      .from('profiles')
+      .select('full_name, email, role, role_id')
+      .eq('id', sessionUser.id)
+      .single();
+
+    if (pErr || !profile){
+      await supabase.auth.signOut();
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
+
+    const roleValue = (profile.role ?? profile.role_id);
+    if (roleValue !== 1){
+      // Not admin -> send to staff dashboard
+      window.location.href = '/staff/dashboard.html';
+      return;
+    }
+
+    $('adminName').textContent = profile.full_name || 'Admin';
+    $('loading').style.display = 'none';
+
+    // Load everything
+    await refreshAll();
+  }
+
+  async function logout(){
+    await supabase.auth.signOut();
+    window.location.href = '/staff-login/index.html';
+  }
+
+  // ========= REFRESH =========
+  async function refreshAll(){
+    // Load in parallel for speed
+    await Promise.allSettled([
+      loadSettings(),
+      loadClaims(),
+      loadDonations(),
+      loadVolunteerApps(),
+      loadInquiries(),
+      loadInventory(),
+      loadUsers(),
+      loadTasks()
+    ]);
+    computeStats();
+  }
+
+  // ========= STATS (best-effort, robust to unknown enums) =========
+  function attentionCount(rows, fieldName){
+    const list = rows || [];
+    let count = 0;
+    for (const r of list){
+      const v = (r?.[fieldName] ?? '').toString().toLowerCase();
+      if (v.includes('pending') || v.includes('new') || v.includes('unread')) count++;
+    }
+    return count;
+  }
+
+  function computeStats(){
+    $('statClaims').textContent = attentionCount(claimsData, 'status');
+    $('statDonations').textContent = attentionCount(donationsData, 'status');
+    $('statVolunteers').textContent = attentionCount(volunteerData, 'application_status');
+    $('statInquiries').textContent = attentionCount(inquiriesData, 'status');
+  }
+
+  // ========= CLAIMS =========
+  async function loadClaims(){
+    const { data, error } = await supabase
+      .from('claims')
+      .select('id, listing_id, claimer_name, claimer_email, claimer_phone, method, transport_address, status, claimed_at, delivery_latitude, delivery_longitude, contact_preference')
+      .order('claimed_at', { ascending: false });
+
+    if (error){
+      showToast('Claims load failed', error.message);
+      claimsData = [];
+      renderClaims();
+      return;
+    }
+    claimsData = data || [];
+    renderClaims();
+    computeStats();
+  }
+
+  function renderClaims(){
+    const q = $('claimsSearch').value?.trim().toLowerCase() || '';
+    const rows = claimsData.filter(r => {
+      const blob = [
+        r.id, r.listing_id, r.claimer_name, r.claimer_email, r.method, r.status, r.transport_address
+      ].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('claimsTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No claims found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.id)}</td>
+        <td class="mono">${escapeHtml(r.listing_id)}</td>
+        <td>
+          <div style="font-weight:800;">${escapeHtml(r.claimer_name || '—')}</div>
+          <div class="muted">${escapeHtml(r.claimer_email || '—')} · ${escapeHtml(r.claimer_phone || '—')}</div>
+        </td>
+        <td>${escapeHtml(r.method || '—')}</td>
+        <td><span class="${statusClass(r.status)}">${escapeHtml(r.status || '—')}</span></td>
+        <td>${fmtDate(r.claimed_at)}</td>
+        <td>
+          <button class="btn blue" onclick='viewClaim(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn orange" onclick="promptClaimStatus('${escapeHtml(r.id)}','${escapeHtml(r.status || '')}')"><i class="fa-solid fa-pen"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewClaim(r){
+    const body = buildKV(r, [
+      'id','listing_id','claimer_name','claimer_email','claimer_phone','method','status',
+      'transport_address','contact_preference','claimed_at','delivery_latitude','delivery_longitude'
+    ]);
+
+    const foot = `
+      <button class="btn" onclick="hideModal()">Close</button>
+      <button class="btn orange" onclick="promptClaimStatus('${escapeHtml(r.id)}','${escapeHtml(r.status || '')}')">
+        <i class="fa-solid fa-pen"></i> Update Status
+      </button>
+    `;
+    openModal('Claim Details', body, foot);
+  }
+
+  function promptClaimStatus(id, current){
+    const existing = Array.from(new Set(claimsData.map(x => x.status).filter(Boolean))).slice(0, 30);
+    const suggestions = existing.length ? existing : ['Pending','Approved','Rejected','Completed'];
+
+    const opts = suggestions.map(s => `
+      <option value="${escapeHtml(s)}" ${s === current ? 'selected' : ''}>${escapeHtml(s)}</option>
+    `).join('');
+
+    const body = `
+      <div class="field">
+        <label>Update claim status</label>
+        <select id="claimStatusSelect">${opts}</select>
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        Status options are inferred from your database values (to avoid enum mismatch).
+      </div>
+    `;
+
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn primary" onclick="updateClaimStatus('${id}')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    `;
+    openModal('Update Claim Status', body, foot);
+  }
+
+  async function updateClaimStatus(id){
+    const newStatus = $('claimStatusSelect').value;
+    const { error } = await supabase.from('claims').update({ status: newStatus }).eq('id', id);
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+    showToast('Claim updated', `Status set to "${newStatus}".`);
+    hideModal();
+    await loadClaims();
+  }
+
+  // ========= DONATIONS =========
+  async function loadDonations(){
+    const { data, error } = await supabase
+      .from('donations')
+      .select('id, donor_name, donor_email, donor_phone, status, created_at, food_type, quantity_kg, expiry_date, storage_type, description, pickup_address, pickup_island, preferred_pickup_time, pickup_coordinates, old_items_donated_t')
+      .order('created_at', { ascending: false });
+
+    if (error){
+      showToast('Donations load failed', error.message);
+      donationsData = [];
+      renderDonations();
+      return;
+    }
+    donationsData = data || [];
+    renderDonations();
+    computeStats();
+  }
+
+  function renderDonations(){
+    const q = $('donationsSearch').value?.trim().toLowerCase() || '';
+    const rows = donationsData.filter(r => {
+      const blob = [
+        r.id, r.donor_name, r.donor_email, r.pickup_island, r.status, r.food_type, r.pickup_address
+      ].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('donationsTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="9" class="muted">No donations found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.id)}</td>
+        <td>
+          <div style="font-weight:800;">${escapeHtml(r.donor_name || '—')}</div>
+          <div class="muted">${escapeHtml(r.donor_email || '—')} · ${escapeHtml(r.donor_phone || '—')}</div>
+        </td>
+        <td>${escapeHtml(r.food_type || '—')}</td>
+        <td>${escapeHtml(r.quantity_kg ?? '—')}</td>
+        <td>${escapeHtml(r.pickup_island || '—')}</td>
+        <td>${escapeHtml(r.expiry_date || '—')}</td>
+        <td><span class="${statusClass(r.status)}">${escapeHtml(r.status || '—')}</span></td>
+        <td>${fmtDate(r.created_at)}</td>
+        <td>
+          <button class="btn blue" onclick='viewDonation(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn orange" onclick="promptDonationStatus('${escapeHtml(r.id)}','${escapeHtml(r.status || '')}')"><i class="fa-solid fa-pen"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewDonation(r){
+    const body = buildKV(r, [
+      'id','donor_name','donor_email','donor_phone','food_type','quantity_kg','expiry_date','storage_type',
+      'pickup_island','pickup_address','preferred_pickup_time','pickup_coordinates','status','created_at','description','old_items_donated_t'
+    ]);
+
+    const foot = `
+      <button class="btn" onclick="hideModal()">Close</button>
+      <button class="btn orange" onclick="promptDonationStatus('${escapeHtml(r.id)}','${escapeHtml(r.status || '')}')">
+        <i class="fa-solid fa-pen"></i> Update Status
+      </button>
+    `;
+    openModal('Donation Details', body, foot);
+  }
+
+  function promptDonationStatus(id, current){
+    const existing = Array.from(new Set(donationsData.map(x => x.status).filter(Boolean))).slice(0, 30);
+    const suggestions = existing.length ? existing : ['New','Pending','Approved','Completed','Rejected'];
+
+    const opts = suggestions.map(s => `
+      <option value="${escapeHtml(s)}" ${s === current ? 'selected' : ''}>${escapeHtml(s)}</option>
+    `).join('');
+
+    const body = `
+      <div class="field">
+        <label>Update donation status</label>
+        <select id="donationStatusSelect">${opts}</select>
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        Status options inferred from your existing database values.
+      </div>
+    `;
+
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn primary" onclick="updateDonationStatus('${id}')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    `;
+    openModal('Update Donation Status', body, foot);
+  }
+
+  async function updateDonationStatus(id){
+    const newStatus = $('donationStatusSelect').value;
+    const { error } = await supabase.from('donations').update({ status: newStatus }).eq('id', id);
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+    showToast('Donation updated', `Status set to "${newStatus}".`);
+    hideModal();
+    await loadDonations();
+  }
+
+  // ========= VOLUNTEER APPS =========
+  async function loadVolunteerApps(){
+    const { data, error } = await supabase
+      .from('volunteer_applications')
+      .select('id, full_name, email, phone, area_of_interest, submitted_at, application_status, available_hours, location_island, reason_for_joining, skills, transport_access')
+      .order('submitted_at', { ascending: false });
+
+    if (error){
+      showToast('Volunteer apps load failed', error.message);
+      volunteerData = [];
+      renderVolunteerApps();
+      return;
+    }
+    volunteerData = data || [];
+    renderVolunteerApps();
+    computeStats();
+  }
+
+  function renderVolunteerApps(){
+    const q = $('volSearch').value?.trim().toLowerCase() || '';
+    const rows = volunteerData.filter(r => {
+      const blob = [
+        r.id, r.full_name, r.email, r.phone, r.location_island, r.skills, r.application_status, r.area_of_interest
+      ].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('volTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="9" class="muted">No applications found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.id)}</td>
+        <td style="font-weight:800;">${escapeHtml(r.full_name || '—')}</td>
+        <td>${escapeHtml(r.email || '—')}</td>
+        <td>${escapeHtml(r.phone || '—')}</td>
+        <td>${escapeHtml(r.location_island || '—')}</td>
+        <td>${escapeHtml(r.transport_access ? 'Yes' : 'No')}</td>
+        <td><span class="${statusClass(r.application_status)}">${escapeHtml(r.application_status || '—')}</span></td>
+        <td>${fmtDate(r.submitted_at)}</td>
+        <td>
+          <button class="btn blue" onclick='viewVolunteer(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn primary" onclick="quickVolunteerStatus('${escapeHtml(r.id)}','Approved')"><i class="fa-solid fa-check"></i></button>
+          <button class="btn red" onclick="quickVolunteerStatus('${escapeHtml(r.id)}','Rejected')"><i class="fa-solid fa-xmark"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewVolunteer(r){
+    const body = buildKV(r, [
+      'id','full_name','email','phone','location_island','area_of_interest','skills',
+      'available_hours','transport_access','application_status','submitted_at','reason_for_joining'
+    ]);
+
+    const existing = Array.from(new Set(volunteerData.map(x => x.application_status).filter(Boolean))).slice(0, 30);
+    const suggestions = existing.length ? existing : ['New','Pending','Approved','Rejected'];
+
+    const opts = suggestions.map(s => `
+      <option value="${escapeHtml(s)}" ${s === r.application_status ? 'selected' : ''}>${escapeHtml(s)}</option>
+    `).join('');
+
+    const foot = `
+      <select id="volStatusSelect" style="max-width:260px;">
+        ${opts}
+      </select>
+      <button class="btn" onclick="hideModal()">Close</button>
+      <button class="btn primary" onclick="updateVolunteerStatus('${escapeHtml(r.id)}')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    `;
+    openModal('Volunteer Application Details', body, foot);
+  }
+
+  async function quickVolunteerStatus(id, status){
+    const { error } = await supabase.from('volunteer_applications').update({ application_status: status }).eq('id', id);
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+    showToast('Updated', `Volunteer application set to "${status}".`);
+    await loadVolunteerApps();
+  }
+
+  async function updateVolunteerStatus(id){
+    const newStatus = $('volStatusSelect').value;
+    const { error } = await supabase.from('volunteer_applications').update({ application_status: newStatus }).eq('id', id);
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+    showToast('Updated', `Volunteer application set to "${newStatus}".`);
+    hideModal();
+    await loadVolunteerApps();
+  }
+
+  // ========= INQUIRIES =========
+  async function loadInquiries(){
+    const { data, error } = await supabase
+      .from('inquiries')
+      .select('id, sender_name, sender_email, subject, message, status, received_at')
+      .order('received_at', { ascending: false });
+
+    if (error){
+      showToast('Inquiries load failed', error.message);
+      inquiriesData = [];
+      renderInquiries();
+      return;
+    }
+    inquiriesData = data || [];
+    renderInquiries();
+    computeStats();
+  }
+
+  function renderInquiries(){
+    const q = $('inqSearch').value?.trim().toLowerCase() || '';
+    const rows = inquiriesData.filter(r => {
+      const blob = [
+        r.id, r.sender_name, r.sender_email, r.subject, r.status
+      ].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('inqTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No inquiries found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.id)}</td>
+        <td style="font-weight:800;">${escapeHtml(r.sender_name || '—')}</td>
+        <td>${escapeHtml(r.sender_email || '—')}</td>
+        <td>${escapeHtml(r.subject || '—')}</td>
+        <td><span class="${statusClass(r.status)}">${escapeHtml(r.status || '—')}</span></td>
+        <td>${fmtDate(r.received_at)}</td>
+        <td>
+          <button class="btn blue" onclick='viewInquiry(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn primary" onclick="markInquiryRead('${escapeHtml(r.id)}')"><i class="fa-solid fa-check"></i> Mark Read</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewInquiry(r){
+    const body = buildKV(r, ['id','sender_name','sender_email','subject','status','received_at','message']);
+    const foot = `
+      <button class="btn" onclick="hideModal()">Close</button>
+      <button class="btn primary" onclick="markInquiryRead('${escapeHtml(r.id)}')"><i class="fa-solid fa-check"></i> Mark Read</button>
+    `;
+    openModal('Inquiry Details', body, foot);
+  }
+
+  async function markInquiryRead(id){
+    // Use best-effort: set to "Read". If enum differs, Supabase returns an error which we surface.
+    const { error } = await supabase.from('inquiries').update({ status: 'Read' }).eq('id', id);
+    if (error){
+      showToast('Mark read failed', error.message);
+      return;
+    }
+    showToast('Inquiry updated', 'Status set to "Read".');
+    hideModal();
+    await loadInquiries();
+  }
+
+  // ========= INVENTORY (CRUD) =========
+  async function loadInventory(){
+    const { data, error } = await supabase
+      .from('food_listings')
+      .select('id, title, description, location, quantity, is_available, posted_at')
+      .order('posted_at', { ascending: false });
+
+    if (error){
+      showToast('Inventory load failed', error.message);
+      inventoryData = [];
+      renderInventory();
+      return;
+    }
+    inventoryData = data || [];
+    renderInventory();
+  }
+
+  function renderInventory(){
+    const q = $('invSearch').value?.trim().toLowerCase() || '';
+    const rows = inventoryData.filter(r => {
+      const blob = [
+        r.id, r.title, r.location, r.quantity, r.is_available
+      ].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('invTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No listings found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.id)}</td>
+        <td>
+          <div style="font-weight:800;">${escapeHtml(r.title || '—')}</div>
+          <div class="muted">${escapeHtml((r.description || '').slice(0, 60))}${(r.description || '').length > 60 ? '…' : ''}</div>
+        </td>
+        <td>${escapeHtml(r.location || '—')}</td>
+        <td>${escapeHtml(r.quantity ?? '—')}</td>
+        <td><span class="tag ${r.is_available ? 's-approved' : 's-rejected'}">${r.is_available ? 'true' : 'false'}</span></td>
+        <td>${fmtDate(r.posted_at)}</td>
+        <td>
+          <button class="btn blue" onclick='editListing(${JSON.stringify(r).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen"></i></button>
+          <button class="btn red" onclick="deleteListingConfirm('${escapeHtml(r.id)}','${escapeHtml(r.title || '')}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function clearNewListing(){
+    $('newTitle').value = '';
+    $('newLocation').value = '';
+    $('newQuantity').value = '';
+    $('newAvailable').value = 'true';
+    $('newDescription').value = '';
+  }
+
+  async function createListing(){
+    const title = $('newTitle').value.trim();
+    const location = $('newLocation').value.trim();
+    const quantityRaw = $('newQuantity').value;
+    const description = $('newDescription').value.trim();
+    const is_available = $('newAvailable').value === 'true';
+
+    if (!title || !location){
+      showToast('Missing fields', 'Title and Location are required.');
+      return;
+    }
+
+    const quantity = quantityRaw === '' ? null : Number(quantityRaw);
+    if (quantityRaw !== '' && Number.isNaN(quantity)){
+      showToast('Invalid quantity', 'Quantity must be a number.');
+      return;
+    }
+
+    const payload = { title, location, description, is_available };
+    if (quantity !== null) payload.quantity = quantity;
+
+    const { error } = await supabase.from('food_listings').insert(payload);
+    if (error){
+      showToast('Create failed', error.message);
+      return;
+    }
+
+    showToast('Listing created', title);
+    clearNewListing();
+    await loadInventory();
+  }
+
+  function editListing(r){
+    const body = `
+      ${buildKV(r, ['id'])}
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="field">
+          <label>Title</label>
+          <input id="editTitle" value="${escapeHtml(r.title || '')}">
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input id="editLocation" value="${escapeHtml(r.location || '')}">
+        </div>
+        <div class="field">
+          <label>Quantity</label>
+          <input id="editQuantity" type="number" step="1" value="${escapeHtml(r.quantity ?? '')}">
+        </div>
+        <div class="field">
+          <label>Available</label>
+          <select id="editAvailable">
+            <option value="true" ${r.is_available ? 'selected' : ''}>true</option>
+            <option value="false" ${!r.is_available ? 'selected' : ''}>false</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-top:12px;">
+        <label>Description</label>
+        <textarea id="editDescription">${escapeHtml(r.description || '')}</textarea>
+      </div>
+    `;
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn primary" onclick="saveListing('${escapeHtml(r.id)}')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    `;
+    openModal('Edit Food Listing', body, foot);
+  }
+
+  async function saveListing(id){
+    const title = $('editTitle').value.trim();
+    const location = $('editLocation').value.trim();
+    const quantityRaw = $('editQuantity').value;
+    const description = $('editDescription').value.trim();
+    const is_available = $('editAvailable').value === 'true';
+
+    if (!title || !location){
+      showToast('Missing fields', 'Title and Location are required.');
+      return;
+    }
+
+    const quantity = quantityRaw === '' ? null : Number(quantityRaw);
+    if (quantityRaw !== '' && Number.isNaN(quantity)){
+      showToast('Invalid quantity', 'Quantity must be a number.');
+      return;
+    }
+
+    const payload = { title, location, description, is_available };
+    if (quantity !== null) payload.quantity = quantity;
+
+    const { error } = await supabase.from('food_listings').update(payload).eq('id', id);
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+
+    showToast('Listing updated', title);
+    hideModal();
+    await loadInventory();
+  }
+
+  function deleteListingConfirm(id, title){
+    const body = `
+      <div class="danger-text" style="font-weight:800; font-size:1.05rem;">
+        Delete this listing?
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        This will permanently remove the food listing from <span class="mono">food_listings</span>.
+      </div>
+      <div style="margin-top:12px;" class="mono">
+        ${escapeHtml(id)} ${title ? ('· ' + escapeHtml(title)) : ''}
+      </div>
+    `;
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn red" onclick="deleteListing('${escapeHtml(id)}')"><i class="fa-solid fa-trash"></i> Delete</button>
+    `;
+    openModal('Confirm Delete', body, foot);
+  }
+
+  async function deleteListing(id){
+    const { error } = await supabase.from('food_listings').delete().eq('id', id);
+    if (error){
+      showToast('Delete failed', error.message);
+      return;
+    }
+    showToast('Deleted', 'Listing removed.');
+    hideModal();
+    await loadInventory();
+  }
+
+  // ========= USERS =========
+  async function loadUsers(){
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, email, role, role_id, updated_at')
+      .order('updated_at', { ascending: false });
+
+    if (error){
+      showToast('Users load failed', error.message);
+      usersData = [];
+      renderUsers();
+      return;
+    }
+    usersData = data || [];
+    renderUsers();
+    populateTaskAssignee();
+  }
+
+  function roleLabel(r){
+    const v = (r?.role ?? r?.role_id);
+    if (v === 1) return '1 (Admin)';
+    if (v === 2) return '2 (Staff/Driver)';
+    if (v === 3) return '3 (Volunteer Coord.)';
+    return `${v ?? '—'}`;
+  }
+
+  function renderUsers(){
+    const q = $('usersSearch').value?.trim().toLowerCase() || '';
+    const rows = usersData.filter(r => {
+      const blob = [r.id, r.full_name, r.email, r.role, r.role_id].join(' ').toLowerCase();
+      return blob.includes(q);
+    });
+
+    const tbody = $('usersTbody');
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="5" class="muted">No users found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(u => {
+      const current = (u.role ?? u.role_id);
+      return `
+      <tr>
+        <td class="mono">${escapeHtml(u.id)}</td>
+        <td style="font-weight:800;">${escapeHtml(u.full_name || '—')}</td>
+        <td>${escapeHtml(u.email || '—')}</td>
+        <td><span class="tag">${escapeHtml(roleLabel(u))}</span></td>
+        <td>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="roleSel_${u.id}" style="max-width:220px;">
+              <option value="1" ${current===1?'selected':''}>1 Admin</option>
+              <option value="2" ${current===2?'selected':''}>2 Staff/Driver</option>
+              <option value="3" ${current===3?'selected':''}>3 Volunteer Coordinator</option>
+            </select>
+            <button class="btn primary" onclick="updateUserRole('${escapeHtml(u.id)}')"><i class="fa-solid fa-floppy-disk"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function updateUserRole(userId){
+    const sel = document.getElementById(`roleSel_${userId}`);
+    const newRole = Number(sel.value);
+
+    // We update BOTH columns if present, to avoid mismatch in your schema.
+    // If one column doesn't exist or is protected, Supabase will error and we show it.
+    const payload = { role: newRole, role_id: newRole };
+
+    const { error } = await supabase.from('profiles').update(payload).eq('id', userId);
+    if (error){
+      showToast('Role update failed', error.message);
+      return;
+    }
+    showToast('Role updated', `User role set to ${newRole}.`);
+    await loadUsers();
+  }
+
+  function populateTaskAssignee(){
+    const staff = usersData.filter(u => {
+      const r = (u.role ?? u.role_id);
+      return r === 2 || r === 3;
+    });
+
+    const sel = $('taskAssignTo');
+    sel.innerHTML = staff.map(u => `
+      <option value="${escapeHtml(u.id)}">${escapeHtml(u.full_name || u.email || u.id)}</option>
+    `).join('');
+
+    if (!staff.length){
+      sel.innerHTML = `<option value="">No staff found</option>`;
+    }
+  }
+
+  // ========= TASKS =========
+  async function loadTasks(){
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('id, assigned_to, title, description, status, priority, created_by, created_at')
+      .order('created_at', { ascending: false })
+      .limit(15);
+
+    if (error){
+      showToast('Tasks load failed', error.message);
+      tasksData = [];
+      renderTasks();
+      return;
+    }
+    tasksData = data || [];
+    renderTasks();
+  }
+
+  function assignedName(userId){
+    const u = usersData.find(x => x.id === userId);
+    return u ? (u.full_name || u.email || userId) : userId;
+  }
+
+  function renderTasks(){
+    const tbody = $('tasksTbody');
+    if (!tasksData.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No tasks created yet.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = tasksData.map(t => `
+      <tr>
+        <td class="mono">${escapeHtml(t.id)}</td>
+        <td>${escapeHtml(assignedName(t.assigned_to) || '—')}</td>
+        <td style="font-weight:800;">${escapeHtml(t.title || '—')}</td>
+        <td>${escapeHtml(t.priority || '—')}</td>
+        <td><span class="${statusClass(t.status)}">${escapeHtml(t.status || '—')}</span></td>
+        <td>${fmtDate(t.created_at)}</td>
+        <td>
+          <button class="btn blue" onclick='viewTask(${JSON.stringify(t).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn red" onclick="deleteTaskConfirm('${escapeHtml(t.id)}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewTask(t){
+    const body = buildKV({
+      ...t,
+      assigned_to_name: assignedName(t.assigned_to)
+    }, ['id','assigned_to','assigned_to_name','title','priority','status','created_at','created_by','description']);
+
+    const foot = `<button class="btn" onclick="hideModal()">Close</button>`;
+    openModal('Task Details', body, foot);
+  }
+
+  function clearTaskForm(){
+    $('taskTitle').value = '';
+    $('taskPriority').value = '';
+    $('taskStatus').value = 'Assigned';
+    $('taskDescription').value = '';
+  }
+
+  async function createTask(){
+    const assigned_to = $('taskAssignTo').value;
+    const title = $('taskTitle').value.trim();
+    const priority = $('taskPriority').value.trim();
+    const status = $('taskStatus').value;
+    const description = $('taskDescription').value.trim();
+
+    if (!assigned_to){
+      showToast('Missing assignee', 'Please select a staff member.');
+      return;
+    }
+    if (!title){
+      showToast('Missing title', 'Task title is required.');
+      return;
+    }
+
+    const payload = {
+      assigned_to,
+      title,
+      description,
+      priority: priority || null,
+      status,
+      created_by: sessionUser?.id || null
+    };
+
+    const { error } = await supabase.from('tasks').insert(payload);
+    if (error){
+      showToast('Task create failed', error.message);
+      return;
+    }
+
+    showToast('Task assigned', `Assigned to ${assignedName(assigned_to)}.`);
+    clearTaskForm();
+    await loadTasks();
+  }
+
+  function deleteTaskConfirm(id){
+    const body = `
+      <div class="danger-text" style="font-weight:800; font-size:1.05rem;">
+        Delete this task?
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        This removes the task from <span class="mono">tasks</span>. Staff will no longer see it.
+      </div>
+      <div style="margin-top:12px;" class="mono">${escapeHtml(id)}</div>
+    `;
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn red" onclick="deleteTask('${escapeHtml(id)}')"><i class="fa-solid fa-trash"></i> Delete</button>
+    `;
+    openModal('Confirm Delete', body, foot);
+  }
+
+  async function deleteTask(id){
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error){
+      showToast('Delete failed', error.message);
+      return;
+    }
+    showToast('Deleted', 'Task removed.');
+    hideModal();
+    await loadTasks();
+  }
+
+  // ========= SETTINGS =========
+  async function loadSettings(){
+    // Load announcement key from settings table
+    const { data, error } = await supabase.from('settings').select('id, key, value').eq('key', 'announcement').maybeSingle();
+
+    if (error){
+      showToast('Settings load failed', error.message);
+      return;
+    }
+
+    $('announcementInput').value = data?.value || '';
+  }
+
+  async function saveAnnouncement(){
+    const value = $('announcementInput').value ?? '';
+
+    // Upsert-like behavior (update if exists, else insert)
+    const existing = await supabase.from('settings').select('id').eq('key', 'announcement').maybeSingle();
+    if (existing.error){
+      showToast('Save failed', existing.error.message);
+      return;
+    }
+
+    if (existing.data?.id){
+      const { error } = await supabase.from('settings').update({ value }).eq('key', 'announcement');
+      if (error){
+        showToast('Save failed', error.message);
+        return;
+      }
+      showToast('Saved', 'Announcement updated.');
+    } else {
+      const { error } = await supabase.from('settings').insert({ key: 'announcement', value, description: 'Homepage announcement' });
+      if (error){
+        showToast('Insert failed', error.message);
+        return;
+      }
+      showToast('Saved', 'Announcement created.');
+    }
+  }
+
+  function clearAnnouncement(){
+    $('announcementInput').value = '';
+  }
+
+  // ========= BOOT =========
+  init();
 </script>
 
 </body>
