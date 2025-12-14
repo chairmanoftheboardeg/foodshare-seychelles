@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim Food (Transport Request) - FoodShare Seychelles</title>
+    
+    <link rel="icon" href="../image/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
+    
+    <style>
+        /* [START STANDARD CSS BLOCK] */
+        :root {
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        main { flex-grow: 1; padding: 40px 0; }
+        .content-container { max-width: 900px; margin: 0 auto; padding: 0 25px; }
+
+        /* Form Specific Styles */
+        .form-card {
+            background-color: var(--neutral-card); padding: 35px; border-radius: 8px;
+            box-shadow: var(--shadow-subtle); margin-top: 30px;
+        }
+        h1 { text-align: center; color: var(--accent-red); margin-bottom: 10px; }
+        h2 { font-size: 1.3em; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--accent-red); padding-bottom: 5px;}
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
+        input[type="text"], input[type="email"], input[type="tel"], textarea {
+            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 1em;
+        }
+        .submit-btn {
+            background-color: var(--accent-red); color: white; padding: 12px 25px;
+            border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
+            transition: background-color var(--transition-speed); width: 100%;
+            margin-top: 15px;
+        }
+        .submit-btn:hover { background-color: #B71C1C; }
+        
+        /* Map Styles */
+        #map { height: 400px; width: 100%; margin-bottom: 20px; border-radius: 4px; border: 2px solid var(--accent-red); }
+        
+        /* Contact Preference Radios */
+        .contact-options { display: flex; gap: 30px; margin-bottom: 20px; }
+        .contact-options div { 
+            background: var(--neutral-bg); padding: 15px; border-radius: 5px; 
+            flex-grow: 1; border: 2px solid #ddd; cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .contact-options div:has(input:checked) { 
+            border-color: var(--accent-red); 
+            background-color: #FFCDD2;
+        }
+        .contact-options label { margin-bottom: 0; cursor: pointer; }
+        .contact-options input[type="radio"] { display: none; }
+
+        /* Status Messages */
+        #statusMessage {
+            padding: 20px; border-radius: 8px; margin-top: 20px;
+            text-align: center; font-weight: bold; display: none;
+        }
+        .success { background-color: var(--primary-light); color: var(--primary-dark); }
+        .error { background-color: var(--accent-red); color: white; }
+
+        /* Item Info Header */
+        #item-info {
+            background-color: #FFCDD2; padding: 15px; border-radius: 5px;
+            color: var(--accent-red); margin-bottom: 25px; font-weight: bold;
+            text-align: center;
+        }
+        .coordinates-display { margin-bottom: 20px; font-size: 0.9em; color: var(--text-dark); }
+        /* [END STANDARD CSS BLOCK] */
+
+        /* Header and Footer (omitted for brevity - copy from /available-food/index.html) */
+    </style>
+    
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        let supabase;
+
+        let listingId = null; // Stores the ID from the URL
+        let map;              // Leaflet map object
+        let marker;           // Leaflet marker object
+
+        // Default center (Victoria, Seychelles)
+        const DEFAULT_CENTER = [-4.6203, 55.4528]; 
+
+        // Utility function to get URL parameter
+        function getUrlParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function showMessage(type, message) {
+            const msgEl = document.getElementById('statusMessage');
+            msgEl.className = type;
+            msgEl.innerHTML = message;
+            msgEl.style.display = 'block';
+        }
+        
+        // --- MAP FUNCTIONS ---
+        function initMap(center) {
+            // Check if L (Leaflet) is defined
+            if (typeof L === 'undefined') {
+                console.error("Leaflet not loaded. Cannot initialize map.");
+                setTimeout(() => initMap(center), 500); // Retry initialization
+                return;
+            }
+
+            map = L.map('map').setView(center, 13); // Zoom level 13 for Seychelles
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            marker = L.marker(center, { draggable: true }).addTo(map);
+            updateCoordinates(center);
+
+            marker.on('dragend', function(e) {
+                updateCoordinates(e.target.getLatLng());
+            });
+
+            // Optional: Locate user and set center
+            map.locate({setView: true, maxZoom: 15});
+            map.on('locationfound', function(e) {
+                map.setView(e.latlng, 15);
+                marker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng);
+            });
+            map.on('locationerror', function(e) {
+                console.warn("Geolocation failed: ", e.message);
+            });
+        }
+
+        function updateCoordinates(latlng) {
+            const lat = latlng.lat.toFixed(6);
+            const lng = latlng.lng.toFixed(6);
+            
+            document.getElementById('lat_input').value = lat;
+            document.getElementById('lng_input').value = lng;
+            document.getElementById('coords-display').textContent = `Drop-off Coordinates: Lat: ${lat}, Long: ${lng}`;
+        }
+        // --- END MAP FUNCTIONS ---
+
+
+        async function fetchListingDetails(id) {
+            const infoEl = document.getElementById('item-info');
+            
+            const { data, error } = await supabase
+                .from('food_listings')
+                .select('title')
+                .eq('id', id)
+                .single();
+
+            if (error || !data) {
+                infoEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error: Listing not found. Please go back and try again.';
+                document.getElementById('claimForm').style.display = 'none';
+                return null;
+            }
+
+            infoEl.innerHTML = `You are requesting transport for: <strong>${data.title}</strong>`;
+            return data;
+        }
+
+        async function handleClaimSubmit(event) {
+            event.preventDefault();
+            
+            if (!listingId) {
+                showMessage('error', 'Error: Item ID is missing. Cannot submit claim.');
+                return;
+            }
+
+            const formData = new FormData(event.target);
+            const name = formData.get('claimer_name');
+            const phone = formData.get('claimer_phone');
+            const email = formData.get('claimer_email');
+            const contactPref = formData.get('contact_preference');
+            const notes = formData.get('transport_notes');
+            const lat = parseFloat(formData.get('delivery_latitude'));
+            const lng = parseFloat(formData.get('delivery_longitude'));
+            
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Submitting...';
+            showMessage('error', ''); // Clear old messages
+
+            const { error } = await supabase
+                .from('claims')
+                .insert([{
+                    listing_id: listingId,
+                    claimer_name: name,
+                    claimer_phone: phone,
+                    claimer_email: email,
+                    method: 'Transport', // Fixed value for this form
+                    transport_address: notes, // Using transport_address for notes/instructions
+                    delivery_latitude: lat,   // New column
+                    delivery_longitude: lng,  // New column
+                    contact_preference: contactPref
+                }]);
+
+            if (error) {
+                console.error('Claim Submission Error:', error);
+                showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: ${error.message}. Please try again.`);
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Submit Transport Request';
+            } else {
+                showMessage('success', 
+                    `<i class="fas fa-truck-moving"></i> **Transport Request Submitted!**<br>
+                     Thank you, ${name}. Your request is being reviewed by our logistics team. 
+                     An administrator will contact you via **${contactPref}** to confirm the delivery time.`);
+                document.getElementById('claimForm').reset();
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            listingId = getUrlParam('listing_id');
+
+            if (listingId) {
+                fetchListingDetails(listingId).then(data => {
+                    // Initialize map only after DOM is fully loaded and listing is verified
+                    if (data) {
+                        // Start map centered on default Seychelles location
+                        initMap(DEFAULT_CENTER); 
+                    }
+                });
+            } else {
+                document.getElementById('item-info').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error: No food item was selected for claim.';
+                document.getElementById('claimForm').style.display = 'none';
+            }
+
+            document.getElementById('claimForm').addEventListener('submit', handleClaimSubmit);
+        });
+    </script>
+</head>
+<body>
+    <main>
+        <div class="content-container">
+            <h1>Claim Food: Transport Request</h1>
+            <p style="text-align: center; margin-bottom: 20px; color: var(--text-light);">
+                We will dispatch a team member to deliver the item. Please specify the exact drop-off point below.
+            </p>
+
+            <div id="item-info">
+                </div>
+
+            <div id="statusMessage" style="display: none;"></div>
+
+            <div class="form-card">
+                <form id="claimForm">
+                    
+                    <h2><i class="fas fa-map-marker-alt"></i> Delivery Location (Required)</h2>
+                    <p style="margin-bottom: 15px; font-size: 0.9em; color: var(--accent-red);">
+                        Drag the red marker to the precise location you want the food dropped off.
+                    </p>
+                    
+                    <div id="map"></div>
+                    <div class="coordinates-display" id="coords-display">
+                        Drop-off Coordinates: Lat: -4.6203, Long: 55.4528
+                    </div>
+
+                    <input type="hidden" id="lat_input" name="delivery_latitude">
+                    <input type="hidden" id="lng_input" name="delivery_longitude">
+                    
+                    <label for="transport_notes">Detailed Instructions / Nearest Landmark (Optional)</label>
+                    <textarea id="transport_notes" name="transport_notes" rows="3" placeholder="e.g., The house next to the large mango tree, or, Corner of 5th Ave and School Road."></textarea>
+                    
+                    
+                    <h2><i class="fas fa-user"></i> Your Contact Details</h2>
+                    
+                    <label for="claimer_name">Full Name *</label>
+                    <input type="text" id="claimer_name" name="claimer_name" required>
+
+                    <label for="claimer_phone">Phone Number *</label>
+                    <input type="tel" id="claimer_phone" name="claimer_phone" placeholder="e.g., 251-0000" required>
+                    
+                    <label for="claimer_email">Email Address</label>
+                    <input type="email" id="claimer_email" name="claimer_email" placeholder="Optional but recommended">
+                    
+                    <h2 style="margin-top: 30px;"><i class="fas fa-headset"></i> Preferred Contact Method (for Delivery Details) *</h2>
+                    <div class="contact-options">
+                        <div>
+                            <input type="radio" id="contact_phone_trans" name="contact_preference" value="Phone" required>
+                            <label for="contact_phone_trans"><i class="fas fa-phone-alt"></i> Phone Call / SMS</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="contact_email_trans" name="contact_preference" value="Email" required>
+                            <label for="contact_email_trans"><i class="fas fa-envelope"></i> Email</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="submit-btn">
+                        <i class="fas fa-check-circle"></i> Submit Transport Request
+                    </button>
+                    
+                    <p style="font-size: 0.8em; color: var(--text-light); text-align: center; margin-top: 15px;">
+                        Note: Transport requests rely on volunteer availability and may take longer than self-pickup.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    </body>
+</html>
