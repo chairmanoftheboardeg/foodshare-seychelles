@@ -5,259 +5,227 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Login - FoodShare Seychelles</title>
     <link rel="icon" href="/image/logo.png" type="image/png">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START CSS STYLES] */
+        /* [Standard CSS Block Omitted for brevity] */
         :root {
-            --primary-main: #4CAF50; /* Green */
-            --primary-dark: #388E3C; 
-            --admin-main: #1A237E; /* Deep Indigo for Staff/Admin */
-            --admin-light: #BBDEFB;
-            --neutral-bg: #F0F2F5; 
-            --neutral-card: #FFFFFF; 
-            --text-dark: #333333; 
-            --shadow-strong: 0 10px 30px rgba(0, 0, 0, 0.15);
-            --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
+            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
+            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
+            --transition-speed: 0.4s;
         }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--neutral-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: var(--text-dark);
+        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
+        a:hover { color: var(--primary-dark); }
+        main { flex-grow: 1; padding: 40px 0; display: flex; justify-content: center; align-items: center; }
+        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
+        .content-container { max-width: 450px; margin: 0 auto; padding: 0 25px; width: 100%; }
+        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
+        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
+        .logo-img { height: 40px; margin-right: 10px; } 
+        .nav-links-container { display: flex; gap: 30px; align-items: center; }
+        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
+        .nav-link:hover::after { width: 100%; }
+        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
+        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
+        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
+        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
+        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
+        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+        
+        .login-card {
+            background-color: var(--neutral-card); padding: 40px; border-radius: 10px;
+            box-shadow: var(--shadow-subtle); text-align: center;
         }
-
-        .login-container {
-            background-color: var(--neutral-card);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-strong);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+        .login-card h1 { 
+            font-size: 1.8em; 
+            margin-bottom: 25px; 
+            color: var(--primary-dark);
         }
-
-        .logo-box {
-            margin-bottom: 25px;
+        label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
+            border-radius: 5px; font-size: 1em;
         }
-        .logo-box img {
-            width: 80px; 
-            height: 80px;
-            border-radius: 50%;
-            margin-bottom: 10px;
+        .login-btn {
+            background-color: var(--primary-main);
+            color: white; padding: 12px 25px;
+            border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
+            transition: background-color var(--transition-speed); width: 100%;
+            margin-top: 15px;
         }
-        .logo-box h1 {
-            color: var(--admin-main);
-            font-size: 1.8em;
-            margin-bottom: 5px;
-        }
-        .logo-box p {
-            color: var(--primary-main);
-            font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--text-dark);
-        }
-        .input-group {
-            position: relative;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px 12px 12px 40px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        .input-group input:focus {
-            border-color: var(--admin-main);
-            outline: none;
-        }
-        .input-group i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary-main);
-        }
-
-        .btn-login {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--admin-main);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-        }
-        .btn-login:hover {
-            background-color: #283593;
-        }
-        .btn-login:active {
-            transform: scale(0.99);
-        }
+        .login-btn:hover { background-color: var(--primary-dark); }
         
         #message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            display: none;
+            padding: 10px; border-radius: 5px; margin-top: 20px;
+            text-align: center; font-weight: bold; display: none;
+            font-size: 0.9em;
         }
-        .error {
-            background-color: #fdd;
-            color: var(--accent-red); /* Assuming we have accent-red defined, if not, fallback to a dark red */
-        }
-        /* [END CSS STYLES] */
+        .success { background-color: var(--primary-light); color: var(--primary-dark); }
+        .error { background-color: #F8D7DA; color: #721C24; border: 1px solid #F5C6CB; }
+        /* [END Standard CSS Block Omitted for brevity] */
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
+        
+        const ADMIN_ROLE_ID = 1;
+        const STAFF_ROLES = [2, 3]; // Includes Coordinator and Logistics/Driver roles
 
-        // --- AUTHENTICATION HANDLERS ---
+        function showMessage(type, message) {
+            const msgEl = document.getElementById('message');
+            msgEl.className = type;
+            msgEl.innerHTML = message;
+            msgEl.style.display = 'block';
+        }
+
+        async function redirectToDashboard(userId) {
+            // Fetch the user's role
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role') // Selecting the role ID
+                .eq('id', userId)
+                .single();
+
+            if (profileError || !profileData || !profileData.role) {
+                console.error("Profile Check Error:", profileError);
+                await supabase.auth.signOut();
+                showMessage('error', `<i class="fas fa-times-circle"></i> Account Setup Error: Cannot retrieve staff role.`);
+                return;
+            }
+
+            const userRole = profileData.role;
+
+            if (userRole === ADMIN_ROLE_ID) {
+                // Role 1: Admin/Manager goes to the full Admin Dashboard
+                window.location.href = '/admin/dashboard.html';
+            } else if (STAFF_ROLES.includes(userRole)) {
+                // Roles 2 & 3: Staff/Coordinators/Drivers go to their Personal Dashboard
+                window.location.href = '/staff/dashboard.html';
+            } else {
+                // Role > 3 or unrecognized role: Deny access
+                await supabase.auth.signOut();
+                showMessage('error', `<i class="fas fa-exclamation-triangle"></i> Access Denied: Unauthorized staff role.`);
+            }
+        }
+
+        // --- Core Authentication Logic ---
         async function handleLogin(event) {
             event.preventDefault();
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const messageDiv = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
             
-            messageDiv.style.display = 'none';
-            messageDiv.classList.remove('error');
-            messageDiv.textContent = '';
-            
-            // Basic validation
-            if (!email || !password) {
-                showMessage("Please enter both email and password.", 'error');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging In...';
+            document.getElementById('message').style.display = 'none';
+
+            // 1. Authenticate with Supabase Auth
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (authError) {
+                console.error("Auth Error:", authError);
+                showMessage('error', `<i class="fas fa-times-circle"></i> Login Failed: Invalid email or password.`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Staff Login';
                 return;
             }
 
-            try {
-                // 1. Attempt Sign In
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (error) throw error;
-                
-                const user = data.user;
-                
-                // 2. Fetch User Profile to get Role ID
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('role_id')
-                    .eq('id', user.id)
-                    .single();
-
-                if (profileError) throw profileError;
-                
-                // 3. Role-Based Redirection
-                const role = profile.role_id;
-                
-                // Role 1: Admin, Role 2: Staff, Role 3: Volunteer
-                if (role === 1) {
-                    // CORRECTED REDIRECT LOCATION
-                    window.location.href = '/admin/dashboard/';
-                } else if (role >= 2) {
-                    window.location.href = '/staff/dashboard/';
-                } else {
-                    // This handles unexpected roles or non-staff users
-                    showMessage("Access denied. Your role is not authorized for staff login.", 'error');
-                    await supabase.auth.signOut(); // Force sign out
-                }
-
-            } catch (error) {
-                console.error('Login error:', error.message);
-                
-                let displayMessage = "Login failed. Check your email and password.";
-                if (error.message.includes('Invalid login credentials')) {
-                    displayMessage = "Invalid email or password.";
-                }
-                
-                showMessage(displayMessage, 'error');
-            }
+            showMessage('success', `<i class="fas fa-check-circle"></i> Success! Checking access level...`);
+            
+            // 2. Authorization: Check the user's role and redirect
+            await redirectToDashboard(authData.user.id);
         }
         
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.style.display = 'block';
-            if (type === 'error') {
-                messageDiv.classList.add('error');
-            } else {
-                messageDiv.classList.remove('error');
+        // --- Initialization and Session Check ---
+        async function checkSession() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                // If a session exists, immediately check role and redirect
+                await redirectToDashboard(session.user.id);
             }
         }
 
-        // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Supabase Client
-            if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            } else {
-                showMessage("Supabase client failed to load.", 'error');
-                return;
-            }
-
-            // Set up form submission listener
-            const loginForm = document.getElementById('staffLoginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            checkSession();
         });
     </script>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo-box">
-            <img src="/image/logo.png" alt="FoodShare Logo">
-            <h1>Staff Access</h1>
-            <p>FoodShare Seychelles Management System</p>
+    <header id="navbar">
+        <a href="/" class="logo-container">
+            <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
+            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+        </a>
+        <nav class="nav-links-container" id="navLinks">
+            <a href="/available-food/" class="nav-link">Find Food</a>
+            <a href="/donate-food/" class="nav-link">Donate</a>
+            <a href="/volunteer/" class="nav-link">Volunteer</a>
+            <a href="/impact/" class="nav-link">Impact</a>
+            <a href="/about/" class="nav-link">About Us</a>
+            <a href="/donate-food/" class="cta-button">DONATE NOW</a> 
+            <a href="/staff-login/" class="staff-login nav-link" style="color: var(--primary-main); font-weight: bold;">Staff Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="login-card">
+                <h1><i class="fas fa-user-shield"></i> Staff & Admin Login</h1>
+                <p style="color: var(--text-light); margin-bottom: 25px;">
+                    Enter your authorized staff credentials to access the FoodShare management dashboard.
+                </p>
+                <div id="message" style="display: none;"></div>
+                <form id="loginForm">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="staff.email@foodshare.sc">
+
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="******">
+
+                    <button type="submit" id="submitBtn" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Staff Login
+                    </button>
+                    
+                    <p style="font-size: 0.8em; margin-top: 20px;">
+                        <a href="#" onclick="alert('Please contact the system administrator to reset your password.')">Forgot Password?</a>
+                    </p>
+                </form>
+            </div>
         </div>
-        
-        <form id="staffLoginForm">
-            <div class="form-group">
-                <label for="email">Email</label>
-                <div class="input-group">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" id="email" required placeholder="staff@foodshare.sc">
-                </div>
+    </main>
+
+    <footer id="main-footer">
+        <div class="content-container footer-content">
+            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+            <div class="footer-section">
+                <h3>Get In Touch</h3>
+                <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+                <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
             </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="input-group">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" id="password" required placeholder="••••••••">
-                </div>
-            </div>
-            
-            <button type="submit" class="btn-login">
-                <i class="fas fa-sign-in-alt"></i> Log In
-            </button>
-        </form>
-        
-        <div id="message"></div>
-    </div>
+        </div>
+        <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+    </footer>
 </body>
 </html>
