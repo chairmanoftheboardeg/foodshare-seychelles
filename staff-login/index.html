@@ -74,7 +74,7 @@
         }
         .form-group input {
             width: 100%;
-            padding: 15px 15px 15px 45px; /* Padding for icon */
+            padding: 15px 15px 15px 45px;
             border: 1px solid #e0e6e9;
             border-radius: 8px;
             font-size: 1em;
@@ -133,6 +133,7 @@
             loginForm.addEventListener('submit', handleLogin);
         });
 
+        // Redirects users who are already logged in
         async function checkSessionAndRedirect() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
@@ -154,7 +155,7 @@
             const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
-                showMessage(messageDiv, 'error', `Login failed: Invalid credentials or account issue. ${error.message.includes('AuthApiError') ? '' : error.message}`);
+                showMessage(messageDiv, 'error', `Login failed: Invalid credentials or account issue.`);
                 loginButton.disabled = false;
                 loginButton.textContent = 'Log In';
                 return;
@@ -165,6 +166,7 @@
             }
         }
 
+        // The core redirection logic based on user role (Crucial for preventing login loop)
         async function checkUserRole(userId, messageDiv = null, loginButton = null) {
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
@@ -172,8 +174,9 @@
                 .eq('id', userId)
                 .single();
 
-            if (profileError || !profileData) {
-                if (messageDiv) showMessage(messageDiv, 'error', "Profile not found or access denied.");
+            // RLS FAILURE OR MISSING PROFILE: This handles the error that caused the loop
+            if (profileError || !profileData || (![ADMIN_ROLE_ID, ...STAFF_ROLES].includes(profileData.role))) {
+                if (messageDiv) showMessage(messageDiv, 'error', "Login succeeded, but profile access failed. Contact admin.");
                 await supabase.auth.signOut();
                 if (loginButton) loginButton.disabled = false;
                 if (loginButton) loginButton.textContent = 'Log In';
@@ -181,20 +184,14 @@
             }
 
             const userRole = profileData.role;
-            let destination = '/staff-login/index.html';
+            let destination = '/staff-login/index.html'; // Default to login if checks fail
 
             if (userRole === ADMIN_ROLE_ID) {
                 destination = '/admin/dashboard/home.html';
             } else if (STAFF_ROLES.includes(userRole)) {
                 destination = '/staff/dashboard.html';
-            } else {
-                if (messageDiv) showMessage(messageDiv, 'error', "Your role is not authorized for portal access.");
-                await supabase.auth.signOut();
-                if (loginButton) loginButton.disabled = false;
-                if (loginButton) loginButton.textContent = 'Log In';
-                return;
             }
-
+            
             window.location.href = destination;
         }
 
