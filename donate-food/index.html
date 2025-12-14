@@ -1,364 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donate Food - FoodShare Seychelles</title>
-    
-    <link rel="icon" href="/image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script>
+  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+  let supabase;
 
-    <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.css" type="text/css">
-    
-    <style>
-        /* [START STANDARD SITE-WIDE CSS BLOCK] */
-        :root {
-            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
-            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
-            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-            --transition-speed: 0.4s;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-        a:hover { color: var(--primary-dark); }
-        main { flex-grow: 1; padding: 40px 0; }
-        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .content-container { max-width: 800px; margin: 0 auto; padding: 0 25px; }
-        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
-        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-        .logo-img { height: 40px; margin-right: 10px; } 
-        .nav-links-container { display: flex; gap: 30px; align-items: center; }
-        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
-        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
-        .nav-link:hover::after { width: 100%; }
-        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
-        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
-        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
-        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
-        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
-        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+  mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNrdW1scDBsbjFwZ2wyb29nOG82dWp4MjMifQ.3980_yJj-iY6S6o0-1H47Q';
 
-        /* Form Specific Styles */
-        .form-card { background-color: var(--neutral-card); padding: 35px; border-radius: 8px; box-shadow: var(--shadow-subtle); margin-top: 30px; }
-        h1 { text-align: center; color: var(--primary-dark); margin-bottom: 10px; }
-        h2 { font-size: 1.3em; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary-main); padding-bottom: 5px;}
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
-        .form-row { display: flex; gap: 20px; }
-        .form-row > div { flex: 1; }
-        
-        .map-container { position: relative; width: 100%; height: 300px; margin-bottom: 20px; border-radius: 4px; }
-        #mapbox-picker { height: 100%; width: 100%; }
-        .geocoder-container { margin-bottom: 20px; }
-        .geocoder-container .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none; }
+  let donationMap;
+  let donationMarker;
+  let selectedCoordinates = null;
 
-        .submit-btn { background-color: var(--primary-main); color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; transition: background-color var(--transition-speed); width: 100%; margin-top: 25px; }
-        .submit-btn:hover { background-color: var(--primary-dark); }
-        
-        #statusMessage { padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold; display: none; }
-        .success { background-color: var(--primary-light); color: var(--primary-dark); }
-        .error { background-color: var(--accent-red); color: white; }
+  function showMessage(type, message) {
+    const msgEl = document.getElementById('statusMessage');
+    msgEl.className = type;   // success | error
+    msgEl.innerHTML = message || '';
+    msgEl.style.display = message ? 'block' : 'none';
+  }
 
-        @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
-    </style>
-    
-    <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        let supabase;
+  function initializeMap() {
+    donationMap = new mapboxgl.Map({
+      container: 'mapbox-picker',
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [55.4522, -4.6796],
+      zoom: 10
+    });
 
-        // Mapbox Configuration (Use generic token for now, replace with your project's public token)
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNrdW1scDBsbjFwZ2wyb29nOG82dWp4MjMifQ.3980_yJj-iY6S6o0-1H47Q';
+    const geocoder = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl,
+      marker: false,
+      placeholder: 'Search for your pickup address...',
+      proximity: { longitude: 55.4522, latitude: -4.6796 }
+    });
 
-        let donationMap;
-        let donationMarker;
-        let selectedCoordinates = null; // Stores the final selected coordinates
+    document.getElementById('geocoder-placeholder').appendChild(geocoder.onAdd(donationMap));
 
-        function showMessage(type, message) {
-            const msgEl = document.getElementById('statusMessage');
-            msgEl.className = type;
-            msgEl.innerHTML = message;
-            msgEl.style.display = 'block';
-        }
+    geocoder.on('result', function (e) {
+      const lngLat = e.result.geometry.coordinates;
+      const addressText = e.result.place_name;
 
-        function initializeMap() {
-            // Center map on Mahé, Seychelles (Lat: -4.6796, Lng: 55.4522)
-            donationMap = new mapboxgl.Map({
-                container: 'mapbox-picker',
-                style: 'mapbox://styles/mapbox/streets-v12',
-                center: [55.4522, -4.6796], 
-                zoom: 10
-            });
+      document.getElementById('pickup_address').value = addressText;
+      selectedCoordinates = `${lngLat[1]},${lngLat[0]}`; // lat,lng
 
-            // 1. Initialize Geocoder (Search Box)
-            const geocoder = new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                mapboxgl: mapboxgl,
-                marker: false, // We'll handle the marker manually
-                placeholder: 'Search for your pickup address...',
-                proximity: {
-                    longitude: 55.4522,
-                    latitude: -4.6796
-                }
-            });
+      updateMarker(lngLat);
+    });
 
-            // Add the search box to the map container
-            document.getElementById('geocoder-placeholder').appendChild(geocoder.onAdd(donationMap));
+    donationMap.on('click', function (e) {
+      const lngLat = e.lngLat;
+      selectedCoordinates = `${lngLat.lat},${lngLat.lng}`;
 
-            // 2. Geocoder Result Event (when user searches)
-            geocoder.on('result', function (e) {
-                const lngLat = e.result.geometry.coordinates;
-                const addressText = e.result.place_name;
-                
-                // Update the hidden input field and coordinates tracker
-                document.getElementById('pickup_address').value = addressText;
-                selectedCoordinates = `${lngLat[1]},${lngLat[0]}`; // Lat, Lng format
-
-                updateMarker(lngLat);
-            });
-
-            // 3. Map Click Event (when user clicks the map directly)
-            donationMap.on('click', function (e) {
-                const lngLat = e.lngLat;
-                selectedCoordinates = `${lngLat.lat},${lngLat.lng}`; // Lat, Lng format
-                
-                // Reverse Geocode the coordinates to get the nearest address text
-                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.features.length > 0) {
-                            document.getElementById('pickup_address').value = data.features[0].place_name;
-                        } else {
-                            document.getElementById('pickup_address').value = `Coordinates: ${lngLat.lat}, ${lngLat.lng}`;
-                        }
-                    });
-
-                updateMarker([lngLat.lng, lngLat.lat]);
-            });
-        }
-        
-        function updateMarker(lngLatArray) {
-            // Remove existing marker if it exists
-            if (donationMarker) {
-                donationMarker.remove();
-            }
-
-            // Create a new marker at the location
-            donationMarker = new mapboxgl.Marker({ color: var(--primary-dark) })
-                .setLngLat(lngLatArray)
-                .addTo(donationMap);
-        }
-
-        async function handleDonationSubmit(event) {
-            event.preventDefault();
-            
-            if (!selectedCoordinates) {
-                showMessage('error', `<i class="fas fa-map-marker-alt"></i> Please select your pickup location on the map.`);
-                return;
-            }
-
-            const formData = new FormData(event.target);
-            
-            const donationData = {
-                donor_name: formData.get('donor_name'),
-                donor_email: formData.get('donor_email'),
-                donor_phone: formData.get('donor_phone'),
-                food_type: formData.get('food_type'),
-                quantity_kg: parseFloat(formData.get('quantity_kg')), 
-                expiry_date: formData.get('expiry_date') || null,
-                storage_type: formData.get('storage_type'),
-                description: formData.get('description'),
-                pickup_address: document.getElementById('pickup_address').value, // Use the value updated by map/geocoder
-                pickup_island: formData.get('pickup_island'),
-                preferred_pickup_time: formData.get('preferred_pickup_time'),
-                pickup_coordinates: selectedCoordinates, // NEW: The coordinates
-                status: 'New' // FIXED: Should now be accepted as TEXT type
-            };
-
-            // Basic validation
-            if (isNaN(donationData.quantity_kg) || donationData.quantity_kg <= 0) {
-                showMessage('error', `<i class="fas fa-exclamation-triangle"></i> Please enter a valid quantity (kg) greater than zero.`);
-                return;
-            }
-            
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('submitBtn').textContent = 'Submitting Request...';
-            showMessage('statusMessage', ''); // Clear previous message
-
-            const { error } = await supabase
-                .from('donations') // Using your existing table name
-                .insert([donationData]);
-
-            if (error) {
-                console.error('Donation Submission Error:', error);
-                showMessage('error', `<i class="fas fa-times-circle"></i> Submission Failed: ${error.message}. Please check your inputs and try again.`);
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('submitBtn').textContent = 'Submit Donation Request';
-            } else {
-                showMessage('success', 
-                    `<i class="fas fa-check-circle"></i> **Thank you, ${donationData.donor_name}!**<br>
-                     Your generous donation request has been successfully submitted. Our team will contact you shortly to schedule pickup.`);
-                document.getElementById('donationForm').reset();
-                document.getElementById('submitBtn').style.display = 'none';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            initializeMap();
-            document.getElementById('donationForm').addEventListener('submit', handleDonationSubmit);
+      fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.features?.length > 0) {
+            document.getElementById('pickup_address').value = data.features[0].place_name;
+          } else {
+            document.getElementById('pickup_address').value = `Coordinates: ${lngLat.lat}, ${lngLat.lng}`;
+          }
+        })
+        .catch(() => {
+          document.getElementById('pickup_address').value = `Coordinates: ${lngLat.lat}, ${lngLat.lng}`;
         });
-    </script>
-</head>
-<body>
-    <header id="navbar">
-        <a href="/" class="logo-container">
-            <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
-            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-        </a>
-        <nav class="nav-links-container" id="navLinks">
-            <a href="/available-food/" class="nav-link">Find Food</a>
-            <a href="/donate-food/" class="nav-link">Donate</a>
-            <a href="/volunteer/" class="nav-link">Volunteer</a>
-            <a href="/impact/" class="nav-link">Impact</a>
-            <a href="/about/" class="nav-link">About Us</a>
-            <a href="/donate-food/" class="cta-button">DONATE NOW</a> 
-            <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-        </nav>
-    </header>
 
-    <main>
-        <div class="content-container">
-            <h1><i class="fas fa-leaf"></i> Donate Surplus Food</h1>
-            <p style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">
-                Help us rescue food that would otherwise go to waste. Fill out the form below and we'll arrange collection.
-            </p>
-            <p style="text-align: center; font-size: 0.9em; color: var(--accent-red); font-weight: bold;">
-                Note: We only accept food that is safe, unexpired (or near-expiry), and suitable for distribution.
-            </p>
+      updateMarker([lngLat.lng, lngLat.lat]);
+    });
+  }
 
-            <div id="statusMessage" style="display: none;"></div>
+  function updateMarker(lngLatArray) {
+    if (donationMarker) donationMarker.remove();
 
-            <div class="form-card">
-                <form id="donationForm">
-                    <h2><i class="fas fa-user-circle"></i> Donor Contact Details</h2>
-                    
-                    <label for="donor_name">Your Name or Organization Name *</label>
-                    <input type="text" id="donor_name" name="donor_name" required>
+    donationMarker = new mapboxgl.Marker({ color: '#388E3C' })  // FIXED
+      .setLngLat(lngLatArray)
+      .addTo(donationMap);
+  }
 
-                    <div class="form-row">
-                        <div>
-                            <label for="donor_email">Email Address *</label>
-                            <input type="email" id="donor_email" name="donor_email" required>
-                        </div>
-                        <div>
-                            <label for="donor_phone">Phone Number</label>
-                            <input type="tel" id="donor_phone" name="donor_phone" placeholder="e.g., 251-0000">
-                        </div>
-                    </div>
+  async function handleDonationSubmit(event) {
+    event.preventDefault();
+    showMessage('', '');
 
-                    <h2 style="margin-top: 30px;"><i class="fas fa-boxes"></i> Food Donation Details</h2>
-                    
-                    <div class="form-row">
-                        <div>
-                            <label for="food_type">Type of Food *</label>
-                            <select id="food_type" name="food_type" required>
-                                <option value="">-- Select Category --</option>
-                                <option value="Produce">Fresh Fruits & Vegetables</option>
-                                <option value="Packaged">Dry & Packaged Goods (Cans, Pasta, Rice)</option>
-                                <option value="Baked">Baked Goods (Bread, Pastries)</option>
-                                <option value="Meat">Meat & Poultry (Frozen/Chilled)</option>
-                                <option value="Dairy">Dairy & Eggs (Chilled)</option>
-                                <option value="Beverages">Non-Alcoholic Beverages</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="quantity_kg">Estimated Quantity (Kilograms - kg) *</label>
-                            <input type="number" id="quantity_kg" name="quantity_kg" step="0.5" min="1" placeholder="Minimum 1 kg" required>
-                        </div>
-                    </div>
+    if (!selectedCoordinates) {
+      showMessage('error', `<i class="fas fa-map-marker-alt"></i> Please select your pickup location on the map.`);
+      return;
+    }
 
-                    <div class="form-row">
-                        <div>
-                            <label for="expiry_date">Best Before / Expiry Date</label>
-                            <input type="date" id="expiry_date" name="expiry_date" title="Please enter the closest expiry date if batch varies">
-                        </div>
-                        <div>
-                            <label for="storage_type">Current Storage Condition</label>
-                            <select id="storage_type" name="storage_type">
-                                <option value="Ambient">Ambient (Room Temperature)</option>
-                                <option value="Refrigerated">Refrigerated (Chilled)</option>
-                                <option value="Frozen">Frozen</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <label for="description">Detailed Description of Food Items</label>
-                    <textarea id="description" name="description" rows="3" placeholder="e.g., 20 kgs of mixed tomatoes and cucumbers, 5 boxes of canned beans, must be picked up by 4 PM."></textarea>
+    const formData = new FormData(event.target);
 
-                    <h2 style="margin-top: 30px;"><i class="fas fa-map-marker-alt"></i> Pickup Location & Timing</h2>
-                    
-                    <label>Search and Click on the map to pinpoint location *</label>
-                    <div id="geocoder-placeholder" class="geocoder-container"></div>
+    const donationData = {
+      donor_name: formData.get('donor_name'),
+      donor_email: formData.get('donor_email'),
+      donor_phone: formData.get('donor_phone'),
+      food_type: formData.get('food_type'),
+      quantity_kg: parseFloat(formData.get('quantity_kg')),
+      expiry_date: formData.get('expiry_date') || null,
+      storage_type: formData.get('storage_type'),
+      description: formData.get('description'),
+      pickup_address: document.getElementById('pickup_address').value,
+      pickup_island: formData.get('pickup_island'),
+      preferred_pickup_time: formData.get('preferred_pickup_time'),
+      pickup_coordinates: selectedCoordinates,
+      status: 'New'
+    };
 
-                    <div class="map-container">
-                        <div id="mapbox-picker"></div>
-                    </div>
-                    
-                    <input type="hidden" id="pickup_address" name="pickup_address" required>
+    if (isNaN(donationData.quantity_kg) || donationData.quantity_kg <= 0) {
+      showMessage('error', `<i class="fas fa-exclamation-triangle"></i> Please enter a valid quantity (kg) greater than zero.`);
+      return;
+    }
 
-                    <div class="form-row">
-                        <div>
-                            <label for="pickup_island">Island Location *</label>
-                            <select id="pickup_island" name="pickup_island" required>
-                                <option value="">-- Select Island --</option>
-                                <option value="Mahe">Mahé</option>
-                                <option value="Praslin">Praslin</option>
-                                <option value="La Digue">La Digue</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="preferred_pickup_time">Preferred Pickup Timeframe</label>
-                            <input type="text" id="preferred_pickup_time" name="preferred_pickup_time" placeholder="e.g., Tomorrow between 10am-12pm">
-                        </div>
-                    </div>
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting Request...';
 
-                    <button type="submit" id="submitBtn" class="submit-btn">
-                        <i class="fas fa-check-circle"></i> Submit Donation Request
-                    </button>
-                    
-                    <p style="font-size: 0.8em; color: var(--text-light); text-align: center; margin-top: 15px;">
-                        All donations are subject to review to ensure food safety standards are met.
-                    </p>
-                </form>
-            </div>
-        </div>
-    </main>
+    const { error } = await supabase.from('donations').insert([donationData]);
 
-    <footer id="main-footer">
-        <div class="content-container footer-content">
-            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-            <div class="footer-section">
-                <h3>Get In Touch</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-                <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
-            </div>
-        </div>
-        <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-    </footer>
-</body>
-</html>
+    if (error) {
+      console.error('Donation Submission Error:', error);
+      showMessage('error',
+        `<i class="fas fa-times-circle"></i> Submission Failed: ${error.message}<br><br>
+         If this says <b>row-level security</b>, you must add the public insert policy for the donations table.`
+      );
+      btn.disabled = false;
+      btn.textContent = 'Submit Donation Request';
+      return;
+    }
+
+    showMessage('success',
+      `<i class="fas fa-check-circle"></i> <b>Thank you, ${donationData.donor_name}!</b><br>
+       Your donation request has been submitted. Our team will contact you shortly.`
+    );
+
+    document.getElementById('donationForm').reset();
+    btn.style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    initializeMap();
+    document.getElementById('donationForm').addEventListener('submit', handleDonationSubmit);
+  });
+</script>
