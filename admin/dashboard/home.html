@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard | FoodShare Seychelles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" type="image/png" href="/image/logo.png" />
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+  />
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --green: #4CAF50;
+      --dark-green: #388E3C;
+      --blue: #2196F3;
+      --danger: #D32F2F;
+      --orange: #FF9800;
+      --bg: #f3f6f9;
+      --card: #ffffff;
+      --text: #2e2e2e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(90deg, var(--green), var(--dark-green));
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header img {
+      height: 42px;
+    }
+
+    header .admin-info {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    header button {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* MAIN */
+    main {
+      padding: 32px;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .section {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .section h2 {
+      margin: 0 0 18px 0;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .stat-card {
+      background: #f9fbfc;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 6px solid var(--green);
+    }
+
+    .stat-card span {
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .stat-card h3 {
+      margin: 6px 0 0;
+      font-size: 1.8rem;
+      color: var(--green);
+    }
+
+    /* TABLES */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #eef4f0;
+      font-weight: 700;
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid #eee;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .approve { background: var(--green); color: #fff; }
+    .reject { background: var(--danger); color: #fff; }
+    .edit { background: var(--blue); color: #fff; }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <img src="/staff-login/image/logo.png" alt="FoodShare Seychelles">
+  <div class="admin-info">
+    <span id="adminName">Admin</span>
+    <button onclick="logout()">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME / STATS -->
+  <section class="section">
+    <h2><i class="fa-solid fa-chart-line"></i> Overview</h2>
+    <div class="stats" id="stats">
+      <div class="stat-card"><span>Pending Claims</span><h3 id="claimsCount">—</h3></div>
+      <div class="stat-card"><span>New Donations</span><h3 id="donationsCount">—</h3></div>
+      <div class="stat-card"><span>Volunteer Applications</span><h3 id="volunteerCount">—</h3></div>
+      <div class="stat-card"><span>Unread Inquiries</span><h3 id="inquiryCount">—</h3></div>
+    </div>
+  </section>
+
+  <!-- PLACEHOLDER SECTIONS -->
+  <section class="section">
+    <h2><i class="fa-solid fa-truck"></i> Claims Review</h2>
+    <p>Pending claim requests will appear here.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-hand-holding-heart"></i> Donations</h2>
+    <p>Donation submissions from the public.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-users"></i> Volunteer Applications</h2>
+    <p>Review volunteer signups.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-boxes-stacked"></i> Inventory</h2>
+    <p>Manage food listings.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-user-gear"></i> User Management</h2>
+    <p>Manage staff roles.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-list-check"></i> Assign Tasks</h2>
+    <p>Create and assign tasks.</p>
+  </section>
+
+  <section class="section">
+    <h2><i class="fa-solid fa-gear"></i> Settings</h2>
+    <p>Announcements and configuration.</p>
+  </section>
+
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  document.addEventListener('DOMContentLoaded', initAdmin);
+
+  async function initAdmin() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
+
+    const user = data.session.user;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name, role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || profile.role !== 1) {
+      window.location.href = '/staff/dashboard.html';
+      return;
+    }
+
+    document.getElementById('adminName').textContent = profile.full_name;
+    loadStats();
+  }
+
+  async function loadStats() {
+    const claims = await supabase.from('claims').select('*', { count: 'exact', head: true });
+    const donations = await supabase.from('donations').select('*', { count: 'exact', head: true });
+    const volunteers = await supabase.from('volunteer_applications').select('*', { count: 'exact', head: true });
+    const inquiries = await supabase.from('inquiries').select('*', { count: 'exact', head: true });
+
+    document.getElementById('claimsCount').textContent = claims.count || 0;
+    document.getElementById('donationsCount').textContent = donations.count || 0;
+    document.getElementById('volunteerCount').textContent = volunteers.count || 0;
+    document.getElementById('inquiryCount').textContent = inquiries.count || 0;
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = '/staff-login/index.html';
+  }
+</script>
+
+</body>
+</html>
