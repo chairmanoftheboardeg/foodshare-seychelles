@@ -8,6 +8,11 @@
     <link rel="icon" href="/image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.1/mapbox-gl-geocoder.css" type="text/css">
     
     <style>
         /* [START STANDARD SITE-WIDE CSS BLOCK] */
@@ -26,8 +31,6 @@
         main { flex-grow: 1; padding: 40px 0; }
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 800px; margin: 0 auto; padding: 0 25px; }
-
-        /* NAVIGATION BAR (omitted for brevity) */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; } 
@@ -37,8 +40,6 @@
         .nav-link:hover::after { width: 100%; }
         .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-
-        /* FOOTER STYLING (omitted for brevity) */
         #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
         .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
         .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
@@ -48,47 +49,41 @@
         .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
 
         /* Form Specific Styles */
-        .form-card {
-            background-color: var(--neutral-card); padding: 35px; border-radius: 8px;
-            box-shadow: var(--shadow-subtle); margin-top: 30px;
-        }
+        .form-card { background-color: var(--neutral-card); padding: 35px; border-radius: 8px; box-shadow: var(--shadow-subtle); margin-top: 30px; }
         h1 { text-align: center; color: var(--primary-dark); margin-bottom: 10px; }
         h2 { font-size: 1.3em; margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary-main); padding-bottom: 5px;}
         label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--text-dark); }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], select, textarea {
-            width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc;
-            border-radius: 4px; font-size: 1em;
-        }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
         .form-row { display: flex; gap: 20px; }
         .form-row > div { flex: 1; }
         
-        .submit-btn {
-            background-color: var(--primary-main);
-            color: white; padding: 12px 25px;
-            border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;
-            transition: background-color var(--transition-speed); width: 100%;
-            margin-top: 25px;
-        }
+        .map-container { position: relative; width: 100%; height: 300px; margin-bottom: 20px; border-radius: 4px; }
+        #mapbox-picker { height: 100%; width: 100%; }
+        .geocoder-container { margin-bottom: 20px; }
+        .geocoder-container .mapboxgl-ctrl-geocoder { width: 100% !important; max-width: none; }
+
+        .submit-btn { background-color: var(--primary-main); color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; transition: background-color var(--transition-speed); width: 100%; margin-top: 25px; }
         .submit-btn:hover { background-color: var(--primary-dark); }
         
-        #statusMessage {
-            padding: 20px; border-radius: 8px; margin-top: 20px;
-            text-align: center; font-weight: bold; display: none;
-        }
+        #statusMessage { padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold; display: none; }
         .success { background-color: var(--primary-light); color: var(--primary-dark); }
         .error { background-color: var(--accent-red); color: white; }
 
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .form-row { flex-direction: column; gap: 0; }
-        }
+        @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
     </style>
     
     <script>
         const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
-        
+
+        // Mapbox Configuration (Use generic token for now, replace with your project's public token)
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNrdW1scDBsbjFwZ2wyb29nOG82dWp4MjMifQ.3980_yJj-iY6S6o0-1H47Q';
+
+        let donationMap;
+        let donationMarker;
+        let selectedCoordinates = null; // Stores the final selected coordinates
+
         function showMessage(type, message) {
             const msgEl = document.getElementById('statusMessage');
             msgEl.className = type;
@@ -96,25 +91,98 @@
             msgEl.style.display = 'block';
         }
 
+        function initializeMap() {
+            // Center map on Mahé, Seychelles (Lat: -4.6796, Lng: 55.4522)
+            donationMap = new mapboxgl.Map({
+                container: 'mapbox-picker',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: [55.4522, -4.6796], 
+                zoom: 10
+            });
+
+            // 1. Initialize Geocoder (Search Box)
+            const geocoder = new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl,
+                marker: false, // We'll handle the marker manually
+                placeholder: 'Search for your pickup address...',
+                proximity: {
+                    longitude: 55.4522,
+                    latitude: -4.6796
+                }
+            });
+
+            // Add the search box to the map container
+            document.getElementById('geocoder-placeholder').appendChild(geocoder.onAdd(donationMap));
+
+            // 2. Geocoder Result Event (when user searches)
+            geocoder.on('result', function (e) {
+                const lngLat = e.result.geometry.coordinates;
+                const addressText = e.result.place_name;
+                
+                // Update the hidden input field and coordinates tracker
+                document.getElementById('pickup_address').value = addressText;
+                selectedCoordinates = `${lngLat[1]},${lngLat[0]}`; // Lat, Lng format
+
+                updateMarker(lngLat);
+            });
+
+            // 3. Map Click Event (when user clicks the map directly)
+            donationMap.on('click', function (e) {
+                const lngLat = e.lngLat;
+                selectedCoordinates = `${lngLat.lat},${lngLat.lng}`; // Lat, Lng format
+                
+                // Reverse Geocode the coordinates to get the nearest address text
+                fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lngLat.lng},${lngLat.lat}.json?access_token=${mapboxgl.accessToken}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.features.length > 0) {
+                            document.getElementById('pickup_address').value = data.features[0].place_name;
+                        } else {
+                            document.getElementById('pickup_address').value = `Coordinates: ${lngLat.lat}, ${lngLat.lng}`;
+                        }
+                    });
+
+                updateMarker([lngLat.lng, lngLat.lat]);
+            });
+        }
+        
+        function updateMarker(lngLatArray) {
+            // Remove existing marker if it exists
+            if (donationMarker) {
+                donationMarker.remove();
+            }
+
+            // Create a new marker at the location
+            donationMarker = new mapboxgl.Marker({ color: var(--primary-dark) })
+                .setLngLat(lngLatArray)
+                .addTo(donationMap);
+        }
+
         async function handleDonationSubmit(event) {
             event.preventDefault();
             
+            if (!selectedCoordinates) {
+                showMessage('error', `<i class="fas fa-map-marker-alt"></i> Please select your pickup location on the map.`);
+                return;
+            }
+
             const formData = new FormData(event.target);
             
-            // Get data from form and ensure quantity is parsed as a number
             const donationData = {
                 donor_name: formData.get('donor_name'),
                 donor_email: formData.get('donor_email'),
-                donor_phone: formData.get('donor_phone'), // Matches renamed column
+                donor_phone: formData.get('donor_phone'),
                 food_type: formData.get('food_type'),
-                quantity_kg: parseFloat(formData.get('quantity_kg')), // CRITICAL: Parse as float for NUMERIC type
+                quantity_kg: parseFloat(formData.get('quantity_kg')), 
                 expiry_date: formData.get('expiry_date') || null,
                 storage_type: formData.get('storage_type'),
                 description: formData.get('description'),
-                pickup_address: formData.get('pickup_address'),
+                pickup_address: document.getElementById('pickup_address').value, // Use the value updated by map/geocoder
                 pickup_island: formData.get('pickup_island'),
                 preferred_pickup_time: formData.get('preferred_pickup_time'),
-                status: 'New'
+                pickup_coordinates: selectedCoordinates, // NEW: The coordinates
+                status: 'New' // FIXED: Should now be accepted as TEXT type
             };
 
             // Basic validation
@@ -128,7 +196,7 @@
             showMessage('statusMessage', ''); // Clear previous message
 
             const { error } = await supabase
-                .from('donations') // <-- USING YOUR EXISTING TABLE NAME
+                .from('donations') // Using your existing table name
                 .insert([donationData]);
 
             if (error) {
@@ -147,6 +215,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            initializeMap();
             document.getElementById('donationForm').addEventListener('submit', handleDonationSubmit);
         });
     </script>
@@ -238,10 +307,16 @@
                     <label for="description">Detailed Description of Food Items</label>
                     <textarea id="description" name="description" rows="3" placeholder="e.g., 20 kgs of mixed tomatoes and cucumbers, 5 boxes of canned beans, must be picked up by 4 PM."></textarea>
 
-                    <h2 style="margin-top: 30px;"><i class="fas fa-truck-pickup"></i> Pickup Location & Timing</h2>
+                    <h2 style="margin-top: 30px;"><i class="fas fa-map-marker-alt"></i> Pickup Location & Timing</h2>
                     
-                    <label for="pickup_address">Full Pickup Address *</label>
-                    <input type="text" id="pickup_address" name="pickup_address" required>
+                    <label>Search and Click on the map to pinpoint location *</label>
+                    <div id="geocoder-placeholder" class="geocoder-container"></div>
+
+                    <div class="map-container">
+                        <div id="mapbox-picker"></div>
+                    </div>
+                    
+                    <input type="hidden" id="pickup_address" name="pickup_address" required>
 
                     <div class="form-row">
                         <div>
