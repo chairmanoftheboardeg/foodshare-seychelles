@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FoodShare Admin</title>
+    
+    <link rel="icon" href="../../image/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    
+    <style>
+        /* [START PLUTO-STYLE CSS] */
+        :root {
+            --primary-main: #2196F3; /* Pluto primary blue */
+            --primary-dark: #1976D2;
+            --accent-green: #4CAF50; 
+            --accent-red: #F44336;
+            --neutral-bg: #F0F2F5; /* Light Gray Background */
+            --neutral-card: #FFFFFF;
+            --text-dark: #333; 
+            --text-light: #777; 
+            --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.3s;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; background-color: var(--neutral-bg); min-height: 100vh; }
+        
+        /* SIDEBAR STYLES */
+        #adminSidebar {
+            width: 250px;
+            background-color: #2c3e50; /* Dark sidebar background */
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+        #adminSidebar h2 {
+            font-size: 1em;
+            color: #bdc3c7; /* Light gray header */
+            padding: 15px 20px 5px;
+            margin-top: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.95em;
+        }
+        .sidebar-link i { margin-right: 10px; width: 20px; text-align: center; }
+        .sidebar-link:hover {
+            background-color: #34495e;
+            color: white;
+        }
+        .sidebar-link.active {
+            background-color: var(--primary-main);
+            color: white;
+            border-left: 5px solid var(--accent-green);
+        }
+        
+        /* MAIN CONTENT AND TOP BAR */
+        #mainContent {
+            margin-left: 250px; /* Offset for sidebar */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #topbar {
+            background-color: var(--neutral-card);
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #topbar h1 { font-size: 1.5em; color: var(--text-dark); }
+        .user-menu { display: flex; align-items: center; cursor: pointer; }
+        .user-menu img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
+        .logout-btn { background-color: var(--accent-red); color: white; border: none; border-radius: 5px; padding: 8px 15px; font-weight: bold; cursor: pointer; margin-left: 15px; }
+
+        /* DASHBOARD GRID */
+        .dashboard-body { padding: 30px; }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            margin-bottom: 40px; 
+        }
+        .stat-card { 
+            background: var(--neutral-card); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: var(--shadow-subtle); 
+            text-align: center;
+            transition: background 0.2s;
+        }
+        .stat-card:hover { background-color: #f7f9fb; }
+        .stat-card i { font-size: 3em; margin-bottom: 10px; }
+        .stat-card p { font-size: 2.5em; font-weight: bold; margin: 0; }
+        .stat-card small { color: var(--text-light); font-size: 1em; display: block; margin-top: 5px; }
+
+        /* Color Coding */
+        .color-blue { color: var(--primary-main); }
+        .color-red { color: var(--accent-red); }
+        .color-green { color: var(--accent-green); }
+        .color-orange { color: var(--accent-orange); }
+
+        /* Charts/Area */
+        .chart-area { 
+            background: var(--neutral-card); 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: var(--shadow-subtle); 
+            min-height: 400px;
+        }
+        .chart-area h2 { font-size: 1.2em; margin-bottom: 20px; color: var(--text-dark); }
+        /* [END PLUTO-STYLE CSS] */
+    </style>
+    
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJisp...'; // Placeholder key
+        let supabase;
+
+        const ADMIN_ROLE_ID = 1;
+        
+        async function checkAccessAndRedirect() {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+            
+            if (sessionError || !session) {
+                window.location.href = '/staff-login/index.html';
+                return;
+            }
+
+            const userId = session.user.id;
+            
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('role, full_name, profile_picture_url')
+                .eq('id', userId)
+                .single();
+            
+            if (profileError || !profileData || profileData.role !== ADMIN_ROLE_ID) {
+                // Redirect if not Admin, check for /staff/dashboard.html access first
+                if (profileData && [2, 3].includes(profileData.role)) {
+                     window.location.href = '/staff/dashboard.html';
+                     return;
+                }
+                await supabase.auth.signOut();
+                window.location.href = '/staff-login/index.html';
+                return;
+            }
+            
+            // ADMIN Success: Set profile info
+            document.getElementById('profileNameTop').textContent = profileData.full_name;
+            document.getElementById('profileImgTop').src = profileData.profile_picture_url || '/image/default-staff-avatar.png';
+            document.getElementById('staffSidebarName').textContent = profileData.full_name;
+            
+            fetchStats();
+        }
+        
+        // --- HOME / STATS MODULE (Uses RPC for real aggregate data) ---
+        async function fetchStats() {
+            // Note: You must create these SQL functions (RPC) in Supabase.
+            
+            const [
+                { data: totalInventory },
+                { data: pendingClaimsCount },
+                { data: newInquiriesCount },
+                { data: newDonationsCount }
+            ] = await Promise.all([
+                supabase.rpc('get_total_inventory_items'), // Counts sum(current_stock_count) from available_inventory
+                supabase.rpc('get_pending_claims_count'),   // Counts claims WHERE status = 'New'
+                supabase.rpc('get_new_inquiries_count'),    // Counts inquiries WHERE status = 'New'
+                supabase.rpc('get_new_donations_count')     // Counts donations WHERE status = 'Pending'
+            ]);
+            
+            document.getElementById('statTotalInventory').textContent = totalInventory && totalInventory[0] ? totalInventory[0].sum : '0';
+            document.getElementById('statPendingClaims').textContent = pendingClaimsCount && pendingClaimsCount[0] ? pendingClaimsCount[0].count : '0';
+            document.getElementById('statNewInquiries').textContent = newInquiriesCount && newInquiriesCount[0] ? newInquiriesCount[0].count : '0';
+            document.getElementById('statNewDonations').textContent = newDonationsCount && newDonationsCount[0] ? newDonationsCount[0].count : '0';
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+    </script>
+</head>
+<body>
+    <nav id="adminSidebar">
+        <h2><i class="fas fa-tools"></i> General</h2>
+        <a href="/admin/dashboard/home.html" class="sidebar-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+        
+        <h2><i class="fas fa-tasks"></i> Workflow</h2>
+        <a href="/admin/dashboard/claims.html" class="sidebar-link"><i class="fas fa-hand-holding-heart"></i> Claims Review</a>
+        <a href="/admin/dashboard/donations.html" class="sidebar-link"><i class="fas fa-truck-loading"></i> Donations Intake</a>
+        <a href="/admin/dashboard/volunteers.html" class="sidebar-link"><i class="fas fa-hands-helping"></i> Volunteer Apps</a>
+        <a href="/admin/dashboard/inquiries.html" class="sidebar-link"><i class="fas fa-question-circle"></i> Inquiries</a>
+
+        <h2><i class="fas fa-database"></i> Management</h2>
+        <a href="/admin/inventory-manage.html" class="sidebar-link"><i class="fas fa-boxes"></i> Inventory</a>
+        <a href="/admin/user-manage.html" class="sidebar-link"><i class="fas fa-users-cog"></i> User Management</a>
+        <a href="/admin/assign-task.html" class="sidebar-link"><i class="fas fa-tasks"></i> Assign Task</a>
+        <a href="/admin/dashboard/settings.html" class="sidebar-link"><i class="fas fa-cogs"></i> Settings</a>
+
+        <div style="padding: 20px; font-size: 0.8em; color: #bdc3c7; margin-top: 30px;">
+            <p>Role ID: 1 (Admin)</p>
+            <p id="staffSidebarName">Admin User</p>
+        </div>
+    </nav>
+
+    <div id="mainContent">
+        <header id="topbar">
+            <h1>Dashboard Overview</h1>
+            <div class="user-menu">
+                <img id="profileImgTop" src="/image/default-staff-avatar.png" alt="Profile">
+                <span id="profileNameTop">Admin User</span>
+                <button class="logout-btn" onclick="supabase.auth.signOut().then(() => { window.location.href = '/staff-login/index.html'; })">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-boxes color-blue"></i>
+                    <p id="statTotalInventory">0</p>
+                    <small>Total Inventory Stock (kg/items)</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-hand-holding-heart color-red"></i>
+                    <p id="statPendingClaims">0</p>
+                    <small>New/Pending Claims</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-truck-loading color-orange"></i>
+                    <p id="statNewDonations">0</p>
+                    <small>New Donation Pickups</small>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-hands-helping color-green"></i>
+                    <p id="statNewInquiries">0</p>
+                    <small>New Volunteer/Inquiries</small>
+                </div>
+            </div>
+
+            <div class="chart-area">
+                <h2>Activity Timeline (Placeholder for Charts)</h2>
+                <div style="text-align: center; color: var(--text-light); padding: 50px;">
+                    <i class="fas fa-chart-bar" style="font-size: 4em; opacity: 0.4;"></i>
+                    <p style="margin-top: 15px;">Historical data charts would be displayed here for volume tracking.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
