@@ -5,7 +5,6 @@
   <title>Staff Dashboard | FoodShare Seychelles</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Correct favicon -->
   <link rel="icon" type="image/png" href="/image/logo.png" />
 
   <!-- Font Awesome -->
@@ -13,223 +12,697 @@
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     crossorigin="anonymous"
+    referrerpolicy="no-referrer"
   />
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --green: #4CAF50;
-      --dark-green: #388E3C;
-      --blue: #2196F3;
-      --bg: #f4f6f8;
-      --danger: #D32F2F;
+    :root{
+      --green:#4CAF50;
+      --dark:#388E3C;
+      --blue:#2196F3;
+      --red:#D32F2F;
+      --orange:#FF9800;
+
+      --bg:#0b1220;
+      --panel:#0f1a2e;
+      --card:#0f203a;
+      --card2:#0c1a30;
+      --border: rgba(255,255,255,0.08);
+      --text:#e7eefc;
+      --muted: rgba(231,238,252,0.72);
+      --shadow: 0 12px 30px rgba(0,0,0,0.35);
+      --radius: 16px;
     }
 
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", Tahoma, sans-serif;
+    *{ box-sizing:border-box; font-family: "Segoe UI", Tahoma, sans-serif; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 600px at 20% 0%, #123055 0%, var(--bg) 55%, #070b14 100%);
+      color:var(--text);
     }
 
-    body {
-      margin: 0;
-      background: var(--bg);
+    /* Topbar */
+    .topbar{
+      position: sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 22px;
+      background: rgba(15,26,46,0.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
     }
-
-    /* LOADING */
-    #loading {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--green);
-      font-weight: 600;
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .brand img{ height:38px; width:auto; }
+    .brand .title{
+      display:flex; flex-direction:column; line-height:1.05;
     }
+    .brand .title strong{ font-size: 1.0rem; }
+    .brand .title span{ font-size: 0.85rem; color:var(--muted); }
 
-    header {
-      background: var(--green);
-      color: #fff;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    main {
-      padding: 24px;
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .profile-card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin-bottom: 24px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-    }
-
-    th, td {
-      padding: 14px;
+    .topbar-right{ display:flex; gap:10px; align-items:center; }
+    .chip{
+      display:flex; align-items:center; gap:8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
       font-size: 0.9rem;
+      max-width: 340px;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn{
+      border:none; cursor:pointer; font-weight:700;
+      padding: 10px 12px; border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      transition: transform .08s ease, background .2s ease;
+    }
+    .btn:hover{ background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+    .btn.primary{ background: linear-gradient(90deg, var(--green), var(--dark)); border:none; }
+    .btn.primary:hover{ background: linear-gradient(90deg, var(--dark), var(--green)); }
+    .btn.blue{ background: rgba(33,150,243,0.16); border: 1px solid rgba(33,150,243,0.30); }
+    .btn.orange{ background: rgba(255,152,0,0.16); border: 1px solid rgba(255,152,0,0.30); }
+    .btn.red{ background: rgba(211,50,47,0.16); border: 1px solid rgba(211,50,47,0.30); }
+
+    /* Layout */
+    .wrap{ max-width: 1200px; margin: 0 auto; padding: 20px 20px 50px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
     }
 
-    th {
-      background: #e8f5e9;
+    /* Cards */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 16px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .card-header h2{
+      margin:0; font-size: 1.05rem;
+      display:flex; align-items:center; gap:10px;
+    }
+    .card-header h2 i{ color: rgba(255,255,255,0.75); }
+    .card-body{ padding: 16px; }
+
+    .muted{ color: var(--muted); }
+    .pill{
+      display:inline-flex; align-items:center; gap:7px;
+      padding: 7px 10px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      font-size: 0.85rem; color: var(--muted);
+    }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.82rem;
+      color: rgba(231,238,252,0.75);
     }
 
-    .btn-complete {
-      background: var(--green);
-      border: none;
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
+    /* Controls */
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:flex-end; justify-content:space-between;
+      margin-bottom: 12px;
     }
+    .left-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      min-width: 220px;
+    }
+    .field label{ font-size: 0.82rem; color: var(--muted); }
+    input, select, textarea{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      outline: none;
+    }
+    input::placeholder{ color: rgba(231,238,252,0.40); }
+
+    /* Table */
+    .table-wrap{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: auto;
+      background: rgba(0,0,0,0.15);
+    }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+    th, td{
+      padding: 12px 12px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top;
+    }
+    th{
+      text-align:left;
+      position: sticky; top:0; z-index: 1;
+      background: rgba(15,26,46,0.95);
+      color: rgba(231,238,252,0.85);
+      font-size: 0.82rem;
+      letter-spacing: .2px;
+    }
+    tr:hover td{ background: rgba(255,255,255,0.03); }
+
+    .tag{
+      display:inline-flex; align-items:center;
+      padding: 6px 10px; border-radius: 999px;
+      font-size: 0.82rem; font-weight: 800;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+    }
+    .s-new{ color: #9bd2ff; border-color: rgba(33,150,243,0.35); background: rgba(33,150,243,0.12); }
+    .s-pending{ color:#ffd28a; border-color: rgba(255,152,0,0.35); background: rgba(255,152,0,0.12); }
+    .s-done{ color:#9ef0a1; border-color: rgba(76,175,80,0.35); background: rgba(76,175,80,0.12); }
+    .s-bad{ color:#ff9b9b; border-color: rgba(211,50,47,0.35); background: rgba(211,50,47,0.12); }
+
+    /* Loading + toast */
+    .loading{
+      position: fixed; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background: radial-gradient(1000px 600px at 20% 0%, #123055 0%, var(--bg) 55%, #070b14 100%);
+      z-index: 100;
+      gap: 14px;
+      color: var(--text);
+    }
+    .spinner{
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.18);
+      border-top-color: rgba(158,240,161,0.9);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast{
+      position: fixed; right: 16px; bottom: 16px;
+      background: rgba(15,26,46,0.92);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: 420px;
+      z-index: 120;
+    }
+    .toast .small{ color: var(--muted); font-size: 0.88rem; margin-top: 4px; }
+
+    /* Modal */
+    .modal-overlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display:none; align-items:center; justify-content:center;
+      z-index: 50;
+      padding: 18px;
+    }
+    .modal{
+      width: min(880px, 100%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,32,58,0.98), rgba(12,26,48,0.98));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal-head{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .modal-head strong{ font-size: 1.0rem; }
+    .modal-body{ padding: 16px; }
+    .modal-foot{
+      display:flex; justify-content:flex-end; gap:10px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .kv .k{ color: var(--muted); }
+    .kv .v{ color: var(--text); word-break: break-word; }
   </style>
 </head>
 
 <body>
 
-<div id="loading">
-  <img src="/image/logo.png" height="70" alt="FoodShare Seychelles">
-  <p>Loading dashboard…</p>
-</div>
+  <!-- Loading -->
+  <div id="loading" class="loading">
+    <img src="/image/logo.png" alt="FoodShare Seychelles" style="height:70px;width:auto;" />
+    <div class="spinner"></div>
+    <div class="muted">Loading Staff Dashboard…</div>
+  </div>
 
-<div id="app" style="display:none;">
-  <header>
-    <h1>Staff Dashboard</h1>
-    <button onclick="logout()">
-      <i class="fa-solid fa-right-from-bracket"></i> Logout
-    </button>
-  </header>
+  <!-- Toast -->
+  <div id="toast" class="toast">
+    <div id="toastTitle" style="font-weight:800;"></div>
+    <div id="toastMsg" class="small"></div>
+  </div>
 
-  <main>
-    <div class="profile-card" id="profileCard"></div>
+  <!-- Modal -->
+  <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <strong id="modalTitle">Details</strong>
+        <button class="btn" onclick="hideModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-foot" id="modalFoot"></div>
+    </div>
+  </div>
 
-    <h3><i class="fa-solid fa-list-check"></i> My Tasks</h3>
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="brand">
+      <img src="/image/logo.png" alt="Logo" />
+      <div class="title">
+        <strong>FoodShare Seychelles</strong>
+        <span>Staff Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="chip" title="Logged in staff member">
+        <i class="fa-solid fa-user"></i>
+        <span id="staffName">—</span>
+      </div>
+      <button class="btn" onclick="refreshTasks()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      <button class="btn primary" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Description</th>
-          <th>Priority</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tasksBody"></tbody>
-    </table>
-  </main>
-</div>
+  <div class="wrap">
+    <div class="grid">
+
+      <!-- Profile -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-id-card"></i> My Profile</h2>
+          <span class="pill" id="rolePill"><i class="fa-solid fa-shield"></i> Role: —</span>
+        </div>
+        <div class="card-body">
+          <div style="display:grid; grid-template-columns: 1fr; gap:10px;">
+            <div><span class="muted">Full name</span><div style="font-weight:900; font-size:1.25rem;" id="profileName">—</div></div>
+            <div><span class="muted">Email</span><div id="profileEmail">—</div></div>
+            <div><span class="muted">User ID</span><div class="mono" id="profileId">—</div></div>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+            <span class="pill"><i class="fa-solid fa-circle-check"></i> Access: Staff Only</span>
+            <span class="pill"><i class="fa-solid fa-list-check"></i> Tasks: Live</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-gauge-high"></i> My Work</h2>
+          <span class="pill"><i class="fa-solid fa-bolt"></i> Real-time</span>
+        </div>
+        <div class="card-body" style="display:grid; grid-template-columns: 1fr; gap:10px;">
+          <div class="pill"><i class="fa-solid fa-clipboard-list"></i> Total assigned tasks: <strong id="taskTotal">—</strong></div>
+          <div class="pill"><i class="fa-solid fa-hourglass-half"></i> Pending / Active: <strong id="taskActive">—</strong></div>
+          <div class="pill"><i class="fa-solid fa-check"></i> Completed: <strong id="taskDone">—</strong></div>
+          <div class="muted" style="font-size:0.9rem;">
+            This dashboard shows all tasks from <span class="mono">tasks</span> where <span class="mono">assigned_to = your auth user id</span>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tasks -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-list-check"></i> My Tasks</h2>
+        <span class="pill"><i class="fa-solid fa-filter"></i> Search + Filter</span>
+      </div>
+      <div class="card-body">
+
+        <div class="controls">
+          <div class="left-controls">
+            <div class="field">
+              <label>Search</label>
+              <input id="taskSearch" placeholder="Title, description, status, priority…" oninput="renderTasks()" />
+            </div>
+            <div class="field" style="min-width:220px;">
+              <label>Status filter</label>
+              <select id="statusFilter" onchange="renderTasks()">
+                <option value="ALL">All</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn" onclick="refreshTasks()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Task ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tasksTbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 
 <script>
+  // ========= CONFIG =========
   const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  document.addEventListener('DOMContentLoaded', init);
+  // ========= STATE =========
+  let sessionUser = null;
+  let profile = null;
+  let tasksData = [];
 
-  async function init() {
-    const { data: sessionData } = await supabase.auth.getSession();
+  const $ = (id) => document.getElementById(id);
 
-    if (!sessionData.session) {
+  function showToast(title, msg){
+    $('toastTitle').textContent = title || 'Info';
+    $('toastMsg').textContent = msg || '';
+    const t = $('toast');
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3600);
+  }
+
+  function escapeHtml(v){
+    const s = (v ?? '').toString();
+    return s.replace(/[&<>"']/g, (c) => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function fmtDate(v){
+    if(!v) return '—';
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return escapeHtml(String(v));
+    return d.toLocaleString();
+  }
+
+  function statusClass(v){
+    const s = (v ?? '').toString().toLowerCase();
+    if (s.includes('assign') || s.includes('new')) return 'tag s-new';
+    if (s.includes('progress') || s.includes('pending')) return 'tag s-pending';
+    if (s.includes('complete') || s.includes('done')) return 'tag s-done';
+    if (s.includes('reject') || s.includes('cancel')) return 'tag s-bad';
+    return 'tag';
+  }
+
+  function roleLabel(v){
+    if (v === 1) return '1 (Admin)';
+    if (v === 2) return '2 (Staff/Driver)';
+    if (v === 3) return '3 (Volunteer Coordinator)';
+    return `${v ?? '—'}`;
+  }
+
+  // ========= MODAL =========
+  function openModal(title, bodyHtml, footHtml){
+    $('modalTitle').textContent = title || 'Details';
+    $('modalBody').innerHTML = bodyHtml || '';
+    $('modalFoot').innerHTML = footHtml || `<button class="btn" onclick="hideModal()">Close</button>`;
+    $('modalOverlay').style.display = 'flex';
+  }
+  function hideModal(){ $('modalOverlay').style.display = 'none'; }
+  function closeModal(e){ if(e.target.id === 'modalOverlay') hideModal(); }
+
+  function buildKV(obj, preferredOrder){
+    const entries = [];
+    const keys = preferredOrder?.length ? preferredOrder : Object.keys(obj || {});
+    keys.forEach(k => {
+      if (obj && Object.prototype.hasOwnProperty.call(obj, k)) entries.push({k, v: obj[k]});
+    });
+    if (obj){
+      Object.keys(obj).forEach(k => {
+        if (!keys.includes(k)) entries.push({k, v: obj[k]});
+      });
+    }
+    return entries.map(e => `
+      <div class="kv">
+        <div class="k">${escapeHtml(e.k)}</div>
+        <div class="v">${escapeHtml(e.v ?? '—')}</div>
+      </div>
+    `).join('');
+  }
+
+  // ========= AUTH + LOAD =========
+  async function init(){
+    const { data: sData, error: sErr } = await supabase.auth.getSession();
+    if (sErr){
+      showToast('Auth error', sErr.message);
+      window.location.href = '/staff-login/index.html';
+      return;
+    }
+    if (!sData.session){
       window.location.href = '/staff-login/index.html';
       return;
     }
 
-    const user = sessionData.session.user;
+    sessionUser = sData.session.user;
 
-    const { data: profile, error } = await supabase
+    // Profiles has both role and role_id in your schema screenshot; accept either.
+    const { data: p, error: pErr } = await supabase
       .from('profiles')
-      .select('*')
-      .eq('id', user.id)
+      .select('id, full_name, email, role, role_id')
+      .eq('id', sessionUser.id)
       .single();
 
-    if (error || !profile) {
+    if (pErr || !p){
       await supabase.auth.signOut();
       window.location.href = '/staff-login/index.html';
       return;
     }
 
-    if (profile.role === 1) {
+    profile = p;
+    const roleVal = (profile.role ?? profile.role_id);
+
+    if (roleVal === 1){
       window.location.href = '/admin/dashboard/home.html';
       return;
     }
-
-    renderProfile(profile);
-    await loadTasks(user.id);
-
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  }
-
-  function renderProfile(profile) {
-    document.getElementById('profileCard').innerHTML = `
-      <div><strong>Name:</strong> ${profile.full_name || '—'}</div>
-      <div><strong>Email:</strong> ${profile.email || '—'}</div>
-      <div><strong>Role:</strong> ${profile.role === 2 ? 'Staff' : 'Volunteer Coordinator'}</div>
-      <div><strong>ID:</strong> ${profile.id}</div>
-    `;
-  }
-
-  async function loadTasks(userId) {
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('assigned_to', userId)
-      .in('status', ['Assigned', 'InProgress']);
-
-    const body = document.getElementById('tasksBody');
-    body.innerHTML = '';
-
-    if (!tasks || tasks.length === 0) {
-      body.innerHTML = `<tr><td colspan="5">No tasks assigned.</td></tr>`;
+    if (roleVal !== 2 && roleVal !== 3){
+      await supabase.auth.signOut();
+      window.location.href = '/staff-login/index.html';
       return;
     }
 
-    tasks.forEach(task => {
-      body.innerHTML += `
-        <tr>
-          <td>${task.title}</td>
-          <td>${task.description}</td>
-          <td>${task.priority}</td>
-          <td>${task.status}</td>
-          <td>
-            <button class="btn-complete" onclick="completeTask('${task.id}')">
-              Complete
-            </button>
-          </td>
-        </tr>
-      `;
-    });
+    // Render profile + name immediately
+    $('staffName').textContent = profile.full_name || profile.email || 'Staff';
+    $('profileName').textContent = profile.full_name || '—';
+    $('profileEmail').textContent = profile.email || sessionUser.email || '—';
+    $('profileId').textContent = profile.id || sessionUser.id || '—';
+    $('rolePill').innerHTML = `<i class="fa-solid fa-shield"></i> Role: ${escapeHtml(roleLabel(roleVal))}`;
+
+    // Load tasks
+    await refreshTasks();
+
+    $('loading').style.display = 'none';
   }
 
-  async function completeTask(id) {
-    await supabase.from('tasks').update({ status: 'Completed' }).eq('id', id);
-    init();
-  }
-
-  async function logout() {
+  async function logout(){
     await supabase.auth.signOut();
     window.location.href = '/staff-login/index.html';
   }
+
+  // ========= TASKS =========
+  async function refreshTasks(){
+    if (!sessionUser?.id) return;
+
+    // IMPORTANT: do NOT filter by status here. Show ALL tasks assigned to the staff user.
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('id, assigned_to, title, description, status, priority, created_by, created_at')
+      .eq('assigned_to', sessionUser.id)
+      .order('created_at', { ascending: false });
+
+    if (error){
+      showToast('Tasks load failed', error.message);
+      tasksData = [];
+      renderTasks();
+      updateTaskStats();
+      return;
+    }
+
+    tasksData = data || [];
+    rebuildStatusFilter();
+    renderTasks();
+    updateTaskStats();
+  }
+
+  function rebuildStatusFilter(){
+    const sel = $('statusFilter');
+    const current = sel.value || 'ALL';
+
+    const statuses = Array.from(new Set(tasksData.map(t => t.status).filter(Boolean)));
+    const options = ['ALL', ...statuses];
+
+    sel.innerHTML = options.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+    // keep current selection if still available
+    if (options.includes(current)) sel.value = current;
+    else sel.value = 'ALL';
+  }
+
+  function updateTaskStats(){
+    const total = tasksData.length;
+    // best-effort classification
+    const done = tasksData.filter(t => (t.status || '').toString().toLowerCase().includes('complete') || (t.status || '').toString().toLowerCase().includes('done')).length;
+    const active = total - done;
+
+    $('taskTotal').textContent = total;
+    $('taskDone').textContent = done;
+    $('taskActive').textContent = active;
+  }
+
+  function renderTasks(){
+    const q = $('taskSearch').value?.trim().toLowerCase() || '';
+    const statusFilter = $('statusFilter').value || 'ALL';
+
+    const rows = tasksData.filter(t => {
+      const blob = [t.id, t.title, t.description, t.status, t.priority].join(' ').toLowerCase();
+      const matchesSearch = blob.includes(q);
+      const matchesStatus = (statusFilter === 'ALL') ? true : (t.status === statusFilter);
+      return matchesSearch && matchesStatus;
+    });
+
+    const tbody = $('tasksTbody');
+
+    if (!rows.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted">No tasks found for your filters.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(t => `
+      <tr>
+        <td class="mono">${escapeHtml(t.id)}</td>
+        <td style="font-weight:900;">${escapeHtml(t.title || '—')}</td>
+        <td class="muted">${escapeHtml((t.description || '').slice(0, 90))}${(t.description || '').length > 90 ? '…' : ''}</td>
+        <td>${escapeHtml(t.priority || '—')}</td>
+        <td><span class="${statusClass(t.status)}">${escapeHtml(t.status || '—')}</span></td>
+        <td>${fmtDate(t.created_at)}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn blue" onclick='viewTask(${JSON.stringify(t).replace(/'/g,"&#39;")})'><i class="fa-solid fa-eye"></i></button>
+          <button class="btn orange" onclick="promptUpdateStatus('${escapeHtml(t.id)}','${escapeHtml(t.status || '')}')"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn primary" onclick="quickComplete('${escapeHtml(t.id)}')"><i class="fa-solid fa-check"></i> Complete</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function viewTask(t){
+    const body = buildKV(t, ['id','title','description','priority','status','created_at','created_by','assigned_to']);
+    const foot = `
+      <button class="btn" onclick="hideModal()">Close</button>
+      <button class="btn orange" onclick="promptUpdateStatus('${escapeHtml(t.id)}','${escapeHtml(t.status || '')}')">
+        <i class="fa-solid fa-pen"></i> Update Status
+      </button>
+      <button class="btn primary" onclick="quickComplete('${escapeHtml(t.id)}')">
+        <i class="fa-solid fa-check"></i> Complete
+      </button>
+    `;
+    openModal('Task Details', body, foot);
+  }
+
+  function promptUpdateStatus(taskId, current){
+    // status options inferred from your actual data (avoids enum mismatch)
+    const existing = Array.from(new Set(tasksData.map(x => x.status).filter(Boolean))).slice(0, 30);
+    const fallback = ['Assigned','InProgress','Completed'];
+    const suggestions = existing.length ? existing : fallback;
+
+    const opts = suggestions.map(s => `
+      <option value="${escapeHtml(s)}" ${s === current ? 'selected' : ''}>${escapeHtml(s)}</option>
+    `).join('');
+
+    const body = `
+      <div class="field">
+        <label>Update task status</label>
+        <select id="taskStatusSelect">${opts}</select>
+      </div>
+      <div class="muted" style="margin-top:10px;">
+        Status options are inferred from your current database values to reduce enum errors.
+      </div>
+    `;
+    const foot = `
+      <button class="btn" onclick="hideModal()">Cancel</button>
+      <button class="btn primary" onclick="updateTaskStatus('${escapeHtml(taskId)}')"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    `;
+    openModal('Update Task Status', body, foot);
+  }
+
+  async function updateTaskStatus(taskId){
+    const newStatus = $('taskStatusSelect').value;
+
+    const { error } = await supabase
+      .from('tasks')
+      .update({ status: newStatus })
+      .eq('id', taskId);
+
+    if (error){
+      showToast('Update failed', error.message);
+      return;
+    }
+
+    showToast('Task updated', `Status set to "${newStatus}".`);
+    hideModal();
+    await refreshTasks();
+  }
+
+  async function quickComplete(taskId){
+    // Best-effort default. If your enum uses a different word, you will see the exact error in toast.
+    const { error } = await supabase.from('tasks').update({ status: 'Completed' }).eq('id', taskId);
+    if (error){
+      showToast('Complete failed', error.message);
+      return;
+    }
+    showToast('Completed', 'Task marked as Completed.');
+    hideModal();
+    await refreshTasks();
+  }
+
+  // ========= BOOT =========
+  init();
 </script>
 
 </body>
