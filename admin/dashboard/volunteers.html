@@ -3,190 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Applications - FoodShare Admin</title>
+    <title>Admin Dashboard - Volunteer Applications</title>
     <link rel="icon" href="../../image/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    
+    <style> /* CSS from 2a goes here for consistency */ </style>
     <style>
-        /* (Shared CSS omitted for brevity, assume the same as claims.html) */
+        /* Shared Admin Styles from 2a (for brevity, imagine them here) */
         :root {
-            --primary-main: #2196F3; /* Pluto primary blue */
-            --primary-dark: #1976D2;
-            --accent-green: #4CAF50; 
-            --accent-red: #F44336;
-            --accent-orange: #FF9800;
-            --neutral-bg: #F0F2F5; 
+            --primary-main: #4CAF50; 
+            --primary-dark: #388E3C;
+            --accent-blue: #2196F3;
+            --accent-red: #D32F2F;
+            --neutral-bg: #F5F7FA; 
             --neutral-card: #FFFFFF;
-            --text-dark: #333; 
-            --text-light: #777; 
-            --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --text-dark: #2C3E50; 
+            --text-light: #7f8c8d;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; background-color: var(--neutral-bg); min-height: 100vh; }
-        
-        #adminSidebar { width: 250px; background-color: #2c3e50; color: white; padding: 20px 0; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); position: fixed; height: 100%; overflow-y: auto; }
-        #adminSidebar h2 { font-size: 1em; color: #bdc3c7; padding: 15px 20px 5px; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sidebar-link { display: flex; align-items: center; padding: 12px 20px; color: #ecf0f1; text-decoration: none; transition: background-color 0.2s, color 0.2s; font-size: 0.95em; }
-        .sidebar-link i { margin-right: 10px; width: 20px; text-align: center; }
-        .sidebar-link:hover { background-color: #34495e; color: white; }
-        .sidebar-link.active { background-color: var(--primary-main); color: white; border-left: 5px solid var(--accent-green); }
-        
-        #mainContent { margin-left: 250px; flex-grow: 1; display: flex; flex-direction: column; }
-        #topbar { background-color: var(--neutral-card); padding: 15px 30px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; }
-        #topbar h1 { font-size: 1.5em; color: var(--text-dark); }
-        .user-menu { display: flex; align-items: center; cursor: pointer; }
-        .user-menu img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
-        .logout-btn { background-color: var(--accent-red); color: white; border: none; border-radius: 5px; padding: 8px 15px; font-weight: bold; cursor: pointer; margin-left: 15px; }
+        body { font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; background-color: var(--neutral-bg); color: var(--text-dark); display: flex; }
+        #sidebar { /* ... same as 2a ... */ width: 250px; background: var(--text-dark); color: white; height: 100vh; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); position: sticky; top: 0; flex-shrink: 0; }
+        #sidebar h2 { padding: 0 20px 20px; border-bottom: 1px solid #444; margin-bottom: 20px; }
+        #sidebar a { display: block; padding: 12px 20px; text-decoration: none; color: #ddd; transition: background 0.2s, color 0.2s; border-left: 5px solid transparent; }
+        #sidebar a:hover { background: #3c4a5c; color: white; }
+        #sidebar a.active { background: #3c4a5c; color: var(--primary-main); border-left-color: var(--primary-main); }
+        #main-content { flex-grow: 1; padding: 40px; }
+        .dashboard-header { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 15px; }
+        .dashboard-header h1 { color: var(--accent-blue); }
 
-        .dashboard-body { padding: 30px; }
-        .data-card { background: var(--neutral-card); padding: 25px; border-radius: 8px; box-shadow: var(--shadow-subtle); margin-top: 20px; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .data-table th, .data-table td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: left; font-size: 0.9em; }
-        .data-table th { background-color: var(--primary-main); color: white; font-weight: 600; }
-        .data-table tr:hover { background-color: #f8f9fa; }
-        
-        .action-button { background-color: var(--accent-blue); color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 0.8em; margin-top: 5px; display: block; width: 100%; text-align: center; }
-        .action-button.reject { background-color: var(--accent-red); }
-        .action-button:hover { opacity: 0.9; }
-
-        .status-badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.75em; text-transform: uppercase; }
-        .status-New, .status-Pending, .status-Assigned { background-color: var(--accent-orange); color: white; }
-        .status-Approved, .status-Resolved, .status-Completed { background-color: var(--accent-green); color: white; }
-        .status-Rejected, .status-Cancelled, .status-Closed { background-color: var(--accent-red); color: white; }
+        /* Page specific CSS */
+        .card { background: var(--neutral-card); padding: 25px; border-radius: 12px; box-shadow: var(--shadow-subtle); }
+        .app-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .app-table th { text-align: left; padding: 10px 15px; background: var(--neutral-bg); font-weight: 600; }
+        .app-table td { background: var(--neutral-card); padding: 15px; border-radius: 8px; box-shadow: var(--shadow-subtle); }
+        .action-btn { background: var(--primary-main); color: white; border: none; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+        .action-btn.reject { background: var(--accent-red); }
+        .status-Pending { background: #FF9800; color: white; }
+        .status-Approved { background: var(--primary-main); color: white; }
+        .status-Rejected { background: var(--accent-red); color: white; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em; }
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        // JS configuration and authGuard remain the same as 2a
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
         const ADMIN_ROLE_ID = 1;
-
-        function formatDate(dateString) { /* ... same function ... */
-            return new Date(dateString).toLocaleString('en-US', {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
-        }
-        function updateStatusBadge(status) { /* ... same function ... */
-            return `<span class="status-badge status-${status.replace(/\s/g, '')}">${status}</span>`;
-        }
-        function showLoading(bodyId, colspan, message = 'Fetching volunteer applications...') { /* ... same function ... */
-            const tbody = document.getElementById(bodyId);
-            if(tbody) tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align: center; font-style: italic;">${message}</td></tr>`;
-        }
-
-        // --- ACCESS CONTROL (Same as claims.html) ---
-        async function checkAccessAndRedirect() {
+        const STAFF_ROLES = [2, 3]; 
+        
+        async function authGuard(allowedRoles) { /* ... same as 2a ... */
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             const { data: { session } } = await supabase.auth.getSession();
-            if (!session) { window.location.href = '/staff-login/index.html'; return; }
-            const { data: profileData } = await supabase.from('profiles').select('role, full_name, profile_picture_url').eq('id', session.user.id).single();
-            if (!profileData || profileData.role !== ADMIN_ROLE_ID) {
-                if (profileData && [2, 3].includes(profileData.role)) { window.location.href = '/staff/dashboard.html'; return; }
-                await supabase.auth.signOut();
-                window.location.href = '/staff-login/index.html';
-                return;
+            if (!session) { window.location.href = '/staff-login/index.html'; return null; }
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles').select('role').eq('id', session.user.id).single();
+            if (profileError || !profileData) { await supabase.auth.signOut(); window.location.href = '/staff-login/index.html'; return null; }
+            if (!allowedRoles.includes(profileData.role)) {
+                if (STAFF_ROLES.includes(profileData.role)) { window.location.href = '/staff/dashboard.html'; return null; }
+                await supabase.auth.signOut(); window.location.href = '/staff-login/index.html'; return null;
             }
-            document.getElementById('profileNameTop').textContent = profileData.full_name;
-            document.getElementById('profileImgTop').src = profileData.profile_picture_url || '/image/default-staff-avatar.png';
-            document.getElementById('staffSidebarName').textContent = profileData.full_name;
-            fetchVolunteers();
+            return profileData;
         }
 
-        // --- DATA FETCH MODULE (FIXED COLUMNS) ---
-        async function fetchVolunteers() {
-            const volunteersBody = document.getElementById('volunteersTableBody');
-            showLoading('volunteersTableBody', 7);
+        async function fetchApplications() {
+            const appsBody = document.getElementById('applicationsTableBody');
+            appsBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">Loading volunteer applications...</td></tr>';
 
-            // FIX: Using your exact schema column: status
             const { data: apps, error } = await supabase
                 .from('volunteer_applications')
-                .select(`id, submitted_at, full_name, email, phone, location_island, available_hours, area_of_interest, skills, status`)
-                .order('submitted_at', { ascending: false });
+                .select(`id, full_name, email, phone, skills, status, created_at`)
+                .order('created_at', { ascending: true });
 
-            if (error) { showLoading('volunteersTableBody', 7, `Error loading applications: ${error.message}`); return; }
-            if (apps.length === 0) { showLoading('volunteersTableBody', 7, `No volunteer applications found.`); return; }
+            if (error) {
+                appsBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 30px;">Error loading applications: ${error.message}</td></tr>`;
+                return;
+            }
 
-            volunteersBody.innerHTML = apps.map(a => `
+            appsBody.innerHTML = apps.map(app => `
                 <tr>
-                    <td>${formatDate(a.submitted_at)}</td>
-                    <td>${a.full_name}<br><small>Area: ${a.area_of_interest || 'N/A'}</small></td>
-                    <td>${a.email}<br>${a.phone || 'N/A'}</td>
-                    <td>${a.location_island}<br><small>Skills: ${a.skills || 'N/A'}</small></td>
-                    <td>${a.available_hours || 'N/A'}</td>
-                    <td>${updateStatusBadge(a.status || 'New')}</td> <td style="width: 150px;">
-                        <button class="action-button" onclick="updateStatus('volunteer_applications', '${a.id}', 'Approved', ${a.status !== 'Approved'})">Approve</button>
-                        <button class="action-button reject" onclick="updateStatus('volunteer_applications', '${a.id}', 'Rejected', ${a.status !== 'Rejected'})">Reject</button>
+                    <td>${app.full_name}<br><small>${app.email}</small></td>
+                    <td>${app.phone}</td>
+                    <td>${app.skills}</td>
+                    <td><span class="status-badge status-${app.status.replace(/\s/g, '')}">${app.status}</span></td>
+                    <td style="width: 250px;">
+                        ${app.status === 'Pending' ? 
+                            `
+                            <button class="action-btn" onclick="updateStatus('${app.id}', 'Approved')"><i class="fas fa-check"></i> Approve</button>
+                            <button class="action-btn reject" onclick="updateStatus('${app.id}', 'Rejected')"><i class="fas fa-times"></i> Reject</button>
+                            ` :
+                            `<span>Status: ${app.status}</span>`
+                        }
                     </td>
                 </tr>
             `).join('');
         }
 
-        // --- GENERIC STATUS UPDATE (FIXED: Uses 'status' for all tables) ---
-        async function updateStatus(tableName, id, newStatus, isConfirmRequired = true) {
-            if (isConfirmRequired && !confirm(`Confirm change status of ID ${id.substring(0, 8)} to "${newStatus}" in the ${tableName} table?`)) { return; }
-            const { error } = await supabase.from(tableName).update({ status: newStatus }).eq('id', id); // 'status' is correct for volunteer_applications
-            if (error) { alert(`Failed to update status in ${tableName}: ` + error.message); } else { fetchVolunteers(); }
-        }
+        async function updateStatus(appId, newStatus) {
+            if (!confirm(`Confirm status change to ${newStatus}?`)) return;
 
-        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+            // Optional: If approved, you would need to also create a new user account (external service or Supabase function)
+            // For now, we only update the application status.
+            
+            const { error } = await supabase
+                .from('volunteer_applications')
+                .update({ status: newStatus, updated_at: new Date() })
+                .eq('id', appId);
+
+            if (error) {
+                alert(`Failed to update status: ${error.message}`);
+            } else {
+                fetchApplications(); // Refresh
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const profile = await authGuard([ADMIN_ROLE_ID]);
+            if (profile) {
+                fetchApplications();
+            }
+        });
     </script>
 </head>
 <body>
-    <nav id="adminSidebar">
-        <h2><i class="fas fa-tools"></i> General</h2>
-        <a href="/admin/dashboard/home.html" class="sidebar-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-        
-        <h2><i class="fas fa-tasks"></i> Workflow</h2>
-        <a href="/admin/dashboard/claims.html" class="sidebar-link"><i class="fas fa-hand-holding-heart"></i> Claims Review</a>
-        <a href="/admin/dashboard/donations.html" class="sidebar-link"><i class="fas fa-truck-loading"></i> Donations Intake</a>
-        <a href="/admin/dashboard/volunteers.html" class="sidebar-link active"><i class="fas fa-hands-helping"></i> Volunteer Apps</a>
-        <a href="/admin/dashboard/inquiries.html" class="sidebar-link"><i class="fas fa-question-circle"></i> Inquiries</a>
+    <div id="sidebar">
+        <h2><i class="fas fa-crown" style="color: var(--primary-main);"></i> FoodShare Admin</h2>
+        <a href="home.html"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a>
+        <a href="users.html"><i class="fas fa-users"></i> User Management</a>
+        <a href="tasks.html"><i class="fas fa-tasks"></i> Assign & Manage Tasks</a>
+        <a href="inventory.html"><i class="fas fa-warehouse"></i> Inventory</a>
+        <a href="donations.html"><i class="fas fa-boxes"></i> Donations Intake</a>
+        <a href="claims.html"><i class="fas fa-clipboard-list"></i> Claims Review</a>
+        <a href="volunteer_apps.html" class="active"><i class="fas fa-handshake"></i> Volunteer Apps</a>
+        <a href="inquiries.html"><i class="fas fa-envelope-open-text"></i> General Inquiries</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <hr style="border-color: #444; margin: 15px 20px;">
+        <a href="#" onclick="supabase.auth.signOut().then(() => { window.location.href = '/staff-login/index.html'; })"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
 
-        <h2><i class="fas fa-database"></i> Management</h2>
-        <a href="/admin/inventory-manage.html" class="sidebar-link"><i class="fas fa-boxes"></i> Inventory</a>
-        <a href="/admin/user-manage.html" class="sidebar-link"><i class="fas fa-users-cog"></i> User Management</a>
-        <a href="/admin/assign-task.html" class="sidebar-link"><i class="fas fa-tasks"></i> Assign Task</a>
-        <a href="/admin/dashboard/settings.html" class="sidebar-link"><i class="fas fa-cogs"></i> Settings</a>
-
-        <div style="padding: 20px; font-size: 0.8em; color: #bdc3c7; margin-top: 30px;">
-            <p>Role ID: 1 (Admin)</p>
-            <p id="staffSidebarName">Admin User</p>
+    <div id="main-content">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-handshake"></i> Volunteer Applications</h1>
+            <p style="color: var(--text-light);">Review and process applications from prospective general volunteers (Table: `volunteer_applications`).</p>
         </div>
-    </nav>
 
-    <div id="mainContent">
-        <header id="topbar">
-            <h1><i class="fas fa-hands-helping"></i> Volunteer Application Review</h1>
-            <div class="user-menu">
-                <img id="profileImgTop" src="/image/default-staff-avatar.png" alt="Profile">
-                <span id="profileNameTop">Admin User</span>
-                <button class="logout-btn" onclick="supabase.auth.signOut().then(() => { window.location.href = '/staff-login/index.html'; })">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </header>
-
-        <div class="dashboard-body">
-            <div class="data-card">
-                <p style="margin-bottom: 20px; color: var(--text-light);">Review, approve, and track new volunteer applicants. (Table: `volunteer_applications`)</p>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Full Name / Interest</th>
-                            <th>Contact Info</th>
-                            <th>Location / Skills</th>
-                            <th>Available Hours</th>
-                            <th>Status</th>
-                            <th style="width: 150px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="volunteersTableBody">
-                        </tbody>
-                </table>
-            </div>
+        <div class="card">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Applicant Name</th>
+                        <th style="width: 15%;">Contact</th>
+                        <th style="width: 25%;">Skills/Motivation</th>
+                        <th style="width: 15%;">Status</th>
+                        <th style="width: 20%;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                    </tbody>
+            </table>
         </div>
     </div>
 </body>
