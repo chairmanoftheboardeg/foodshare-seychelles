@@ -3,265 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodShare Seychelles - Staff Login</title>
-    <link rel="icon" href="/assets/image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <title>Login - Secure Access</title>
     <style>
-        /* --- Color Palette --- */
-        :root {
-            --color-primary: #4CAF50; /* Base Green */
-            --color-primary-dark: #388E3C; /* Darker Green for hover/accents */
-            --color-secondary: #2196F3; /* Blue for reliability */
-            --color-background: #f4f7f6; /* Light gray background */
-            --color-card-bg: #ffffff; /* White card background */
-            --color-text-dark: #333333;
-            --color-error: #D32F2F; /* Red for errors */
-        }
-
-        /* --- Global Reset and Body Styling --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+        /* Basic Reset and Setup */
         body {
-            background-color: var(--color-background);
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
         }
 
-        /* --- Login Container (The main card) --- */
+        /* Container for the Form */
         .login-container {
-            background-color: var(--color-card-bg);
+            background-color: #ffffff;
+            padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
-            padding: 40px;
+        }
+
+        /* Logo/Branding Section */
+        .logo-area {
             text-align: center;
-        }
-
-        /* --- Logo and Header Styling --- */
-        .logo-area img {
-            width: 80px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        .logo-area h1 {
-            font-size: 1.8em;
-            color: var(--color-text-dark);
-            margin-bottom: 5px;
-        }
-
-        .logo-area p {
-            color: #6c757d;
             margin-bottom: 30px;
-            font-size: 0.95em;
         }
 
-        /* --- Form and Input Styling --- */
-        .input-group {
-            position: relative;
+        .logo-area img {
+            /* Assuming your logo is in image/logo.png as mentioned */
+            width: 150px; /* Adjust size as needed */
+            height: auto;
+            border-radius: 8px; /* Optional: adds soft corners to the logo */
+        }
+
+        .login-container h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        /* Form Group Styles */
+        .form-group {
             margin-bottom: 20px;
-            text-align: left;
         }
 
-        .input-group input {
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 12px 12px 12px 45px;
-            border: 1px solid #dee2e6;
+            padding: 12px;
+            border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 1em;
+            box-sizing: border-box; /* Important for padding/width calculation */
             transition: border-color 0.3s;
         }
 
-        .input-group input:focus {
-            border-color: var(--color-primary);
+        .form-group input:focus {
+            border-color: #007bff; /* Highlight focus */
             outline: none;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
 
-        .input-group .icon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: #6c757d;
-            font-size: 1.1em;
-        }
-
-        /* --- Button Styling --- */
-        #loginButton {
+        /* Button Styles */
+        .login-btn {
             width: 100%;
-            padding: 15px;
-            background-color: var(--color-primary);
+            padding: 12px;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 8px;
+            cursor: pointer;
             font-size: 1.1em;
             font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: background-color 0.3s;
         }
 
-        #loginButton:hover {
-            background-color: var(--color-primary-dark);
+        .login-btn:hover {
+            background-color: #0056b3;
         }
 
-        #loginButton:active {
-            transform: scale(0.99);
-        }
-
-        #loginButton .fas {
-            margin-right: 10px;
-        }
-
-        /* --- Error Message Styling --- */
-        .error-message {
+        /* Footer Links */
+        .footer-links {
+            text-align: center;
             margin-top: 20px;
-            padding: 10px;
-            background-color: #ffeaea;
-            color: var(--color-error);
-            border: 1px solid var(--color-error);
-            border-radius: 8px;
             font-size: 0.9em;
-            text-align: left;
+        }
+
+        .footer-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="logo-area">
-            <img src="/assets/image/logo.png" alt="FoodShare Seychelles Logo">
-            <h1>Staff & Admin Login</h1>
-            <p>Access the operational dashboard.</p>
-        </div>
-
-        <form id="loginForm" class="login-form">
-            <div class="input-group">
-                <i class="fas fa-envelope icon"></i>
-                <input type="email" id="email" placeholder="Work Email" required>
-            </div>
-            
-            <div class="input-group">
-                <i class="fas fa-lock icon"></i>
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
-            
-            <button type="submit" id="loginButton">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-
-            <div id="error-message" class="error-message" style="display: none;"></div>
-        </form>
+<div class="login-container">
+    <div class="logo-area">
+        <img src="image/logo.png" alt="Your Company Logo">
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // --- Supabase Client Initialization ---
-        // !!! IMPORTANT: REPLACE THESE PLACEHOLDERS !!!
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        // ----------------------------------------
+    <h2>Sign In to Your Account</h2>
 
-        // Initialize Supabase client
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <form id="loginForm" action="#" method="POST">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="name@example.com">
+        </div>
 
-        // Role IDs as defined in the brief
-        const ROLE_ADMIN = 1;
-        const ROLE_STAFF_DRIVER = 2;
-        const ROLE_STAFF_COORDINATOR = 3;
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required placeholder="••••••••">
+        </div>
 
-        // --- DOM Elements ---
-        const loginForm = document.getElementById('loginForm');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const errorMessage = document.getElementById('error-message');
+        <button type="submit" class="login-btn">
+            Log In
+        </button>
+    </form>
 
-        /**
-         * Displays an error message to the user.
-         */
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
+    <div class="footer-links">
+        <a href="#">Forgot Password?</a>
+        <span>|</span>
+        <a href="#">Create Account</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        // 1. Prevent the default form submission (stops the page from reloading immediately)
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        // 2. Client-Side Validation (checks if fields are just empty)
+        if (!email || !password) {
+            alert('Please enter both email and password.');
+            return; // Stop the function here
         }
 
-        /**
-         * Hides the error message.
-         */
-        function hideError() {
-            errorMessage.textContent = '';
-            errorMessage.style.display = 'none';
-        }
+        // 3. THIS IS THE KEY: If the form is valid, this is where you send the data.
+        // Replace this alert with your actual AJAX/Fetch call to the server.
+        console.log('Attempting login with:', { email, password });
+        alert('Login attempt initiated. Now sending data to server...');
 
-        /**
-         * Handles the login and role-based redirection.
-         */
-        async function handleLogin(e) {
-            e.preventDefault();
-            hideError();
-
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            // 1. Authenticate the user against Supabase auth.users
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
-
-            if (authError) {
-                console.error('Authentication Error:', authError.message);
-                return showError('Login failed: Invalid email or password.');
-            }
-
-            // Get the user ID from the successful authentication data
-            const userId = authData.user.id;
-
-            // 2. Fetch the user's role from the 'profiles' table
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('role_id')
-                .eq('id', userId)
-                .single();
-
-            if (profileError || !profileData) {
-                console.error('Profile/Role Fetch Error:', profileError ? profileError.message : 'No profile found.');
-                // Log out the user since we can't determine their access level
-                await supabase.auth.signOut();
-                return showError('Profile configuration error. Please contact an administrator.');
-            }
-
-            const roleId = profileData.role_id;
-            
-            // --- 3. REDIRECTION LOGIC (using absolute paths from root) ---
-            if (roleId === ROLE_ADMIN) {
-                // Role 1: Admin Dashboard -> www.foodshare-seychelles.online/admin/dashboard/home.html
-                window.location.href = '/admin/dashboard/home.html';
-            } else if (roleId === ROLE_STAFF_DRIVER || roleId === ROLE_STAFF_COORDINATOR) {
-                // Roles 2 & 3: Staff Dashboard -> www.foodshare-seychelles.online/staff/dashboard.html
-                window.location.href = '/staff/dashboard.html';
+        // Example of a proper Fetch call (requires a server endpoint)
+        /*
+        fetch('your-server-login-url', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/dashboard.html'; // Redirect on success
             } else {
-                // Unknown or invalid role
-                console.warn('User logged in with an unrecognized role ID:', roleId);
-                await supabase.auth.signOut();
-                showError('Access Denied: Unrecognized user role.');
+                alert('Login failed: ' + data.message); // Show server error
             }
-        }
-
-        // Attach the event listener to the form
-        loginForm.addEventListener('submit', handleLogin);
-    </script>
+        })
+        .catch(error => {
+            console.error('Network or Server Error:', error);
+            alert('An unexpected error occurred during login.');
+        });
+        */
+    });
+</script>
 
 </body>
 </html>
