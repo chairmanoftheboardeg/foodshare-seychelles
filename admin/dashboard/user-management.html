@@ -1,0 +1,83 @@
+<script>
+        // ... (Same CONSTS and Utility functions as claims.html) ...
+        const ROLE_MAP = { 1: 'Admin', 2: 'Driver/Staff', 3: 'Volunteer Coordinator', 4: 'General Volunteer' };
+
+        async function checkAccessAndRedirect() {
+            // ... (Same Auth/Access check as claims.html) ...
+            fetchUsers(); // CHANGE: Fetch Users
+        }
+        
+        // --- USER MANAGEMENT MODULE (Table: profiles) ---
+        async function fetchUsers() {
+            const usersBody = document.getElementById('usersTableBody');
+            showLoading('usersTableBody', 6);
+
+            const { data: users, error } = await supabase
+                .from('profiles')
+                .select(`id, full_name, email, role, profile_picture_url`)
+                .order('full_name', { ascending: true });
+
+            if (error) { showLoading('usersTableBody', 6, `Error: ${error.message}`); return; }
+            if (users.length === 0) { showLoading('usersTableBody', 6, `No staff profiles found.`); return; }
+
+            usersBody.innerHTML = users.map(u => `
+                <tr>
+                    <td><img src="${u.profile_picture_url || '/image/default-staff-avatar.png'}" alt="Pic" style="width:30px; height:30px; border-radius:50%; margin-right: 10px; object-fit: cover;">${u.full_name}</td>
+                    <td>${u.email}</td>
+                    <td><span class="status-badge status-${ROLE_MAP[u.role].replace(/\s/g, '')}" style="background-color: ${u.role === 1 ? '#D32F2F' : u.role === 2 ? '#2196F3' : '#4CAF50'};">${ROLE_MAP[u.role]}</span></td>
+                    <td>${u.id.substring(0, 8)}...</td>
+                    <td>
+                        <button class="action-button" onclick="openRoleModal('${u.id}', '${u.full_name}', ${u.role})">Change Role</button>
+                        <button class="action-button reject" onclick="resetPassword('${u.email}')">Reset Password</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Placeholder functions
+        function openRoleModal(id, name, currentRole) { 
+             alert(`Open role change interface for ${name}. Current Role ID: ${currentRole}`); 
+        }
+        function resetPassword(email) { 
+             if (confirm(`Send password reset link to ${email}?`)) {
+                 alert('Password reset initiated (Supabase Auth action).');
+             }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', checkAccessAndRedirect);
+    </script>
+</head>
+<body>
+    <nav id="adminSidebar">
+        <h2><i class="fas fa-database"></i> Management</h2>
+        <a href="/admin/user-manage.html" class="sidebar-link active"><i class="fas fa-users-cog"></i> User Management</a>
+        </nav>
+    
+    <div id="mainContent">
+        <header id="topbar">
+            <h1>Staff and User Role Management</h1>
+            </header>
+
+        <div class="dashboard-body">
+            <div class="content-card">
+                <h2>All Staff Profiles (Table: `profiles`)</h2>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>User ID (Snippet)</th>
+                            <th style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
