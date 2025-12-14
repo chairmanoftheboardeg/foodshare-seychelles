@@ -10,113 +10,126 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     
     <style>
-        /* [START Inquiry Form CSS] */
+        /* [Inquiry Form CSS] - Reusing core styles for consistency */
         :root {
             --primary-main: #4CAF50; 
             --primary-dark: #388E3C;
             --accent-blue: #2196F3;
             --accent-red: #D32F2F;
-            --neutral-bg: #F0F2F5; 
+            --neutral-bg: #EAEFF2; 
             --neutral-card: #FFFFFF;
-            --text-dark: #333; 
+            --text-dark: #2C3E50; 
+            --text-light: #7f8c8d;
             --shadow-subtle: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
             background-color: var(--neutral-bg);
             color: var(--text-dark);
             line-height: 1.6;
-            padding: 40px 0;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+        }
+
+        /* Nav Bar - Simple Public Header */
+        #main-header {
+            background-color: var(--neutral-card);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+        }
+        .header-logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-main);
+            text-decoration: none;
+        }
+        .header-logo i { color: var(--accent-blue); margin-right: 5px; }
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--accent-blue); }
+
+        /* Main Content */
+        main {
+            flex-grow: 1;
+            padding: 50px 0;
+            display: flex;
+            justify-content: center;
         }
         .form-wrapper {
             background-color: var(--neutral-card);
             padding: 40px;
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: var(--shadow-subtle);
             width: 100%;
-            max-width: 650px;
+            max-width: 700px;
         }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        header h1 {
-            color: var(--primary-dark);
+        .form-wrapper h1 {
+            color: var(--accent-blue);
             font-size: 2em;
             margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
         }
-        header p {
+        .form-wrapper p {
             color: var(--text-light);
+            margin-bottom: 30px;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--text-dark);
+            font-weight: 600;
         }
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group textarea {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1em;
-            transition: border-color 0.3s;
         }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: var(--primary-main);
-            outline: none;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
+        .form-group textarea { min-height: 150px; resize: vertical; }
         .submit-btn {
             width: 100%;
             padding: 15px;
-            background-color: var(--accent-blue);
+            background-color: var(--primary-main);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s, opacity 0.3s;
+            transition: background-color 0.3s;
         }
-        .submit-btn:hover {
-            background-color: #1A7BCF;
-        }
-        .submit-btn:disabled {
-            background-color: #aaa;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        #responseMessage {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            font-weight: bold;
-            text-align: center;
-            display: none;
-        }
+        .submit-btn:hover { background-color: var(--primary-dark); }
+        .submit-btn:disabled { background-color: #aaa; opacity: 0.8; }
+        
+        #responseMessage { margin-top: 25px; padding: 15px; border-radius: 8px; font-weight: bold; text-align: center; display: none; }
         .success { background-color: #e8f5e9; color: var(--primary-dark); }
         .error { background-color: #ffebee; color: var(--accent-red); }
-        /* [END Inquiry Form CSS] */
+
+        /* Footer */
+        #main-footer {
+            background-color: var(--text-dark);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.9em;
+        }
     </style>
     
     <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJisp...'; // Placeholder key
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
         let supabase;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -141,27 +154,27 @@
             const subject = form.subject.value;
             const message = form.messageContent.value;
 
-            // Insert data into the 'inquiries' table
+            // Database insertion logic (this is the table that feeds the admin dashboard)
             const { error } = await supabase
                 .from('inquiries')
                 .insert([
                     {
-                        sender_name: sender_name,
-                        sender_email: sender_email,
-                        subject: subject,
-                        message: message,
-                        status: 'New', // Default status for admin review
+                        sender_name,
+                        sender_email,
+                        subject,
+                        message,
+                        status: 'New', 
                         received_at: new Date()
                     }
                 ]);
 
             if (error) {
-                showMessage(messageDiv, 'error', `Submission failed. Please try again later. Error: ${error.message}`);
+                showMessage(messageDiv, 'error', `Submission failed. Error: ${error.message}`);
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Inquiry';
             } else {
-                showMessage(messageDiv, 'success', 'Thank you! Your inquiry has been sent and will be reviewed shortly.');
-                form.reset(); // Clear the form on success
+                showMessage(messageDiv, 'success', 'Success! Your inquiry has been sent and staff will contact you shortly.');
+                form.reset(); 
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Inquiry';
             }
@@ -175,39 +188,53 @@
     </script>
 </head>
 <body>
-    <div class="form-wrapper">
-        <header>
-            <h1><i class="fas fa-question-circle" style="color: var(--accent-blue);"></i> General Inquiry</h1>
-            <p>Use this form for general questions, feedback, or non-urgent matters. If you are a donor or claimant, please use the specific forms.</p>
-        </header>
+    <header id="main-header">
+        <a href="/" class="header-logo"><i class="fas fa-seedling"></i> FoodShare</a>
+        <nav class="nav-links">
+            <a href="/">Home</a>
+            <a href="/donate/request.html">Donate Food</a>
+            <a href="/claim/form.html">Claim Food</a>
+            <a href="/staff-login/index.html">Staff Login</a>
+        </nav>
+    </header>
 
-        <form id="inquiryForm">
-            <div class="form-group">
-                <label for="senderName"><i class="fas fa-user"></i> Your Full Name</label>
-                <input type="text" id="senderName" name="senderName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="senderEmail"><i class="fas fa-at"></i> Your Email Address</label>
-                <input type="email" id="senderEmail" name="senderEmail" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="subject"><i class="fas fa-tag"></i> Subject</label>
-                <input type="text" id="subject" name="subject" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="messageContent"><i class="fas fa-comment-alt"></i> Your Message</label>
-                <textarea id="messageContent" name="messageContent" required></textarea>
-            </div>
-            
-            <button type="submit" id="submitBtn" class="submit-btn">
-                <i class="fas fa-paper-plane"></i> Submit Inquiry
-            </button>
-        </form>
+    <main>
+        <div class="form-wrapper">
+            <h1><i class="fas fa-envelope-open-text"></i> Contact Us</h1>
+            <p>Please use this form for general questions, partnership inquiries, or feedback. We aim to respond within 24 hours.</p>
 
-        <div id="responseMessage" class="success"></div>
-    </div>
+            <form id="inquiryForm">
+                <div class="form-group">
+                    <label for="senderName"><i class="fas fa-user-circle"></i> Your Full Name</label>
+                    <input type="text" id="senderName" name="senderName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="senderEmail"><i class="fas fa-at"></i> Your Email Address</label>
+                    <input type="email" id="senderEmail" name="senderEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject"><i class="fas fa-bookmark"></i> Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="messageContent"><i class="fas fa-comment-dots"></i> Your Message (Be Detailed)</label>
+                    <textarea id="messageContent" name="messageContent" required></textarea>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Inquiry
+                </button>
+            </form>
+
+            <div id="responseMessage"></div>
+        </div>
+    </main>
+    
+    <footer id="main-footer">
+        <p>FoodShare Seychelles. Connecting food surplus with need since 2024. | <a href="/contact/inquiry.html" style="color: white; text-decoration: none;">Contact</a></p>
+    </footer>
 </body>
 </html>
