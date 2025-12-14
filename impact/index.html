@@ -12,7 +12,7 @@
         /* [START STANDARD CSS BLOCK] */
         :root {
             --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800;
+            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
             --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
             --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
             --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
@@ -26,7 +26,7 @@
         h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
         .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
 
-        /* NAVIGATION BAR */
+        /* NAVIGATION BAR (omitted for brevity - assume it's included) */
         #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
         .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
         .logo-img { height: 40px; margin-right: 10px; } 
@@ -37,7 +37,7 @@
         .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
         .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
 
-        /* FOOTER STYLING */
+        /* FOOTER STYLING (omitted for brevity - assume it's included) */
         #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
         .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
         .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
@@ -49,8 +49,8 @@
         /* Impact Page Specific Styles */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjusted for 5 columns */
+            gap: 20px;
             margin: 40px 0;
             text-align: center;
         }
@@ -62,15 +62,20 @@
             transition: transform 0.3s;
             border-bottom: 5px solid var(--primary-main);
         }
+        .stat-card:nth-child(2) { border-bottom-color: var(--accent-orange); }
+        .stat-card:nth-child(3) { border-bottom-color: var(--accent-blue); }
+        .stat-card:nth-child(4) { border-bottom-color: #673AB7; } /* Purple for people/claims */
+        .stat-card:nth-child(5) { border-bottom-color: var(--primary-dark); } /* Darker green for CO2 */
+
         .stat-card:hover { transform: translateY(-5px); }
         .stat-value {
-            font-size: 3.5em;
+            font-size: 2.8em; /* Slightly reduced font size for 5 cards */
             font-weight: bold;
             color: var(--primary-dark);
             margin-bottom: 5px;
         }
         .stat-label {
-            font-size: 1.1em;
+            font-size: 0.95em;
             color: var(--text-light);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -83,15 +88,30 @@
             box-shadow: var(--shadow-subtle);
         }
         .report-section h2 { margin-bottom: 20px; border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; }
-        #categoryList { list-style: none; padding: 0; }
+        #categoryList { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
         #categoryList li { 
             background-color: var(--neutral-bg); 
             padding: 10px 15px; 
             border-radius: 6px; 
-            margin-bottom: 8px;
             font-weight: 500;
             border-left: 3px solid var(--accent-orange);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+        .kg-value { font-weight: bold; color: var(--primary-dark); }
+        
+        /* Environmental note styling */
+        .environmental-note {
+            background-color: #E0F2F1; /* Light teal */
+            border-left: 5px solid #009688; /* Darker teal */
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            color: #00796B;
+        }
+        .environmental-note strong { color: #004D40; }
         /* [END STANDARD CSS BLOCK] */
     </style>
     
@@ -102,52 +122,69 @@
 
         document.addEventListener('DOMContentLoaded', () => {
              if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                fetchImpactData();
-            } else {
-                console.error("Supabase client library failed to load.");
-            }
+                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                 fetchImpactData();
+             } else {
+                 console.error("Supabase client library failed to load.");
+             }
         });
 
         const updateMetric = (id, value) => {
             const element = document.getElementById(id);
             if (element) {
-                element.textContent = value.toLocaleString();
+                // Use maximumFractionDigits: 0 for whole numbers, or a maximum of 1 for high values (e.g., Tons)
+                element.textContent = value.toLocaleString(undefined, { maximumFractionDigits: (value < 1000) ? 0 : 1 });
             }
         };
 
         async function fetchImpactData() {
-            // 1. Total Kilograms Rescued & Donations Count
-            const { data: sumData, count: donationCount, error: dataError } = await supabase
+            // 1. Total Kilograms Rescued & Donations Count (from donation_requests)
+            const { data: sumData, error: dataError } = await supabase
                 .from('donation_requests')
-                .select('quantity_kg, food_type', { count: 'exact' });
+                .select('quantity_kg, food_type, status');
 
             let totalKg = 0;
-            if (sumData && !dataError) {
-                // Filter and sum only completed donations for accuracy
-                totalKg = sumData
-                    .filter(item => item.status === 'Completed' || true) // Temporarily remove status check if RLS prevents it
-                    .reduce((sum, item) => sum + (item.quantity_kg || 0), 0);
-            }
-            updateMetric('totalKgRescued', Math.round(totalKg));
-            updateMetric('totalDonations', donationCount || 0);
-
-            // 2. Estimated Meals Provided (1Kg = 2 meals)
-            const estimatedMeals = Math.round(totalKg * 2); 
-            updateMetric('estimatedMeals', estimatedMeals);
+            let donationsProcessed = 0;
             
-            // 3. Total Volunteer Applications (Requires a COUNT on the volunteer_applications table)
+            if (sumData && !dataError) {
+                // Only count items with status 'Collected' or 'Completed' for official impact metrics
+                const filteredData = sumData.filter(item => item.status === 'Collected' || item.status === 'Completed');
+                
+                totalKg = filteredData.reduce((sum, item) => sum + (item.quantity_kg || 0), 0);
+                donationsProcessed = filteredData.length;
+            }
+            
+            // 2. Estimated Meals Provided (Industry Standard: 1 Kg = 2 Meals)
+            const estimatedMeals = Math.round(totalKg * 2); 
+            updateMetric('totalKgRescued', Math.round(totalKg));
+            updateMetric('estimatedMeals', estimatedMeals);
+            updateMetric('totalDonations', donationsProcessed);
+            
+            // 3. Environmental Impact (Industry Standard: 1 Kg of rescued food prevents 3.8 Kg of CO2e)
+            const co2OffsetKg = Math.round(totalKg * 3.8);
+            const co2OffsetTonnes = co2OffsetKg / 1000;
+            updateMetric('co2OffsetTonnes', co2OffsetTonnes); 
+
+            // 4. Total Volunteer Applications (from volunteer_applications)
             const { count: volunteerCount } = await supabase
-                .from('volunteer_applications')
+                .from('volunteer_applications') 
                 .select('*', { count: 'exact', head: true });
                 
             updateMetric('totalVolunteers', volunteerCount || 0);
             
+            // 5. Total People Helped (Total successfully processed claims - assuming 'Approved' claims equals one person helped)
+            const { count: claimsCount } = await supabase
+                .from('claims')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'Approved'); // Only count claims approved by admin as 'helped'
+                
+            updateMetric('peopleHelped', claimsCount || 0);
+
             if (dataError) {
-                console.error("Error fetching impact data:", dataError);
+                console.error("Error fetching donation data:", dataError);
             }
 
-            // 4. Fetch and display categories
+            // 6. Fetch and display categories
             fetchCategories(sumData);
         }
 
@@ -156,13 +193,13 @@
             categoryListEl.innerHTML = '';
             
             if (!data || data.length === 0) {
-                categoryListEl.innerHTML = '<li>No completed donation data available to categorize.</li>';
+                categoryListEl.innerHTML = '<li>No confirmed donation data available to categorize.</li>';
                 return;
             }
 
-            // Group and sum quantities by food_type
+            // Group and sum quantities by food_type, filtering only completed/collected items
             const categoryMap = data
-                .filter(item => item.status === 'Completed' || true) // Same temporary status check
+                .filter(item => item.status === 'Collected' || item.status === 'Completed')
                 .reduce((acc, item) => {
                     const type = item.food_type || 'Unknown Category';
                     acc[type] = (acc[type] || 0) + (item.quantity_kg || 0);
@@ -174,7 +211,10 @@
 
             categories.forEach(([type, quantity]) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `${type}: ${Math.round(quantity).toLocaleString()} kg`;
+                listItem.innerHTML = `
+                    <span><i class="fas fa-box-open"></i> ${type}</span>
+                    <span class="kg-value">${Math.round(quantity).toLocaleString()} kg</span>
+                `;
                 categoryListEl.appendChild(listItem);
             });
         }
@@ -200,7 +240,7 @@
     <main>
         <div class="content-container">
             <header style="text-align: center; margin-bottom: 40px;">
-                <h1 id="impact-title">Our Impact in Seychelles</h1>
+                <h1 id="impact-title">Our Impact in Seychelles: By The Numbers</h1>
                 <p>See the real-time difference we are making in the fight against food waste and hunger, powered by our community and partners.</p>
             </header>
 
@@ -210,35 +250,57 @@
                     <div id="totalKgRescued" class="stat-value">0</div>
                     <div class="stat-label">Total Kilograms Rescued</div>
                 </div>
+                
                 <div class="stat-card">
                     <i class="fas fa-utensils fa-3x" style="color: var(--accent-orange); margin-bottom: 10px;"></i>
                     <div id="estimatedMeals" class="stat-value">0</div>
                     <div class="stat-label">Estimated Meals Provided</div>
                 </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-handshake fa-3x" style="color: #673AB7; margin-bottom: 10px;"></i>
+                    <div id="peopleHelped" class="stat-value">0</div>
+                    <div class="stat-label">Successful Claims/People Helped</div>
+                </div>
+
                 <div class="stat-card">
                     <i class="fas fa-hand-holding-heart fa-3x" style="color: var(--accent-blue); margin-bottom: 10px;"></i>
                     <div id="totalDonations" class="stat-value">0</div>
-                    <div class="stat-label">Total Donations Processed</div>
+                    <div class="stat-label">Donations Collected</div>
                 </div>
+                
                 <div class="stat-card">
-                    <i class="fas fa-users fa-3x" style="color: #673AB7; margin-bottom: 10px;"></i>
-                    <div id="totalVolunteers" class="stat-value">0</div>
-                    <div class="stat-label">Volunteer Applications Received</div>
+                    <i class="fas fa-leaf fa-3x" style="color: var(--primary-dark); margin-bottom: 10px;"></i>
+                    <div id="co2OffsetTonnes" class="stat-value">0</div>
+                    <div class="stat-label">Metric Tons of $\text{CO}_2$ Offset</div>
                 </div>
             </div>
 
+            <div class="environmental-note">
+                <p><i class="fas fa-chart-line"></i> **Environmental Impact Note:** Food waste is a major contributor to greenhouse gases. By diverting food from landfill, we prevent methane creation. We estimate that $1 \text{ kg}$ of food rescued prevents the emission of $3.8 \text{ kg}$ of $\text{CO}_2$ equivalents.</p>
+            </div>
+
             <div class="report-section">
-                <h2>Our Mission & Data Transparency</h2>
-                <p>FoodShare Seychelles is committed to transparency. The data above reflects contributions from our community.</p>
-                <p style="margin-top: 15px;">We convert rescued weight into estimated meals using the standard industry metric of $1 \text{ kg} = 2$ meals.</p>
+                <h2>Data Transparency and Breakdown</h2>
+                <p>FoodShare Seychelles is committed to transparency. The figures above are calculated directly from processed and confirmed donations and claims within our system.</p>
                 
-                <h3 style="margin-top: 30px;">Food Category Breakdown (Year to Date)</h3>
-                <div id="categoryBreakdown" style="padding: 15px;">
+                <h3 style="margin-top: 30px;"><i class="fas fa-list-alt"></i> Food Category Breakdown (Confirmed Donations)</h3>
+                <p style="margin-bottom: 15px; font-size: 0.9em; color: var(--text-light);">See what types of food the community is donating and receiving the most.</p>
+                <div id="categoryBreakdown" style="padding: 10px 0;">
                     <ul id="categoryList">
                         <li>Loading categories...</li>
                     </ul>
                 </div>
-                <p style="margin-top: 15px; font-size: 0.9em; color: var(--text-light);">*Data aggregates completed donation requests by food type.</p>
+
+                <h3 style="margin-top: 30px;"><i class="fas fa-users"></i> Volunteer Involvement</h3>
+                <div style="padding: 15px; background: var(--neutral-bg); border-radius: 6px;">
+                    <p style="font-size: 1.5em; font-weight: bold; color: var(--accent-blue); margin-bottom: 10px;">
+                        <span id="totalVolunteers">0</span> Volunteer Applications Received
+                    </p>
+                    <p style="font-size: 0.9em; color: var(--text-light);">
+                        Your willingness to help is the engine of our logistics. If you haven't applied, consider joining our mission!
+                    </p>
+                </div>
             </div>
         </div>
     </main>
