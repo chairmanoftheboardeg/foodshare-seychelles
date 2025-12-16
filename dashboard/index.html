@@ -1,599 +1,618 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff Dashboard - Foodshare Seychelles Management</title>
-    
-    <link rel="icon" type="image/png" href="../image/logo.png">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Dashboard — FoodShare Seychelles</title>
+  <link rel="icon" href="/image/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
+      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
+      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
+      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
+      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
+      --transition-speed:0.35s;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);color:var(--text-dark);background:var(--neutral-bg);min-height:100vh;display:flex;flex-direction:column}
+    a{text-decoration:none;color:var(--primary-main)}
+    a:hover{color:var(--primary-dark)}
+    main{flex:1;padding:34px 0}
+    .content-container{max-width:1150px;margin:0 auto;padding:0 25px}
 
-    <style>
-        /* Theme Variables */
-        :root {
-            --primary: #4CAF50; /* Vibrant Green */
-            --secondary: #388E3C; /* Darker Green */
-            --tertiary: #FFC107; /* Amber/Warning */
-            --neutral: #F5F5F5; /* Light Grey */
-            --dark: #212121; /* Dark Text */
-            --white: #ffffff;
-            --font-family: 'Helvetica', 'Arial', sans-serif;
-            --danger: #D32F2F; /* Red */
-        }
+    /* NAVBAR */
+    #navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 25px;background:var(--neutral-card);box-shadow:0 4px 12px rgba(0,0,0,0.08);position:sticky;top:0;z-index:1000}
+    .logo-container{display:flex;align-items:center;font-size:1.6em;font-weight:bold;color:var(--text-dark)}
+    .logo-img{height:40px;margin-right:10px}
+    .nav-links-container{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .nav-link{font-weight:600;padding:8px 0;position:relative;color:var(--text-dark)}
+    .nav-link::after{content:'';position:absolute;width:0;height:2px;bottom:-5px;left:0;background:var(--primary-main);transition:width var(--transition-speed)}
+    .nav-link:hover::after{width:100%}
 
-        /* Base and Layout */
-        body {
-            font-family: var(--font-family); 
-            margin: 0; 
-            background-color: var(--neutral);
-            color: var(--dark); 
-            display: flex;
-            height: 100vh;
-            overflow: hidden; /* Prevent body scroll */
-        }
+    .nav-actions{display:flex;align-items:center;gap:12px}
+    .icon-btn{
+      position:relative; border:1px solid rgba(56,142,60,0.16);
+      background:#fff; border-radius:999px; padding:10px 12px; cursor:pointer;
+      transition:transform .12s ease, box-shadow .2s ease;
+    }
+    .icon-btn:hover{box-shadow:0 10px 18px rgba(0,0,0,0.08)}
+    .icon-btn:active{transform:translateY(1px)}
+    .badge{
+      position:absolute; top:-6px; right:-6px;
+      background:var(--accent-red); color:#fff; font-weight:900;
+      font-size:.75rem; padding:4px 7px; border-radius:999px;
+      border:2px solid #fff;
+      display:none;
+    }
+    .user-chip{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 10px;border-radius:999px;background:rgba(129,199,132,0.15);
+      border:1px solid rgba(56,142,60,0.18);
+      max-width:260px;
+    }
+    .avatar{
+      width:34px;height:34px;border-radius:50%;object-fit:cover;
+      border:2px solid rgba(56,142,60,0.25); background:#fff;
+    }
+    .user-chip b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .user-chip span{display:block;font-size:.82rem;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-        /* --- Sidebar Navigation --- */
-        #sidebar {
-            width: 250px;
-            background-color: var(--dark);
-            color: var(--white);
-            padding: 20px 0;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
+    /* FOOTER */
+    #main-footer{margin-top:auto;background:#222;color:var(--neutral-bg);padding:50px 0 20px;font-size:.9em}
+    .footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:30px;max-width:1200px;margin:0 auto 30px;padding:0 25px;gap:18px}
+    .footer-section{width:20%;min-width:180px;margin-bottom:20px}
+    .footer-section h3{color:var(--primary-light);margin-bottom:14px;font-size:1.1em;border-bottom:1px solid rgba(255,255,255,0.12);padding-bottom:6px}
+    .footer-section a{color:var(--neutral-bg);display:block;padding:3px 0}
+    .footer-section a:hover{color:var(--primary-main);text-decoration:underline}
+    .footer-bottom{text-align:center;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);color:#aaa;font-size:.85em}
 
-        .logo-dash {
-            text-align: center;
-            padding: 10px 20px 30px;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--primary);
-            border-bottom: 1px solid #333;
-            margin-bottom: 20px;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            font-size: 1.05em;
-        }
+    /* LAYOUT */
+    .grid{display:grid;grid-template-columns: 1.05fr 0.95fr;gap:18px;align-items:start}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
 
-        .nav-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
+    .card{
+      background:var(--neutral-card);
+      border-radius:16px;
+      box-shadow:var(--shadow-subtle);
+      border:1px solid rgba(56,142,60,0.14);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";position:absolute;left:0;top:0;right:0;height:6px;
+      background:linear-gradient(90deg,var(--primary-dark),var(--primary-main),var(--primary-light));
+    }
+    .card-inner{padding:22px}
+    h1,h2{font-family:var(--font-serif);color:var(--primary-dark)}
+    h1{font-size:1.85rem;margin-bottom:6px}
+    .sub{color:var(--text-light);line-height:1.7}
 
-        .nav-item:hover, .nav-item.active {
-            background-color: var(--secondary);
-            color: var(--white);
-        }
+    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+    .btn{
+      border:none;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;
+      background:var(--primary-main);color:#fff;box-shadow:0 10px 18px rgba(0,0,0,0.10);
+    }
+    .btn:hover{background:var(--primary-dark)}
+    .btn.ghost{
+      background:#fff;color:var(--primary-dark);border:1px solid rgba(56,142,60,0.22);box-shadow:none;
+    }
+    .btn.ghost:hover{background:rgba(129,199,132,0.12)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
 
-        .nav-item:hover .badge, .nav-item.active .badge {
-            background-color: var(--tertiary);
-            color: var(--dark);
-        }
+    .list{margin-top:14px;display:grid;gap:10px}
+    .item{
+      border:1px solid rgba(0,0,0,0.06);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+    }
+    .item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .pill{
+      font-size:.78rem;font-weight:900;padding:6px 10px;border-radius:999px;
+      background:rgba(129,199,132,0.18);
+      border:1px solid rgba(56,142,60,0.22);
+      color:var(--primary-dark);
+      white-space:nowrap;
+    }
+    .item p{margin-top:6px;color:var(--text-light);line-height:1.55}
+    .muted{color:var(--text-light);font-size:.95rem}
 
-        .badge {
-            margin-left: auto;
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
+    /* Notification dropdown */
+    .dropdown{
+      position:absolute; right:0; top:54px;
+      width:min(420px, 92vw);
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.10);
+      border-radius:14px;
+      box-shadow:0 18px 40px rgba(0,0,0,0.12);
+      display:none;
+      overflow:hidden;
+      z-index:2000;
+    }
+    .dropdown header{
+      padding:12px 14px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+      background:rgba(129,199,132,0.16);
+      border-bottom:1px solid rgba(56,142,60,0.14);
+      font-weight:900;color:var(--primary-dark);
+    }
+    .dropdown .body{max-height:420px;overflow:auto}
+    .drop-item{
+      padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.06);
+    }
+    .drop-item:last-child{border-bottom:none}
+    .drop-item b{display:block}
+    .drop-item .meta{margin-top:4px;font-size:.85rem;color:var(--text-light)}
+    .drop-item.unread{background:rgba(33,150,243,0.06)}
+    .link-btn{border:none;background:transparent;color:var(--accent-blue);font-weight:900;cursor:pointer}
+    .link-btn:hover{text-decoration:underline}
 
-        /* --- Main Content Area --- */
-        #main-content {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto; /* Enable scrolling for main content */
-        }
-        
-        .content-section {
-            display: none; /* Hidden by default, shown by JS */
-        }
+    /* Toast */
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%);
+      bottom:20px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.12);
+      box-shadow:0 18px 40px rgba(0,0,0,0.12);
+      border-radius:14px;
+      padding:12px 14px;
+      width:min(520px, 92vw);
+      display:none;
+      z-index:3000;
+    }
+    .toast b{color:var(--primary-dark)}
+    .toast p{margin-top:4px;color:var(--text-light);line-height:1.45}
 
-        .content-section.active {
-            display: block;
-        }
+    /* Loading overlay */
+    .loading{
+      position:fixed; inset:0; background:rgba(249,249,249,0.9);
+      display:flex; align-items:center; justify-content:center; z-index:5000;
+    }
+    .spinner{
+      width:52px;height:52px;border-radius:50%;
+      border:5px solid rgba(76,175,80,0.18);
+      border-top-color: var(--primary-main);
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px;
-        }
+    /* Floating assistance button (stub now; links to your assistance form) */
+    .assist-btn{
+      position:fixed; right:18px; bottom:18px;
+      width:56px; height:56px; border-radius:50%;
+      background:var(--accent-blue); color:#fff;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 18px 40px rgba(0,0,0,0.18);
+      cursor:pointer; z-index:2500;
+      border: none;
+    }
+    .assist-btn:hover{filter:brightness(0.95)}
+  </style>
 
-        .section-header h2 {
-            margin: 0;
-            color: var(--dark);
-        }
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    let supabase;
+    let currentUser = null;
+    let lastToastAt = 0;
 
-        /* --- Table Styling --- */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: var(--white);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
+    function qs(id){ return document.getElementById(id); }
 
-        .data-table th, .data-table td {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            text-align: left;
-            font-size: 0.9em;
-        }
+    function setLoading(show){
+      qs('loading').style.display = show ? 'flex' : 'none';
+    }
 
-        .data-table th {
-            background-color: var(--secondary);
-            color: var(--white);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
+    function toggleDropdown(show){
+      qs('notifDropdown').style.display = show ? 'block' : 'none';
+    }
 
-        .data-table tr:nth-child(even) {
-            background-color: var(--neutral);
-        }
+    function setBadge(count){
+      const b = qs('notifBadge');
+      if (!count || count <= 0){ b.style.display = 'none'; b.textContent = ''; return; }
+      b.style.display = 'inline-block';
+      b.textContent = String(count);
+    }
 
-        .data-table tr:hover {
-            background-color: #e0f2f1; /* Light hover effect */
-        }
+    function fmtTime(ts){
+      try { return new Date(ts).toLocaleString(); } catch { return ''; }
+    }
 
-        /* --- Action Buttons in Table --- */
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-weight: bold;
-            transition: opacity 0.2s;
-            margin-right: 5px;
-        }
+    function toast(title, body){
+      const now = Date.now();
+      if (now - lastToastAt < 2500) return;
+      lastToastAt = now;
 
-        .btn-view { background-color: var(--primary); color: var(--white); }
-        .btn-approve { background-color: #64B5F6; color: var(--white); }
-        .btn-reject { background-color: var(--danger); color: var(--white); }
-        .btn-publish { background-color: var(--tertiary); color: var(--dark); }
+      qs('toastTitle').textContent = title || 'Update';
+      qs('toastBody').textContent = body || '';
+      qs('toast').style.display = 'block';
+      setTimeout(() => { qs('toast').style.display = 'none'; }, 5200);
+    }
 
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-        
-        /* --- Status/Pill Indicators --- */
-        .status-pill {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.75em;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+    async function authGuard(){
+      const { data } = await supabase.auth.getSession();
+      if (!data?.session?.user){
+        window.location.href = '/account/';
+        return null;
+      }
+      currentUser = data.session.user;
+      return currentUser;
+    }
 
-        .status-new { background-color: #FFC107; color: var(--dark); }
-        .status-pending { background-color: #64B5F6; color: var(--dark); }
-        .status-approved { background-color: var(--primary); color: var(--white); }
-        .status-completed { background-color: var(--secondary); color: var(--white); }
-        .status-rejected { background-color: var(--danger); color: var(--white); }
-        .status-published { background-color: var(--primary); color: var(--white); }
+    async function loadProfile(){
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name,email,phone,avatar_url,role,linkedin_url')
+        .eq('id', currentUser.id)
+        .single();
 
+      if (error){
+        qs('welcomeName').textContent = 'Welcome';
+        return;
+      }
 
-        /* --- Dashboard Overview Styles (Home Section) --- */
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+      const name = data.full_name || 'Community Member';
+      qs('welcomeName').textContent = `Welcome, ${name}`;
+      qs('chipName').textContent = name;
+      qs('chipEmail').textContent = data.email || currentUser.email || '';
 
-        .stat-card {
-            background-color: var(--white);
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid;
-            text-align: left;
-        }
+      const avatar = data.avatar_url && data.avatar_url.trim() ? data.avatar_url.trim() : '/image/logo.png';
+      qs('avatarImg').src = avatar;
+      qs('avatarImg').alt = name + ' avatar';
 
-        .stat-card h3 {
-            margin: 0 0 5px 0;
-            font-size: 1.1em;
-            color: #666;
-        }
+      qs('profileName').textContent = name;
+      qs('profileEmail').textContent = data.email || currentUser.email || '';
+      qs('profilePhone').textContent = data.phone || 'Not set';
+      qs('profileLinkedIn').innerHTML = data.linkedin_url
+        ? `<a href="${data.linkedin_url}" target="_blank" rel="noopener">View LinkedIn</a>`
+        : 'Not set';
+    }
 
-        .stat-card .value {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
+    async function updateAvatar(){
+      const url = prompt('Paste your profile picture URL (must be a direct image URL):');
+      if (!url) return;
 
-        .stat-card.green { border-color: var(--primary); }
-        .stat-card.green .value { color: var(--primary); }
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: url, updated_at: new Date().toISOString() })
+        .eq('id', currentUser.id);
 
-        .stat-card.blue { border-color: #64B5F6; }
-        .stat-card.blue .value { color: #64B5F6; }
+      if (error) return toast('Update failed', error.message);
+      toast('Profile updated', 'Your profile picture has been updated.');
+      await loadProfile();
+    }
 
-        .stat-card.yellow { border-color: var(--tertiary); }
-        .stat-card.yellow .value { color: var(--tertiary); }
-        
-        .stat-card.red { border-color: var(--danger); }
-        .stat-card.red .value { color: var(--danger); }
+    async function loadNotifications(){
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('id,title,body,type,is_read,created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
+      if (error){
+        qs('notifList').innerHTML = `<div class="drop-item">Failed to load notifications.</div>`;
+        setBadge(0);
+        return;
+      }
 
-        /* --- Footer for Dashboard (Hidden in main view, used for reference) --- */
-        #dashboard-footer {
-            margin-top: auto;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.8em;
-            color: #ccc;
-            border-top: 1px solid #333;
-        }
-        .logout-link {
-            color: var(--tertiary);
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
+      const unread = data.filter(n => !n.is_read).length;
+      setBadge(unread);
 
-    <aside id="sidebar">
-        <div class="logo-dash">Foodshare Admin</div>
+      if (!data.length){
+        qs('notifList').innerHTML = `<div class="drop-item">No notifications yet.</div>`;
+        return;
+      }
 
-        <nav>
-            <div class="nav-item active" data-section="home">
-                <i class="fas fa-tachometer-alt"></i> Dashboard Overview
-            </div>
-            
-            <div class="nav-item" data-section="donations">
-                <i class="fas fa-box-open"></i> Donation Listings 
-                <span class="badge" id="donation-badge">0</span>
-            </div>
-            
-            <div class="nav-item" data-section="volunteers">
-                <i class="fas fa-user-plus"></i> Volunteer Applications
-                <span class="badge" id="volunteer-badge">0</span>
-            </div>
-            
-            <div class="nav-item" data-section="transport">
-                <i class="fas fa-shipping-fast"></i> Transport Requests
-                <span class="badge" id="transport-badge">0</span>
-            </div>
-
-            <div class="nav-item" data-section="settings">
-                <i class="fas fa-cog"></i> Settings
-            </div>
-        </nav>
-
-        <div id="dashboard-footer">
-            <p>
-                © 2025 Foodshare Seychelles.
-                <br> <span class="logout-link" onclick="logout()">Logout</span>
-            </p>
+      qs('notifList').innerHTML = data.map(n => `
+        <div class="drop-item ${n.is_read ? '' : 'unread'}">
+          <b>${n.title}</b>
+          <div class="meta">${fmtTime(n.created_at)} • ${n.type}</div>
+          <div class="meta" style="margin-top:6px;">${n.body}</div>
+          ${n.is_read ? '' : `<div style="margin-top:8px;"><button class="link-btn" onclick="markNotifRead('${n.id}')">Mark read</button></div>`}
         </div>
-    </aside>
+      `).join('');
+    }
 
-    <main id="main-content">
+    async function markNotifRead(id){
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
 
-        <section id="home" class="content-section active">
-            <div class="section-header">
-                <h2>Dashboard Overview</h2>
+      if (error) return toast('Update failed', error.message);
+      await loadNotifications();
+    }
+
+    async function markAllRead(){
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('user_id', currentUser.id)
+        .eq('is_read', false);
+
+      if (error) return toast('Update failed', error.message);
+      await loadNotifications();
+    }
+
+    async function loadAdminMessages(){
+      const { data, error } = await supabase
+        .from('admin_messages')
+        .select('id,subject,message,created_at,is_read')
+        .eq('recipient_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error){
+        qs('msgList').innerHTML = `<div class="item"><b>Messages</b><p>Failed to load messages.</p></div>`;
+        return;
+      }
+
+      if (!data.length){
+        qs('msgList').innerHTML = `<div class="item"><b>No messages yet</b><p class="muted">When admins contact you, messages will appear here.</p></div>`;
+        return;
+      }
+
+      qs('msgList').innerHTML = data.map(m => `
+        <div class="item">
+          <div class="top">
+            <div>
+              <b>${m.subject}</b>
+              <div class="muted">${fmtTime(m.created_at)} ${m.is_read ? '' : '• Unread'}</div>
             </div>
-            
-            <div class="dashboard-stats">
-                <div class="stat-card green">
-                    <h3>Active Food Listings</h3>
-                    <div class="value" id="stat-active-listings">0</div>
+            ${m.is_read ? '' : `<button class="btn ghost" onclick="markMsgRead('${m.id}')">Mark read</button>`}
+          </div>
+          <p>${m.message}</p>
+        </div>
+      `).join('');
+    }
+
+    async function markMsgRead(id){
+      const { error } = await supabase
+        .from('admin_messages')
+        .update({ is_read: true })
+        .eq('id', id)
+        .eq('recipient_id', currentUser.id);
+
+      if (error) return toast('Update failed', error.message);
+      await loadAdminMessages();
+    }
+
+    async function loadMyActivity(){
+      // Optional: show recent claims/donations/apps if those tables exist
+      let html = '';
+
+      // Claims
+      try {
+        const { data } = await supabase
+          .from('claims')
+          .select('id,claim_type,status,created_at,listing_ref')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (data?.length){
+          html += `<div class="item"><div class="top"><b>Recent Claims</b><span class="pill">Last 5</span></div>
+                   <p class="muted">${data.map(x => `${x.claim_type} • ${x.status} • ${fmtTime(x.created_at)}`).join('<br>')}</p></div>`;
+        }
+      } catch {}
+
+      // Donations
+      try {
+        const { data } = await supabase
+          .from('donations')
+          .select('id,status,created_at,food_type,quantity_kg')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (data?.length){
+          html += `<div class="item"><div class="top"><b>Recent Donations</b><span class="pill">Last 5</span></div>
+                   <p class="muted">${data.map(x => `${x.food_type || 'Donation'} • ${x.status || 'Submitted'} • ${fmtTime(x.created_at)}`).join('<br>')}</p></div>`;
+        }
+      } catch {}
+
+      // Volunteer apps
+      try {
+        const { data } = await supabase
+          .from('volunteer_applications')
+          .select('id,status,submitted_at')
+          .eq('user_id', currentUser.id)
+          .order('submitted_at', { ascending: false })
+          .limit(3);
+        if (data?.length){
+          html += `<div class="item"><div class="top"><b>Volunteer Application</b><span class="pill">Latest</span></div>
+                   <p class="muted">${data.map(x => `${x.status || 'Submitted'} • ${fmtTime(x.submitted_at)}`).join('<br>')}</p></div>`;
+        }
+      } catch {}
+
+      if (!html) html = `<div class="item"><b>No recent activity yet</b><p class="muted">Once you submit a claim, donation, or application, it will appear here.</p></div>`;
+      qs('activityList').innerHTML = html;
+    }
+
+    async function logout(){
+      await supabase.auth.signOut();
+      window.location.href = '/account/';
+    }
+
+    async function pollNewNotifications(){
+      // lightweight: just refresh counts + show toast if new unread arrives
+      await loadNotifications();
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      setLoading(true);
+      const u = await authGuard();
+      if (!u) return;
+
+      await loadProfile();
+      await loadNotifications();
+      await loadAdminMessages();
+      await loadMyActivity();
+
+      // Navbar actions
+      qs('notifBtn').addEventListener('click', () => {
+        const open = qs('notifDropdown').style.display === 'block';
+        toggleDropdown(!open);
+      });
+      document.addEventListener('click', (e) => {
+        const dd = qs('notifDropdown');
+        const btn = qs('notifBtn');
+        if (!dd.contains(e.target) && !btn.contains(e.target)) toggleDropdown(false);
+      });
+
+      qs('markAllReadBtn').addEventListener('click', markAllRead);
+      qs('logoutBtn').addEventListener('click', logout);
+      qs('updateAvatarBtn').addEventListener('click', updateAvatar);
+
+      // Poll notifications every 25s (simple + reliable)
+      setInterval(pollNewNotifications, 25000);
+
+      setLoading(false);
+    });
+  </script>
+</head>
+
+<body>
+  <div id="loading" class="loading" aria-label="Loading">
+    <div class="spinner" aria-hidden="true"></div>
+  </div>
+
+  <header id="navbar">
+    <a href="/" class="logo-container">
+      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
+      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+    </a>
+
+    <nav class="nav-links-container">
+      <a href="/available-food/" class="nav-link">Find Food</a>
+      <a href="/donate-now/" class="nav-link">Donate</a>
+      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
+      <a href="/our-impact/" class="nav-link">Impact</a>
+      <a href="/about/" class="nav-link">About Us</a>
+    </nav>
+
+    <div class="nav-actions" style="position:relative;">
+      <div class="user-chip" title="My account">
+        <img id="avatarImg" class="avatar" src="/image/logo.png" alt="avatar">
+        <div style="min-width:0;">
+          <b id="chipName">Loading...</b>
+          <span id="chipEmail">...</span>
+        </div>
+      </div>
+
+      <button id="notifBtn" class="icon-btn" type="button" aria-label="Notifications">
+        <i class="fa-solid fa-bell"></i>
+        <span id="notifBadge" class="badge">0</span>
+      </button>
+
+      <button id="logoutBtn" class="icon-btn" type="button" aria-label="Logout">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+
+      <div id="notifDropdown" class="dropdown" role="dialog" aria-label="Notifications dropdown">
+        <header>
+          <span>Notifications</span>
+          <button id="markAllReadBtn" class="link-btn" type="button">Mark all read</button>
+        </header>
+        <div id="notifList" class="body"></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="content-container">
+      <div class="row" style="margin-bottom:14px;">
+        <div>
+          <h1 id="welcomeName">Welcome</h1>
+          <div class="sub">This is your personal dashboard. You will receive updates here after you submit requests.</div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn" href="/available-food/"><i class="fa-solid fa-basket-shopping" style="margin-right:8px;"></i>Find Food</a>
+          <a class="btn ghost" href="/donate-now/"><i class="fa-solid fa-hand-holding-heart" style="margin-right:8px;"></i>Donate</a>
+        </div>
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <div class="card-inner">
+            <h2 style="margin-bottom:6px;">My Profile</h2>
+            <div class="sub">Keep your details up to date for smoother communication.</div>
+
+            <div class="list">
+              <div class="item">
+                <div class="top">
+                  <div>
+                    <b id="profileName">—</b>
+                    <div class="muted" id="profileEmail">—</div>
+                  </div>
+                  <button id="updateAvatarBtn" class="btn ghost" type="button">Update Photo</button>
                 </div>
-                <div class="stat-card yellow">
-                    <h3>New Volunteer Applications</h3>
-                    <div class="value" id="stat-new-volunteers">0</div>
+                <p><b>Phone:</b> <span id="profilePhone">—</span></p>
+                <p><b>LinkedIn:</b> <span id="profileLinkedIn">—</span></p>
+              </div>
+
+              <div class="item">
+                <div class="top">
+                  <b>Quick Actions</b>
+                  <span class="pill">v1.1</span>
                 </div>
-                <div class="stat-card blue">
-                    <h3>Open Transport Requests</h3>
-                    <div class="value" id="stat-open-transport">0</div>
-                </div>
-                <div class="stat-card red">
-                    <h3>Urgent Items (Expiring Today)</h3>
-                    <div class="value" id="stat-urgent-items">0</div>
-                </div>
+                <p class="muted">
+                  Submit requests using the website pages:
+                  <br>• Claim food: <a href="/available-food/">Find Food</a>
+                  <br>• Donate: <a href="/donate-now/">Donate Now</a>
+                  <br>• Volunteer: <a href="/volunteer-now/">Volunteer Now</a>
+                </p>
+              </div>
             </div>
-
-            <div class="section-header">
-                <h3>Quick Actions</h3>
-            </div>
-            <div style="display: flex; gap: 15px;">
-                <button class="action-btn btn-view" style="padding: 10px 20px;" onclick="switchSection('donations')"><i class="fas fa-plus-circle"></i> Create New Listing</button>
-                <button class="action-btn btn-approve" style="padding: 10px 20px;" onclick="switchSection('volunteers')"><i class="fas fa-check"></i> Review New Apps</button>
-                <button class="action-btn btn-reject" style="padding: 10px 20px;" onclick="window.location.href='../volunteer/'"><i class="fas fa-users-slash"></i> Close Volunteer Intake</button>
-            </div>
+          </div>
         </section>
 
+        <aside class="card">
+          <div class="card-inner">
+            <h2 style="margin-bottom:6px;">Updates & Messages</h2>
+            <div class="sub">Official messages from admins will appear below.</div>
 
-        <section id="donations" class="content-section">
-            <div class="section-header">
-                <h2>Manage Donation Listings</h2>
-                <button class="action-btn btn-view" onclick="alert('Simulated: Opening New Listing Modal')"><i class="fas fa-plus"></i> Add Listing Manually</button>
+            <div class="list" id="msgList" style="margin-top:14px;"></div>
+
+            <div style="margin-top:16px;">
+              <h2 style="margin-bottom:6px;">My Activity</h2>
+              <div class="sub">Your recent submissions (claims/donations/applications).</div>
+              <div class="list" id="activityList"></div>
             </div>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Listing ID</th>
-                        <th>Item</th>
-                        <th>Donor</th>
-                        <th>Expiry Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="donations-table-body">
-                    </tbody>
-            </table>
-        </section>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
 
-        <section id="volunteers" class="content-section">
-            <div class="section-header">
-                <h2>Review Volunteer Applications</h2>
-            </div>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>App ID</th>
-                        <th>Applicant Name</th>
-                        <th>Contact Email</th>
-                        <th>Preferred Role/Island</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="volunteers-table-body">
-                    </tbody>
-            </table>
-        </section>
+  <!-- Floating assistance button (currently links to your assistance form) -->
+  <button class="assist-btn" type="button" title="Need help?"
+    onclick="window.location.href='/general/assistance/'" aria-label="Need help">
+    <i class="fa-solid fa-headset"></i>
+  </button>
 
-        <section id="transport" class="content-section">
-            <div class="section-header">
-                <h2>Open Transport Requests</h2>
-            </div>
-            
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Req ID</th>
-                        <th>Item ID</th>
-                        <th>Recipient</th>
-                        <th>Delivery Location</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="transport-table-body">
-                    </tbody>
-            </table>
-        </section>
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <b id="toastTitle">Update</b>
+    <p id="toastBody"></p>
+  </div>
 
-        <section id="settings" class="content-section">
-            <div class="section-header">
-                <h2>System Settings</h2>
-            </div>
-            
-            <div style="background-color: var(--white); padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <h3>Volunteer Intake Status</h3>
-                <p>Control whether the public can submit new volunteer applications.</p>
-                <button class="action-btn btn-approve" style="padding: 8px 15px; margin-right: 15px;" onclick="alert('Simulated: Volunteer applications are now OPEN.')">Set Status to OPEN</button>
-                <button class="action-btn btn-reject" style="padding: 8px 15px;" onclick="alert('Simulated: Volunteer applications are now CLOSED.')">Set Status to CLOSED</button>
-                
-                <h3 style="margin-top: 30px;">Email Notifications</h3>
-                <p>Admin Email: <strong>admin@foodshare-seychelles.com</strong></p>
-                <p>Ensure applications receive follow-up emails no later than 7 days.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <script>
-        // --- SIMULATED DATA ---
-        let donationsData = [
-            { id: 'LST001', item: '20kg Fresh Fish', donor: 'Fisherman Co-op', expiry: 'Dec 9, 2025', status: 'Published', category: 'Meat' },
-            { id: 'LST002', item: 'Surplus Rolls & Bread', donor: 'Beau Vallon Bakery', expiry: 'Today 7 PM', status: 'New', category: 'Baked' },
-            { id: 'LST003', item: 'Canned Goods (Mixed)', donor: 'Local Hotel Chain', expiry: 'Jan 20, 2026', status: 'Claimed', category: 'Pantry' },
-        ];
-
-        let volunteersData = [
-            { id: 'APP001', name: 'James Michel', email: 'james.m@example.com', role: 'Driver, Mahé', status: 'New' },
-            { id: 'APP002', name: 'Lucie Pierre', email: 'lucie.p@example.com', role: 'Admin Support, Praslin', status: 'Approved' },
-            { id: 'APP003', name: 'Anil Sahoo', email: 'anil.s@example.com', role: 'Community Outreach', status: 'New' },
-        ];
-
-        let transportData = [
-            { id: 'REQ001', itemId: 'LST003', recipient: 'Orphanage Trust', location: 'Victoria Center', status: 'Pending Assignment' },
-            { id: 'REQ002', itemId: 'LST002', recipient: 'Family X', location: 'Takamaka South', status: 'New' },
-        ];
-
-        // --- DASHBOARD CORE FUNCTIONS ---
-
-        // 1. Navigation Switching
-        function switchSection(sectionId) {
-            // Update Active Nav Item
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`.nav-item[data-section="${sectionId}"]`).classList.add('active');
-
-            // Update Active Content Section
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Reload data for the specific section
-            if (sectionId !== 'home') {
-                renderData(sectionId);
-            } else {
-                updateStats();
-            }
-        }
-
-        // 2. Rendering Data Tables
-        function renderData(section) {
-            let data, tableBodyId, headers;
-
-            if (section === 'donations') {
-                data = donationsData;
-                tableBodyId = 'donations-table-body';
-            } else if (section === 'volunteers') {
-                data = volunteersData;
-                tableBodyId = 'volunteers-table-body';
-            } else if (section === 'transport') {
-                data = transportData;
-                tableBodyId = 'transport-table-body';
-            } else {
-                return;
-            }
-
-            const tableBody = document.getElementById(tableBodyId);
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            data.forEach(item => {
-                const row = tableBody.insertRow();
-                let statusClass = getStatusClass(item.status);
-
-                if (section === 'donations') {
-                    row.innerHTML = `
-                        <td>${item.id}</td>
-                        <td>${item.item}</td>
-                        <td>${item.donor}</td>
-                        <td>${item.expiry}</td>
-                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
-                        <td>
-                            <button class="action-btn btn-view" onclick="alert('Viewing Details for ${item.id}')">View</button>
-                            <button class="action-btn btn-publish" onclick="updateStatus('${item.id}', 'donations', 'Published')">Publish</button>
-                        </td>
-                    `;
-                } else if (section === 'volunteers') {
-                     row.innerHTML = `
-                        <td>${item.id}</td>
-                        <td>${item.name}</td>
-                        <td>${item.email}</td>
-                        <td>${item.role}</td>
-                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
-                        <td>
-                            <button class="action-btn btn-view" onclick="alert('Reviewing Application ${item.id}')">Review</button>
-                            <button class="action-btn btn-approve" onclick="updateStatus('${item.id}', 'volunteers', 'Approved')">Approve</button>
-                            <button class="action-btn btn-reject" onclick="updateStatus('${item.id}', 'volunteers', 'Rejected')">Reject</button>
-                        </td>
-                    `;
-                } else if (section === 'transport') {
-                     row.innerHTML = `
-                        <td>${item.id}</td>
-                        <td>${item.itemId}</td>
-                        <td>${item.recipient}</td>
-                        <td>${item.location}</td>
-                        <td><span class="status-pill ${statusClass}">${item.status}</span></td>
-                        <td>
-                            <button class="action-btn btn-view" onclick="alert('Assigning Volunteer for ${item.id}')">Assign</button>
-                            <button class="action-btn btn-approve" onclick="updateStatus('${item.id}', 'transport', 'Completed')">Complete</button>
-                        </td>
-                    `;
-                }
-            });
-            updateStats();
-        }
-
-        // 3. Status Helper
-        function getStatusClass(status) {
-            const statusMap = {
-                'New': 'status-new',
-                'Pending': 'status-pending',
-                'Approved': 'status-approved',
-                'Claimed': 'status-pending',
-                'Published': 'status-published',
-                'Completed': 'status-completed',
-                'Rejected': 'status-rejected',
-                'Pending Assignment': 'status-pending'
-            };
-            return statusMap[status] || '';
-        }
-
-        // 4. Update Status (Simulated Action)
-        function updateStatus(id, type, newStatus) {
-            let dataArray;
-            if (type === 'donations') dataArray = donationsData;
-            else if (type === 'volunteers') dataArray = volunteersData;
-            else if (type === 'transport') dataArray = transportData;
-
-            const item = dataArray.find(i => i.id === id);
-            if (item) {
-                item.status = newStatus;
-                alert(`${item.id} status updated to: ${newStatus}`);
-                renderData(type); // Re-render table after update
-            } else {
-                console.error("Item not found:", id);
-            }
-            updateStats(); // Update badges and home stats
-        }
-        
-        // 5. Update Badges and Home Stats
-        function updateStats() {
-            const newDonations = donationsData.filter(d => d.status === 'New').length;
-            const newVolunteers = volunteersData.filter(v => v.status === 'New').length;
-            const openTransport = transportData.filter(t => t.status !== 'Completed').length;
-            const activeListings = donationsData.filter(d => d.status === 'Published' || d.status === 'Claimed').length;
-            const urgentItems = donationsData.filter(d => d.expiry.includes('Today')).length;
-
-
-            // Update Badges
-            document.getElementById('donation-badge').textContent = newDonations;
-            document.getElementById('volunteer-badge').textContent = newVolunteers;
-            document.getElementById('transport-badge').textContent = openTransport;
-            
-            // Update Home Stats
-            document.getElementById('stat-active-listings').textContent = activeListings;
-            document.getElementById('stat-new-volunteers').textContent = newVolunteers;
-            document.getElementById('stat-open-transport').textContent = openTransport;
-            document.getElementById('stat-urgent-items').textContent = urgentItems;
-        }
-
-        // 6. Logout Simulation
-        function logout() {
-            if (confirm("Are you sure you want to log out?")) {
-                // Redirect back to the staff login page
-                window.location.href = '../staff/'; 
-            }
-        }
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize the dashboard to the home view
-            switchSection('home');
-            
-            // Initial render of all data and stats
-            renderData('donations');
-            renderData('volunteers');
-            renderData('transport');
-            updateStats();
-            
-            // Set up navigation click handlers
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const sectionId = item.getAttribute('data-section');
-                    switchSection(sectionId);
-                });
-            });
-        });
-    </script>
-
+  <footer id="main-footer">
+    <div class="content-container footer-content">
+      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+      <div class="footer-section">
+        <h3>Get In Touch</h3>
+        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+  </footer>
 </body>
 </html>
