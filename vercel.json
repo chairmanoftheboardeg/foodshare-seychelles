@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/image/:path*", "destination": "/image/:path*" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/favicon.png", "destination": "/favicon.png" },
+    { "source": "/maintenance.html", "destination": "/maintenance.html" },
+
+    { "source": "/staff-login/:path*", "destination": "/staff-login/:path*" },
+    { "source": "/admin/:path*", "destination": "/admin/:path*" },
+    { "source": "/staff/:path*", "destination": "/staff/:path*" },
+
+    { "source": "/:path*", "destination": "/maintenance.html" }
+  ]
+}
