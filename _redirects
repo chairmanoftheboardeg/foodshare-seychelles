@@ -1,0 +1,13 @@
+# Allow assets (so logo/favicon load)
+ /image/*              /image/:splat              200
+ /favicon.ico          /favicon.ico               200
+ /favicon.png          /favicon.png               200
+ /maintenance.html     /maintenance.html          200
+
+# Allow staff/admin login (and optionally dashboards)
+ /staff-login/*        /staff-login/:splat        200
+ /admin/*              /admin/:splat              200
+ /staff/*              /staff/:splat              200
+
+# Everything else -> maintenance
+ /*                    /maintenance.html          302
