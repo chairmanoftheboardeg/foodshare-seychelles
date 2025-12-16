@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maintenance Mode — FoodShare Seychelles (v1.1 Upgrade)</title>
+
+  <link rel="icon" href="/image/logo.png" type="image/png" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="description" content="FoodShare Seychelles is currently undergoing scheduled maintenance while we prepare Version 1.1." />
+
+  <style>
+    :root{
+      --primary-light:#81C784;
+      --primary-main:#4CAF50;
+      --primary-dark:#388E3C;
+      --accent-orange:#FF9800;
+      --neutral-bg:#F9F9F9;
+      --neutral-card:#FFFFFF;
+      --text-dark:#1f2937;
+      --text-light:#6b7280;
+      --shadow: 0 18px 45px rgba(0,0,0,0.10);
+      --shadow-soft: 0 10px 24px rgba(0,0,0,0.08);
+      --font-serif: 'Georgia', serif;
+      --font-sans: 'Helvetica Neue', Arial, sans-serif;
+    }
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    body{
+      font-family: var(--font-sans);
+      color: var(--text-dark);
+      background: radial-gradient(1200px 700px at 20% 10%, rgba(76,175,80,0.14), transparent 55%),
+                  radial-gradient(1100px 650px at 90% 20%, rgba(129,199,132,0.16), transparent 60%),
+                  linear-gradient(180deg, #ffffff, var(--neutral-bg));
+      min-height: 100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 16px;
+    }
+    .bg-grid{
+      position:fixed; inset:0;
+      background-image: radial-gradient(rgba(56,142,60,0.10) 1px, transparent 1px);
+      background-size: 26px 26px;
+      pointer-events:none;
+      mask-image: radial-gradient(circle at 50% 25%, rgba(0,0,0,0.9), transparent 70%);
+      opacity:0.7;
+    }
+    .wrap{
+      width: 100%;
+      max-width: 980px;
+      display:grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 26px;
+      align-items: stretch;
+    }
+    @media (max-width: 880px){ .wrap{ grid-template-columns: 1fr; } }
+    .card{
+      background: var(--neutral-card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      border: 1px solid rgba(56,142,60,0.12);
+      position:relative;
+    }
+    .card::before{
+      content:""; position:absolute; left:0; top:0; right:0; height: 6px;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
+    }
+    .card-inner{ padding: 28px; }
+    .brand{ display:flex; align-items:center; gap: 14px; margin-bottom: 18px; }
+    .brand img{
+      width: 56px; height: 56px; object-fit: contain;
+      border-radius: 14px; background: #fff;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(56,142,60,0.12);
+      padding: 8px;
+    }
+    .brand h1{ font-family: var(--font-serif); font-size: 1.7rem; color: var(--primary-dark); line-height: 1.1; }
+    .brand .sub{ margin-top: 4px; font-size: 0.95rem; color: var(--text-light); }
+    .headline{ font-size: 1.85rem; font-family: var(--font-serif); color: var(--text-dark); margin: 8px 0 10px; }
+    .lede{ color: var(--text-light); font-size: 1.02rem; line-height: 1.7; margin-bottom: 18px; }
+    .pillrow{ display:flex; flex-wrap:wrap; gap: 10px; margin: 16px 0 18px; }
+    .pill{
+      font-size: 0.9rem; border-radius: 999px; padding: 9px 12px;
+      border: 1px solid rgba(56,142,60,0.15);
+      background: rgba(129,199,132,0.14);
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+    .actions{ display:flex; flex-wrap:wrap; gap: 12px; margin-top: 18px; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 12px 16px; border-radius: 999px;
+      font-weight: 800; text-decoration:none; cursor:pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+      white-space: nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{ background: var(--primary-main); color: #fff; }
+    .btn-primary:hover{ background: var(--primary-dark); }
+    .btn-ghost{
+      background: #fff; color: var(--primary-dark);
+      border: 1px solid rgba(56,142,60,0.22);
+      box-shadow: none;
+    }
+    .btn-ghost:hover{ box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+    .statusbox{
+      background: linear-gradient(180deg, rgba(76,175,80,0.10), rgba(255,255,255,0.85));
+      border: 1px solid rgba(56,142,60,0.14);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .status-top{ display:flex; align-items:center; justify-content:space-between; gap: 10px; margin-bottom: 10px; }
+    .status-title{ font-weight: 900; color: var(--primary-dark); font-size: 1.05rem; }
+    .badge{
+      font-size: 0.82rem; font-weight: 900; padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,152,0,0.16);
+      color: #9a4a00;
+      border: 1px solid rgba(255,152,0,0.28);
+    }
+    .progress{ width: 100%; height: 10px; background: rgba(0,0,0,0.06); border-radius: 999px; overflow:hidden; }
+    .progress > span{
+      display:block; height: 100%; width: 36%;
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
+      border-radius: 999px;
+      animation: progressPulse 1.8s ease-in-out infinite;
+    }
+    @keyframes progressPulse{
+      0%{ transform: translateX(-40%); opacity:0.7; }
+      50%{ opacity:1; }
+      100%{ transform: translateX(120%); opacity:0.7; }
+    }
+    footer{ margin-top: 16px; text-align:center; color: var(--text-light); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="wrap" role="main" aria-label="Maintenance mode">
+    <section class="card">
+      <div class="card-inner">
+        <div class="brand">
+          <img src="/image/logo.png" alt="FoodShare Seychelles logo" />
+          <div>
+            <h1>FoodShare Seychelles</h1>
+            <div class="sub">Reducing Food Waste. Supporting Communities.</div>
+          </div>
+        </div>
+
+        <div class="headline">Website Maintenance — Version 1.1</div>
+        <p class="lede">
+          We are currently upgrading the FoodShare Seychelles platform to Version 1.1 to introduce a redesigned
+          website experience, improved mobile usability, and new community account features.
+        </p>
+
+        <div class="pillrow">
+          <span class="pill">Design Overhaul</span>
+          <span class="pill">Community Accounts</span>
+          <span class="pill">Notifications</span>
+          <span class="pill">Performance Improvements</span>
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="/staff-login/">Staff/Admin Login</a>
+          <a class="btn btn-ghost" href="mailto:admin@foodshare-seychelles.online">Contact Support</a>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="card-inner">
+        <div class="statusbox">
+          <div class="status-top">
+            <div>
+              <div class="status-title">Maintenance in Progress</div>
+              <div style="color: var(--text-light); font-size:0.95rem; margin-top:2px;">
+                Deploying FoodShare Seychelles v1.1
+              </div>
+            </div>
+            <div class="badge">Updating</div>
+          </div>
+          <div class="progress"><span></span></div>
+        </div>
+
+        <footer>&copy; 2025 FoodShare Seychelles. All Rights Reserved.</footer>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>
