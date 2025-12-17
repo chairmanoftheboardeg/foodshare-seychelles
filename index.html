@@ -74,10 +74,15 @@
         .footer-logo img { height: 50px; filter: brightness(0) invert(1); }
         .footer-copy { text-align: center; padding-top: 15px; font-size: 0.9em; }
         .footer-credit { 
-            color: rgba(255, 255, 255, 0.7); 
-            display: inline-flex; 
-            align-items: center; 
+            color: rgba(255, 255, 255, 0.9); 
             font-size: 0.9em;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+        .footer-credit a {
+            color: white;
+            text-decoration: underline;
         }
 
         /* Development Banner */
@@ -90,32 +95,42 @@
             font-size: 0.9em;
         }
 
-        /* Cookie/Login Gate Overlay */
-        #cookie-gate {
+        /* Hero Section with BG Image */
+        .hero {
+            background-image: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('/image/front-page.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 400px;
+        }
+        .hero h1 { color: var(--fs-green-dark); }
+        .hero p { color: var(--fs-text-primary); }
+
+        /* Initial Sign-Up Gate (Replaces Cookie Gate) */
+        #signup-gate {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
+            background-color: rgba(255, 255, 255, 0.95); /* Light, professional backdrop */
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 3000;
+            opacity: 1; /* Start visible */
+            transition: opacity 0.5s ease;
         }
-        .cookie-content {
-            background-color: var(--fs-bg-white);
+        .signup-content {
             padding: 40px;
             border-radius: 20px;
             max-width: 500px;
             text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--fs-green-primary);
+            background-color: var(--fs-bg-white);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .signup-content h2 { color: var(--fs-blue-cta); margin-bottom: 20px; }
 
         /* Media Queries */
         @media (min-width: 768px) {
@@ -133,18 +148,17 @@
         <i class="fas fa-tools"></i> Website is currently under development for version 1.1. Please expect bugs and glitches.
     </div>
 
-    <div id="cookie-gate">
-        <div class="cookie-content">
-            <h2 style="color: var(--fs-green-dark);"><i class="fas fa-cookie-bite"></i> Welcome to FoodShare Seychelles</h2>
-            <p style="margin: 20px 0;">We use cookies and similar technologies to improve your experience and track our vital impact statistics. By continuing, you agree to our <a href="/policies/privacy-policy/" style="color: var(--fs-blue-cta);">Privacy Policy</a>.</p>
-            <hr style="border-color: #eee; margin: 20px 0;">
-            <p style="font-size: 1.1em; font-weight: 600; color: var(--fs-green-primary); margin-bottom: 20px;">
-                To utilize our full range of services (Donate, Claim Food, Volunteer), you must sign up or log in.
+    <div id="signup-gate">
+        <div class="signup-content">
+            <img src="/image/logo.png" alt="FoodShare Logo" style="height: 60px; margin-bottom: 15px;">
+            <h2>Please Sign Up for a User Account to Get Started.</h2>
+            <p style="margin-bottom: 30px;">
+                Access to donating food, viewing available food listings, and applying to volunteer requires a registered account.
             </p>
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <a href="/account/signup/" class="btn btn-cta"><i class="fas fa-user-plus"></i> Sign Up / Log In</a>
-                <button class="btn btn-secondary" onclick="hideCookieGate(event)">I Understand / Continue Browsing</button>
-            </div>
+            <a href="/account/signup/" class="btn btn-cta" onclick="hideSignupGate(event)"><i class="fas fa-user-plus"></i> Sign Up / Log In</a>
+            <p style="margin-top: 20px; font-size: 0.9em; color: #777;">
+                By proceeding, you agree to our <a href="/policies/privacy-policy/" style="color: var(--fs-blue-cta); text-decoration: none;">Privacy Policy</a>.
+            </p>
         </div>
     </div>
 
@@ -153,7 +167,7 @@
             <div class="logo">
                 <a href="/">
                     <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
-                    <span style="font-size: 1.5em; font-weight: 700; color: var(--fs-green-dark);">FoodShare Seychelles</span>
+                    <span style="font-size: 1.5em; font-weight: 700; color: var(--fs-green-dark);">FoodShare</span>
                 </a>
             </div>
             
@@ -179,10 +193,10 @@
     </nav>
 
     <main>
-        <header class="hero section-padding" style="background-color: var(--fs-bg-white);">
+        <header class="hero section-padding">
             <div class="container" style="display: flex; flex-direction: column; gap: 30px;">
-                <h1 style="font-size: 2.5em; color: var(--fs-green-dark); text-align: center;">Reducing Waste, Building Community in Seychelles.</h1>
-                <p style="text-align: center; font-size: 1.2em; max-width: 800px; margin: 0 auto;">Our web platform coordinates the efficient transfer of surplus food, fighting hunger and promoting sustainability across the islands. 
+                <h1 style="font-size: 2.5em; text-align: center; text-shadow: 0 0 5px white;">Reducing Waste, Building Community in Seychelles.</h1>
+                <p style="text-align: center; font-size: 1.2em; max-width: 800px; margin: 0 auto; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 8px;">Our web platform coordinates the efficient transfer of surplus food, fighting hunger and promoting sustainability across the islands. 
                     <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" class="linkedin-link">
                         <i class="fab fa-linkedin"></i> Follow our mission on LinkedIn.
                     </a>
@@ -252,8 +266,8 @@
                     <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
                     <p style="margin-top: 10px; font-size: 0.9em;">A non-profit initiative dedicated to sustainability and community welfare.</p>
                     <div style="margin-top: 15px;">
-                        <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" style="color: #0077B5; background-color: white; padding: 5px 8px; border-radius: 4px; display: inline-flex; align-items: center;">
-                            <i class="fab fa-linkedin fa-lg"></i>
+                        <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" style="color: white; font-size: 1.5em; text-decoration: none;">
+                            <i class="fab fa-linkedin-in"></i> 
                         </a>
                     </div>
                 </div>
@@ -299,11 +313,10 @@
             <div class="footer-copy">
                 &copy; <span id="current-year"></span> FoodShare Seychelles. All rights reserved. | 
                 <span class="footer-credit">
-                    Website by Tyler Nicholas 
-                    <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" style="color: white; text-decoration: none; margin-left: 5px;">(tylernicholasgroup.com/staff/tyler)</a>
-                    <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" style="color: #0077B5; background-color: white; padding: 3px 5px; border-radius: 3px; margin-left: 5px; display: inline-flex;">
-                        <i class="fab fa-linkedin fa-sm"></i>
-                    </a>
+                    Website by 
+                    <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a> 
+                    | 
+                    <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank">LinkedIn</a>
                 </span>
             </div>
         </div>
@@ -316,32 +329,42 @@
         const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Utility: Cookie/Login Gate 
-        function hideCookieGate(event) {
-            // Fix: Prevent default button action to avoid page reload/scroll issues
+        // Utility: Sign Up Gate (Only hides it)
+        function hideSignupGate(event) {
+            // Prevent default link action (optional, as it links to signup anyway)
             if (event) event.preventDefault(); 
-            document.getElementById('cookie-gate').style.display = 'none';
+            // Hide the gate by fading it out
+            document.getElementById('signup-gate').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('signup-gate').style.display = 'none';
+            }, 500);
+            
+            // Set localStorage to prevent it from showing up again
             localStorage.setItem('fs_v11_visited', 'true');
+            // Navigate to the signup page after a small delay (for visual effect)
+            if (event && event.target.tagName === 'A') {
+                window.location.href = event.target.href;
+            }
         }
 
         // Feature: Load Data (Announcement and Testimonials)
         async function loadPublicData() {
             try {
                 // 1. Load Announcement
-                let { data: settingsData, error: settingsError } = await supabase
+                let { data: settingsData } = await supabase
                     .from('settings')
                     .select('announcement, is_announcement_active')
                     .limit(1)
                     .single();
 
-                if (!settingsError && settingsData && settingsData.is_announcement_active) {
+                if (settingsData && settingsData.is_announcement_active) {
                     document.getElementById('announcement-text').innerText = settingsData.announcement;
                 } else {
                     document.getElementById('announcement-text').innerText = "No active announcements at this time. Check our News page for updates!";
                 }
                 
                 // 2. Load Testimonials
-                let { data: testimonialsData, error: testimonialsError } = await supabase
+                let { data: testimonialsData } = await supabase
                     .from('testimonials')
                     .select('full_name, body, relationship')
                     .eq('is_approved', true) 
@@ -350,7 +373,7 @@
                 const testimonialContainer = document.getElementById('testimonials-preview');
                 testimonialContainer.innerHTML = '';
 
-                if (!testimonialsError && testimonialsData && testimonialsData.length > 0) {
+                if (testimonialsData && testimonialsData.length > 0) {
                     testimonialsData.forEach(t => {
                         testimonialContainer.innerHTML += `
                             <div class="card" style="background-color: #f1f8e9;">
@@ -379,9 +402,9 @@
                 document.getElementById('nav-links').classList.toggle('active');
             });
 
-            // Check if user has seen the cookie gate
+            // Check if user has seen the signup gate
             if (localStorage.getItem('fs_v11_visited') === 'true') {
-                document.getElementById('cookie-gate').style.display = 'none';
+                document.getElementById('signup-gate').style.display = 'none';
             }
 
             // Supabase Auth Listener (To show Dashboard link)
