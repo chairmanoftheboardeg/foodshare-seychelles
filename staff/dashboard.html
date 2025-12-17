@@ -2,626 +2,331 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Staff Dashboard - FoodShare Seychelles</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staff Dashboard — FoodShare Seychelles</title>
 
   <link rel="icon" href="/image/logo.png" type="image/png" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
   <style>
-    :root {
-      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
-      --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
-      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333;
-      --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-      --transition-speed: 0.35s;
+    :root{
+      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
+      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
+      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
+      --shadow:0 10px 28px rgba(0,0,0,0.10);
+      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
+      --t:.35s;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; }
-    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-    a:hover { color: var(--primary-dark); }
-
-    /* NAVBAR (matches site/admin) */
-    #navbar {
-      display:flex; justify-content:space-between; align-items:center;
-      padding: 18px 25px; background-color: var(--neutral-card);
-      box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000;
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);background:var(--neutral-bg);color:var(--text-dark);min-height:100vh;display:flex;flex-direction:column}
+    a{text-decoration:none;color:var(--primary-main)} a:hover{color:var(--primary-dark)}
+    header{
+      position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid rgba(0,0,0,.06);
+      box-shadow:0 4px 12px rgba(0,0,0,0.06);
     }
-    .logo-container { display:flex; align-items:center; font-size:1.6em; font-weight:bold; color: var(--text-dark); }
-    .logo-img { height: 40px; margin-right: 10px; }
-
-    .nav-right { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; }
-    .chip{
-      display:flex; align-items:center; gap:10px;
-      padding: 10px 14px; border-radius: 999px;
-      background: #f2f6f2; border: 1px solid #e7efe7;
-      color: var(--text-dark); font-weight: 800;
-      max-width: 420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    .topbar{max-width:1200px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:1000;font-size:1.25rem;color:var(--text-dark)}
+    .brand img{height:38px;width:38px;border-radius:12px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;
+      background:rgba(129,199,132,.16);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark);
+      font-weight:1000;font-size:.92rem;
     }
-    .chip i{ color: var(--primary-dark); }
-
     .btn{
-      border:none; cursor:pointer; font-weight:bold;
-      border-radius: 50px; padding: 10px 18px;
-      transition: transform 0.15s, background-color var(--transition-speed);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-      background: var(--primary-main); color: white;
-      display:inline-flex; align-items:center; gap:10px;
+      border:none;border-radius:999px;padding:10px 14px;font-weight:1000;cursor:pointer;
+      box-shadow:0 12px 22px rgba(0,0,0,.10);
     }
-    .btn:hover{ background: var(--primary-dark); transform: translateY(-1px); }
-    .btn.secondary{ background:#eef3ff; color:#1b3b74; box-shadow:none; border:1px solid #dce7ff; }
-    .btn.secondary:hover{ background:#e3eeff; }
-    .btn.danger{ background: var(--accent-red); }
-    .btn.danger:hover{ background:#b32622; }
-
-    main { padding: 30px 0 60px; }
-    .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
-
-    .page-header{ text-align:center; margin-bottom: 24px; }
-    .page-header h1{ font-family: var(--font-serif); color: var(--primary-dark); }
-    .page-header p{ color: var(--text-light); margin-top: 8px; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 18px;
-      margin-bottom: 18px;
+    .btn.blue{background:var(--accent-blue);color:#fff}
+    .btn.blue:hover{filter:brightness(.95)}
+    .btn.green{background:var(--primary-main);color:#fff}
+    .btn.green:hover{background:var(--primary-dark)}
+    .btn.ghost{background:#fff;color:var(--text-dark);border:1px solid rgba(0,0,0,.10);box-shadow:none}
+    .btn.ghost:hover{background:rgba(0,0,0,.03)}
+    main{flex:1}
+    .container{max-width:1200px;margin:0 auto;padding:20px 18px}
+    .grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:14px;align-items:start}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{
+      background:var(--neutral-card);border-radius:18px;border:1px solid rgba(56,142,60,.14);box-shadow:var(--shadow);
+      overflow:hidden;position:relative;
     }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
-
-    .section{
-      background-color: var(--neutral-card);
-      padding: 26px;
-      border-radius: 12px;
-      box-shadow: var(--shadow-subtle);
-      border-top: 5px solid var(--primary-main);
-    }
-    .section.blue{ border-top-color: var(--accent-blue); }
-    .section.orange{ border-top-color: var(--accent-orange); }
-
-    .section h2{
-      font-family: var(--font-serif);
-      margin-bottom: 14px;
-      color: var(--primary-dark);
-      border-bottom: 2px solid var(--primary-light);
-      padding-bottom: 10px;
-      display:flex; align-items:center; gap:10px;
-    }
-
-    .kv{
-      display:grid;
-      grid-template-columns: 180px 1fr;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid #efefef;
-    }
-    .kv .k{ color: var(--text-light); font-weight:800; }
-    .kv .v{ color: var(--text-dark); font-weight:700; word-break: break-word; }
-
-    .grid-stats{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(200px,1fr));
-      gap: 12px;
-    }
-    @media (max-width: 980px){ .grid-stats{ grid-template-columns: 1fr; } }
-    .stat{
-      background:#fbfbfb;
-      border:1px solid #eee;
-      border-radius: 12px;
-      padding: 16px;
-    }
-    .stat .label{ color: var(--text-light); font-weight:800; font-size: .95em; }
-    .stat .value{ font-size: 1.9em; font-weight: 900; margin-top: 6px; }
-    .stat .hint{ color: var(--text-light); font-size: .85em; margin-top: 4px; }
-
-    .controls{
-      display:flex; gap:12px; flex-wrap:wrap;
-      justify-content:space-between; align-items:flex-end;
-      margin: 12px 0 14px;
-    }
-    .field{ display:flex; flex-direction:column; gap:6px; min-width: 240px; }
-    .field label{ font-weight:800; color: var(--text-dark); font-size: .95em; }
-    input, select{
-      width:100%; padding: 12px;
-      border:1px solid #ccc; border-radius: 8px; font-size: 1em;
-      background: white;
-    }
-
-    .table-wrap{
-      overflow:auto;
-      border:1px solid #e7e7e7;
-      border-radius: 10px;
-    }
-    table{ width:100%; border-collapse: collapse; min-width: 980px; }
-    th, td{ padding: 12px; border-bottom: 1px solid #efefef; vertical-align: top; }
-    th{
-      background:#f6f6f6;
-      text-align:left;
-      font-size: .92em;
-      position: sticky; top:0; z-index: 2;
-    }
-    tr:hover td{ background:#fafafa; }
-
-    .badge{
-      display:inline-block; padding: 6px 10px; border-radius: 999px;
-      font-size: .85em; font-weight: 900;
-      border: 1px solid #e6e6e6; background: #f7f7f7;
-    }
-    .b-new{ background:#e9f3ff; border-color:#cfe3ff; color:#174b92; }
-    .b-warn{ background:#fff4e6; border-color:#ffe2b8; color:#7a4b00; }
-    .b-ok{ background:#e9f7ea; border-color:#cfead1; color:#1b6b2a; }
-    .b-bad{ background:#ffe9e9; border-color:#ffcaca; color:#8a1515; }
-
-    .row-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-    .mini{
-      border:none; cursor:pointer; font-weight:900;
-      padding: 8px 12px; border-radius: 10px;
-      background: #f2f2f2; border: 1px solid #e6e6e6;
-      display:inline-flex; align-items:center; gap:8px;
-    }
-    .mini:hover{ background:#ebebeb; }
-    .mini.blue{ background:#e9f3ff; border-color:#cfe3ff; color:#174b92; }
-    .mini.orange{ background:#fff4e6; border-color:#ffe2b8; color:#7a4b00; }
-    .mini.green{ background:#e9f7ea; border-color:#cfead1; color:#1b6b2a; }
-
-    /* Toast */
-    #toast{
-      position: fixed; right: 18px; bottom: 18px;
-      background: white; border: 1px solid #e7e7e7; border-radius: 12px;
-      box-shadow: var(--shadow-subtle);
-      padding: 14px 16px; display:none; max-width: 420px; z-index: 2000;
-    }
-    #toast strong{ display:block; }
-    #toast span{ color: var(--text-light); font-size: .92em; display:block; margin-top: 4px; }
-
-    /* Modal */
-    #modalOverlay{
-      position: fixed; inset:0;
-      background: rgba(0,0,0,0.55);
-      display:none; align-items:center; justify-content:center;
-      z-index: 2500;
-      padding: 18px;
-    }
-    .modal{
-      width: min(900px, 100%);
-      background: white;
-      border-radius: 14px;
-      border: 1px solid #e7e7e7;
-      box-shadow: var(--shadow-subtle);
-      overflow:hidden;
-    }
-    .modal-head{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 14px 16px;
-      background: #f6f6f6;
-      border-bottom: 1px solid #e7e7e7;
-    }
-    .modal-head strong{ font-size: 1.05em; }
-    .modal-body{ padding: 16px; max-height: 60vh; overflow:auto; }
-    .modal-foot{
-      display:flex; justify-content:flex-end; gap:10px;
-      padding: 14px 16px;
-      border-top: 1px solid #e7e7e7;
-      background: #fafafa;
-    }
-
-    /* Loading */
-    #loading{
-      position: fixed; inset: 0;
-      background: rgba(249,249,249,0.92);
-      display:flex; flex-direction:column; justify-content:center; align-items:center;
-      z-index: 3000;
-    }
-    .spinner{
-      width: 44px; height: 44px; border-radius: 50%;
-      border: 4px solid #dfe9df; border-top-color: var(--primary-main);
-      animation: spin 1s linear infinite;
-      margin-top: 12px;
-    }
-    @keyframes spin{ to { transform: rotate(360deg);} }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: .9em; color: #4c4c4c;
-    }
+    .card::before{content:"";position:absolute;left:0;top:0;right:0;height:6px;background:linear-gradient(90deg,var(--primary-dark),var(--primary-main))}
+    .card .inner{padding:16px}
+    h1,h2{font-family:var(--font-serif);color:var(--primary-dark)}
+    h1{font-size:1.8rem}
+    h2{font-size:1.2rem}
+    .muted{color:var(--text-light);line-height:1.7}
+    .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+    @media(max-width:520px){.kv{grid-template-columns:1fr}}
+    .kv .box{background:rgba(129,199,132,.12);border:1px solid rgba(56,142,60,.14);border-radius:14px;padding:12px}
+    .k{font-weight:1000;color:var(--primary-dark);font-size:.9rem}
+    .v{margin-top:4px;font-weight:900}
+    table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden}
+    th,td{padding:12px 10px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;vertical-align:top}
+    th{font-size:.9rem;color:var(--text-light);font-weight:1000}
+    td{font-weight:800}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:1000;font-size:.82rem;border:1px solid rgba(0,0,0,.10);background:#fff}
+    .tag.green{border-color:rgba(56,142,60,.18);background:rgba(129,199,132,.16);color:var(--primary-dark)}
+    .tag.orange{border-color:rgba(255,152,0,.22);background:rgba(255,152,0,.12);color:#8a4d00}
+    .tag.blue{border-color:rgba(33,150,243,.18);background:rgba(33,150,243,.10);color:#0f4e8a}
+    .tag.red{border-color:rgba(211,47,47,.22);background:rgba(211,47,47,.10);color:var(--accent-red)}
+    .mini{font-size:.92rem;color:var(--text-light);font-weight:800;margin-top:6px}
+    .rowbtns{display:flex;gap:8px;flex-wrap:wrap}
+    .smallbtn{border:none;border-radius:999px;padding:8px 10px;font-weight:1000;cursor:pointer}
+    .smallbtn.start{background:rgba(33,150,243,.12);color:#0f4e8a;border:1px solid rgba(33,150,243,.18)}
+    .smallbtn.done{background:rgba(129,199,132,.18);color:var(--primary-dark);border:1px solid rgba(56,142,60,.18)}
+    .smallbtn:hover{filter:brightness(.98)}
+    .msg{display:none;margin-top:10px;padding:12px 14px;border-radius:14px;font-weight:900;line-height:1.55}
+    .msg.err{background:rgba(211,47,47,.10);border:1px solid rgba(211,47,47,.22);color:var(--accent-red)}
+    .msg.ok{background:rgba(129,199,132,.22);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark)}
+    .loading{position:fixed;inset:0;background:rgba(249,249,249,.92);display:none;align-items:center;justify-content:center;z-index:5000}
+    .spinner{width:54px;height:54px;border-radius:50%;border:6px solid rgba(76,175,80,.18);border-top-color:var(--primary-main);animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
+
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+
+    let supabase;
+    let currentUser = null;
+    let currentProfile = null;
+
+    function qs(id){ return document.getElementById(id); }
+    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
+    function showMsg(kind, html){
+      const el = qs('msg');
+      el.className = 'msg ' + kind;
+      el.innerHTML = html;
+      el.style.display = 'block';
+    }
+    function hideMsg(){ qs('msg').style.display = 'none'; }
+
+    function normalizeRole(profile){
+      const raw = profile?.role_id ?? profile?.role ?? profile?.roleId ?? profile?.roleID;
+      const asNum = Number(raw);
+      if (Number.isFinite(asNum)) return asNum;
+      if (typeof raw === 'string'){
+        const s = raw.toLowerCase();
+        if (s.includes('admin')) return 1;
+        if (s.includes('driver') || s.includes('staff')) return 2;
+        if (s.includes('volunteer')) return 3;
+      }
+      return null;
+    }
+    function displayName(profile, user){
+      return profile?.full_name || profile?.name || user?.user_metadata?.full_name || user?.email || 'Staff';
+    }
+    function formatDate(d){
+      if (!d) return '—';
+      const dt = new Date(d);
+      if (Number.isNaN(dt.getTime())) return '—';
+      return dt.toLocaleString();
+    }
+    function statusTag(status){
+      const s = (status || '').toLowerCase();
+      if (s.includes('complete')) return `<span class="tag green"><i class="fa-solid fa-circle-check"></i> ${status}</span>`;
+      if (s.includes('progress')) return `<span class="tag blue"><i class="fa-solid fa-spinner"></i> ${status}</span>`;
+      if (s.includes('assign')) return `<span class="tag orange"><i class="fa-solid fa-clipboard-list"></i> ${status}</span>`;
+      if (s.includes('reject')) return `<span class="tag red"><i class="fa-solid fa-circle-xmark"></i> ${status}</span>`;
+      return `<span class="tag">${status || '—'}</span>`;
+    }
+
+    async function authGuard(){
+      setLoading(true);
+      const { data, error } = await supabase.auth.getSession();
+      if (error) { setLoading(false); throw error; }
+      if (!data?.session?.user){
+        window.location.href = '/staff-login/';
+        return;
+      }
+      currentUser = data.session.user;
+
+      const prof = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+      if (prof.error) { setLoading(false); throw prof.error; }
+      if (!prof.data){
+        await supabase.auth.signOut();
+        window.location.href = '/staff-login/';
+        return;
+      }
+      currentProfile = prof.data;
+
+      const roleId = normalizeRole(currentProfile);
+      if (roleId === 1){
+        window.location.href = '/admin/dashboard/home.html';
+        return;
+      }
+      if (!(roleId === 2 || roleId === 3)){
+        await supabase.auth.signOut();
+        window.location.href = '/staff-login/';
+        return;
+      }
+      setLoading(false);
+    }
+
+    async function loadProfileCard(){
+      const name = displayName(currentProfile, currentUser);
+      qs('who').textContent = name;
+      qs('role').textContent = String(currentProfile.role_name || currentProfile.role_label || currentProfile.role || currentProfile.role_id || 'Staff');
+      qs('email').textContent = currentUser.email || '—';
+      qs('phone').textContent = currentProfile.phone || currentProfile.phone_number || '—';
+      qs('welcome').textContent = `Welcome, ${name}`;
+    }
+
+    async function loadTasks(){
+      hideMsg();
+      qs('tasksBody').innerHTML = `<tr><td colspan="5" class="muted">Loading tasks...</td></tr>`;
+
+      try{
+        // Fetch all tasks for this user, then filter safely client-side.
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*')
+          .eq('assigned_to', currentUser.id)
+          .order('created_at', { ascending:false });
+
+        if (error) throw error;
+
+        const rows = (data || []).filter(t => {
+          const s = String(t.status || '');
+          return s === 'Assigned' || s === 'InProgress' || s === 'In Progress';
+        });
+
+        if (!rows.length){
+          qs('tasksBody').innerHTML = `<tr><td colspan="5" class="muted">No active assignments right now.</td></tr>`;
+          return;
+        }
+
+        qs('tasksBody').innerHTML = rows.map(t => `
+          <tr>
+            <td>
+              <div style="font-weight:1000">${t.title || 'Untitled Task'}</div>
+              <div class="mini">${t.description || ''}</div>
+            </td>
+            <td>${t.priority ? `<span class="tag">${t.priority}</span>` : '—'}</td>
+            <td>${statusTag(t.status)}</td>
+            <td class="mini">${formatDate(t.created_at)}</td>
+            <td>
+              <div class="rowbtns">
+                ${String(t.status) === 'Assigned'
+                  ? `<button class="smallbtn start" onclick="window.__updateTaskStatus('${t.id}','InProgress')"><i class="fa-solid fa-play"></i> Start</button>`
+                  : ''
+                }
+                <button class="smallbtn done" onclick="window.__updateTaskStatus('${t.id}','Completed')"><i class="fa-solid fa-check"></i> Complete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch(err){
+        console.error(err);
+        qs('tasksBody').innerHTML = `<tr><td colspan="5" class="muted">Failed to load tasks.</td></tr>`;
+        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Tasks load failed: ${err.message}`);
+      }
+    }
+
+    async function updateTaskStatus(taskId, status){
+      hideMsg();
+      setLoading(true);
+      try{
+        const { error } = await supabase.from('tasks').update({ status }).eq('id', taskId);
+        if (error) throw error;
+        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Task updated to <b>${status}</b>.`);
+        await loadTasks();
+      } catch(err){
+        console.error(err);
+        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Update failed: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function logout(){
+      setLoading(true);
+      await supabase.auth.signOut();
+      window.location.href = '/staff-login/';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      window.__updateTaskStatus = updateTaskStatus;
+
+      try{
+        await authGuard();
+        await loadProfileCard();
+        await loadTasks();
+      } catch(err){
+        console.error(err);
+        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`);
+      }
+
+      qs('refreshBtn').addEventListener('click', loadTasks);
+      qs('logoutBtn').addEventListener('click', logout);
+    });
+  </script>
 </head>
 
 <body>
-<header id="navbar">
-  <a href="/" class="logo-container">
-    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-  </a>
+  <div id="loading" class="loading"><div class="spinner"></div></div>
 
-  <div class="nav-right">
-    <div class="chip" title="Logged in staff member">
-      <i class="fas fa-user"></i>
-      <span id="staffChipName">—</span>
-    </div>
-    <button class="btn secondary" onclick="refreshTasks()"><i class="fas fa-rotate"></i> Refresh</button>
-    <button class="btn danger" onclick="logout()"><i class="fas fa-right-from-bracket"></i> Logout</button>
-  </div>
-</header>
-
-<div id="loading">
-  <img src="/image/logo.png" alt="FoodShare Seychelles" style="height:70px;">
-  <div class="spinner"></div>
-  <div style="margin-top:10px; font-weight:900; color: var(--text-dark);">Loading Staff Dashboard…</div>
-</div>
-
-<div id="toast"><strong id="toastTitle"></strong><span id="toastMsg"></span></div>
-
-<div id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-head">
-      <strong id="modalTitle">Details</strong>
-      <button class="btn secondary" onclick="hideModal()"><i class="fas fa-xmark"></i> Close</button>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-foot" id="modalFoot"></div>
-  </div>
-</div>
-
-<main>
-  <div class="content-container">
-    <div class="page-header">
-      <h1>Staff Dashboard</h1>
-      <p>Your assignments and current work status.</p>
-    </div>
-
-    <div class="grid">
-      <section class="section">
-        <h2><i class="fas fa-id-card"></i> My Profile</h2>
-        <div class="kv"><div class="k">Full name</div><div class="v" id="profileName">—</div></div>
-        <div class="kv"><div class="k">Email</div><div class="v" id="profileEmail">—</div></div>
-        <div class="kv"><div class="k">Role</div><div class="v" id="profileRole">—</div></div>
-        <div class="kv" style="border-bottom:none;"><div class="k">User ID</div><div class="v mono" id="profileId">—</div></div>
-      </section>
-
-      <section class="section blue">
-        <h2><i class="fas fa-gauge-high"></i> My Work (Summary)</h2>
-        <div class="grid-stats">
-          <div class="stat">
-            <div class="label">Total assigned</div>
-            <div class="value" id="statTotal">—</div>
-            <div class="hint">All tasks assigned to you</div>
-          </div>
-          <div class="stat">
-            <div class="label">Pending / Active</div>
-            <div class="value" id="statActive">—</div>
-            <div class="hint">Not marked as completed</div>
-          </div>
-          <div class="stat">
-            <div class="label">Completed</div>
-            <div class="value" id="statDone">—</div>
-            <div class="hint">Marked completed/done</div>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="section orange">
-      <h2><i class="fas fa-list-check"></i> My Tasks</h2>
-
-      <div class="controls">
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-          <div class="field">
-            <label>Search</label>
-            <input id="taskSearch" placeholder="title, description, status, priority…" oninput="renderTasks()">
-          </div>
-          <div class="field" style="min-width:220px;">
-            <label>Status filter</label>
-            <select id="statusFilter" onchange="renderTasks()">
-              <option value="ALL">All</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn secondary" onclick="refreshTasks()"><i class="fas fa-rotate"></i> Refresh Tasks</button>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="/image/logo.png" alt="FoodShare Seychelles">
+        <span>FoodShare Seychelles — Staff</span>
       </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Task ID</th>
-              <th>Title</th>
-              <th>Description</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tasksTbody"></tbody>
-        </table>
+      <div class="actions">
+        <span class="pill"><i class="fa-solid fa-user"></i> <span id="who">—</span></span>
+        <button id="refreshBtn" class="btn ghost" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        <button id="logoutBtn" class="btn green" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </div>
-    </section>
-  </div>
-</main>
+    </div>
+  </header>
 
-<script>
-  const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <main>
+    <div class="container">
+      <div class="grid">
+        <section class="card">
+          <div class="inner">
+            <h1 id="welcome">Welcome</h1>
+            <p class="muted">This dashboard shows your profile and your current operational assignments.</p>
 
-  let sessionUser = null;
-  let profile = null;
-  let tasksData = [];
+            <div class="kv">
+              <div class="box"><div class="k">Role</div><div class="v" id="role">—</div></div>
+              <div class="box"><div class="k">Email</div><div class="v" id="email">—</div></div>
+              <div class="box"><div class="k">Phone</div><div class="v" id="phone">—</div></div>
+              <div class="box"><div class="k">Status</div><div class="v"><span class="tag green"><i class="fa-solid fa-shield-heart"></i> Active</span></div></div>
+            </div>
 
-  const $ = (id) => document.getElementById(id);
-
-  function toast(title, msg){
-    $('toastTitle').textContent = title || 'Info';
-    $('toastMsg').textContent = msg || '';
-    const t = $('toast');
-    t.style.display = 'block';
-    setTimeout(()=> t.style.display = 'none', 3800);
-  }
-
-  function esc(v){
-    const s = (v ?? '').toString();
-    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  function fmtDate(v){
-    if(!v) return '—';
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return esc(v);
-    return d.toLocaleString();
-  }
-
-  function roleLabel(v){
-    if (v === 1) return '1 (Admin)';
-    if (v === 2) return '2 (Staff/Driver)';
-    if (v === 3) return '3 (Volunteer Coordinator)';
-    return String(v ?? '—');
-  }
-
-  function badgeClass(status){
-    const s = (status ?? '').toString().toLowerCase();
-    if (s.includes('assign') || s.includes('new')) return 'badge b-new';
-    if (s.includes('progress') || s.includes('pending')) return 'badge b-warn';
-    if (s.includes('complete') || s.includes('done')) return 'badge b-ok';
-    if (s.includes('reject') || s.includes('cancel')) return 'badge b-bad';
-    return 'badge';
-  }
-
-  function buildKV(obj, preferredOrder){
-    const keys = preferredOrder?.length ? preferredOrder : Object.keys(obj || {});
-    const seen = new Set();
-    const parts = [];
-
-    for (const k of keys){
-      if(!obj || !(k in obj)) continue;
-      seen.add(k);
-      parts.push(`
-        <div class="kv">
-          <div class="k">${esc(k)}</div>
-          <div class="v">${esc(obj[k] ?? '—')}</div>
-        </div>
-      `);
-    }
-    if(obj){
-      for (const k of Object.keys(obj)){
-        if(seen.has(k)) continue;
-        parts.push(`
-          <div class="kv">
-            <div class="k">${esc(k)}</div>
-            <div class="v">${esc(obj[k] ?? '—')}</div>
+            <div id="msg" class="msg" style="margin-top:12px"></div>
           </div>
-        `);
-      }
-    }
-    return parts.join('');
-  }
+        </section>
 
-  // ===== MODAL =====
-  function openModal(title, bodyHtml, footHtml){
-    $('modalTitle').textContent = title || 'Details';
-    $('modalBody').innerHTML = bodyHtml || '';
-    $('modalFoot').innerHTML = footHtml || `<button class="btn secondary" onclick="hideModal()">Close</button>`;
-    $('modalOverlay').style.display = 'flex';
-  }
-  function hideModal(){ $('modalOverlay').style.display = 'none'; }
-  function closeModal(e){ if(e.target.id === 'modalOverlay') hideModal(); }
+        <section class="card">
+          <div class="inner">
+            <h2><i class="fa-solid fa-list-check"></i> My Current Assignments</h2>
+            <p class="muted">Tasks assigned to you (Assigned / InProgress). Use Start or Complete as you progress.</p>
 
-  // ===== AUTH + LOAD =====
-  async function init(){
-    const { data: sData, error: sErr } = await supabase.auth.getSession();
-    if (sErr || !sData.session){
-      window.location.href = '/staff-login/index.html';
-      return;
-    }
-    sessionUser = sData.session.user;
-
-    const { data: p, error: pErr } = await supabase
-      .from('profiles')
-      .select('id, full_name, email, role, role_id')
-      .eq('id', sessionUser.id)
-      .single();
-
-    if (pErr || !p){
-      await supabase.auth.signOut();
-      window.location.href = '/staff-login/index.html';
-      return;
-    }
-
-    profile = p;
-    const roleVal = (profile.role ?? profile.role_id);
-
-    if (roleVal === 1){
-      window.location.href = '/admin/dashboard/home.html';
-      return;
-    }
-    if (roleVal !== 2 && roleVal !== 3){
-      await supabase.auth.signOut();
-      window.location.href = '/staff-login/index.html';
-      return;
-    }
-
-    // Render identity
-    $('profileName').textContent = profile.full_name || '—';
-    $('profileEmail').textContent = profile.email || sessionUser.email || '—';
-    $('profileRole').textContent = roleLabel(roleVal);
-    $('profileId').textContent = profile.id || sessionUser.id || '—';
-    $('staffChipName').textContent = profile.full_name || profile.email || 'Staff';
-
-    await refreshTasks();
-    $('loading').style.display = 'none';
-  }
-
-  async function logout(){
-    await supabase.auth.signOut();
-    window.location.href = '/staff-login/index.html';
-  }
-
-  // ===== TASKS =====
-  async function refreshTasks(){
-    if (!sessionUser?.id) return;
-
-    // Show ALL tasks for this staff member (no status filtering)
-    const { data, error } = await supabase
-      .from('tasks')
-      .select('id, assigned_to, title, description, status, priority, created_by, created_at')
-      .eq('assigned_to', sessionUser.id)
-      .order('created_at', { ascending: false });
-
-    if (error){
-      toast('Tasks load failed', error.message);
-      tasksData = [];
-      rebuildStatusFilter();
-      renderTasks();
-      updateStats();
-      return;
-    }
-
-    tasksData = data || [];
-    rebuildStatusFilter();
-    renderTasks();
-    updateStats();
-  }
-
-  function rebuildStatusFilter(){
-    const sel = $('statusFilter');
-    const current = sel.value || 'ALL';
-
-    const statuses = Array.from(new Set(tasksData.map(t => t.status).filter(Boolean)));
-    const options = ['ALL', ...statuses];
-
-    sel.innerHTML = options.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
-    sel.value = options.includes(current) ? current : 'ALL';
-  }
-
-  function updateStats(){
-    const total = tasksData.length;
-    const done = tasksData.filter(t => {
-      const s = (t.status || '').toString().toLowerCase();
-      return s.includes('complete') || s.includes('done');
-    }).length;
-
-    $('statTotal').textContent = total;
-    $('statDone').textContent = done;
-    $('statActive').textContent = total - done;
-  }
-
-  function renderTasks(){
-    const q = ($('taskSearch').value || '').toLowerCase().trim();
-    const statusFilter = $('statusFilter').value || 'ALL';
-
-    const rows = tasksData.filter(t => {
-      const blob = [t.id, t.title, t.description, t.status, t.priority].join(' ').toLowerCase();
-      const matchesSearch = blob.includes(q);
-      const matchesStatus = (statusFilter === 'ALL') ? true : (t.status === statusFilter);
-      return matchesSearch && matchesStatus;
-    });
-
-    const tb = $('tasksTbody');
-    if (!rows.length){
-      tb.innerHTML = `<tr><td colspan="7" style="color:var(--text-light);">No tasks found for your filters.</td></tr>`;
-      return;
-    }
-
-    tb.innerHTML = rows.map(t => `
-      <tr>
-        <td class="mono">${esc(t.id)}</td>
-        <td><b>${esc(t.title || '—')}</b></td>
-        <td style="color:var(--text-light);">${esc((t.description || '').slice(0, 90))}${(t.description || '').length > 90 ? '…' : ''}</td>
-        <td>${esc(t.priority || '—')}</td>
-        <td><span class="${badgeClass(t.status)}">${esc(t.status || '—')}</span></td>
-        <td>${fmtDate(t.created_at)}</td>
-        <td class="row-actions">
-          <button class="mini blue" onclick='viewTask(${JSON.stringify(t).replace(/'/g,"&#39;")})'><i class="fas fa-eye"></i></button>
-          <button class="mini orange" onclick="promptUpdateStatus('${esc(t.id)}','${esc(t.status || '')}')"><i class="fas fa-pen"></i> Status</button>
-          <button class="mini green" onclick="quickComplete('${esc(t.id)}')"><i class="fas fa-check"></i> Complete</button>
-        </td>
-      </tr>
-    `).join('');
-  }
-
-  function viewTask(t){
-    const body = buildKV(t, ['id','title','description','priority','status','created_at','created_by','assigned_to']);
-    const foot = `
-      <button class="btn secondary" onclick="hideModal()"><i class="fas fa-xmark"></i> Close</button>
-      <button class="btn secondary" onclick="promptUpdateStatus('${esc(t.id)}','${esc(t.status || '')}')"><i class="fas fa-pen"></i> Update Status</button>
-      <button class="btn" onclick="quickComplete('${esc(t.id)}')"><i class="fas fa-check"></i> Complete</button>
-    `;
-    openModal('Task Details', body, foot);
-  }
-
-  function promptUpdateStatus(taskId, current){
-    const existing = Array.from(new Set(tasksData.map(x => x.status).filter(Boolean))).slice(0, 30);
-    const fallback = ['Assigned','InProgress','Completed'];
-    const suggestions = existing.length ? existing : fallback;
-
-    const opts = suggestions.map(s => `<option value="${esc(s)}" ${s === current ? 'selected' : ''}>${esc(s)}</option>`).join('');
-
-    const body = `
-      <div style="font-weight:900; margin-bottom:10px;">Update task status</div>
-      <div class="field" style="min-width:unset;">
-        <label>Status</label>
-        <select id="taskStatusSelect">${opts}</select>
+            <div style="overflow:auto;margin-top:10px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tasksBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       </div>
-      <div style="margin-top:10px; color: var(--text-light); font-size:.92em;">
-        Status options are inferred from existing database values to reduce enum errors.
-      </div>
-    `;
-
-    const foot = `
-      <button class="btn secondary" onclick="hideModal()"><i class="fas fa-xmark"></i> Cancel</button>
-      <button class="btn" onclick="updateTaskStatus('${esc(taskId)}')"><i class="fas fa-floppy-disk"></i> Save</button>
-    `;
-    openModal('Update Status', body, foot);
-  }
-
-  async function updateTaskStatus(taskId){
-    const newStatus = document.getElementById('taskStatusSelect').value;
-
-    const { error } = await supabase.from('tasks').update({ status: newStatus }).eq('id', taskId);
-
-    if (error){
-      toast('Update failed', error.message);
-      return;
-    }
-    toast('Updated', `Status set to "${newStatus}".`);
-    hideModal();
-    await refreshTasks();
-  }
-
-  async function quickComplete(taskId){
-    const { error } = await supabase.from('tasks').update({ status: 'Completed' }).eq('id', taskId);
-    if (error){
-      toast('Complete failed', error.message);
-      return;
-    }
-    toast('Completed', 'Task marked as Completed.');
-    hideModal();
-    await refreshTasks();
-  }
-
-  init();
-</script>
+    </div>
+  </main>
 </body>
 </html>
