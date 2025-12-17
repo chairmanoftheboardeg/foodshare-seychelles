@@ -1,262 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Available Food - FoodShare Seychelles</title>
-    <link rel="icon" href="/image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    
-    <style>
-        /* [START STANDARD SITE-WIDE CSS BLOCK] */
-        :root {
-            --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C; 
-            --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
-            --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333; 
-            --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-            --transition-speed: 0.4s;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-        a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-        a:hover { color: var(--primary-dark); }
-        main { flex-grow: 1; padding: 40px 0; }
-        h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-        .content-container { max-width: 1200px; margin: 0 auto; padding: 0 25px; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Food — FoodShare Seychelles</title>
 
-        /* NAVIGATION BAR */
-        #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
-        .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-        .logo-img { height: 40px; margin-right: 10px; }
-        .nav-links-container { display: flex; gap: 30px; align-items: center; }
-        .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
-        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
-        .nav-link:hover::after { width: 100%; }
-        .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
-        .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+  <link rel="icon" href="/image/logo.png" type="image/png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
-        /* FOOTER STYLING */
-        #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
-        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
-        .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
-        .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
-        .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
-        .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
+  <style>
+    :root {
+      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
+      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
+      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
+      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
+      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
+      --transition-speed:0.35s;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:var(--font-sans); color:var(--text-dark); background:var(--neutral-bg); min-height:100vh; display:flex; flex-direction:column; }
+    a { text-decoration:none; color:var(--primary-main); transition:color var(--transition-speed); }
+    a:hover { color:var(--primary-dark); }
+    main { flex-grow:1; padding:40px 0; }
+    h1,h2,h3 { font-family:var(--font-serif); color:var(--primary-dark); }
+    .content-container { max-width:1150px; margin:0 auto; padding:0 25px; }
 
-        /* Find Food Specific Styles */
-        .inventory-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-        .item-card {
-            background-color: var(--neutral-card);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid var(--primary-main);
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-        }
-        .item-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
-        .item-card h4 { margin-bottom: 5px; color: var(--primary-dark); }
-        .item-card p { font-size: 0.9em; color: var(--text-light); }
-        .item-card .quantity { 
-            font-size: 1.2em; font-weight: bold; 
-            color: var(--accent-blue); margin-top: 10px;
-        }
-        .claim-btn {
-            background-color: var(--accent-orange);
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 15px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .claim-btn:hover { background-color: #E68900; }
-        
-        /* Modal Styles (New) */
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); display: none; 
-            justify-content: center; align-items: center; z-index: 2000;
-        }
-        .modal-content {
-            background: var(--neutral-card); padding: 30px; border-radius: 8px;
-            width: 90%; max-width: 450px; text-align: center; position: relative;
-            box-shadow: var(--shadow-subtle);
-        }
-        .modal-content h3 { margin-bottom: 20px; color: var(--text-dark); }
-        .modal-content .option-btn {
-            display: block; width: 100%; margin: 10px 0; padding: 15px;
-            font-size: 1.1em; border: none; border-radius: 5px; cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #transportBtn { background-color: var(--accent-red); color: white; }
-        #pickupBtn { background-color: var(--primary-main); color: white; }
-        #transportBtn:hover { background-color: #B71C1C; }
-        #pickupBtn:hover { background-color: var(--primary-dark); }
-        .close-btn { position: absolute; top: 10px; right: 20px; font-size: 1.5em; cursor: pointer; color: var(--text-light); }
-        /* [END STANDARD CSS BLOCK] */
-    </style>
-    
-    <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        let supabase;
-        let currentListingId = null;
+    /* NAVBAR (same style as your site) */
+    #navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 25px; background-color:var(--neutral-card); box-shadow:0 4px 12px rgba(0,0,0,0.08); position:sticky; top:0; z-index:1000; }
+    .logo-container { display:flex; align-items:center; font-size:1.6em; font-weight:bold; color:var(--text-dark); }
+    .logo-img { height:40px; margin-right:10px; }
+    .nav-links-container { display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .nav-link { font-weight:600; padding:8px 0; position:relative; color:var(--text-dark); }
+    .nav-link::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background-color:var(--primary-main); transition:width var(--transition-speed); }
+    .nav-link:hover::after { width:100%; }
+    .cta-button { background-color:var(--primary-main); color:var(--neutral-card); border-radius:999px; padding:10px 18px; font-weight:800; box-shadow:0 10px 18px rgba(0,0,0,0.10); transition:background-color var(--transition-speed); }
+    .cta-button:hover { background-color:var(--primary-dark); }
+    .staff-login { opacity:.9; }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.supabase && window.supabase.createClient) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                fetchListings();
-            } else {
-                console.error("Supabase client library failed to load.");
-            }
-            
-            // Attach event listeners for the modal
-            document.getElementById('transportBtn').addEventListener('click', redirectToTransportForm);
-            document.getElementById('pickupBtn').addEventListener('click', redirectToPickupForm);
-            document.querySelector('.close-btn').addEventListener('click', closeModal);
-            document.getElementById('claimModal').addEventListener('click', function(e) {
-                if (e.target.id === 'claimModal') {
-                    closeModal();
-                }
-            });
-        });
+    .nav-right { display:flex; gap:10px; align-items:center; }
+    .pill-btn {
+      border:1px solid rgba(56,142,60,0.18);
+      background:#fff;
+      border-radius:999px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900;
+      transition:transform .12s ease, box-shadow .2s ease;
+      white-space:nowrap;
+    }
+    .pill-btn:hover { box-shadow:0 10px 18px rgba(0,0,0,0.08); }
+    .pill-btn:active { transform:translateY(1px); }
+    .user-chip {
+      display:none;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(129,199,132,0.16);
+      border:1px solid rgba(56,142,60,0.18);
+      max-width:320px;
+    }
+    .avatar {
+      width:34px; height:34px; border-radius:50%;
+      object-fit:cover; border:2px solid rgba(56,142,60,0.25); background:#fff;
+    }
+    .user-chip b { display:block; font-size:.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .user-chip span { display:block; font-size:.82rem; color:var(--text-light); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-        function openModal(listingId, title) {
-            currentListingId = listingId;
-            document.getElementById('listingTitle').textContent = title;
-            document.getElementById('claimModal').style.display = 'flex';
-        }
+    /* FOOTER */
+    #main-footer { margin-top:auto; background-color:#222; color:var(--neutral-bg); padding:50px 0 20px; font-size:0.9em; }
+    .footer-content { display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:30px; max-width:1200px; margin:0 auto 30px; padding:0 25px; gap:18px; }
+    .footer-section { width:20%; min-width:180px; margin-bottom:20px; }
+    .footer-section h3 { color:var(--primary-light); margin-bottom:14px; font-size:1.1em; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:6px; }
+    .footer-section a { color:var(--neutral-bg); transition:color 0.3s; display:block; padding:3px 0; }
+    .footer-section a:hover { color:var(--primary-main); text-decoration:underline; }
+    .footer-bottom { text-align:center; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); color:#aaa; font-size:0.85em; }
 
-        function closeModal() {
-            document.getElementById('claimModal').style.display = 'none';
-            currentListingId = null;
-        }
+    /* Page layout */
+    .page-head {
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .page-head h1 { font-size:2.05rem; }
+    .page-head p { color:var(--text-light); line-height:1.7; max-width:720px; }
 
-        function redirectToTransportForm() {
-            if (currentListingId) {
-                window.location.href = `/claim/transport.html?listing_id=${currentListingId}`;
-            }
-        }
+    .tools {
+      display:grid;
+      grid-template-columns: 1.4fr 0.6fr;
+      gap:12px;
+      margin: 16px 0 18px;
+      align-items:center;
+    }
+    @media (max-width: 760px) { .tools { grid-template-columns:1fr; } }
 
-        function redirectToPickupForm() {
-            if (currentListingId) {
-                window.location.href = `/claim/pickup.html?listing_id=${currentListingId}`;
-            }
-        }
+    .search {
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.10);
+      border-radius:14px;
+      box-shadow:var(--shadow-subtle);
+      padding:12px;
+      display:flex; gap:10px; align-items:center;
+    }
+    .search input {
+      width:100%;
+      border:none;
+      outline:none;
+      font-size:1rem;
+    }
+    .filter {
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.10);
+      border-radius:14px;
+      box-shadow:var(--shadow-subtle);
+      padding:12px;
+      display:flex; gap:10px; align-items:center;
+      justify-content:space-between;
+    }
+    .filter select {
+      width:100%;
+      border:none;
+      outline:none;
+      font-size:1rem;
+      background:transparent;
+      cursor:pointer;
+    }
 
-        async function fetchListings() {
-            const inventoryList = document.getElementById('inventoryList');
-            inventoryList.innerHTML = '<p style="text-align: center; color: var(--text-light);">Loading available food...</p>';
+    .grid {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 
-            // FIX: Querying the correct table 'food_listings'
-            const { data, error } = await supabase
-                .from('food_listings')
-                .select('id, title, description, location, quantity, is_available')
-                .eq('is_available', true)
-                .order('posted_at', { ascending: false });
+    .card {
+      background:var(--neutral-card);
+      border-radius:16px;
+      border:1px solid rgba(56,142,60,0.14);
+      box-shadow:var(--shadow-subtle);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before {
+      content:"";
+      position:absolute; left:0; top:0; right:0; height:6px;
+      background:linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
+    }
+    .card-inner { padding:16px; }
+    .meta { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0; }
+    .pill {
+      font-size:.78rem; font-weight:900;
+      padding:6px 10px; border-radius:999px;
+      background:rgba(129,199,132,0.18);
+      border:1px solid rgba(56,142,60,0.22);
+      color:var(--primary-dark);
+      white-space:nowrap;
+    }
+    .pill.blue { background:rgba(33,150,243,0.10); border-color:rgba(33,150,243,0.22); color:#145ea8; }
+    .pill.orange { background:rgba(255,152,0,0.12); border-color:rgba(255,152,0,0.25); color:#9a4a00; }
 
-            if (error) {
-                // IMPORTANT: The policy recursion error is not shown here, but this catch handles DB connection issues.
-                inventoryList.innerHTML = `<p style="text-align: center; color: var(--accent-red);">Error loading food listings: ${error.message}</p>`;
-                return;
-            }
+    .card h3 { font-family:var(--font-serif); font-size:1.22rem; color:var(--primary-dark); margin-bottom:6px; }
+    .desc { color:var(--text-light); line-height:1.55; min-height: 46px; }
+    .actions { margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+    .btn {
+      border:none;
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .12s ease, background .2s ease;
+      white-space:nowrap;
+    }
+    .btn:active { transform:translateY(1px); }
+    .btn.primary { background:var(--primary-main); color:#fff; box-shadow:0 10px 18px rgba(0,0,0,0.10); }
+    .btn.primary:hover { background:var(--primary-dark); }
+    .btn.ghost { background:#fff; color:var(--primary-dark); border:1px solid rgba(56,142,60,0.22); }
 
-            if (data.length === 0) {
-                inventoryList.innerHTML = '<p style="text-align: center; font-style: italic; color: var(--text-light);">No food items are currently available for claim. Please check back later or consider making a donation.</p>';
-                return;
-            }
+    .state {
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.10);
+      border-radius:16px;
+      box-shadow:var(--shadow-subtle);
+      padding:16px;
+      color:var(--text-light);
+      line-height:1.6;
+    }
 
-            inventoryList.innerHTML = '';
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                
-                card.innerHTML = `
-                    <h4><i class="fas fa-box-open"></i> ${item.title}</h4>
-                    <p>Location: ${item.location || 'Central Location'}</p>
-                    <p style="margin-top: 5px;">${item.description || 'No detailed description provided.'}</p>
-                    <div class="quantity">${item.quantity} available</div>
-                    
-                    <button class="claim-btn" onclick="openModal('${item.id}', '${item.title.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-hand-holding-heart"></i> Claim Food
-                    </button>
-                `;
-                inventoryList.appendChild(card);
-            });
-        }
-    </script>
-</head>
-<body>
-    <header id="navbar">
-        <a href="/" class="logo-container">
-            <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img"> 
-            FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-        </a>
-        <nav class="nav-links-container" id="navLinks">
-            <a href="/available-food/" class="nav-link">Find Food</a>
-            <a href="/donate-food/" class="nav-link">Donate</a>
-            <a href="/volunteer/" class="nav-link">Volunteer</a>
-            <a href="/impact/" class="nav-link">Impact</a>
-            <a href="/about/" class="nav-link">About Us</a>
-            <a href="/donate-food/" class="cta-button">DONATE NOW</a> 
-            <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-        </nav>
-    </header>
+    /* Loading */
+    .loading {
+      position:fixed; inset:0; background:rgba(249,249,249,0.92);
+      display:none; align-items:center; justify-content:center; z-index:5000;
+    }
+    .spinner {
+      width:54px; height:54px; border-radius:50%;
+      border:6px solid rgba(76,175,80,0.18);
+      border-top-color: var(--primary-main);
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg);} }
 
-    <main>
-        <div class="content-container">
-            <header style="text-align: center; margin-bottom: 40px;">
-                <h1>Available Food Inventory</h1>
-                <p>Browse the food items currently available for claim in Seychelles. **Click 'Claim Food' to select your pickup method.**</p>
-            </header>
+    /* Modal */
+    .modal-overlay {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.45);
+      display:none; align-items:center; justify-content:center;
+      padding:18px;
+      z-index:6000;
+    }
+    .modal {
+      width:min(720px, 96vw);
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 26px 60px rgba(0,0,0,0.18);
+      overflow:hidden;
+      border:1px solid rgba(56,142,60,0.18);
+      position:relative;
+    }
+    .modal::before {
+      content:"";
+      position:absolute; left:0; top:0; right:0; height:7px;
+      background:linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
+    }
+    .modal-head {
+      padding:18px 18px 10px;
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+    }
+    .modal-head h2 { font-size:1.35rem; }
+    .close {
+      border:none; background:transparent; cursor:pointer;
+      font-size:1.2rem; color:#444;
+      padding:6px 8px; border-radius:10px;
+    }
+    .close:hover { background:rgba(0,0,0,0.05); }
 
-            <div id="inventoryList" class="inventory-list">
-                </div>
-        </div>
-    </main>
+    .modal-body { padding: 0 18px 18px; }
+    .modal-body p { color:var(--text-light); line-height:1.6; }
+    .choice {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    @media (max-width: 640px) { .choice { grid-template-columns:1fr; } }
+    .choice-btn{
+      border:1px solid rgba(0,0,0,0.10);
+      background:#fff;
+      border-radius:16px;
+      padding:14px;
+      cursor:pointer;
+      text-align:left;
+      transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .choice-btn:hover { transform: translateY(-1px); box-shadow:0 16px 28px rgba(0,0,0,0.10); border-color: rgba(56,142,60,0.25); }
+    .choice-btn b { display:block; margin-bottom:6px; color:var(--text-dark); }
+    .choice-btn span { color:var(--text-light); line-height:1.5; display:block; }
+    .choice-btn .icon { color:var(--primary-dark); margin-right:8px; }
 
-    <div id="claimModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h3>How would you like to receive the claimed item: <span id="listingTitle" style="color: var(--primary-main);"></span>?</h3>
-            <p style="margin-bottom: 25px; color: var(--text-light);">Choose one of the options below to proceed to the claim form.</p>
+    .modal-foot { padding: 0 18px 18px; display:flex; gap:10px; flex-wrap:wrap; }
+    .warn { color: #7a5600; background: rgba(255,152,0,0.12); border:1px solid rgba(255,152,0,0.22); padding:10px 12px; border-radius:14px; width:100%; }
+  </style>
 
-            <button id="pickupBtn" class="option-btn">
-                <i class="fas fa-car-side"></i> Pick Up Myself (Fastest)
-            </button>
-            <p style="font-size: 0.8em; color: var(--text-light); margin: 15px 0 10px;">(Select this if you can collect the item directly from the specified location.)</p>
-            
-            <button id="transportBtn" class="option-btn">
-                <i class="fas fa-truck-moving"></i> Need Transport
-            </button>
-            <p style="font-size: 0.8em; color: var(--text-light);">(Select this if you require a volunteer or staff member to deliver the food to you. Note: May involve a longer wait.)</p>
-        </div>
-    </div>
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
 
-    <footer id="main-footer">
-        <div class="content-container footer-content">
-            <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-            <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-            <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-            <div class="footer-section">
-                <h3>Get In Touch</h3>
-                <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-                <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
+    let supabase;
+    let sessionUser = null;
+
+    let allListings = [];
+    let selectedListing = null;
+
+    function qs(id){ return document.getElementById(id); }
+    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
+
+    function fmtDate(ts){
+      try { return new Date(ts).toLocaleString(); } catch { return ''; }
+    }
+
+    function safeText(v){
+      if (v === null || v === undefined) return '';
+      return String(v);
+    }
+
+    async function loadSession(){
+      const { data } = await supabase.auth.getSession();
+      sessionUser = data?.session?.user || null;
+      await paintNavUser();
+    }
+
+    async function paintNavUser(){
+      const chip = qs('userChip');
+      const authBtn = qs('accountBtn');
+      const dashBtn = qs('dashboardBtn');
+      const logoutBtn = qs('logoutBtn');
+
+      if (!sessionUser){
+        chip.style.display = 'none';
+        authBtn.style.display = 'inline-flex';
+        dashBtn.style.display = 'none';
+        logoutBtn.style.display = 'none';
+        return;
+      }
+
+      authBtn.style.display = 'none';
+      dashBtn.style.display = 'inline-flex';
+      logoutBtn.style.display = 'inline-flex';
+      chip.style.display = 'inline-flex';
+
+      // Load profile for avatar + name
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name,email,avatar_url')
+        .eq('id', sessionUser.id)
+        .single();
+
+      const name = data?.full_name || 'Community Member';
+      const email = data?.email || sessionUser.email || '';
+      const avatar = (data?.avatar_url && data.avatar_url.trim()) ? data.avatar_url.trim() : '/image/logo.png';
+
+      qs('chipName').textContent = name;
+      qs('chipEmail').textContent = email;
+      qs('chipAvatar').src = avatar;
+      qs('chipAvatar').alt = name + ' avatar';
+    }
+
+    async function logout(){
+      await supabase.auth.signOut();
+      window.location.reload();
+    }
+
+    function renderListings(list){
+      const grid = qs('grid');
+
+      if (!list.length){
+        grid.innerHTML = '';
+        qs('state').style.display = 'block';
+        qs('state').innerHTML = `
+          <div style="font-weight:900; color: var(--primary-dark); margin-bottom:6px;">
+            No available food listings found
+          </div>
+          Try adjusting your search or check again soon. We update listings frequently.
+        `;
+        return;
+      }
+
+      qs('state').style.display = 'none';
+
+      grid.innerHTML = list.map(l => {
+        const title = safeText(l.title || 'Food Listing');
+        const desc = safeText(l.description || '');
+        const location = safeText(l.location || 'Seychelles');
+        const qty = safeText(l.quantity || 'N/A');
+        const posted = l.posted_at ? fmtDate(l.posted_at) : '';
+
+        return `
+          <article class="card">
+            <div class="card-inner">
+              <h3>${title}</h3>
+              <div class="desc">${desc.length > 140 ? (desc.slice(0, 140) + '…') : desc}</div>
+
+              <div class="meta">
+                <span class="pill"><i class="fa-solid fa-location-dot"></i> ${location}</span>
+                <span class="pill blue"><i class="fa-solid fa-scale-balanced"></i> Qty: ${qty}</span>
+                ${posted ? `<span class="pill orange"><i class="fa-regular fa-clock"></i> ${posted}</span>` : ''}
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" onclick="openClaimModal('${l.id}')">
+                  <i class="fa-solid fa-hand-holding-heart"></i> Claim
+                </button>
+                <a class="btn ghost" href="/donate-now/">
+                  <i class="fa-solid fa-gift"></i> Donate Instead
+                </a>
+              </div>
             </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function applyFilters(){
+      const q = qs('searchInput').value.trim().toLowerCase();
+      const loc = qs('locationFilter').value;
+
+      let filtered = allListings.slice();
+
+      if (loc !== 'all'){
+        filtered = filtered.filter(x => safeText(x.location).toLowerCase() === loc);
+      }
+
+      if (q){
+        filtered = filtered.filter(x => {
+          const blob = (safeText(x.title) + ' ' + safeText(x.description) + ' ' + safeText(x.location)).toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      renderListings(filtered);
+    }
+
+    async function fetchListings(){
+      // Try "known columns" first. If schema differs, fallback to "*".
+      let res = await supabase
+        .from('food_listings')
+        .select('id,title,description,location,quantity,is_available,posted_at')
+        .eq('is_available', true)
+        .order('posted_at', { ascending: false })
+        .limit(120);
+
+      if (res.error){
+        const fallback = await supabase
+          .from('food_listings')
+          .select('*')
+          .eq('is_available', true)
+          .limit(120);
+
+        if (fallback.error) throw fallback.error;
+        res = fallback;
+      }
+
+      allListings = (res.data || []).map(x => ({
+        id: x.id,
+        title: x.title,
+        description: x.description,
+        location: x.location,
+        quantity: x.quantity,
+        is_available: x.is_available,
+        posted_at: x.posted_at
+      }));
+
+      // Build location filter options
+      const locations = Array.from(new Set(allListings.map(x => safeText(x.location).toLowerCase()).filter(Boolean))).sort();
+      qs('locationFilter').innerHTML =
+        `<option value="all">All locations</option>` +
+        locations.map(v => `<option value="${v}">${v.charAt(0).toUpperCase() + v.slice(1)}</option>`).join('');
+
+      renderListings(allListings);
+    }
+
+    function showModal(show){
+      qs('modalOverlay').style.display = show ? 'flex' : 'none';
+      if (!show) selectedListing = null;
+    }
+
+    window.openClaimModal = function(listingId){
+      selectedListing = allListings.find(x => String(x.id) === String(listingId));
+      if (!selectedListing) return;
+
+      qs('modalTitle').textContent = selectedListing.title || 'Food Listing';
+      qs('modalDesc').textContent = selectedListing.description || 'No description provided.';
+      qs('modalMeta').innerHTML = `
+        <span class="pill"><i class="fa-solid fa-location-dot"></i> ${safeText(selectedListing.location || 'Seychelles')}</span>
+        <span class="pill blue"><i class="fa-solid fa-scale-balanced"></i> Qty: ${safeText(selectedListing.quantity || 'N/A')}</span>
+      `;
+
+      const loggedIn = !!sessionUser;
+      qs('modalWarn').style.display = loggedIn ? 'none' : 'block';
+
+      showModal(true);
+    }
+
+    function goToClaim(type){
+      if (!selectedListing) return;
+      const url = type === 'transport'
+        ? `/request-transport/?listing_id=${encodeURIComponent(selectedListing.id)}`
+        : `/self-pickup/?listing_id=${encodeURIComponent(selectedListing.id)}`;
+
+      if (!sessionUser){
+        // Force login first
+        window.location.href = `/account/?next=${encodeURIComponent(url)}`;
+        return;
+      }
+      window.location.href = url;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      qs('logoutBtn').addEventListener('click', logout);
+      qs('modalClose').addEventListener('click', () => showModal(false));
+      qs('modalOverlay').addEventListener('click', (e) => { if (e.target === qs('modalOverlay')) showModal(false); });
+
+      qs('searchInput').addEventListener('input', applyFilters);
+      qs('locationFilter').addEventListener('change', applyFilters);
+
+      qs('btnTransport').addEventListener('click', () => goToClaim('transport'));
+      qs('btnPickup').addEventListener('click', () => goToClaim('pickup'));
+
+      try{
+        setLoading(true);
+        await loadSession();
+        await fetchListings();
+      } catch (e){
+        console.error(e);
+        qs('state').style.display = 'block';
+        qs('state').innerHTML = `
+          <div style="font-weight:900; color: var(--accent-red); margin-bottom:6px;">
+            Failed to load food listings
+          </div>
+          ${safeText(e.message || e)}
+          <div style="margin-top:10px;">
+            If this persists, it is usually an RLS policy blocking SELECT on <b>food_listings</b>.
+          </div>
+        `;
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="loading" class="loading"><div class="spinner" aria-hidden="true"></div></div>
+
+  <header id="navbar">
+    <a href="/" class="logo-container">
+      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
+      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
+    </a>
+
+    <nav class="nav-links-container">
+      <a href="/available-food/" class="nav-link">Find Food</a>
+      <a href="/donate-now/" class="nav-link">Donate</a>
+      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
+      <a href="/our-impact/" class="nav-link">Impact</a>
+      <a href="/about/" class="nav-link">About Us</a>
+      <a href="/donate-now/" class="cta-button">DONATE NOW</a>
+      <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
+
+      <div class="nav-right">
+        <div id="userChip" class="user-chip" title="Signed in">
+          <img id="chipAvatar" class="avatar" src="/image/logo.png" alt="avatar">
+          <div style="min-width:0;">
+            <b id="chipName">—</b>
+            <span id="chipEmail">—</span>
+          </div>
         </div>
-        <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-    </footer>
+
+        <a id="accountBtn" class="pill-btn" href="/account/" style="display:inline-flex;">
+          <i class="fa-solid fa-user"></i>&nbsp; Account
+        </a>
+        <a id="dashboardBtn" class="pill-btn" href="/dashboard/" style="display:none;">
+          <i class="fa-solid fa-gauge"></i>&nbsp; Dashboard
+        </a>
+        <button id="logoutBtn" class="pill-btn" type="button" style="display:none;">
+          <i class="fa-solid fa-right-from-bracket"></i>&nbsp; Logout
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <div class="content-container">
+      <div class="page-head">
+        <div>
+          <h1>Find Available Food</h1>
+          <p>
+            Browse available food listings across Seychelles. When you find something you need, click <b>Claim</b> and choose either
+            <b>Request Transport</b> or <b>Self Pickup</b>.
+          </p>
+        </div>
+      </div>
+
+      <div class="tools">
+        <div class="search">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--text-light);"></i>
+          <input id="searchInput" type="text" placeholder="Search by food type, description, or location..." />
+        </div>
+
+        <div class="filter">
+          <span style="font-weight:900; color: var(--text-light); white-space:nowrap;">
+            <i class="fa-solid fa-filter"></i>&nbsp; Location
+          </span>
+          <select id="locationFilter">
+            <option value="all">All locations</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="state" class="state" style="display:none;"></div>
+      <section id="grid" class="grid" aria-label="Food listings"></section>
+    </div>
+  </main>
+
+  <!-- Claim Modal -->
+  <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-label="Claim options">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle">Food Listing</h2>
+          <div id="modalMeta" class="meta" style="margin-top:8px;"></div>
+        </div>
+        <button id="modalClose" class="close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="modalDesc"></p>
+
+        <div id="modalWarn" class="warn" style="display:none; margin-top:12px;">
+          <b>Sign in required:</b> Please sign in or create an account to submit a claim request.
+        </div>
+
+        <div class="choice">
+          <button id="btnTransport" class="choice-btn" type="button">
+            <b><i class="fa-solid fa-truck icon"></i> Request Transport</b>
+            <span>We deliver the food to you. You will provide delivery details and time availability.</span>
+          </button>
+
+          <button id="btnPickup" class="choice-btn" type="button">
+            <b><i class="fa-solid fa-person-walking icon"></i> Self Pickup</b>
+            <span>You will pick up the food yourself. Confirm the listing and submit your pickup intent.</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn ghost" type="button" onclick="window.location.href='/dashboard/'">
+          <i class="fa-solid fa-bell"></i> View My Notifications
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="main-footer">
+    <div class="content-container footer-content">
+      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
+      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
+      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
+      <div class="footer-section">
+        <h3>Get In Touch</h3>
+        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
+        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
+  </footer>
 </body>
 </html>
