@@ -29,7 +29,7 @@
         /* Global Resets and Typography */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; }
         body { color: var(--fs-text-primary); background-color: var(--fs-bg-light); min-height: 100vh; display: flex; flex-direction: column; }
-        main { flex-grow: 1; }
+        main { flex-grow: 1; opacity: 0; transition: opacity 0.5s ease-in-out 0.5s; } /* Main content starts hidden for smooth reveal */
 
         /* Containers and Layout */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
@@ -106,31 +106,49 @@
         .hero h1 { color: var(--fs-green-dark); }
         .hero p { color: var(--fs-text-primary); }
 
-        /* Initial Sign-Up Gate (Replaces Cookie Gate) */
-        #signup-gate {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95); /* Light, professional backdrop */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-            opacity: 1; /* Start visible */
-            transition: opacity 0.5s ease;
+        /* Animated Loading Screen (Reinstated) */
+        #loading-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: var(--fs-bg-white); 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            z-index: 3000; 
+            opacity: 1; 
+            transition: opacity 0.5s ease-out;
         }
-        .signup-content {
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 2px solid var(--fs-green-primary);
-            background-color: var(--fs-bg-white);
+        .spinner { 
+            border: 8px solid #f3f3f3; 
+            border-top: 8px solid var(--fs-green-primary); 
+            border-radius: 50%; 
+            width: 60px; 
+            height: 60px; 
+            animation: spin 1.2s linear infinite; 
+            margin-bottom: 25px; 
         }
-        .signup-content h2 { color: var(--fs-blue-cta); margin-bottom: 20px; }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        .loading-announcement {
+            max-width: 400px; 
+            text-align: center; 
+            padding: 20px; 
+            border: 2px solid var(--fs-green-light); 
+            color: var(--fs-green-dark); 
+            background-color: #f1fff1; 
+            border-radius: 10px;
+        }
+        .loading-announcement a {
+            color: var(--fs-blue-cta);
+            font-weight: 600;
+        }
+
 
         /* Media Queries */
         @media (min-width: 768px) {
@@ -148,16 +166,13 @@
         <i class="fas fa-tools"></i> Website is currently under development for version 1.1. Please expect bugs and glitches.
     </div>
 
-    <div id="signup-gate">
-        <div class="signup-content">
-            <img src="/image/logo.png" alt="FoodShare Logo" style="height: 60px; margin-bottom: 15px;">
-            <h2>Please Sign Up for a User Account to Get Started.</h2>
-            <p style="margin-bottom: 30px;">
-                Access to donating food, viewing available food listings, and applying to volunteer requires a registered account.
-            </p>
-            <a href="/account/signup/" class="btn btn-cta" onclick="hideSignupGate(event)"><i class="fas fa-user-plus"></i> Sign Up / Log In</a>
-            <p style="margin-top: 20px; font-size: 0.9em; color: #777;">
-                By proceeding, you agree to our <a href="/policies/privacy-policy/" style="color: var(--fs-blue-cta); text-decoration: none;">Privacy Policy</a>.
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-announcement">
+            <h3 style="margin-bottom: 10px;">Welcome to FoodShare Seychelles!</h3>
+            <p style="font-size: 1.1em;">
+                <i class="fas fa-user-circle"></i> Create a free 
+                <a href="/account/signup/">user account</a> for the full experience (donating, claiming food, volunteering).
             </p>
         </div>
     </div>
@@ -192,7 +207,7 @@
         </div>
     </nav>
 
-    <main>
+    <main id="main-content">
         <header class="hero section-padding">
             <div class="container" style="display: flex; flex-direction: column; gap: 30px;">
                 <h1 style="font-size: 2.5em; text-align: center; text-shadow: 0 0 5px white;">Reducing Waste, Building Community in Seychelles.</h1>
@@ -329,22 +344,19 @@
         const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Utility: Sign Up Gate (Only hides it)
-        function hideSignupGate(event) {
-            // Prevent default link action (optional, as it links to signup anyway)
-            if (event) event.preventDefault(); 
-            // Hide the gate by fading it out
-            document.getElementById('signup-gate').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('signup-gate').style.display = 'none';
-            }, 500);
+        // Utility: Loading Screen Hider
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loading-overlay');
+            const mainContent = document.getElementById('main-content');
             
-            // Set localStorage to prevent it from showing up again
-            localStorage.setItem('fs_v11_visited', 'true');
-            // Navigate to the signup page after a small delay (for visual effect)
-            if (event && event.target.tagName === 'A') {
-                window.location.href = event.target.href;
-            }
+            // Fade out the overlay
+            overlay.style.opacity = '0';
+            
+            // Reveal main content after the fade
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                mainContent.style.opacity = '1';
+            }, 500); // Matches the CSS transition duration
         }
 
         // Feature: Load Data (Announcement and Testimonials)
@@ -402,25 +414,11 @@
                 document.getElementById('nav-links').classList.toggle('active');
             });
 
-            // Check if user has seen the signup gate
-            if (localStorage.getItem('fs_v11_visited') === 'true') {
-                document.getElementById('signup-gate').style.display = 'none';
-            }
-
-            // Supabase Auth Listener (To show Dashboard link)
-            supabase.auth.onAuthStateChange((event, session) => {
-                const dashboardLink = document.getElementById('nav-dashboard-link');
-                if (session) {
-                    // User is logged in, show Dashboard link
-                    dashboardLink.style.display = 'block';
-                } else {
-                    // User is logged out, hide Dashboard link
-                    dashboardLink.style.display = 'none';
-                }
-            });
-
             // Start data loading and page setup
             loadPublicData();
+            
+            // Time the loading screen to hide after 1.5 seconds (max wait time)
+            setTimeout(hideLoadingOverlay, 1500);
         });
     </script>
 </body>
