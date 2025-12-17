@@ -73,8 +73,14 @@
         .footer-links a:hover { color: var(--fs-green-light); }
         .footer-logo img { height: 50px; filter: brightness(0) invert(1); }
         .footer-copy { text-align: center; padding-top: 15px; font-size: 0.9em; }
+        .footer-credit { 
+            color: rgba(255, 255, 255, 0.7); 
+            display: inline-flex; 
+            align-items: center; 
+            font-size: 0.9em;
+        }
 
-        /* Development Banner (Replaces Loading Screen) */
+        /* Development Banner */
         .dev-banner {
             background-color: var(--fs-green-light);
             color: var(--fs-green-dark);
@@ -137,7 +143,7 @@
             </p>
             <div style="display: flex; justify-content: center; gap: 15px;">
                 <a href="/account/signup/" class="btn btn-cta"><i class="fas fa-user-plus"></i> Sign Up / Log In</a>
-                <button class="btn btn-secondary" onclick="hideCookieGate()">I Understand / Continue Browsing</button>
+                <button class="btn btn-secondary" onclick="hideCookieGate(event)">I Understand / Continue Browsing</button>
             </div>
         </div>
     </div>
@@ -147,7 +153,7 @@
             <div class="logo">
                 <a href="/">
                     <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
-                    <span style="font-size: 1.5em; font-weight: 700; color: var(--fs-green-dark);">FoodShare</span>
+                    <span style="font-size: 1.5em; font-weight: 700; color: var(--fs-green-dark);">FoodShare Seychelles</span>
                 </a>
             </div>
             
@@ -246,8 +252,9 @@
                     <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
                     <p style="margin-top: 10px; font-size: 0.9em;">A non-profit initiative dedicated to sustainability and community welfare.</p>
                     <div style="margin-top: 15px;">
-                        <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" style="margin-right: 15px; color: #0077B5; background-color: white; padding: 5px 8px; border-radius: 4px;"><i class="fab fa-linkedin fa-lg"></i></a>
-                        <a href="/social/" style="color: white;"><i class="fab fa-facebook-square fa-lg"></i></a>
+                        <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" style="color: #0077B5; background-color: white; padding: 5px 8px; border-radius: 4px; display: inline-flex; align-items: center;">
+                            <i class="fab fa-linkedin fa-lg"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="footer-links">
@@ -290,7 +297,14 @@
                 </div>
             </div>
             <div class="footer-copy">
-                &copy; <span id="current-year"></span> FoodShare Seychelles. All rights reserved. | <a href="/sitemap/" style="color: rgba(255, 255, 255, 0.7);">Sitemap</a>
+                &copy; <span id="current-year"></span> FoodShare Seychelles. All rights reserved. | 
+                <span class="footer-credit">
+                    Website by Tyler Nicholas 
+                    <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" style="color: white; text-decoration: none; margin-left: 5px;">(tylernicholasgroup.com/staff/tyler)</a>
+                    <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank" style="color: #0077B5; background-color: white; padding: 3px 5px; border-radius: 3px; margin-left: 5px; display: inline-flex;">
+                        <i class="fab fa-linkedin fa-sm"></i>
+                    </a>
+                </span>
             </div>
         </div>
     </footer>
@@ -303,7 +317,9 @@
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Utility: Cookie/Login Gate 
-        function hideCookieGate() {
+        function hideCookieGate(event) {
+            // Fix: Prevent default button action to avoid page reload/scroll issues
+            if (event) event.preventDefault(); 
             document.getElementById('cookie-gate').style.display = 'none';
             localStorage.setItem('fs_v11_visited', 'true');
         }
