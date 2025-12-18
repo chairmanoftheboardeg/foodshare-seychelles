@@ -1,625 +1,224 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Our Impact — FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root{
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --transition-speed:0.35s;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-sans);color:var(--text-dark);background:var(--neutral-bg);min-height:100vh;display:flex;flex-direction:column}
-    a{text-decoration:none;color:var(--primary-main)}
-    a:hover{color:var(--primary-dark)}
-    main{flex-grow:1;padding:40px 0}
-    h1,h2,h3{font-family:var(--font-serif);color:var(--primary-dark)}
-    .content-container{max-width:1150px;margin:0 auto;padding:0 25px}
-
-    /* NAVBAR */
-    #navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 25px;background:var(--neutral-card);
-      box-shadow:0 4px 12px rgba(0,0,0,0.08);position:sticky;top:0;z-index:1000}
-    .logo-container{display:flex;align-items:center;font-size:1.6em;font-weight:bold;color:var(--text-dark)}
-    .logo-img{height:40px;margin-right:10px}
-    .nav-links-container{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-    .nav-link{font-weight:600;padding:8px 0;position:relative;color:var(--text-dark)}
-    .nav-link::after{content:'';position:absolute;width:0;height:2px;bottom:-5px;left:0;background:var(--primary-main);transition:width var(--transition-speed)}
-    .nav-link:hover::after{width:100%}
-    .cta-button{background:var(--primary-main);color:#fff;border-radius:999px;padding:10px 18px;font-weight:800;box-shadow:0 10px 18px rgba(0,0,0,0.10)}
-    .cta-button:hover{background:var(--primary-dark)}
-    .staff-login{opacity:.9}
-
-    /* FOOTER */
-    #main-footer{margin-top:auto;background:#222;color:var(--neutral-bg);padding:50px 0 20px;font-size:.9em}
-    .footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:30px;max-width:1200px;margin:0 auto 30px;padding:0 25px;gap:18px}
-    .footer-section{width:20%;min-width:180px;margin-bottom:20px}
-    .footer-section h3{color:var(--primary-light);margin-bottom:14px;font-size:1.1em;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:6px}
-    .footer-section a{color:var(--neutral-bg);display:block;padding:3px 0}
-    .footer-section a:hover{color:var(--primary-main);text-decoration:underline}
-    .footer-bottom{text-align:center;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);color:#aaa;font-size:.85em}
-
-    /* HERO */
-    .hero{
-      background:linear-gradient(135deg, rgba(129,199,132,.22), rgba(33,150,243,.10));
-      border:1px solid rgba(56,142,60,.14);
-      border-radius:22px;
-      box-shadow:var(--shadow-subtle);
-      padding:22px;
-      overflow:hidden;
-      position:relative;
-    }
-    .hero::before{
-      content:"";
-      position:absolute; inset:-120px -140px auto auto;
-      width:280px; height:280px;
-      background:radial-gradient(circle, rgba(76,175,80,.20), transparent 62%);
-      transform:rotate(18deg);
-    }
-    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;align-items:center}
-    @media(max-width:920px){.hero-grid{grid-template-columns:1fr}}
-    .hero h1{font-size:2.2rem;margin-bottom:8px}
-    .hero p{color:var(--text-light);line-height:1.75}
-    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    .btn-outline{
-      border:1px solid rgba(56,142,60,.26);
-      background:#fff;
-      color:var(--primary-dark);
-      font-weight:900;
-      padding:10px 14px;
-      border-radius:999px;
-      cursor:pointer;
-    }
-    .btn-outline:hover{background:rgba(129,199,132,.12)}
-    .btn-blue{
-      border:none;background:var(--accent-blue);color:#fff;font-weight:900;
-      padding:10px 14px;border-radius:999px;cursor:pointer;
-      box-shadow:0 10px 18px rgba(0,0,0,.10)
-    }
-    .btn-blue:hover{filter:brightness(.95)}
-
-    .stamp{
-      background:#fff;
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:18px;
-      padding:14px;
-      position:relative;
-      overflow:hidden;
-    }
-    .stamp::before{
-      content:"";
-      position:absolute; left:0; top:0; right:0; height:6px;
-      background:linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
-    }
-    .stamp .small{color:var(--text-light);font-weight:800;font-size:.92rem}
-    .stamp .big{font-weight:1000;font-size:1.55rem;margin-top:4px}
-    .stamp .meta{margin-top:10px;color:var(--text-light);font-weight:800}
-
-    /* STATS GRID */
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:14px;
-      margin-top:18px;
-    }
-    @media(max-width:980px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:640px){.stats-grid{grid-template-columns:1fr}}
-
-    .card{
-      background:var(--neutral-card);
-      border-radius:18px;
-      border:1px solid rgba(56,142,60,.14);
-      box-shadow:var(--shadow-subtle);
-      overflow:hidden;
-      position:relative;
-      padding:16px;
-    }
-    .card::before{
-      content:"";
-      position:absolute; left:0; top:0; right:0; height:6px;
-      background:linear-gradient(90deg, rgba(56,142,60,.95), rgba(76,175,80,.92));
-    }
-    .card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .icon{
-      width:44px;height:44px;border-radius:14px;
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(129,199,132,.18);
-      border:1px solid rgba(56,142,60,.18);
-      color:var(--primary-dark);
-      flex:0 0 auto;
-    }
-    .label{color:var(--text-light);font-weight:900}
-    .value{font-size:1.85rem;font-weight:1100;margin-top:6px}
-    .note{margin-top:10px;color:var(--text-light);line-height:1.6;font-weight:700;font-size:.95rem}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:6px 10px;border-radius:999px;
-      background:rgba(33,150,243,.10);
-      border:1px solid rgba(33,150,243,.18);
-      color:#0f4e8a;font-weight:900;font-size:.85rem;
-      white-space:nowrap;
-    }
-    .pill.green{background:rgba(129,199,132,.16);border-color:rgba(56,142,60,.18);color:var(--primary-dark)}
-    .pill.orange{background:rgba(255,152,0,.12);border-color:rgba(255,152,0,.20);color:#8a4d00}
-
-    /* CHART */
-    .chart-card{
-      margin-top:14px;
-      background:var(--neutral-card);
-      border-radius:18px;
-      border:1px solid rgba(56,142,60,.14);
-      box-shadow:var(--shadow-subtle);
-      overflow:hidden;
-      position:relative;
-      padding:16px;
-    }
-    .chart-card::before{
-      content:"";
-      position:absolute; left:0; top:0; right:0; height:6px;
-      background:linear-gradient(90deg, rgba(33,150,243,.92), rgba(76,175,80,.92));
-    }
-    .chart-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-    .chart-title{font-weight:1100;font-size:1.15rem}
-    .canvas-wrap{margin-top:10px;border:1px solid rgba(0,0,0,.08);border-radius:14px;overflow:hidden;background:#fff}
-    canvas{display:block;width:100%;height:260px}
-
-    /* Messages + Loading */
-    .msg{display:none;margin-top:14px;padding:12px 14px;border-radius:14px;font-weight:900;line-height:1.55}
-    .msg.err{background:rgba(211,47,47,.10);color:var(--accent-red);border:1px solid rgba(211,47,47,.22)}
-    .loading{
-      position:fixed;inset:0;background:rgba(249,249,249,.92);
-      display:none;align-items:center;justify-content:center;z-index:5000
-    }
-    .spinner{
-      width:54px;height:54px;border-radius:50%;
-      border:6px solid rgba(76,175,80,.18);
-      border-top-color:var(--primary-main);
-      animation:spin .9s linear infinite
-    }
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .grid{display:grid;gap:14px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media(max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px}
+    .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:34px;margin:0}
+    .h2{font-size:18px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .kpi b{font-size:28px}
+    .small{font-size:12px;color:var(--muted)}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+    @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-
-    .fineprint{margin-top:14px;color:var(--text-light);font-weight:750;line-height:1.7}
   </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../available-food/">Find Food</a>
+        <a href="../donate-now/">Donate</a>
+        <a href="../volunteer-now/">Volunteer</a>
+        <a href="../our-impact/">Impact</a>
+        <a href="../about/">About</a>
+        <a href="../our-partners/">Partners</a>
+        <a href="../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
+    </div>
+  </div>
 
-  <script>
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
 
-    // TUNABLE IMPACT FACTORS (you can change these anytime)
-    const KG_PER_MEAL = 0.5;     // default estimate: 0.5kg food per meal
-    const CO2E_PER_KG = 2.5;     // default estimate: 2.5 kg CO2e avoided per 1kg rescued
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <h1 class="h1">Our Impact</h1>
+        <p class="p">Live metrics (where policies allow). Some values may be estimates.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <a class="btn secondary" href="../available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+      </div>
+    </div>
 
-    // TABLE NAMES (match your Supabase tables)
-    const TABLES = {
-      profiles: 'profiles',
-      donations: 'donations',
-      claims: 'claims',
-      volunteerApps: 'volunteer_applications',
-      inquiries: 'inquiries'
-    };
+    <div id="msg" class="notice warn" style="display:none;margin-top:12px"></div>
 
-    let supabase;
+    <div class="grid three" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content kpi">
+        <div class="small">Staff count</div><b id="kStaff">—</b>
+      </div></div>
+      <div class="card"><div class="bar"></div><div class="content kpi">
+        <div class="small">Donations</div><b id="kDonations">—</b>
+      </div></div>
+      <div class="card"><div class="bar"></div><div class="content kpi">
+        <div class="small">Claims</div><b id="kClaims">—</b>
+      </div></div>
+    </div>
 
-    function qs(id){ return document.getElementById(id); }
-    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
-    function showErr(html){
-      const el = qs('msg');
-      el.className = 'msg err';
-      el.innerHTML = html;
-      el.style.display = 'block';
-    }
-    function hideMsg(){ qs('msg').style.display = 'none'; }
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><div class="bar"></div><div class="content kpi">
+        <div class="small">Meals provided (estimated)</div><b id="kMeals">—</b>
+        <div class="small">Estimate: 1 claim ≈ 1 household / allocation.</div>
+      </div></div>
+      <div class="card"><div class="bar"></div><div class="content kpi">
+        <div class="small">Kg rescued (estimated)</div><b id="kKg">—</b>
+        <div class="small">Estimate based on donations count. Adjust later with impact_daily table.</div>
+      </div></div>
+    </div>
 
-    function fmtInt(n){
-      if (n === null || n === undefined || Number.isNaN(n)) return '—';
-      return new Intl.NumberFormat().format(Math.round(n));
-    }
-    function fmtDec(n, d=1){
-      if (n === null || n === undefined || Number.isNaN(n)) return '—';
-      return new Intl.NumberFormat(undefined, { maximumFractionDigits:d, minimumFractionDigits:d }).format(n);
-    }
+    <div class="card" style="margin-top:14px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="h2">Notes</div>
+        <div class="sep"></div>
+        <div class="small">
+          If you want these numbers to be reliably public, best practice is to create a safe public view
+          (e.g., <b>impact_public</b>) or a pre-aggregated table (e.g., <b>impact_daily</b>).
+        </div>
+      </div>
+    </div>
+  </main>
 
-    function animateNumber(el, toValue){
-      const from = 0;
-      const dur = 900;
-      const start = performance.now();
-      const isNum = Number.isFinite(toValue);
+  <div class="footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="notice"><b>Contact (no login):</b> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></div>
+          <p class="small" style="margin-top:10px">For dashboard replies and notifications, please create an account and sign in.</p>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Learn</div>
+          <div class="grid" style="gap:6px">
+            <a href="../learn/safety/">Food Safety</a>
+            <a href="../learn/faq/">FAQ</a>
+            <a href="../social/">Social</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Legal</div>
+          <div class="grid" style="gap:6px">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms of Use</a>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+        <div class="small">Powered by Supabase</div>
+      </div>
+    </div>
+  </div>
+  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
 
-      function step(t){
-        if (!isNum){ el.textContent = '—'; return; }
-        const p = Math.min(1, (t - start) / dur);
-        const v = from + (toValue - from) * (1 - Math.pow(1 - p, 3));
-        el.textContent = fmtInt(v);
-        if (p < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
 
-    async function countRows(table, opts = {}){
-      // opts: { eq: [col,val], in: [col,arr] }
-      let q = supabase.from(table).select('id', { count:'exact', head:true });
-      if (opts.eq) q = q.eq(opts.eq[0], opts.eq[1]);
-      if (opts.in) q = q.in(opts.in[0], opts.in[1]);
-      const { count, error } = await q;
-      if (error) throw error;
-      return count ?? 0;
-    }
+    const loading = document.getElementById("loading");
+    const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
 
-    async function sumColumn(table, col, statusCol=null, statusAllow=null){
-      // pulls col + optional status filter, sums client-side (safe for moderate row counts)
-      let q = supabase.from(table).select(statusCol ? `${col},${statusCol}` : `${col}`);
-      if (statusCol && statusAllow && statusAllow.length){
-        q = q.in(statusCol, statusAllow);
-      }
-      const { data, error } = await q;
-      if (error) throw error;
-
-      let total = 0;
-      for (const row of (data || [])){
-        const v = parseFloat(row[col]);
-        if (Number.isFinite(v)) total += v;
-      }
-      return total;
-    }
-
-    function drawBars(canvas, labels, values){
-      const dpr = window.devicePixelRatio || 1;
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      // background
-      ctx.clearRect(0,0,w,h);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0,0,w,h);
-
-      const pad = 18;
-      const chartW = w - pad*2;
-      const chartH = h - pad*2 - 22;
-
-      const max = Math.max(1, ...values);
-      const n = values.length;
-      const gap = 8;
-      const barW = Math.max(10, (chartW - gap*(n-1)) / n);
-
-      // axes baseline
-      ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(pad, pad + chartH);
-      ctx.lineTo(pad + chartW, pad + chartH);
-      ctx.stroke();
-
-      // bars
-      for (let i=0;i<n;i++){
-        const v = values[i];
-        const bh = (v / max) * (chartH - 10);
-        const x = pad + i*(barW + gap);
-        const y = pad + (chartH - bh);
-
-        // gradient
-        const g = ctx.createLinearGradient(0, y, 0, y + bh);
-        g.addColorStop(0, 'rgba(33,150,243,0.85)');
-        g.addColorStop(1, 'rgba(76,175,80,0.85)');
-
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        const r = 10;
-        ctx.moveTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.lineTo(x + barW - r, y);
-        ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
-        ctx.lineTo(x + barW, y + bh);
-        ctx.lineTo(x, y + bh);
-        ctx.closePath();
-        ctx.fill();
-
-        // labels (every 2 bars)
-        if (i % 2 === 0){
-          ctx.fillStyle = 'rgba(0,0,0,0.55)';
-          ctx.font = '700 11px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(labels[i], x + barW/2, pad + chartH + 16);
-        }
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        nav.innerHTML = `
+          <a class="btn small secondary" href="../account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a class="btn small" href="../account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
+        `;
+      }else{
+        nav.innerHTML = `
+          <a class="btn small secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+          <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        `;
+        document.getElementById("btnLogout").addEventListener("click", async ()=>{
+          setLoading(true); await supabase.auth.signOut(); setLoading(false);
+          location.reload();
+        });
       }
     }
 
     async function loadImpact(){
-      hideMsg();
+      const warn = document.getElementById("msg");
+      const setWarn = (t)=>{ warn.style.display="block"; warn.textContent=t; };
+
       setLoading(true);
+      const [staff, dons, claims] = await Promise.allSettled([
+        supabase.from("profiles").select("id",{count:"exact",head:true}).in("role_id",[1,2,3]),
+        supabase.from("donations").select("id",{count:"exact",head:true}),
+        supabase.from("claims").select("id",{count:"exact",head:true}),
+      ]);
+      setLoading(false);
 
-      // placeholders
-      qs('updatedAt').textContent = 'Loading…';
+      // If RLS blocks public counts, show note.
+      const ok = (x)=> x.status==="fulfilled" && !x.value.error;
 
-      try{
-        // STAFF COUNT (role_id 1/2/3). If your schema differs, we fallback to total profiles.
-        let staffCount = null;
-        try{
-          staffCount = await countRows(TABLES.profiles, { in: ['role_id', [1,2,3]] });
-        } catch (e){
-          // fallback: count all profiles
-          staffCount = await countRows(TABLES.profiles);
-        }
-
-        // VOLUNTEER APPS IN REVIEW
-        let appsPending = null;
-        try{
-          appsPending = await countRows(TABLES.volunteerApps, { in: ['status', ['New','Pending','In Review','Review']] });
-        } catch (e){
-          appsPending = await countRows(TABLES.volunteerApps);
-        }
-
-        // INQUIRIES (Unread)
-        let inquiriesUnread = null;
-        try{
-          inquiriesUnread = await countRows(TABLES.inquiries, { in: ['status', ['Unread','New','Open']] });
-        } catch (e){
-          inquiriesUnread = await countRows(TABLES.inquiries);
-        }
-
-        // DONATIONS COUNT
-        const donationsTotal = await countRows(TABLES.donations);
-
-        // KG RESCUED (try common columns)
-        let kgRescued = null;
-        const kgColsToTry = ['quantity_kg', 'quantity', 'kg', 'estimated_kg'];
-        let kgColUsed = null;
-
-        for (const c of kgColsToTry){
-          try{
-            kgRescued = await sumColumn(TABLES.donations, c, 'status', ['Collected','Completed','Approved','Delivered','Accepted','New','Pending']);
-            kgColUsed = c;
-            break;
-          } catch (e){
-            // continue
-          }
-        }
-        if (kgRescued === null) kgRescued = 0;
-
-        const mealsProvided = kgRescued > 0 ? (kgRescued / KG_PER_MEAL) : 0;
-        const carbonKg = kgRescued * CO2E_PER_KG;
-        const carbonTons = carbonKg / 1000;
-
-        // CLAIMS PROCESSED (optional)
-        let claimsTotal = null;
-        try{
-          claimsTotal = await countRows(TABLES.claims);
-        } catch {
-          claimsTotal = null;
-        }
-
-        // Animate primary values
-        animateNumber(qs('staffCount'), staffCount);
-        animateNumber(qs('donationsCount'), donationsTotal);
-        animateNumber(qs('appsPending'), appsPending);
-        animateNumber(qs('inquiriesUnread'), inquiriesUnread);
-        animateNumber(qs('claimsCount'), claimsTotal ?? 0);
-
-        qs('kgRescued').textContent = fmtDec(kgRescued, 1);
-        qs('mealsProvided').textContent = fmtInt(mealsProvided);
-        qs('carbonOffset').textContent = fmtDec(carbonTons, 2);
-
-        // Notes
-        qs('calcNote').textContent =
-          `Meals estimate uses ${KG_PER_MEAL} kg/meal. Carbon estimate uses ${CO2E_PER_KG} kg CO₂e per 1 kg rescued.`;
-        qs('kgSource').textContent = kgColUsed ? `Source: donations.${kgColUsed}` : `Source: donations (no kg column detected)`;
-
-        // Mini chart: last 14 donations/day (best-effort)
-        try{
-          const { data, error } = await supabase
-            .from(TABLES.donations)
-            .select('created_at')
-            .order('created_at', { ascending:false })
-            .limit(800);
-
-          if (error) throw error;
-
-          const days = 14;
-          const now = new Date();
-          const buckets = new Array(days).fill(0);
-          const labels = [];
-
-          for (let i = days - 1; i >= 0; i--){
-            const d = new Date(now);
-            d.setDate(now.getDate() - i);
-            const mm = String(d.getMonth()+1).padStart(2,'0');
-            const dd = String(d.getDate()).padStart(2,'0');
-            labels.push(`${mm}/${dd}`);
-          }
-
-          for (const r of (data || [])){
-            if (!r.created_at) continue;
-            const dt = new Date(r.created_at);
-            const diffDays = Math.floor((now - dt) / (1000*60*60*24));
-            if (diffDays >= 0 && diffDays < days){
-              buckets[days - 1 - diffDays] += 1;
-            }
-          }
-
-          drawBars(qs('impactChart'), labels, buckets);
-          qs('chartSub').textContent = 'Donation requests received (last 14 days)';
-        } catch {
-          qs('chartSub').textContent = 'Chart unavailable (RLS or missing created_at).';
-        }
-
-        qs('updatedAt').textContent = `Last updated: ${new Date().toLocaleString()}`;
-      } catch (e){
-        console.error(e);
-        showErr(`<i class="fa-solid fa-circle-xmark"></i> Impact metrics failed to load: ${e.message}`);
-      } finally {
-        setLoading(false);
+      if(!ok(staff) || !ok(dons) || !ok(claims)){
+        setWarn("Some statistics may be hidden due to security policies. Admins can enable a safe public impact view.");
       }
+
+      if(ok(staff)) document.getElementById("kStaff").textContent = staff.value.count ?? "—";
+      if(ok(dons)) document.getElementById("kDonations").textContent = dons.value.count ?? "—";
+      if(ok(claims)) document.getElementById("kClaims").textContent = claims.value.count ?? "—";
+
+      // simple estimates
+      const c = ok(claims) ? (claims.value.count || 0) : 0;
+      const d = ok(dons) ? (dons.value.count || 0) : 0;
+      document.getElementById("kMeals").textContent = c ? (c * 4) : "—"; // placeholder estimate
+      document.getElementById("kKg").textContent = d ? (d * 8) : "—"; // placeholder estimate
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      qs('refreshBtn').addEventListener('click', loadImpact);
+    (async ()=>{
+      await setNav();
       await loadImpact();
-    });
+    })();
   </script>
-</head>
-
-<body>
-  <div id="loading" class="loading"><div class="spinner"></div></div>
-
-  <header id="navbar">
-    <a href="/" class="logo-container">
-      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-    </a>
-    <nav class="nav-links-container">
-      <a href="/available-food/" class="nav-link">Find Food</a>
-      <a href="/donate-now/" class="nav-link">Donate</a>
-      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
-      <a href="/our-impact/" class="nav-link">Impact</a>
-      <a href="/about/" class="nav-link">About Us</a>
-      <a href="/donate-now/" class="cta-button">DONATE NOW</a>
-      <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-    </nav>
-  </header>
-
-  <main>
-    <div class="content-container">
-
-      <section class="hero">
-        <div class="hero-grid">
-          <div>
-            <h1>Our Impact</h1>
-            <p>
-              FoodShare Seychelles is building a transparent, traceable food rescue network — connecting donors to communities, reducing waste,
-              and improving food security across the islands. This dashboard updates automatically from our live system.
-            </p>
-            <div class="hero-actions">
-              <button id="refreshBtn" class="btn-outline" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
-              <a class="btn-blue" href="/volunteer-now/"><i class="fa-solid fa-users"></i> Volunteer Now</a>
-              <a class="btn-outline" href="/donate-now/"><i class="fa-solid fa-gift"></i> Donate Food</a>
-            </div>
-          </div>
-
-          <div class="stamp">
-            <div class="small"><i class="fa-solid fa-chart-line"></i> Live summary</div>
-            <div class="big" id="mealsProvided">—</div>
-            <div class="meta">Estimated meals provided</div>
-            <div class="meta" id="updatedAt" style="margin-top:8px;">Last updated: —</div>
-          </div>
-        </div>
-      </section>
-
-      <div id="msg" class="msg"></div>
-
-      <section class="stats-grid">
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Team Members</div>
-              <div class="value" id="staffCount">—</div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-user-group"></i></div>
-          </div>
-          <div class="note"><span class="pill green"><i class="fa-solid fa-shield-heart"></i> Staff + Admin</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Donation Requests</div>
-              <div class="value" id="donationsCount">—</div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-gift"></i></div>
-          </div>
-          <div class="note"><span class="pill"><i class="fa-solid fa-bolt"></i> Live total</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Applications in Review</div>
-              <div class="value" id="appsPending">—</div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-clipboard-check"></i></div>
-          </div>
-          <div class="note"><span class="pill orange"><i class="fa-solid fa-hourglass-half"></i> Pending</span></div>
-        </div>
-
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Food Rescued</div>
-              <div class="value"><span id="kgRescued">—</span> <span style="font-size:1rem;color:var(--text-light);font-weight:900;">kg</span></div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-seedling"></i></div>
-          </div>
-          <div class="note" id="kgSource">Source: donations.quantity_kg</div>
-        </div>
-
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Carbon Offset</div>
-              <div class="value"><span id="carbonOffset">—</span> <span style="font-size:1rem;color:var(--text-light);font-weight:900;">t</span></div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-earth-africa"></i></div>
-          </div>
-          <div class="note">Estimated CO₂e avoided</div>
-        </div>
-
-        <div class="card">
-          <div class="card-top">
-            <div>
-              <div class="label">Unread Inquiries</div>
-              <div class="value" id="inquiriesUnread">—</div>
-            </div>
-            <div class="icon"><i class="fa-solid fa-envelope"></i></div>
-          </div>
-          <div class="note">Public contact submissions</div>
-        </div>
-      </section>
-
-      <section class="chart-card">
-        <div class="chart-head">
-          <div>
-            <div class="chart-title"><i class="fa-solid fa-chart-column"></i> Activity Trend</div>
-            <div class="note" id="chartSub">Donation requests received (last 14 days)</div>
-          </div>
-          <div class="pill green"><i class="fa-solid fa-signal"></i> Live</div>
-        </div>
-        <div class="canvas-wrap">
-          <canvas id="impactChart"></canvas>
-        </div>
-      </section>
-
-      <p class="fineprint" id="calcNote">
-        Meals and carbon figures are calculated estimates and can be adjusted in the code.
-      </p>
-
-    </div>
-  </main>
-
-  <footer id="main-footer">
-    <div class="content-container footer-content">
-      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-      <div class="footer-section">
-        <h3>Get In Touch</h3>
-        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
-      </div>
-    </div>
-    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-  </footer>
 </body>
 </html>
