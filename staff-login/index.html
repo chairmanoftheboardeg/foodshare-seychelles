@@ -1,225 +1,185 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Staff Login — FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root{
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --t:.35s;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-sans);background:var(--neutral-bg);color:var(--text-dark);min-height:100vh;display:flex;flex-direction:column}
-    a{text-decoration:none;color:var(--primary-main)} a:hover{color:var(--primary-dark)}
-    main{flex:1;display:flex;align-items:center;justify-content:center;padding:42px 18px}
-    .wrap{width:100%;max-width:1000px;display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
-    @media(max-width:900px){.wrap{grid-template-columns:1fr}}
-    .panel{background:var(--neutral-card);border-radius:18px;border:1px solid rgba(56,142,60,.14);box-shadow:var(--shadow);overflow:hidden;position:relative}
-    .panel::before{content:"";position:absolute;left:0;top:0;right:0;height:7px;background:linear-gradient(90deg,var(--primary-dark),var(--primary-main),var(--primary-light))}
-    .inner{padding:22px}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-    .brand img{height:44px;width:44px;border-radius:12px}
-    h1{font-family:var(--font-serif);color:var(--primary-dark);font-size:2rem;line-height:1.1}
-    .sub{color:var(--text-light);line-height:1.7;margin-top:8px}
-    label{display:block;font-weight:900;margin:12px 0 6px}
-    input{
-      width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:12px;outline:none;font-size:1rem;background:#fff
-    }
-    input:focus{border-color:rgba(76,175,80,.55);box-shadow:0 0 0 4px rgba(76,175,80,.14)}
-    .btn{
-      width:100%;margin-top:14px;border:none;border-radius:999px;padding:12px 14px;
-      background:var(--primary-main);color:#fff;font-weight:1000;font-size:1.05rem;cursor:pointer;
-      box-shadow:0 12px 22px rgba(0,0,0,.12)
-    }
-    .btn:hover{background:var(--primary-dark)}
-    .btn:disabled{opacity:.65;cursor:not-allowed}
-    .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--text-light);font-weight:800}
-    .linkbtn{border:none;background:transparent;color:var(--accent-blue);font-weight:1000;cursor:pointer;padding:0}
-    .linkbtn:hover{text-decoration:underline}
-    .msg{display:none;margin-top:12px;padding:12px 14px;border-radius:14px;font-weight:900;line-height:1.55}
-    .msg.err{background:rgba(211,47,47,.10);border:1px solid rgba(211,47,47,.22);color:var(--accent-red)}
-    .msg.ok{background:rgba(129,199,132,.22);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark)}
-    .loading{position:fixed;inset:0;background:rgba(249,249,249,.92);display:none;align-items:center;justify-content:center;z-index:5000}
-    .spinner{width:54px;height:54px;border-radius:50%;border:6px solid rgba(76,175,80,.18);border-top-color:var(--primary-main);animation:spin .9s linear infinite}
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:30px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
+    .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .field label{font-weight:800}
+    .field input{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
+    .small{font-size:12px;color:var(--muted)}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .badge{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(33,150,243,.10);border:1px solid rgba(33,150,243,.18);color:#0f4e8a;font-weight:1000;font-size:.85rem}
   </style>
-
-  <script>
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-
-    let supabase;
-
-    const ADMIN_PATH = '/admin/dashboard/home.html';
-    const STAFF_PATH = '/staff/dashboard.html';
-
-    function qs(id){ return document.getElementById(id); }
-    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
-    function showMsg(kind, html){
-      const el = qs('msg');
-      el.className = 'msg ' + kind;
-      el.innerHTML = html;
-      el.style.display = 'block';
-    }
-    function hideMsg(){ qs('msg').style.display = 'none'; }
-
-    function normalizeRole(profile){
-      const raw = profile?.role_id ?? profile?.role ?? profile?.roleId ?? profile?.roleID;
-      if (raw === null || raw === undefined) return null;
-
-      const asNum = Number(raw);
-      if (Number.isFinite(asNum)) return asNum;
-
-      if (typeof raw === 'string'){
-        const s = raw.toLowerCase();
-        if (s.includes('admin')) return 1;
-        if (s.includes('driver') || s.includes('staff')) return 2;
-        if (s.includes('volunteer')) return 3;
-      }
-      return null;
-    }
-
-    async function routeUser(user){
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error('Profile not found in profiles table for this user.');
-
-      const roleId = normalizeRole(data);
-      if (roleId === 1) return window.location.href = ADMIN_PATH;
-      if (roleId === 2 || roleId === 3) return window.location.href = STAFF_PATH;
-
-      // unknown role
-      await supabase.auth.signOut();
-      throw new Error('Your account role is not set correctly. Please contact an administrator.');
-    }
-
-    async function doLogin(e){
-      e.preventDefault();
-      hideMsg();
-
-      const email = qs('email').value.trim();
-      const password = qs('password').value;
-
-      qs('loginBtn').disabled = true;
-      qs('loginBtn').textContent = 'Signing in...';
-      setLoading(true);
-
-      try{
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await routeUser(data.user);
-      } catch(err){
-        console.error(err);
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`);
-      } finally {
-        setLoading(false);
-        qs('loginBtn').disabled = false;
-        qs('loginBtn').textContent = 'Sign In';
-      }
-    }
-
-    async function forgotPassword(){
-      hideMsg();
-      const email = qs('email').value.trim();
-      if (!email) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Enter your email first, then click “Forgot password”.`);
-
-      setLoading(true);
-      try{
-        const redirectTo = 'https://www.foodshare-seychelles.online/staff-login/';
-        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
-        if (error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-envelope"></i> Password reset email sent. Please check your inbox.`);
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // If already logged in, route immediately
-      setLoading(true);
-      try{
-        const { data } = await supabase.auth.getSession();
-        if (data?.session?.user) await routeUser(data.session.user);
-      } catch {
-        // ignore
-      } finally {
-        setLoading(false);
-      }
-
-      qs('loginForm').addEventListener('submit', doLogin);
-      qs('forgotBtn').addEventListener('click', forgotPassword);
-    });
-  </script>
 </head>
-
 <body>
-  <div id="loading" class="loading"><div class="spinner"></div></div>
 
-  <main>
-    <div class="wrap">
-      <section class="panel">
-        <div class="inner">
-          <div class="brand">
-            <img src="/image/logo.png" alt="FoodShare Seychelles">
-            <div>
-              <h1>Staff Login</h1>
-              <div class="sub">Secure access for FoodShare Seychelles staff, coordinators, and administrators.</div>
-            </div>
-          </div>
-          <div class="sub" style="margin-top:10px">
-            <span class="badge"><i class="fa-solid fa-shield"></i> Supabase Auth</span>
-            <span class="badge" style="margin-left:8px"><i class="fa-solid fa-id-badge"></i> Role-based access</span>
-          </div>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="row">
+        <a class="btn small secondary" href="../account/login/"><i class="fa-solid fa-user"></i> Community Login</a>
+        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+      </div>
+    </div>
+  </div>
 
-          <div class="sub" style="margin-top:12px">
-            Admins will be redirected to the Admin Dashboard. Staff will be redirected to the Staff Dashboard.
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
+
+  <main class="container">
+    <div class="card" style="max-width:720px;margin:18px auto;">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <h1 class="h1">Staff / Admin Login</h1>
+            <p class="p">Use your staff credentials. Access is enforced by role checks.</p>
+          </div>
+          <div class="notice">
+            <b>Roles</b>
+            <div class="small">Admin (1) • Driver/Staff (2) • Volunteer Coordinator (3)</div>
           </div>
         </div>
-      </section>
 
-      <section class="panel">
-        <div class="inner">
-          <h2 style="font-family:var(--font-serif);color:var(--primary-dark);font-size:1.35rem;">Sign In</h2>
-          <div id="msg" class="msg"></div>
+        <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
+        <div class="sep"></div>
 
-          <form id="loginForm">
-            <label for="email">Email Address</label>
-            <input id="email" type="email" required placeholder="name@foodshare-seychelles.online" />
-
-            <label for="password">Password</label>
-            <input id="password" type="password" required placeholder="Your password" />
-
-            <button id="loginBtn" class="btn" type="submit">
-              <i class="fa-solid fa-right-to-bracket"></i> Sign In
-            </button>
-
-            <div class="row">
-              <span>Forgot your password?</span>
-              <button id="forgotBtn" class="linkbtn" type="button">Send reset email</button>
-            </div>
-
-            <div class="sub" style="margin-top:12px">
-              Back to website: <a href="/">www.foodshare-seychelles.online</a>
-            </div>
-          </form>
+        <div class="field">
+          <label>Email</label>
+          <input id="email" type="email" placeholder="staff@example.com" autocomplete="username">
         </div>
-      </section>
+        <div class="field">
+          <label>Password</label>
+          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btnLogin"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+          <a class="btn secondary" href="../"><i class="fa-solid fa-house"></i> Back to site</a>
+        </div>
+
+        <div class="sep"></div>
+        <div class="small">
+          If you are a public user, use <a href="../account/login/"><b>Community Login</b></a>.
+          For non-login contact: <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>
+        </div>
+      </div>
     </div>
   </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+
+    function toast(type, html){
+      const el = document.getElementById("msg");
+      el.className = "notice" + (type ? " "+type : "");
+      el.innerHTML = html;
+      el.style.display = "block";
+    }
+
+    async function routeByRole(){
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u?.user?.id;
+      if(!uid){
+        toast("error","No authenticated user found.");
+        return;
+      }
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("role_id,full_name")
+        .eq("id", uid)
+        .single();
+
+      if(error || !profile){
+        await supabase.auth.signOut();
+        toast("error","Profile not found or access denied. Contact admin.");
+        return;
+      }
+
+      const r = Number(profile.role_id);
+      if(r === 1){
+        location.href = "../admin/dashboard/home.html";
+      } else if(r === 2 || r === 3){
+        location.href = "../staff/dashboard.html";
+      } else {
+        await supabase.auth.signOut();
+        toast("error","This account is not authorized for staff/admin access.");
+      }
+    }
+
+    document.getElementById("btnLogin").addEventListener("click", async ()=>{
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!email || !password){
+        toast("warn","Email and password are required.");
+        return;
+      }
+
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+
+      if(error){
+        toast("error", `<b>Login failed:</b> ${error.message}`);
+        return;
+      }
+
+      toast("", "<b>Logged in.</b> Checking permissions…");
+      await routeByRole();
+    });
+
+    // If already logged in, route immediately
+    (async ()=>{
+      const { data } = await supabase.auth.getSession();
+      if(data.session){
+        setLoading(true);
+        await routeByRole();
+        setLoading(false);
+      }
+    })();
+  </script>
 </body>
 </html>
