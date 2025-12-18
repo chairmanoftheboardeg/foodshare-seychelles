@@ -1,341 +1,273 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Volunteer Now — FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --transition-speed:0.35s;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:var(--font-sans); color:var(--text-dark); background:var(--neutral-bg); min-height:100vh; display:flex; flex-direction:column; }
-    a { text-decoration:none; color:var(--primary-main); }
-    a:hover { color:var(--primary-dark); }
-    main { flex-grow:1; padding:40px 0; }
-    h1,h2,h3 { font-family:var(--font-serif); color:var(--primary-dark); }
-    .content-container { max-width:980px; margin:0 auto; padding:0 25px; }
-
-    /* NAVBAR */
-    #navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 25px; background-color:var(--neutral-card); box-shadow:0 4px 12px rgba(0,0,0,0.08); position:sticky; top:0; z-index:1000; }
-    .logo-container { display:flex; align-items:center; font-size:1.6em; font-weight:bold; color:var(--text-dark); }
-    .logo-img { height:40px; margin-right:10px; }
-    .nav-links-container { display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
-    .nav-link { font-weight:600; padding:8px 0; position:relative; color:var(--text-dark); }
-    .nav-link::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background-color:var(--primary-main); transition:width var(--transition-speed); }
-    .nav-link:hover::after { width:100%; }
-    .cta-button { background-color:var(--primary-main); color:#fff; border-radius:999px; padding:10px 18px; font-weight:800; box-shadow:0 10px 18px rgba(0,0,0,0.10); }
-    .cta-button:hover { background-color:var(--primary-dark); }
-    .staff-login { opacity:.9; }
-
-    /* FOOTER */
-    #main-footer { margin-top:auto; background-color:#222; color:var(--neutral-bg); padding:50px 0 20px; font-size:0.9em; }
-    .footer-content { display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:30px; max-width:1200px; margin:0 auto 30px; padding:0 25px; gap:18px; }
-    .footer-section { width:20%; min-width:180px; margin-bottom:20px; }
-    .footer-section h3 { color:var(--primary-light); margin-bottom:14px; font-size:1.1em; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:6px; }
-    .footer-section a { color:var(--neutral-bg); display:block; padding:3px 0; }
-    .footer-section a:hover { color:var(--primary-main); text-decoration:underline; }
-    .footer-bottom { text-align:center; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); color:#aaa; font-size:0.85em; }
-
-    /* Card */
-    .panel {
-      background:var(--neutral-card);
-      border-radius:18px;
-      box-shadow:var(--shadow-subtle);
-      border:1px solid rgba(56,142,60,0.14);
-      overflow:hidden;
-      position:relative;
-    }
-    .panel::before{
-      content:"";
-      position:absolute; left:0; top:0; right:0; height:7px;
-      background:linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
-    }
-    .panel-inner{ padding:22px; }
-    .head h1{ font-size:2rem; margin-bottom:6px; }
-    .sub{ color:var(--text-light); line-height:1.7; }
-
-    form { margin-top:16px; }
-    label { display:block; font-weight:900; margin:12px 0 6px; }
-    input, select, textarea {
-      width:100%;
-      padding:12px 12px;
-      border:1px solid #d0d5dd;
-      border-radius:12px;
-      outline:none;
-      font-size:1rem;
-      background:#fff;
-    }
-    input:focus, textarea:focus, select:focus{
-      border-color: rgba(76,175,80,0.55);
-      box-shadow: 0 0 0 4px rgba(76,175,80,0.14);
-    }
-    textarea { resize: vertical; min-height: 110px; }
-
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width: 680px){ .row{ grid-template-columns:1fr; } }
-
-    .chipbox{
-      background:rgba(129,199,132,0.14);
-      border:1px solid rgba(56,142,60,0.18);
-      border-radius:14px;
-      padding:12px;
-      margin-top:10px;
-      color:var(--text-light);
-      line-height:1.65;
-    }
-    .chipbox b{ color:var(--primary-dark); }
-
-    .btn{
-      width:100%;
-      margin-top:16px;
-      border:none;
-      border-radius:999px;
-      padding:12px 14px;
-      background:var(--primary-main);
-      color:#fff;
-      font-weight:900;
-      font-size:1.05rem;
-      cursor:pointer;
-      box-shadow:0 12px 22px rgba(0,0,0,0.12);
-    }
-    .btn:hover{ background:var(--primary-dark); }
-    .btn:disabled{ opacity:.65; cursor:not-allowed; }
-
-    .msg{
-      display:none;
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:900;
-      line-height:1.55;
-    }
-    .msg.ok{ background:rgba(129,199,132,0.22); color:var(--primary-dark); border:1px solid rgba(56,142,60,0.18); }
-    .msg.err{ background:rgba(211,47,47,0.10); color:var(--accent-red); border:1px solid rgba(211,47,47,0.22); }
-
-    /* Loading */
-    .loading {
-      position:fixed; inset:0; background:rgba(249,249,249,0.92);
-      display:none; align-items:center; justify-content:center; z-index:5000;
-    }
-    .spinner {
-      width:54px; height:54px; border-radius:50%;
-      border:6px solid rgba(76,175,80,0.18);
-      border-top-color: var(--primary-main);
-      animation: spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg);} }
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .grid{display:grid;gap:14px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media(max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px} .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))} .card .content{padding:14px}
+    .h1{font-size:34px;line-height:1.1;margin:0} .h2{font-size:20px;margin:0}
+    .p{margin:10px 0;color:var(--muted)} .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0} .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .small{font-size:12px;color:var(--muted)}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .field label{font-weight:800}
+    .field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
+    textarea{min-height:120px;resize:vertical}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 10px;font-weight:800}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px} @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
-
-  <script>
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-
-    let supabase;
-    function qs(id){ return document.getElementById(id); }
-    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
-
-    function showMsg(kind, html){
-      const el = qs('msg');
-      el.className = 'msg ' + kind;
-      el.innerHTML = html;
-      el.style.display = 'block';
-    }
-
-    function val(id){ return qs(id).value.trim(); }
-
-    async function submitVolunteer(e){
-      e.preventDefault();
-      qs('msg').style.display = 'none';
-
-      const full_name = val('fullName');
-      const email = val('email');
-      const phone = val('phone');
-
-      const linkedin_url = val('linkedin');
-      const is_resident = qs('resident').value;
-      const island = qs('island').value;
-      const availability = val('availability');
-      const has_transport = qs('transport').value;
-      const interest_area = qs('interest').value;
-      const motivation = val('motivation');
-
-      if (!linkedin_url.startsWith('http')){
-        return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> LinkedIn URL must start with http(s)://`);
-      }
-      if (!is_resident) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Please select residency status.`);
-      if (!interest_area) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Please select an area of interest.`);
-
-      const btn = qs('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Submitting...';
-
-      const payload = {
-        full_name,
-        email,
-        phone,
-        linkedin_url,
-        is_resident: (is_resident === 'Yes'),
-        island: island || null,
-        weekly_availability: availability || null,
-        has_transport: has_transport ? (has_transport === 'Yes') : null,
-        interest_area,
-        motivation,
-        status: 'New'
-      };
-
-      const { error } = await supabase.from('volunteer_applications').insert([payload]);
-
-      if (error){
-        console.error(error);
-        btn.disabled = false;
-        btn.textContent = 'Submit Application';
-        return showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Submission failed: ${error.message}`);
-      }
-
-      showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Thank you, <b>${full_name}</b>. Your application has been submitted successfully. We will review it soon.`);
-      qs('volunteerForm').reset();
-      btn.style.display = 'none';
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      qs('volunteerForm').addEventListener('submit', submitVolunteer);
-    });
-  </script>
 </head>
-
 <body>
-  <div id="loading" class="loading"><div class="spinner"></div></div>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../available-food/">Find Food</a>
+        <a href="../our-impact/">Our Impact</a>
+        <a href="../about/">About</a>
+        <a href="../our-partners/">Partners</a>
+        <a href="../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
+    </div>
+  </div>
 
-  <header id="navbar">
-    <a href="/" class="logo-container">
-      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-    </a>
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
 
-    <nav class="nav-links-container">
-      <a href="/available-food/" class="nav-link">Find Food</a>
-      <a href="/donate-now/" class="nav-link">Donate</a>
-      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
-      <a href="/our-impact/" class="nav-link">Impact</a>
-      <a href="/about/" class="nav-link">About Us</a>
-      <a href="/donate-now/" class="cta-button">DONATE NOW</a>
-      <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-    </nav>
-  </header>
+  <main class="container">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 class="h1">Volunteer Application</h1>
+        <p class="p">Login required so we can respond via your dashboard notifications.</p>
+      </div>
+      <div class="row">
+        <a class="btn secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+      </div>
+    </div>
 
-  <main>
-    <div class="content-container">
-      <section class="panel">
-        <div class="panel-inner">
-          <div class="head">
-            <h1><i class="fa-solid fa-users"></i> Volunteer Application</h1>
-            <div class="sub">
-              Join FoodShare Seychelles and help us reduce food waste while supporting communities across the islands.
+    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="grid two">
+          <div>
+            <div class="field"><label>Full name</label><input id="full_name" placeholder="Your name"></div>
+            <div class="grid two">
+              <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div>
+              <div class="field"><label>Phone</label><input id="phone" placeholder="+248 …"></div>
             </div>
-            <div class="chipbox">
-              <b>LinkedIn is required</b> for internal staff coordination. If you do not have an account, please create one and paste your profile link below.
+            <div class="field"><label>LinkedIn profile URL (required)</label><input id="linkedin_url" placeholder="https://www.linkedin.com/in/..."></div>
+            <div class="grid two">
+              <div class="field">
+                <label>Residency status</label>
+                <select id="residency_status">
+                  <option value="">Select</option>
+                  <option>Seychelles</option>
+                  <option>International Remote</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Island (if Seychelles)</label>
+                <select id="island">
+                  <option value="">—</option>
+                  <option>Mahé</option>
+                  <option>Praslin</option>
+                  <option>La Digue</option>
+                </select>
+              </div>
+            </div>
+            <div class="field"><label>Weekly availability</label><input id="weekly_availability" placeholder="e.g., Mon/Wed evenings, Sat mornings"></div>
+
+            <div class="notice">
+              <b>Transport availability (Seychelles)</b>
+              <div class="row" style="margin-top:10px">
+                <label class="pill"><input type="checkbox" id="transport_availability"> I can help with transport</label>
+              </div>
             </div>
           </div>
 
-          <div id="msg" class="msg"></div>
-
-          <form id="volunteerForm">
-            <h2 style="font-size:1.25rem; margin-top:12px;">Contact Details</h2>
-
-            <label for="fullName">Full Name *</label>
-            <input id="fullName" type="text" required placeholder="First & Last name" />
-
-            <div class="row">
-              <div>
-                <label for="email">Email Address *</label>
-                <input id="email" type="email" required placeholder="you@example.com" />
-              </div>
-              <div>
-                <label for="phone">Phone Number</label>
-                <input id="phone" type="tel" placeholder="e.g., 251-0000" />
+          <div>
+            <div class="notice">
+              <b>Interest areas</b>
+              <div class="small">Select one or more.</div>
+              <div class="grid" style="gap:10px;margin-top:10px">
+                <label class="pill"><input type="checkbox" class="ia" value="Admin"> Admin</label>
+                <label class="pill"><input type="checkbox" class="ia" value="Support"> Support</label>
+                <label class="pill"><input type="checkbox" class="ia" value="Social Media"> Social Media</label>
+                <label class="pill"><input type="checkbox" class="ia" value="Driver"> Driver</label>
+                <label class="pill"><input type="checkbox" class="ia" value="Operations"> Operations</label>
+                <label class="pill"><input type="checkbox" class="ia" value="Fundraising"> Fundraising</label>
               </div>
             </div>
 
-            <label for="linkedin">LinkedIn Profile URL *</label>
-            <input id="linkedin" type="url" required placeholder="https://www.linkedin.com/in/yourname" />
+            <div class="field"><label>Motivation statement</label><textarea id="motivation" placeholder="Why do you want to volunteer?"></textarea></div>
 
-            <h2 style="font-size:1.25rem; margin-top:18px;">Residency & Availability</h2>
+            <div class="row">
+              <button class="btn blue" id="btnSubmit"><i class="fa-solid fa-paper-plane"></i> Submit application</button>
+              <a class="btn secondary" href="mailto:admin@foodshare-seychelles.online"><i class="fa-solid fa-envelope"></i> Email instead</a>
+            </div>
 
-            <label for="resident">Are you a current resident of the Republic of Seychelles? *</label>
-            <select id="resident" required>
-              <option value="">-- Select --</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No (I can volunteer remotely)</option>
-            </select>
-
-            <label for="island">If you are in Seychelles, which island do you live on?</label>
-            <select id="island">
-              <option value="">-- Select (Optional) --</option>
-              <option value="Mahe">Mahé</option>
-              <option value="Praslin">Praslin</option>
-              <option value="La Digue">La Digue</option>
-              <option value="Other">Other</option>
-            </select>
-
-            <label for="availability">Weekly availability you can dedicate</label>
-            <input id="availability" type="text" placeholder="e.g., 5 hours/week; evenings; weekends" />
-
-            <label for="transport">If you are in Seychelles, do you have access to personal transport?</label>
-            <select id="transport">
-              <option value="">-- Select (Optional) --</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-
-            <h2 style="font-size:1.25rem; margin-top:18px;">Interests</h2>
-
-            <label for="interest">What area are you interested in assisting with? *</label>
-            <select id="interest" required>
-              <option value="">-- Select --</option>
-              <option value="Admin/Coordination">Admin / Coordination</option>
-              <option value="Support">Support</option>
-              <option value="Ambassadorship">Ambassadorship</option>
-              <option value="Social Media">Social Media</option>
-              <option value="Driver/Logistics">Driver / Logistics</option>
-              <option value="Other">Other</option>
-            </select>
-
-            <label for="motivation">Why do you want to volunteer at FoodShare Seychelles?</label>
-            <textarea id="motivation" placeholder="Tell us why you want to join and what skills you can contribute."></textarea>
-
-            <button id="submitBtn" class="btn" type="submit">
-              <i class="fa-solid fa-paper-plane"></i> Submit Application
-            </button>
-          </form>
+            <div class="small" style="margin-top:10px">
+              No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+            </div>
+          </div>
         </div>
-      </section>
+
+      </div>
     </div>
   </main>
 
-  <footer id="main-footer">
-    <div class="content-container footer-content">
-      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-      <div class="footer-section">
-        <h3>Get In Touch</h3>
-        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
+  <div class="footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="notice"><b>Contact (no login):</b> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></div>
+          <p class="small" style="margin-top:10px">Applications here require login to enable dashboard replies.</p>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Learn</div>
+          <div class="grid" style="gap:6px">
+            <a href="../learn/safety/">Food Safety</a>
+            <a href="../learn/faq/">FAQ</a>
+            <a href="../social/">Social</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Legal</div>
+          <div class="grid" style="gap:6px">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms of Use</a>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="row" style="justify-content:space-between">
+        <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+        <div class="small">Powered by Supabase</div>
       </div>
     </div>
-    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-  </footer>
+  </div>
+  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+    function toast(type, html){
+      const el = document.getElementById("msg");
+      el.className = "notice" + (type ? " "+type : "");
+      el.innerHTML = html;
+      el.style.display = "block";
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    async function guard(){
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        location.href = `../account/login/?next=%2Fvolunteer-now%2F`;
+        return false;
+      }
+      return true;
+    }
+
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      nav.innerHTML = `
+        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <a class="btn small secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      `;
+      document.getElementById("btnLogout").addEventListener("click", async ()=>{
+        setLoading(true); await supabase.auth.signOut(); setLoading(false);
+        location.href = "../";
+      });
+    }
+
+    document.getElementById("btnSubmit").addEventListener("click", async ()=>{
+      const interest_areas = Array.from(document.querySelectorAll(".ia:checked")).map(x=>x.value);
+
+      const payload = {
+        full_name: document.getElementById("full_name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        linkedin_url: document.getElementById("linkedin_url").value.trim(),
+        residency_status: document.getElementById("residency_status").value.trim(),
+        island: document.getElementById("island").value.trim() || null,
+        weekly_availability: document.getElementById("weekly_availability").value.trim() || null,
+        transport_availability: document.getElementById("transport_availability").checked,
+        interest_areas,
+        motivation: document.getElementById("motivation").value.trim() || null,
+        status: "New"
+      };
+
+      if(!payload.full_name || !payload.email || !payload.phone || !payload.linkedin_url || !payload.residency_status){
+        toast("warn","<b>Missing fields:</b> name, email, phone, LinkedIn URL, and residency status are required.");
+        return;
+      }
+
+      setLoading(true);
+      const { data, error } = await supabase.from("volunteer_applications").insert(payload).select("id").single();
+      if(error){
+        setLoading(false);
+        toast("error", `<b>Submit failed:</b> ${error.message}`);
+        return;
+      }
+
+      await supabase.from("notifications").insert({
+        title: "Volunteer application submitted",
+        message: "Thank you. We received your application and will respond via notifications.",
+        type: "Info"
+      });
+
+      setLoading(false);
+      toast("", `<b>Submitted.</b> Application reference: <code class="inline">${data.id}</code>. <a href="../account/dashboard/"><b>Go to dashboard</b></a>.`);
+    });
+
+    (async ()=>{
+      if(!await guard()) return;
+      await setNav();
+    })();
+  </script>
 </body>
 </html>
