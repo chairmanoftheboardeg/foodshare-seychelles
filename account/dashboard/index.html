@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — FoodShare Seychelles</title>
+  <link rel="icon" href="../../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .grid{display:grid;gap:14px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} @media(max-width:900px){.grid.two{grid-template-columns:1fr}}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px} .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))} .card .content{padding:14px}
+    .h1{font-size:34px;line-height:1.1;margin:0} .h2{font-size:20px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0} .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .small{font-size:12px;color:var(--muted)}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;background:#eef6ee;border:1px solid #d7ead7;color:var(--green-dark)}
+    .badge.blue{background:#e3f2fd;border-color:#bbdefb;color:#0b5aa5}
+    .badge.orange{background:#fff3e0;border-color:#ffe0b2;color:#b26a00}
+    .badge.red{background:#ffebee;border-color:#ffcdd2;color:#a10f0f}
+    .kpi{padding:14px;border-radius:16px;background:#fff;border:1px solid var(--border)}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+
+<body>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../../">
+        <img src="../../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../../available-food/">Find Food</a>
+        <a href="../../our-impact/">Our Impact</a>
+        <a href="../../about/">About</a>
+        <a href="../../our-partners/">Partners</a>
+        <a href="../../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
+
+  <main class="container">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 class="h1">My Dashboard</h1>
+        <p class="p">Your submissions and updates. Admin replies arrive via notifications.</p>
+      </div>
+      <div class="row">
+        <a class="btn secondary" href="../../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate</a>
+        <a class="btn" href="../../available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+      </div>
+    </div>
+
+    <div class="grid two" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="h2">Profile</div>
+        <div class="sep"></div>
+        <div id="profileBox" class="small">Loading…</div>
+      </div></div>
+
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div class="h2">Notifications</div>
+          <button class="btn small secondary" id="btnMarkAll"><i class="fa-solid fa-check"></i> Mark all read</button>
+        </div>
+        <div class="sep"></div>
+        <div id="notifBox" class="grid" style="gap:10px"></div>
+      </div></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="h2">My Submissions</div>
+        <p class="p">Claims, donations, volunteer applications, and inquiries linked to your account.</p>
+
+        <div class="grid two">
+          <div>
+            <div class="badge"><i class="fa-solid fa-file-signature"></i> Claims</div>
+            <div class="sep"></div>
+            <div id="claimsBox" class="small">Loading…</div>
+          </div>
+          <div>
+            <div class="badge blue"><i class="fa-solid fa-gift"></i> Donations</div>
+            <div class="sep"></div>
+            <div id="donationsBox" class="small">Loading…</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="grid two">
+          <div>
+            <div class="badge"><i class="fa-solid fa-people-group"></i> Volunteer Applications</div>
+            <div class="sep"></div>
+            <div id="appsBox" class="small">Loading…</div>
+          </div>
+          <div>
+            <div class="badge orange"><i class="fa-solid fa-circle-question"></i> Inquiries</div>
+            <div class="sep"></div>
+            <div id="inqBox" class="small">Loading…</div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="notice">
+          <b>Need help?</b> Use the assistance form (login required) or email
+          <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+          <div class="row" style="margin-top:10px">
+            <a class="btn blue" href="../../general/assistance/"><i class="fa-solid fa-headset"></i> Assistance form</a>
+            <a class="btn secondary" href="mailto:admin@foodshare-seychelles.online"><i class="fa-solid fa-envelope"></i> Email admin</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+
+    function esc(s){ return (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function badgeForStatus(st){
+      const s=(st||"").toLowerCase();
+      if(s.includes("approved") || s.includes("completed")) return "badge";
+      if(s.includes("rejected") || s.includes("cancel")) return "badge red";
+      if(s.includes("inprogress") || s.includes("review") || s.includes("scheduled")) return "badge orange";
+      return "badge blue";
+    }
+    function listMini(rows, fields){
+      if(!rows || rows.length===0) return '<div class="small">No records yet.</div>';
+      return rows.slice(0,5).map(r=>`
+        <div class="kpi">
+          <div class="row" style="justify-content:space-between">
+            <div style="font-weight:900">${esc(r[fields.title] || "—")}</div>
+            <span class="${badgeForStatus(r[fields.status])}">${esc(r[fields.status] || "—")}</span>
+          </div>
+          <div class="small">${fields.sub ? esc(r[fields.sub] || "") : ""}</div>
+          <div class="small">${r.created_at ? new Date(r.created_at).toLocaleString() : ""}</div>
+        </div>
+      `).join("");
+    }
+
+    async function guard(){
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        // send user to login, then back here
+        location.href = `../login/?next=%2Faccount%2Fdashboard%2F`;
+        return false;
+      }
+      return true;
+    }
+
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      nav.innerHTML = `
+        <a class="btn small blue" href="../../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      `;
+      document.getElementById("btnLogout").addEventListener("click", async ()=>{
+        setLoading(true);
+        await supabase.auth.signOut();
+        setLoading(false);
+        location.href = "../../";
+      });
+    }
+
+    (async ()=>{
+      if(!await guard()) return;
+
+      setLoading(true);
+      await setNav();
+
+      // Profile
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user.id;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id,full_name,email,phone,role_id")
+        .eq("id", uid)
+        .single();
+
+      document.getElementById("profileBox").innerHTML = `
+        <div style="font-weight:950">${esc(profile?.full_name || "")}</div>
+        <div class="small">${esc(profile?.email || "")}</div>
+        <div class="small">${esc(profile?.phone || "")}</div>
+        <div class="small">Role ID: <b>${profile?.role_id ?? "—"}</b></div>
+      `;
+
+      // Notifications
+      const { data: notifs } = await supabase
+        .from("notifications")
+        .select("id,title,message,type,is_read,created_at")
+        .order("created_at",{ascending:false})
+        .limit(25);
+
+      const notifBox = document.getElementById("notifBox");
+      if(!notifs || notifs.length===0){
+        notifBox.innerHTML = `<div class="small">No notifications yet.</div>`;
+      } else {
+        notifBox.innerHTML = notifs.map(n=>`
+          <div class="notice ${n.is_read ? "" : "warn"}">
+            <div class="row" style="justify-content:space-between">
+              <b>${esc(n.title)}</b>
+              <span class="small">${new Date(n.created_at).toLocaleString()}</span>
+            </div>
+            <div class="small">${esc(n.message)}</div>
+          </div>
+        `).join("");
+      }
+
+      document.getElementById("btnMarkAll").addEventListener("click", async ()=>{
+        setLoading(true);
+        await supabase.from("notifications").update({ is_read:true }).eq("is_read", false);
+        setLoading(false);
+        location.reload();
+      });
+
+      // History tables
+      const { data: claims } = await supabase.from("claims")
+        .select("id,request_type,status,created_at,listing_id")
+        .order("created_at",{ascending:false}).limit(5);
+      document.getElementById("claimsBox").innerHTML = listMini(claims, { title:"request_type", status:"status", sub:"listing_id" });
+
+      const { data: dons } = await supabase.from("donations")
+        .select("id,donor_name,status,created_at,food_type")
+        .order("created_at",{ascending:false}).limit(5);
+      document.getElementById("donationsBox").innerHTML = listMini(dons, { title:"donor_name", status:"status", sub:"food_type" });
+
+      const { data: apps } = await supabase.from("volunteer_applications")
+        .select("id,full_name,status,created_at,residency_status")
+        .order("created_at",{ascending:false}).limit(5);
+      document.getElementById("appsBox").innerHTML = listMini(apps, { title:"full_name", status:"status", sub:"residency_status" });
+
+      const { data: inq } = await supabase.from("inquiries")
+        .select("id,subject,status,created_at")
+        .order("created_at",{ascending:false}).limit(5);
+      document.getElementById("inqBox").innerHTML = listMini(inq, { title:"subject", status:"status", sub:null });
+
+      setLoading(false);
+    })();
+  </script>
+</body>
+</html>
