@@ -2,390 +2,293 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>FoodShare Seychelles - Reduce Food Waste, End Food Insecurity</title>
-    <meta name="description" content="FoodShare Seychelles connects donors with recipients to reduce food waste and combat food insecurity across the Seychelles islands.">
-    <meta property="og:title" content="FoodShare Seychelles">
-    <meta property="og:image" content="/image/logo.png">
+    <title>FoodShare Seychelles | Reducing Waste, Ending Hunger</title>
+    <meta name="description" content="The official food rescue platform for the Seychelles islands.">
     <link rel="icon" type="image/png" href="/image/logo.png">
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
     <style>
-        /* 9.1 Brand & Theme Variables */
         :root {
-            --fs-green-primary: #4CAF50;    /* Primary Green */
-            --fs-green-dark: #388E3C;       /* Headers, highlights */
-            --fs-green-light: #81C784;      /* Accents */
-            --fs-blue-cta: #2196F3;         /* Blue for CTAs */
-            --fs-text-primary: #333;
-            --fs-bg-light: #f9f9f9;
-            --fs-bg-white: #fff;
-            --fs-radius: 18px; 
-            --fs-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --primary: #2e7d32;
+            --primary-light: #e8f5e9;
+            --accent: #0288d1;
+            --text-main: #1a1a1a;
+            --text-muted: #666;
+            --white: #ffffff;
+            --shadow: 0 2px 15px rgba(0,0,0,0.05);
+            --radius: 12px;
         }
 
-        /* Global Resets and Typography */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; line-height: 1.6; }
-        body { color: var(--fs-text-primary); background-color: var(--fs-bg-light); min-height: 100vh; display: flex; flex-direction: column; }
-        
-        /* FIX: Main content is fully visible from load */
-        main { flex-grow: 1; } 
+        /* Basic Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            background-color: #fdfdfd;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* Containers and Layout */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .section-padding { padding: 60px 0; }
+        /* Fixed Navigation */
+        .nav-container {
+            position: sticky;
+            top: 0;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            height: 70px;
+        }
 
-        /* UI Components: Cards, Buttons */
-        .card { background-color: var(--fs-bg-white); border-radius: var(--fs-radius); box-shadow: var(--fs-shadow); padding: 25px; overflow: hidden; transition: transform 0.3s ease; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
-        .card-top-gradient { height: 8px; background: linear-gradient(90deg, var(--fs-green-primary), var(--fs-green-light)); margin: -25px -25px 20px -25px; }
-        .btn { display: inline-block; padding: 12px 25px; border-radius: 8px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; transition: background-color 0.3s, transform 0.1s; border: none; }
-        .btn-primary { background-color: var(--fs-green-primary); color: white; }
-        .btn-primary:hover { background-color: var(--fs-green-dark); }
-        .btn-cta { background-color: var(--fs-blue-cta); color: white; font-size: 1.1em; padding: 15px 30px; }
-        .btn-cta:hover { background-color: #1a7fc5; }
-        .btn-secondary { background-color: transparent; color: var(--fs-green-primary); border: 2px solid var(--fs-green-primary); }
-        .btn-secondary:hover { background-color: var(--fs-green-light); color: white; }
-        .linkedin-link { color: #0077B5; margin-left: 10px; }
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            height: 100%;
+        }
 
-        /* Typography */
-        h1, h2, h3 { margin-bottom: 0.5em; color: var(--fs-green-dark); line-height: 1.2; }
-        .grid-3-col { display: grid; grid-template-columns: 1fr; gap: 30px; }
-        
-        /* Navigation Bar */
-        .navbar { background-color: var(--fs-bg-white); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
-        .navbar-content { display: flex; justify-content: space-between; align-items: center; }
-        .logo img { height: 40px; margin-right: 10px; }
-        .nav-links { display: none; }
-        .nav-links a { text-decoration: none; color: var(--fs-text-primary); margin-left: 20px; font-weight: 500; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--fs-green-primary); }
-        .hamburger { display: block; font-size: 24px; cursor: pointer; color: var(--fs-green-dark); }
-        .nav-links.active { display: flex; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background-color: var(--fs-bg-white); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); padding: 15px 0; }
-        .nav-links.active a { margin: 10px 15px; padding: 8px 0; border-bottom: 1px solid #eee; }
-        .nav-staff-login { margin-left: 20px; color: var(--fs-blue-cta); font-weight: 500; text-decoration: none; }
-        
-        /* Footer */
-        .footer { background-color: var(--fs-green-dark); color: white; padding: 40px 0 20px 0; margin-top: auto; }
-        .footer-content { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-        .footer-links h4 { color: var(--fs-green-light); margin-bottom: 15px; }
-        .footer-links ul { list-style: none; }
-        .footer-links a { color: white; text-decoration: none; display: block; margin-bottom: 8px; transition: color 0.2s; }
-        .footer-links a:hover { color: var(--fs-green-light); }
-        .footer-logo img { height: 50px; filter: brightness(0) invert(1); }
-        .footer-copy { text-align: center; padding-top: 15px; font-size: 0.9em; }
-        .footer-credit { 
-            color: rgba(255, 255, 255, 0.9); 
-            font-size: 0.9em;
-            text-align: center;
+        .brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .brand img { height: 35px; width: auto; }
+        .brand span { 
+            font-weight: 700; 
+            font-size: 1.1rem; 
+            color: var(--primary); 
+            letter-spacing: -0.5px;
+        }
+
+        /* Mobile Nav Toggle */
+        .menu-btn {
             display: block;
-            margin-top: 10px;
-        }
-        .footer-credit a {
-            color: white;
-            text-decoration: underline;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-main);
         }
 
-        /* Development Banner */
-        .dev-banner {
-            background-color: var(--fs-green-light);
-            color: var(--fs-green-dark);
-            text-align: center;
-            padding: 10px 0;
+        .nav-menu {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+            border-bottom: 1px solid #eee;
+            display: none; /* Hidden by default */
+        }
+
+        .nav-menu.active { display: flex; }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text-main);
             font-weight: 600;
-            font-size: 0.9em;
+            font-size: 0.95rem;
+            padding: 10px 0;
         }
 
-        /* Hero Section with BG Image */
-        .hero {
-            background-image: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('/image/front-page.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 400px;
-        }
-        .hero h1 { color: var(--fs-green-dark); }
-        .hero p { color: var(--fs-text-primary); }
-
-        /* NEW: Sign-up Announcement Banner Style */
-        .signup-banner {
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            color: #856404; 
-            padding: 10px 15px;
+        .btn-donate {
+            background: var(--primary);
+            color: var(--white) !important;
+            padding: 12px 20px !important;
+            border-radius: var(--radius);
             text-align: center;
-            font-weight: 500;
-            margin: 0 0 30px 0;
-            border-radius: 8px;
         }
-        .signup-banner a {
-            color: var(--fs-blue-cta);
-            font-weight: 700;
-            text-decoration: underline;
+
+        /* Hero Section */
+        .hero {
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--primary-light) 0%, var(--white) 100%);
         }
-        /* End NEW */
 
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #0d2310;
+        }
 
-        /* Media Queries */
-        @media (min-width: 768px) {
-            .grid-3-col { grid-template-columns: repeat(3, 1fr); }
-            .nav-links { display: flex; flex-grow: 1; justify-content: flex-end; align-items: center; }
-            .hamburger { display: none; }
-            .footer-content { grid-template-columns: repeat(5, 1fr); }
-            .footer-logo { grid-column: span 1; }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* Announcement Banner */
+        .announcement-bar {
+            background: #fff9c4;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid #fbc02d;
+        }
+
+        .announcement-bar a { color: var(--accent); }
+
+        /* Content Grid */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .f-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 1px solid #eee;
+            transition: transform 0.2s;
+        }
+
+        .f-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .f-card h3 { margin-bottom: 10px; }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: #ccc;
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .footer-logo { color: var(--white); font-weight: 700; font-size: 1.2rem; }
+
+        /* Desktop Adjustments */
+        @media (min-width: 992px) {
+            .menu-btn { display: none; }
+            .nav-menu {
+                position: static;
+                display: flex;
+                flex-direction: row;
+                width: auto;
+                background: none;
+                border: none;
+                padding: 0;
+            }
+            .hero h1 { font-size: 3.5rem; }
+            .feature-grid { grid-template-columns: repeat(3, 1fr); }
+            .footer-grid { grid-template-columns: 2fr 1fr 1fr; }
         }
     </style>
 </head>
 <body>
-    
-    <div class="dev-banner">
-        <i class="fas fa-tools"></i> Website is currently under development for version 1.1. Please expect bugs and glitches.
+
+    <div class="announcement-bar">
+        <i class="fas fa-bullhorn"></i> New to FoodShare Seychelles? 
+        <a href="/account/signup/">Register to claim food today.</a>
     </div>
 
-    <nav class="navbar">
-        <div class="container navbar-content">
-            <div class="logo">
-                <a href="/">
-                    <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
-                    <span style="font-size: 1.5em; font-weight: 700; color: var(--fs-green-dark);">FoodShare</span>
-                </a>
-            </div>
+    <nav class="nav-container">
+        <div class="nav-content">
+            <a href="/" class="brand">
+                <img src="/image/logo.png" alt="Logo">
+                <span>FoodShare Seychelles</span>
+            </a>
             
-            <div class="nav-auth-group">
-                <div class="nav-links" id="nav-links">
-                    <a href="/available-food/">Find Food</a>
-                    <a href="/how-it-works/">How It Works</a>
-                    <a href="/impact/">Impact</a>
-                    <a href="/news-updates/">News</a>
-                    <a href="/about-us/">About Us</a>
-                    <a href="/contact-us/">Contact</a>
-                    
-                    <a href="/account/dashboard/" id="nav-dashboard-link" style="display: none;"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-
-                    <a href="/donate-now/" class="btn btn-cta">Donate Now</a>
-                </div>
-                
-                <a href="/staff-login/" class="nav-staff-login">Staff Login</a>
+            <div class="menu-btn" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
             </div>
 
-            <i class="fa-solid fa-bars hamburger" id="hamburger"></i>
+            <div class="nav-menu" id="navMenu">
+                <a href="/available-food/">Available Food</a>
+                <a href="/how-it-works/">How it Works</a>
+                <a href="/impact/">Impact</a>
+                <a href="/about-us/">About Us</a>
+                <a href="/donate-now/" class="btn-donate">Donate Food</a>
+            </div>
         </div>
     </nav>
 
-    <main id="main-content">
-        <header class="hero section-padding" style="padding-bottom: 30px;">
-            <div class="container" style="display: flex; flex-direction: column; gap: 30px;">
-                <h1 style="font-size: 2.5em; text-align: center; text-shadow: 0 0 5px white;">Reducing Waste, Building Community in Seychelles.</h1>
-                <p style="text-align: center; font-size: 1.2em; max-width: 800px; margin: 0 auto; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 8px;">Our web platform coordinates the efficient transfer of surplus food, fighting hunger and promoting sustainability across the islands. 
-                    <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" class="linkedin-link">
-                        <i class="fab fa-linkedin"></i> Follow our mission on LinkedIn.
-                    </a>
-                </p>
-                
-                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                    <a href="/donate-now/" class="btn btn-cta"><i class="fas fa-hand-holding-heart"></i> Donate Food Today</a>
-                    <a href="/available-food/" class="btn btn-secondary"><i class="fas fa-search"></i> Find Available Food</a>
-                </div>
-            </div>
-        </header>
-        
-        <div class="container" style="margin-top: 30px;">
-            <div class="signup-banner">
-                <i class="fas fa-user-circle"></i> **Unlock the Full Experience!** To donate food or claim listings, please 
-                <a href="/account/signup/">Sign Up</a> or 
-                <a href="/account/login/">Log In</a>. It's free and takes seconds!
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="card" style="margin-bottom: 60px; border: 2px solid var(--fs-green-light);">
-                <div class="card-top-gradient" style="margin-top: -25px; margin-bottom: 15px;"></div>
-                <h3 style="color: var(--fs-green-dark);"><i class="fas fa-bullhorn"></i> Latest Update</h3>
-                <p id="announcement-text">Loading latest updates...</p>
-                <p style="font-size: 0.85em; text-align: right; color: #777; margin-top: 10px;"><a href="/news-updates/" style="color: var(--fs-blue-cta);">View all News & Updates <i class="fas fa-arrow-right"></i></a></p>
-            </div>
-        </div>
-
-
-        <section class="section-padding" style="padding-top: 0;">
+    <main>
+        <section class="hero">
             <div class="container">
-                <h2 style="text-align: center; margin-bottom: 40px;">Get Involved in 3 Simple Steps</h2>
-                <div class="grid-3-col">
-                    <div class="card">
-                        <div class="card-top-gradient"></div>
-                        <h3 style="color: var(--fs-green-primary);"><i class="fas fa-box"></i> 1. List Surplus Food</h3>
-                        <p>Businesses, hotels, and individuals list their food via our easy, mobile-friendly donation form.</p>
-                        <a href="/donate-now/" class="btn btn-primary" style="margin-top: 15px;">List Food Now</a>
-                    </div>
-                    <div class="card">
-                        <div class="card-top-gradient" style="background: linear-gradient(90deg, var(--fs-blue-cta), #64b5f6);"></div>
-                        <h3 style="color: var(--fs-blue-cta);"><i class="fas fa-hand-holding"></i> 2. Claim & Fulfill</h3>
-                        <p>Registered community members claim listings, handled by our volunteer logistics team for delivery or pickup.</p>
-                        <a href="/available-food/" class="btn btn-primary" style="margin-top: 15px;">View Listings</a>
-                    </div>
-                    <div class="card">
-                        <div class="card-top-gradient" style="background: linear-gradient(90deg, var(--fs-green-dark), var(--fs-green-light));"></div>
-                        <h3 style="color: var(--fs-green-dark);"><i class="fas fa-chart-line"></i> 3. Track Our Impact</h3>
-                        <p>Every donation is tracked, allowing us to report on meals provided and carbon emissions offset.</p>
-                        <a href="/impact/" class="btn btn-primary" style="margin-top: 15px;">See Impact</a>
-                    </div>
-                </div>
-                <p style="text-align: center; margin-top: 30px;"><a href="/how-it-works/" style="color: var(--fs-green-dark); font-weight: 600;">View the full Step-by-Step Explanation <i class="fas fa-long-arrow-alt-right"></i></a></p>
-            </div>
-        </section>
-        
-        <section class="section-padding" style="background-color: var(--fs-bg-white);">
-            <div class="container">
-                <h2 style="text-align: center; margin-bottom: 40px;">Voices from Our Community</h2>
-                <div class="grid-3-col" id="testimonials-preview">
-                    <div class="card" style="text-align: center; background-color: #f1f8e9;"><p>Loading feedback...</p></div>
-                    <div class="card" style="text-align: center; background-color: #f1f8e9;"><p>Loading feedback...</p></div>
-                    <div class="card" style="text-align: center; background-color: #f1f8e9;"><p>Loading feedback...</p></div>
-                </div>
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="/about-us/testimonials/" class="btn btn-secondary">Read More Testimonials <i class="fas fa-arrow-right"></i></a>
+                <h1>Bridging the gap between surplus and need.</h1>
+                <p>We connect hotels and businesses with community organizations to ensure no good food goes to waste in the Seychelles.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="/available-food/" class="btn-donate" style="background: var(--primary); text-decoration: none;">Browse Listings</a>
+                    <a href="/how-it-works/" style="text-decoration: none; color: var(--primary); font-weight: 700; padding: 12px 20px;">Learn More <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
         </section>
 
+        <section class="container">
+            <div class="feature-grid">
+                <div class="f-card">
+                    <i class="fas fa-utensils"></i>
+                    <h3>For Donors</h3>
+                    <p>Quickly list surplus food and coordinate professional pickup within hours.</p>
+                </div>
+                <div class="f-card">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <h3>For Recipients</h3>
+                    <p>Non-profits and community groups can claim high-quality ingredients for free.</p>
+                </div>
+                <div class="f-card">
+                    <i class="fas fa-leaf"></i>
+                    <h3>For the Planet</h3>
+                    <p>Reducing food waste is the #1 way to fight climate change in our islands.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="/image/logo.png" alt="FoodShare Seychelles Logo">
-                    <p style="margin-top: 10px; font-size: 0.9em;">A non-profit initiative dedicated to sustainability and community welfare.</p>
-                    <div style="margin-top: 15px;">
-                        <a href="https://www.linkedin.com/company/foodshare-seychelles" target="_blank" style="color: white; font-size: 1.5em; text-decoration: none;">
-                            <i class="fab fa-linkedin-in"></i> 
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>About Us</h4>
-                    <ul>
-                        <li><a href="/about-us/mission-vision/">Mission & Vision</a></li>
-                        <li><a href="/about-us/history-story/">History & Story</a></li>
-                        <li><a href="/about-us/meet-our-team/">Meet Our Team</a></li>
-                        <li><a href="/about-us/partners-supporters/">Partners & Supporters</a></li>
-                        <li><a href="/about-us/testimonials/">Testimonials</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Get Involved</h4>
-                    <ul>
-                        <li><a href="/donate-now/">Donate Food</a></li>
-                        <li><a href="/available-food/">Find Food</a></li>
-                        <li><a href="/volunteer-now/">Volunteer Now</a></li>
-                        <li><a href="/how-it-works/volunteer-involvement/">Volunteer Roles</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Information</h4>
-                    <ul>
-                        <li><a href="/impact/">Impact Dashboard</a></li>
-                        <li><a href="/news-updates/">News & Updates</a></li>
-                        <li><a href="/contact-us/">Contact Us</a></li>
-                        <li><a href="/contact-us/faq/">FAQ</a></li>
-                        <li><a href="/staff-login/">Staff Login</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Legal & Safety</h4>
-                    <ul>
-                        <li><a href="/policies/privacy-policy/">Privacy Policy</a></li>
-                        <li><a href="/policies/terms-of-use/">Terms of Use</a></li>
-                        <li><a href="/policies/food-safety-guidelines/">Food Safety Guidelines</a></li>
-                        <li><a href="/policies/donation-refund-policy/">Donation & Refund Policy</a></li>
-                    </ul>
-                </div>
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <div class="footer-logo">FoodShare Seychelles</div>
+                <p style="margin-top: 15px; font-size: 0.9rem;">The archipelago's leading food rescue initiative. Connecting abundance to those who need it most.</p>
             </div>
-            <div class="footer-copy">
-                &copy; <span id="current-year"></span> FoodShare Seychelles. All rights reserved. | 
-                <span class="footer-credit">
-                    Website by 
-                    <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a> 
-                    | 
-                    <a href="https://www.linkedin.com/in/tyler-nicholas-62999534a" target="_blank">LinkedIn</a>
-                </span>
+            <div>
+                <h4 style="color: white; margin-bottom: 15px;">Organization</h4>
+                <p><a href="/about-us/" style="color: #ccc; text-decoration: none; font-size: 0.9rem;">About Us</a></p>
+                <p><a href="/news-updates/" style="color: #ccc; text-decoration: none; font-size: 0.9rem;">Latest News</a></p>
             </div>
+            <div>
+                <h4 style="color: white; margin-bottom: 15px;">Support</h4>
+                <p><a href="/contact-us/" style="color: #ccc; text-decoration: none; font-size: 0.9rem;">Contact</a></p>
+                <p><a href="/staff-login/" style="color: #ccc; text-decoration: none; font-size: 0.9rem;">Staff Login</a></p>
+            </div>
+        </div>
+        <div class="container" style="border-top: 1px solid #333; padding-top: 20px; text-align: center; font-size: 0.8rem;">
+            &copy; 2025 FoodShare Seychelles. Developed by Tyler Nicholas.
         </div>
     </footer>
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase Client (REPLACE WITH YOUR KEYS)
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; 
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        
-        // Feature: Load Data (Announcement and Testimonials)
-        async function loadPublicData() {
-            try {
-                // 1. Load Announcement and Testimonials (Combined for efficiency)
-                const [settingsResponse, testimonialsResponse] = await Promise.all([
-                    supabase.from('settings').select('announcement, is_announcement_active').limit(1).single(),
-                    supabase.from('testimonials').select('full_name, body, relationship').eq('is_approved', true).limit(3)
-                ]);
-
-                // Update Announcement
-                const settingsData = settingsResponse.data;
-                if (settingsData && settingsData.is_announcement_active) {
-                    document.getElementById('announcement-text').innerText = settingsData.announcement;
-                } else {
-                    document.getElementById('announcement-text').innerText = "No active announcements at this time. Check our News page for updates!";
-                }
-                
-                // Update Testimonials
-                const testimonialsData = testimonialsResponse.data;
-                const testimonialContainer = document.getElementById('testimonials-preview');
-                testimonialContainer.innerHTML = '';
-
-                if (testimonialsData && testimonialsData.length > 0) {
-                    testimonialsData.forEach(t => {
-                        testimonialContainer.innerHTML += `
-                            <div class="card" style="background-color: #f1f8e9;">
-                                <p style="font-style: italic;">"${t.body}"</p>
-                                <p style="font-weight: 600; margin-top: 10px;">- ${t.full_name}</p>
-                                <p style="font-size: 0.8em; color: #777;">${t.relationship || 'Community Member'}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                     testimonialContainer.innerHTML = `<div class="card" style="grid-column: 1 / -1; text-align: center;"><p>Be the first to leave a testimonial! Use our contact form to submit feedback.</p></div>`;
-                }
-
-            } catch (err) {
-                console.error('Error loading public data:', err);
-            }
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
         }
-        
-        // Feature: Run on Page Load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set current year in footer
-            document.getElementById('current-year').innerText = new Date().getFullYear();
-            
-            // Navigation Toggle Logic
-            document.getElementById('hamburger').addEventListener('click', () => {
-                document.getElementById('nav-links').classList.toggle('active');
-            });
-            
-            // Start data loading (This runs async and does not block the page)
-            loadPublicData();
-
-            // Supabase Auth Listener (To show Dashboard link)
-            supabase.auth.onAuthStateChange((event, session) => {
-                const dashboardLink = document.getElementById('nav-dashboard-link');
-                if (session) {
-                    dashboardLink.style.display = 'block';
-                } else {
-                    dashboardLink.style.display = 'none';
-                }
-            });
-        });
     </script>
 </body>
 </html>
