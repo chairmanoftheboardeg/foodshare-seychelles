@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Request Transport — FoodShare Seychelles</title>
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .grid{display:grid;gap:14px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} @media(max-width:900px){.grid.two{grid-template-columns:1fr}}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px} .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))} .card .content{padding:14px}
+    .h1{font-size:34px;line-height:1.1;margin:0} .h2{font-size:20px;margin:0}
+    .p{margin:10px 0;color:var(--muted)} .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0} .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .small{font-size:12px;color:var(--muted)}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .field label{font-weight:800}
+    .field input,.field textarea,.field select{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
+    textarea{min-height:110px;resize:vertical}
+    code.inline{background:#f1f5f1;border:1px solid var(--border);padding:2px 6px;border-radius:10px}
+    .pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 10px;font-weight:800}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../available-food/">Find Food</a>
+        <a href="../our-impact/">Our Impact</a>
+        <a href="../about/">About</a>
+        <a href="../our-partners/">Partners</a>
+        <a href="../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
+
+  <main class="container">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 class="h1">Request Transport</h1>
+        <p class="p">For delivery to your location or a chosen address.</p>
+      </div>
+      <div class="row">
+        <a class="btn secondary" href="../available-food/"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <a class="btn secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <div id="listingBox" class="notice" style="margin-top:12px"></div>
+    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="grid two">
+          <div>
+            <div class="field"><label>Full name</label><input id="full_name"></div>
+            <div class="grid two">
+              <div class="field"><label>Email</label><input id="email" type="email"></div>
+              <div class="field"><label>Phone</label><input id="phone"></div>
+            </div>
+
+            <div class="notice">
+              <b>Location</b>
+              <div class="small">We can capture your current location coordinates.</div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn small secondary" id="btnGeo"><i class="fa-solid fa-location-crosshairs"></i> Use my location</button>
+                <span class="small">Lat: <code class="inline" id="lat">—</code> Lng: <code class="inline" id="lng">—</code></span>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="notice">
+              <b>Delivery address</b>
+              <div class="row" style="margin-top:10px">
+                <label class="pill"><input type="radio" name="addrMode" value="current" checked> Deliver to my current location</label>
+                <label class="pill"><input type="radio" name="addrMode" value="manual"> Deliver to this address</label>
+              </div>
+              <div class="field"><label>Address / landmark</label><input id="delivery_address" placeholder="Only required if using manual address"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="notice">
+              <b>Delivery time window</b>
+              <div class="small">Choose the earliest and latest time you can receive delivery.</div>
+              <div class="grid two">
+                <div class="field"><label>Start</label><input id="time_start" type="datetime-local"></div>
+                <div class="field"><label>End</label><input id="time_end" type="datetime-local"></div>
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:12px">
+              <label class="pill"><input type="checkbox" id="signature"> I accept and confirm the request details (signature acceptance)</label>
+            </div>
+
+            <div class="row" style="margin-top:12px">
+              <button class="btn blue" id="btnSubmit"><i class="fa-solid fa-paper-plane"></i> Submit transport request</button>
+              <a class="btn secondary" href="mailto:admin@foodshare-seychelles.online"><i class="fa-solid fa-envelope"></i> Email instead</a>
+            </div>
+
+            <div class="small" style="margin-top:10px">
+              No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+    function toast(type, html){
+      const el = document.getElementById("msg");
+      el.className = "notice" + (type ? " "+type : "");
+      el.innerHTML = html;
+      el.style.display = "block";
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    let geo_lat = null, geo_lng = null;
+    let selected = null;
+
+    async function guard(){
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        location.href = `../account/login/?next=%2Frequest-transport%2F`;
+        return false;
+      }
+      return true;
+    }
+
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      nav.innerHTML = `
+        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <a class="btn small secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      `;
+      document.getElementById("btnLogout").addEventListener("click", async ()=>{
+        setLoading(true); await supabase.auth.signOut(); setLoading(false);
+        location.href = "../";
+      });
+    }
+
+    function loadSelectedListing(){
+      try{
+        selected = JSON.parse(localStorage.getItem("fs_selected_listing") || "null");
+      }catch{ selected=null; }
+      const box = document.getElementById("listingBox");
+      if(!selected?.id){
+        box.className = "notice warn";
+        box.innerHTML = `<b>No listing selected.</b> Please return to <a href="../available-food/"><b>Available Food</b></a> and select “Claim”.`;
+      } else {
+        box.className = "notice";
+        box.innerHTML = `<b>Selected listing:</b> ${selected.title || "—"} • <span class="small">ID:</span> <code class="inline">${selected.id}</code>`;
+      }
+    }
+
+    document.getElementById("btnGeo").addEventListener("click", ()=>{
+      if(!navigator.geolocation){
+        toast("warn","Geolocation not supported on this device.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        geo_lat = pos.coords.latitude;
+        geo_lng = pos.coords.longitude;
+        document.getElementById("lat").textContent = geo_lat.toFixed(6);
+        document.getElementById("lng").textContent = geo_lng.toFixed(6);
+      }, (err)=>{
+        toast("warn", `Location permission denied or unavailable: ${err.message}`);
+      }, { enableHighAccuracy:true, timeout:12000 });
+    });
+
+    document.getElementById("btnSubmit").addEventListener("click", async ()=>{
+      if(!selected?.id){
+        toast("warn","Please select a listing first from Available Food.");
+        return;
+      }
+
+      const addrMode = document.querySelector('input[name="addrMode"]:checked')?.value || "current";
+      const delivery_address = document.getElementById("delivery_address").value.trim();
+
+      const payload = {
+        listing_id: selected.id,
+        request_type: "Transport",
+        full_name: document.getElementById("full_name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        geo_lat, geo_lng,
+        delivery_address: (addrMode === "manual") ? (delivery_address || null) : null,
+        delivery_time_start: document.getElementById("time_start").value ? new Date(document.getElementById("time_start").value).toISOString() : null,
+        delivery_time_end: document.getElementById("time_end").value ? new Date(document.getElementById("time_end").value).toISOString() : null,
+        signature_accepted: document.getElementById("signature").checked,
+        status: "New"
+      };
+
+      if(!payload.full_name || !payload.email || !payload.phone){
+        toast("warn","<b>Missing fields:</b> name, email, phone are required.");
+        return;
+      }
+      if(addrMode === "manual" && !delivery_address){
+        toast("warn","Please enter the delivery address (manual mode).");
+        return;
+      }
+      if(!payload.signature_accepted){
+        toast("warn","Please accept signature confirmation.");
+        return;
+      }
+
+      setLoading(true);
+      const { data, error } = await supabase.from("claims").insert(payload).select("id").single();
+      if(error){
+        setLoading(false);
+        toast("error", `<b>Submit failed:</b> ${error.message}`);
+        return;
+      }
+
+      await supabase.from("notifications").insert({
+        title: "Transport claim submitted",
+        message: "We received your transport request. You will receive updates via notifications.",
+        type: "Info"
+      });
+
+      setLoading(false);
+      toast("", `<b>Submitted.</b> Claim reference: <code class="inline">${data.id}</code>. <a href="../account/dashboard/"><b>Go to dashboard</b></a>.`);
+    });
+
+    (async ()=>{
+      if(!await guard()) return;
+      await setNav();
+      loadSelectedListing();
+    })();
+  </script>
+</body>
+</html>
