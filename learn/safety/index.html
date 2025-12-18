@@ -1,227 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Safety Protocol - FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Food Safety Protocol — FoodShare Seychelles</title>
+  <link rel="icon" href="../../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
-      --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
-      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333;
-      --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-      --transition-speed: 0.4s;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-    a:hover { color: var(--primary-dark); }
-    main { flex-grow: 1; padding: 40px 0; }
-    h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-    .content-container { max-width: 1050px; margin: 0 auto; padding: 0 25px; }
-
-    #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
-    .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-    .logo-img { height: 40px; margin-right: 10px; }
-    .nav-links-container { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-    .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
-    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
-    .nav-link:hover::after { width: 100%; }
-    .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
-    .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-
-    #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
-    .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
-    .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
-    .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
-    .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
-    .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
-    .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
-
-    .header {
-      background: var(--neutral-card);
-      border-radius: 14px;
-      box-shadow: var(--shadow-subtle);
-      padding: 30px;
-      border-top: 5px solid var(--accent-orange);
-      margin-bottom: 18px;
-    }
-    .header p { color: var(--text-light); max-width: 900px; margin-top: 8px; }
-    .note {
-      margin-top: 14px;
-      padding: 14px 16px;
-      border-radius: 12px;
-      background: #fff8e9;
-      border: 1px solid #ffe4bd;
-      color: #6c4500;
-      font-weight: 700;
-    }
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
-
-    .section {
-      background: var(--neutral-card);
-      border-radius: 14px;
-      box-shadow: var(--shadow-subtle);
-      padding: 24px;
-      border: 1px solid #efefef;
-      border-top: 5px solid var(--primary-main);
-    }
-    .section h2 {
-      display:flex; gap:10px; align-items:center;
-      margin-bottom: 12px;
-      border-bottom: 2px solid var(--primary-light);
-      padding-bottom: 8px;
-    }
-    ul { padding-left: 18px; }
-    li { margin: 8px 0; color: var(--text-dark); }
-    .muted { color: var(--text-light); }
-    .mini {
-      font-size: .92em;
-      color: var(--text-light);
-      margin-top: 8px;
-    }
-
-    .callout {
-      margin-top: 18px;
-      border-radius: 14px;
-      background: #f4fbf4;
-      border: 1px solid #e9f3e9;
-      box-shadow: var(--shadow-subtle);
-      padding: 20px;
-      border-top: 5px solid var(--accent-blue);
-    }
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1000px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px}
+    .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:34px;margin:0}
+    .h2{font-size:18px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .small{font-size:12px;color:var(--muted)}
+    ul{margin:8px 0 0 18px;color:var(--muted)}
+    .notice{border:1px solid #ffe0b2;background:#fff3e0;border-radius:16px;padding:12px 14px}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+    @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<header id="navbar">
-  <a href="/" class="logo-container">
-    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-  </a>
-  <nav class="nav-links-container" id="navLinks">
-    <a href="/available-food/" class="nav-link">Find Food</a>
-    <a href="/donate-food/" class="nav-link">Donate</a>
-    <a href="/volunteer/" class="nav-link">Volunteer</a>
-    <a href="/impact/" class="nav-link">Impact</a>
-    <a href="/about/" class="nav-link">About Us</a>
-    <a href="/donate-food/" class="cta-button">DONATE NOW</a>
-    <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-  </nav>
-</header>
-
-<main>
-  <div class="content-container">
-    <section class="header">
-      <h1>Food Safety Protocol</h1>
-      <p>
-        FoodShare Seychelles follows strict handling procedures to protect recipients and maintain donor trust.
-        This protocol outlines acceptance criteria, storage, transport, and distribution safety practices.
-      </p>
-      <div class="note">
-        <i class="fas fa-shield-halved"></i>
-        Safety first: if an item’s safety is uncertain, we do not distribute it.
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../../">
+        <img src="../../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../../available-food/">Find Food</a>
+        <a href="../../donate-now/">Donate</a>
+        <a href="../../volunteer-now/">Volunteer</a>
+        <a href="../../our-impact/">Impact</a>
+        <a href="../../about/">About</a>
+        <a href="../../our-partners/">Partners</a>
+        <a href="../../staff-login/">Staff Login</a>
       </div>
-    </section>
-
-    <div class="grid">
-      <section class="section">
-        <h2><i class="fas fa-circle-check"></i> Accepted Donations</h2>
-        <ul>
-          <li>Food that is safe, unspoiled, and properly stored.</li>
-          <li>Packaged goods with intact seals and readable labels.</li>
-          <li>Produce that is clean and free from significant mold/rot.</li>
-          <li>Chilled/frozen items only if cold-chain can be maintained.</li>
-        </ul>
-        <div class="mini muted">Note: “Best before” items may be accepted if quality is still good, subject to screening.</div>
-      </section>
-
-      <section class="section" style="border-top-color: var(--accent-red);">
-        <h2><i class="fas fa-ban"></i> Not Accepted</h2>
-        <ul>
-          <li>Food with signs of spoilage (off smell, slime, mold on most foods).</li>
-          <li>Open/partially used products (unless a controlled program is in place).</li>
-          <li>Items without labels where allergens/contents cannot be confirmed.</li>
-          <li>Food exposed to unsafe temperatures for extended periods.</li>
-        </ul>
-        <div class="mini muted">We may decline donations if packaging is damaged or contamination risk is present.</div>
-      </section>
-
-      <section class="section" style="border-top-color: var(--accent-blue);">
-        <h2><i class="fas fa-temperature-low"></i> Temperature & Cold Chain</h2>
-        <ul>
-          <li>Keep chilled foods cold until handoff (use coolers/ice packs).</li>
-          <li>Frozen foods must remain frozen; avoid thaw-refreeze cycles.</li>
-          <li>Minimize time between pickup and distribution.</li>
-          <li>Separate raw items from ready-to-eat foods.</li>
-        </ul>
-        <div class="mini muted">If cold chain is broken, items may be rejected for safety.</div>
-      </section>
-
-      <section class="section" style="border-top-color: var(--accent-orange);">
-        <h2><i class="fas fa-box"></i> Packaging & Labeling</h2>
-        <ul>
-          <li>Use clean, food-safe containers.</li>
-          <li>Label items with contents, date, and storage instructions if possible.</li>
-          <li>For prepared foods: include prep date and “consume by” guidance.</li>
-          <li>Keep allergens identifiable (nuts, dairy, gluten, seafood, etc.).</li>
-        </ul>
-      </section>
-
-      <section class="section">
-        <h2><i class="fas fa-truck"></i> Transport & Handling</h2>
-        <ul>
-          <li>Clean transport surfaces; avoid chemical contamination.</li>
-          <li>Keep food off the floor; protect from sun/rain exposure.</li>
-          <li>Use “first expiring, first out” prioritization.</li>
-          <li>Record pickup and drop-off times when possible.</li>
-        </ul>
-      </section>
-
-      <section class="section" style="border-top-color: var(--accent-blue);">
-        <h2><i class="fas fa-clipboard-list"></i> Screening & Traceability</h2>
-        <ul>
-          <li>Staff/volunteers visually inspect items at pickup/intake.</li>
-          <li>High-risk categories receive extra scrutiny.</li>
-          <li>Trace donor contact where needed for follow-ups.</li>
-          <li>Log and safely dispose of rejected items.</li>
-        </ul>
-      </section>
-    </div>
-
-    <section class="callout">
-      <h2 style="margin-bottom:8px;"><i class="fas fa-handshake"></i> Donor Guidance</h2>
-      <div class="muted">
-        If you are unsure whether your items qualify, submit a donation request with details and photos/description.
-        Our team will advise and schedule safe pickup.
-      </div>
-      <div style="margin-top:12px;">
-        <a href="/donate-food/" style="display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;background:var(--primary-main);color:white;font-weight:900;box-shadow:0 4px 6px rgba(0,0,0,.08);">
-          <i class="fas fa-leaf"></i> Submit Donation Request
-        </a>
-      </div>
-    </section>
-  </div>
-</main>
-
-<footer id="main-footer">
-  <div class="content-container footer-content">
-    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-    <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-    <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-    <div class="footer-section">
-      <h3>Get In Touch</h3>
-      <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-      <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
+      <div class="nav-cta" id="navAuth"></div>
     </div>
   </div>
-  <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-</footer>
+
+  <main class="container">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
+      <div>
+        <h1 class="h1">Food Safety Protocol</h1>
+        <p class="p">Guidelines for safe donation, transport, and distribution.</p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn blue" href="../../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top:12px">
+      <b>Disclaimer:</b> This page provides general safety guidance. Always follow local regulations and common-sense hygiene.
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="h2">Donor checklist</div>
+        <div class="sep"></div>
+        <ul>
+          <li>Provide accurate expiry date and storage condition.</li>
+          <li>Use sealed packaging when possible.</li>
+          <li>Label allergens (nuts, dairy, seafood, etc.).</li>
+          <li>Do not donate food that has been left in unsafe temperatures.</li>
+        </ul>
+
+        <div class="sep"></div>
+        <div class="h2">Transport checklist</div>
+        <div class="sep"></div>
+        <ul>
+          <li>Keep cold items cold (coolers/ice packs when needed).</li>
+          <li>Minimize time between pickup and delivery.</li>
+          <li>Do not mix raw foods with ready-to-eat foods.</li>
+          <li>Keep vehicles clean and food off the floor.</li>
+        </ul>
+
+        <div class="sep"></div>
+        <div class="h2">Recipient checklist</div>
+        <div class="sep"></div>
+        <ul>
+          <li>Inspect packaging and smell/appearance before use.</li>
+          <li>Refrigerate perishable foods immediately.</li>
+          <li>Consume prepared foods promptly.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="card" style="box-shadow:none">
+            <div class="content">
+              <b>Contact (no login):</b>
+              <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a>
+              <div class="small" style="margin-top:8px">Forms require login for dashboard replies.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Learn</div>
+          <div class="grid" style="gap:6px">
+            <a href="./">Food Safety</a>
+            <a href="../faq/">FAQ</a>
+            <a href="../../social/">Social</a>
+            <a href="../../sitemap/">Sitemap</a>
+          </div>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Legal</div>
+          <div class="grid" style="gap:6px">
+            <a href="../../privacy-policy/">Privacy Policy</a>
+            <a href="../../terms-of-use/">Terms of Use</a>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+        <div class="small">Powered by Supabase</div>
+      </div>
+    </div>
+  </div>
+  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        nav.innerHTML = `
+          <a class="btn small secondary" href="../../account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a class="btn small" href="../../account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
+        `;
+      }else{
+        nav.innerHTML = `
+          <a class="btn small secondary" href="../../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+          <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        `;
+        document.getElementById("btnLogout").addEventListener("click", async ()=>{
+          await supabase.auth.signOut(); location.reload();
+        });
+      }
+    }
+    setNav();
+  </script>
 </body>
 </html>
