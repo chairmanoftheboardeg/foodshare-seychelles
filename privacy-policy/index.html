@@ -1,155 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="icon" href="/favicon.png" type="image/png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Privacy Policy — FoodShare Seychelles</title>
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --primary-light: #81C784; --primary-main: #4CAF50; --primary-dark: #388E3C;
-      --accent-blue: #2196F3; --accent-orange: #FF9800; --accent-red: #D32F2F;
-      --neutral-bg: #F9F9F9; --neutral-card: #FFFFFF; --text-dark: #333333;
-      --text-light: #666666; --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --font-serif: 'Georgia', serif; --font-sans: 'Helvetica Neue', Arial, sans-serif;
-      --transition-speed: 0.4s;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-sans); color: var(--text-dark); background-color: var(--neutral-bg); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-    a { text-decoration: none; color: var(--primary-main); transition: color var(--transition-speed); }
-    a:hover { color: var(--primary-dark); }
-    main { flex-grow: 1; padding: 40px 0; }
-    h1, h2, h3 { font-family: var(--font-serif); color: var(--primary-dark); }
-    .content-container { max-width: 1000px; margin: 0 auto; padding: 0 25px; }
-
-    #navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; background-color: var(--neutral-card); box-shadow: var(--shadow-subtle); position: sticky; top: 0; z-index: 1000; }
-    .logo-container { display: flex; align-items: center; font-size: 1.6em; font-weight: bold; color: var(--text-dark); }
-    .logo-img { height: 40px; margin-right: 10px; }
-    .nav-links-container { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-    .nav-link { font-weight: 500; padding: 8px 0; position: relative; color: var(--text-dark); }
-    .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary-main); transition: width var(--transition-speed); }
-    .nav-link:hover::after { width: 100%; }
-    .cta-button { background-color: var(--primary-main); color: var(--neutral-card); border-radius: 50px; padding: 10px 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color var(--transition-speed), transform 0.2s; }
-    .cta-button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-
-    #main-footer { margin-top: auto; background-color: var(--text-dark); color: var(--neutral-bg); padding: 50px 0 20px; font-size: 0.9em; }
-    .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 30px; max-width: 1200px; margin: 0 auto 30px; padding: 0 25px; }
-    .footer-section { width: 20%; min-width: 150px; margin-bottom: 20px; }
-    .footer-section h3 { color: var(--primary-light); margin-bottom: 20px; font-size: 1.2em; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 5px; }
-    .footer-section a { color: var(--neutral-bg); transition: color 0.3s; display: block; padding: 3px 0; }
-    .footer-section a:hover { color: var(--primary-main); text-decoration: underline; }
-    .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaa; font-size: 0.8em; }
-
-    .doc {
-      background: var(--neutral-card);
-      border-radius: 14px;
-      box-shadow: var(--shadow-subtle);
-      padding: 30px;
-      border: 1px solid #efefef;
-      border-top: 5px solid var(--accent-blue);
-    }
-    .meta { color: var(--text-light); margin-top: 6px; }
-    .doc h2 { margin-top: 22px; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px; }
-    .doc p, .doc li { color: var(--text-light); }
-    ul { padding-left: 18px; margin-top: 8px; }
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1000px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit} .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .navbar{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px;text-decoration:none;color:inherit}
+    .nav-links a:hover{background:#eef6ee}
+    .nav-cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border)}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:34px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .small{font-size:12px;color:var(--muted)}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+    @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-<header id="navbar">
-  <a href="/" class="logo-container">
-    <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-    FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-  </a>
-  <nav class="nav-links-container" id="navLinks">
-    <a href="/available-food/" class="nav-link">Find Food</a>
-    <a href="/donate-food/" class="nav-link">Donate</a>
-    <a href="/volunteer/" class="nav-link">Volunteer</a>
-    <a href="/impact/" class="nav-link">Impact</a>
-    <a href="/about/" class="nav-link">About Us</a>
-    <a href="/donate-food/" class="cta-button">DONATE NOW</a>
-    <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-  </nav>
-</header>
-
-<main>
-  <div class="content-container">
-    <section class="doc">
-      <h1>Privacy Policy</h1>
-      <div class="meta">Effective date: 2025-01-01 (update as needed)</div>
-
-      <p style="margin-top:12px;">
-        FoodShare Seychelles (“we”, “our”, “us”) respects your privacy. This policy explains what information we collect, how we use it,
-        and the choices you have when using our website and services.
-      </p>
-
-      <h2>Information We Collect</h2>
-      <ul>
-        <li><b>Donation submissions:</b> name/organization, email, phone (optional), food details, pickup location and timing.</li>
-        <li><b>Volunteer applications:</b> contact details, skills, availability, and interest area.</li>
-        <li><b>Claims & inquiries:</b> contact details and message content submitted through forms.</li>
-        <li><b>Technical data:</b> basic analytics/diagnostic data (e.g., device/browser) where available.</li>
-      </ul>
-
-      <h2>How We Use Information</h2>
-      <ul>
-        <li>To coordinate donation pickups, logistics, and communication.</li>
-        <li>To review volunteer applications and coordinate volunteer operations.</li>
-        <li>To respond to inquiries and provide support.</li>
-        <li>To maintain platform security and operational integrity.</li>
-      </ul>
-
-      <h2>Data Sharing</h2>
-      <p>
-        We do not sell your personal data. We may share limited information only when needed to fulfill operations (e.g., logistics coordination),
-        or when required by law.
-      </p>
-
-      <h2>Data Storage & Security</h2>
-      <p>
-        We use reasonable safeguards to protect data. Access to internal dashboards is restricted and role-based.
-        However, no method of transmission or storage is 100% secure.
-      </p>
-
-      <h2>Retention</h2>
-      <p>
-        We retain data only as long as needed for operational purposes and compliance. We may anonymize data for reporting (impact metrics).
-      </p>
-
-      <h2>Your Choices</h2>
-      <ul>
-        <li>You may request access, correction, or deletion of your submitted information where feasible.</li>
-        <li>You may opt out of non-essential communications.</li>
-      </ul>
-
-      <h2>Contact</h2>
-      <p>
-        For privacy questions, contact: <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a>
-      </p>
-
-      <p style="margin-top:18px; font-size:.92em;">
-        This policy is provided for transparency and general information and may be updated as the platform evolves.
-      </p>
-    </section>
-  </div>
-</main>
-
-<footer id="main-footer">
-  <div class="content-container footer-content">
-    <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-food/">Donate Food</a></li><li><a href="/volunteer/">Volunteer</a></li><li><a href="/impact/">Impact & Reports</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-    <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-    <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-    <div class="footer-section">
-      <h3>Get In Touch</h3>
-      <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-      <p>Follow us on <a href="/social/" style="color: var(--primary-main); display: inline;">Social Media</a></p>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../available-food/">Find Food</a>
+        <a href="../donate-now/">Donate</a>
+        <a href="../volunteer-now/">Volunteer</a>
+        <a href="../our-impact/">Impact</a>
+        <a href="../about/">About</a>
+        <a href="../our-partners/">Partners</a>
+        <a href="../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
     </div>
   </div>
-  <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-</footer>
+
+  <main class="container">
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <h1 class="h1">Privacy Policy</h1>
+        <p class="p">This is a template. Replace with your official policy text.</p>
+        <div class="sep"></div>
+        <div class="small">
+          We collect information you provide (e.g., name, email, phone, location details) to operate FoodShare Seychelles.
+          Access is restricted by role-based security. Community members can only view their own submissions and notifications.
+          If you have privacy questions, contact <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer">
+    <div class="container">
+      <div class="cols">
+        <div class="small">
+          <b>Contact (no login):</b>
+          <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a>
+        </div>
+        <div class="small"><b>Learn</b><div class="sep"></div>
+          <a href="../learn/safety/">Food Safety</a><br>
+          <a href="../learn/faq/">FAQ</a><br>
+          <a href="../social/">Social</a><br>
+          <a href="../sitemap/">Sitemap</a>
+        </div>
+        <div class="small"><b>Legal</b><div class="sep"></div>
+          <a href="./">Privacy Policy</a><br>
+          <a href="../terms-of-use/">Terms of Use</a>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+    </div>
+  </div>
+  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        nav.innerHTML = `<a class="btn small secondary" href="../account/login/">Login</a><a class="btn small" href="../account/signup/">Sign up</a>`;
+      }else{
+        nav.innerHTML = `<a class="btn small secondary" href="../account/dashboard/">Dashboard</a><button class="btn small secondary" id="btnLogout">Logout</button>`;
+        document.getElementById("btnLogout").addEventListener("click", async ()=>{ await supabase.auth.signOut(); location.reload(); });
+      }
+    }
+    setNav();
+  </script>
 </body>
 </html>
