@@ -1,1168 +1,983 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin Dashboard — FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
+  <link rel="icon" href="../../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root{
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --t:.35s;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-sans);background:var(--neutral-bg);color:var(--text-dark);min-height:100vh;display:flex;flex-direction:column}
-    a{text-decoration:none;color:var(--primary-main)} a:hover{color:var(--primary-dark)}
-    header{
-      position:sticky;top:0;z-index:1000;background:#fff;border-bottom:1px solid rgba(0,0,0,.06);
-      box-shadow:0 4px 12px rgba(0,0,0,0.06);
-    }
-    .topbar{max-width:1300px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:1000;font-size:1.25rem;color:var(--text-dark)}
-    .brand img{height:38px;width:38px;border-radius:12px}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .pill{
-      display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;
-      background:rgba(129,199,132,.16);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark);
-      font-weight:1000;font-size:.92rem;
-    }
-    .btn{
-      border:none;border-radius:999px;padding:10px 14px;font-weight:1000;cursor:pointer;
-      box-shadow:0 12px 22px rgba(0,0,0,.10);
-    }
-    .btn.blue{background:var(--accent-blue);color:#fff}
-    .btn.blue:hover{filter:brightness(.95)}
-    .btn.green{background:var(--primary-main);color:#fff}
-    .btn.green:hover{background:var(--primary-dark)}
-    .btn.ghost{background:#fff;color:var(--text-dark);border:1px solid rgba(0,0,0,.10);box-shadow:none}
-    .btn.ghost:hover{background:rgba(0,0,0,.03)}
-
-    .nav{
-      max-width:1300px;margin:0 auto;padding:0 18px 12px;
-      display:flex;gap:8px;flex-wrap:wrap;align-items:center
-    }
-    .tab{
-      border:1px solid rgba(0,0,0,.10);
-      background:#fff;
-      color:var(--text-dark);
-      font-weight:1000;
-      border-radius:999px;
-      padding:10px 12px;
-      cursor:pointer;
-      display:inline-flex;gap:8px;align-items:center;
-    }
-    .tab.active{
-      background:rgba(129,199,132,.18);
-      border-color:rgba(56,142,60,.20);
-      color:var(--primary-dark);
-    }
-
-    main{flex:1}
-    .container{max-width:1300px;margin:0 auto;padding:20px 18px}
-    .hero{
-      background:linear-gradient(135deg, rgba(129,199,132,.22), rgba(33,150,243,.10));
-      border:1px solid rgba(56,142,60,.14);
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      padding:18px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero::before{
-      content:"";position:absolute;inset:-130px -150px auto auto;width:300px;height:300px;
-      background:radial-gradient(circle, rgba(76,175,80,.20), transparent 62%);transform:rotate(15deg);
-    }
-    h1,h2{font-family:var(--font-serif);color:var(--primary-dark)}
-    h1{font-size:2rem}
-    h2{font-size:1.2rem}
-    .muted{color:var(--text-light);line-height:1.7}
-    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
-    @media(max-width:980px){.grid3{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:640px){.grid3{grid-template-columns:1fr}}
-    .card{
-      background:var(--neutral-card);border-radius:18px;border:1px solid rgba(56,142,60,.14);box-shadow:var(--shadow);
-      overflow:hidden;position:relative;
-    }
-    .card::before{content:"";position:absolute;left:0;top:0;right:0;height:6px;background:linear-gradient(90deg,var(--primary-dark),var(--primary-main))}
-    .card .inner{padding:16px}
-    .metricTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .icon{
-      width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;
-      background:rgba(129,199,132,.18);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark)
-    }
-    .label{color:var(--text-light);font-weight:1000}
-    .value{font-size:1.85rem;font-weight:1100;margin-top:6px}
-    .section{display:none;margin-top:14px}
-    .section.active{display:block}
-
-    table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden}
-    th,td{padding:12px 10px;border-bottom:1px solid rgba(0,0,0,.06);text-align:left;vertical-align:top}
-    th{font-size:.9rem;color:var(--text-light);font-weight:1000}
-    td{font-weight:800}
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:1000;font-size:.82rem;border:1px solid rgba(0,0,0,.10);background:#fff}
-    .tag.green{border-color:rgba(56,142,60,.18);background:rgba(129,199,132,.16);color:var(--primary-dark)}
-    .tag.orange{border-color:rgba(255,152,0,.22);background:rgba(255,152,0,.12);color:#8a4d00}
-    .tag.blue{border-color:rgba(33,150,243,.18);background:rgba(33,150,243,.10);color:#0f4e8a}
-    .tag.red{border-color:rgba(211,47,47,.22);background:rgba(211,47,47,.10);color:var(--accent-red)}
-    .rowbtns{display:flex;gap:8px;flex-wrap:wrap}
-    .smallbtn{border:none;border-radius:999px;padding:8px 10px;font-weight:1000;cursor:pointer}
-    .smallbtn.blue{background:rgba(33,150,243,.12);color:#0f4e8a;border:1px solid rgba(33,150,243,.18)}
-    .smallbtn.green{background:rgba(129,199,132,.18);color:var(--primary-dark);border:1px solid rgba(56,142,60,.18)}
-    .smallbtn.red{background:rgba(211,47,47,.10);color:var(--accent-red);border:1px solid rgba(211,47,47,.22)}
-    .smallbtn.orange{background:rgba(255,152,0,.12);color:#8a4d00;border:1px solid rgba(255,152,0,.22)}
-    .smallbtn:hover{filter:brightness(.98)}
-
-    .formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    @media(max-width:760px){.formgrid{grid-template-columns:1fr}}
-    label{display:block;font-weight:1000;margin:10px 0 6px}
-    input,select,textarea{
-      width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:12px;outline:none;font-size:1rem;background:#fff
-    }
-    input:focus,select:focus,textarea:focus{border-color:rgba(76,175,80,.55);box-shadow:0 0 0 4px rgba(76,175,80,.14)}
-    textarea{min-height:100px;resize:vertical}
-
-    .msg{display:none;margin-top:10px;padding:12px 14px;border-radius:14px;font-weight:900;line-height:1.55}
-    .msg.err{background:rgba(211,47,47,.10);border:1px solid rgba(211,47,47,.22);color:var(--accent-red)}
-    .msg.ok{background:rgba(129,199,132,.22);border:1px solid rgba(56,142,60,.18);color:var(--primary-dark)}
-    .loading{position:fixed;inset:0;background:rgba(249,249,249,.92);display:none;align-items:center;justify-content:center;z-index:5000}
-    .spinner{width:54px;height:54px;border-radius:50%;border:6px solid rgba(76,175,80,.18);border-top-color:var(--primary-main);animation:spin .9s linear infinite}
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1300px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .top-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)}
+    .btn.small{padding:8px 10px;border-radius:12px}
+    .grid{display:grid;gap:14px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media(max-width:1000px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:28px;margin:0}
+    .h2{font-size:18px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
+    .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .small{font-size:12px;color:var(--muted)}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:12px;background:#eef6ee;border:1px solid #d7ead7;color:var(--green-dark)}
+    .badge.blue{background:#e3f2fd;border-color:#bbdefb;color:#0b5aa5}
+    .badge.orange{background:#fff3e0;border-color:#ffe0b2;color:#b26a00}
+    .badge.red{background:#ffebee;border-color:#ffcdd2;color:#a10f0f}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tab{padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
+    .tab.active{background:#eef6ee;border-color:#d7ead7;color:var(--green-dark)}
+    .panel{display:none}
+    .panel.active{display:block}
+    table{width:100%;border-collapse:separate;border-spacing:0}
+    th,td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .field label{font-weight:900}
+    .field input,.field textarea,.field select{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
+    textarea{min-height:120px;resize:vertical}
+    code.inline{background:#f1f5f1;border:1px solid var(--border);padding:2px 6px;border-radius:10px}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* modal */
-    .modalBack{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:6000;padding:18px}
-    .modal{width:100%;max-width:900px;background:#fff;border-radius:18px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.10);overflow:hidden}
-    .modalHead{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(0,0,0,.08)}
-    .modalBody{padding:16px;max-height:70vh;overflow:auto}
-    .closeX{border:none;background:#fff;border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:8px 10px;font-weight:1000;cursor:pointer}
-    pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.03);padding:12px;border-radius:14px;border:1px solid rgba(0,0,0,.08)}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:220;padding:18px}
+    .modal{width:min(900px,100%);background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .modal .content{padding:14px}
+    .modal .actions{padding:14px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
   </style>
-
-  <script>
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-
-    // Tables
-    const T = {
-      profiles:'profiles',
-      tasks:'tasks',
-      donations:'donations',
-      claims:'claims',
-      volunteer:'volunteer_applications',
-      inquiries:'inquiries',
-      listings:'food_listings',
-      settings:'settings'
-    };
-
-    let supabase;
-    let user=null, profile=null;
-
-    function qs(id){ return document.getElementById(id); }
-    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
-    function showMsg(kind, html){
-      const el = qs('msg');
-      el.className = 'msg ' + kind;
-      el.innerHTML = html;
-      el.style.display = 'block';
-    }
-    function hideMsg(){ qs('msg').style.display = 'none'; }
-
-    function normalizeRole(p){
-      const raw = p?.role_id ?? p?.role ?? p?.roleId ?? p?.roleID;
-      const n = Number(raw);
-      if (Number.isFinite(n)) return n;
-      if (typeof raw==='string'){
-        const s = raw.toLowerCase();
-        if (s.includes('admin')) return 1;
-        if (s.includes('driver')||s.includes('staff')) return 2;
-        if (s.includes('volunteer')) return 3;
-      }
-      return null;
-    }
-    function displayName(p,u){ return p?.full_name || p?.name || u?.user_metadata?.full_name || u?.email || 'Admin'; }
-    function formatDate(d){
-      if(!d) return '—';
-      const dt=new Date(d); if(Number.isNaN(dt.getTime())) return '—';
-      return dt.toLocaleString();
-    }
-    function tag(status){
-      const s=(status||'').toLowerCase();
-      if(s.includes('unread')||s.includes('new')) return `<span class="tag orange"><i class="fa-solid fa-bell"></i> ${status}</span>`;
-      if(s.includes('pending')||s.includes('review')) return `<span class="tag orange"><i class="fa-solid fa-hourglass-half"></i> ${status}</span>`;
-      if(s.includes('progress')) return `<span class="tag blue"><i class="fa-solid fa-spinner"></i> ${status}</span>`;
-      if(s.includes('approved')||s.includes('complete')||s.includes('collected')||s.includes('read')) return `<span class="tag green"><i class="fa-solid fa-circle-check"></i> ${status}</span>`;
-      if(s.includes('reject')||s.includes('cancel')) return `<span class="tag red"><i class="fa-solid fa-circle-xmark"></i> ${status}</span>`;
-      return `<span class="tag">${status||'—'}</span>`;
-    }
-    function pick(obj, keys){
-      for(const k of keys){ if(obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== '') return obj[k]; }
-      return '';
-    }
-
-    // Modal
-    function openModal(title, contentObj){
-      qs('modalTitle').textContent = title;
-      qs('modalPre').textContent = JSON.stringify(contentObj, null, 2);
-      qs('modalBack').style.display='flex';
-    }
-    function closeModal(){ qs('modalBack').style.display='none'; }
-
-    async function authGuard(){
-      setLoading(true);
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      if(!data?.session?.user){
-        window.location.href='/staff-login/';
-        return;
-      }
-      user=data.session.user;
-
-      const prof = await supabase.from(T.profiles).select('*').eq('id', user.id).maybeSingle();
-      if (prof.error) throw prof.error;
-      if(!prof.data){
-        await supabase.auth.signOut();
-        window.location.href='/staff-login/';
-        return;
-      }
-      profile=prof.data;
-
-      const roleId = normalizeRole(profile);
-      if(roleId !== 1){
-        // non-admin -> push to staff
-        window.location.href='/staff/dashboard.html';
-        return;
-      }
-      qs('who').textContent = displayName(profile,user);
-      setLoading(false);
-    }
-
-    function setView(view){
-      for(const el of document.querySelectorAll('.tab')) el.classList.remove('active');
-      for(const el of document.querySelectorAll('.section')) el.classList.remove('active');
-
-      qs('tab_'+view).classList.add('active');
-      qs('sec_'+view).classList.add('active');
-
-      // load on demand
-      if(view==='home') loadHome();
-      if(view==='claims') loadClaims();
-      if(view==='donations') loadDonations();
-      if(view==='volunteer') loadVolunteer();
-      if(view==='inquiries') loadInquiries();
-      if(view==='inventory') loadInventory();
-      if(view==='users') loadUsers();
-      if(view==='tasks') { loadStaffListForTasks(); loadTasksAdmin(); }
-      if(view==='settings') loadSettings();
-    }
-
-    // Counts helper
-    async function countRows(table, filterFn){
-      let q = supabase.from(table).select('id', { count:'exact', head:true });
-      if(filterFn) q = filterFn(q);
-      const { count, error } = await q;
-      if(error) throw error;
-      return count || 0;
-    }
-
-    async function loadHome(){
-      hideMsg();
-      try{
-        const donationsNew = await countRows(T.donations, q => q.in('status', ['New','Pending']));
-        const claimsPending = await countRows(T.claims, q => q.in('status', ['New','Pending','In Review']));
-        const appsNew = await countRows(T.volunteer, q => q.in('status', ['New','Pending','In Review']));
-        const inquiriesUnread = await countRows(T.inquiries, q => q.in('status', ['Unread','New']));
-        qs('m_don').textContent = donationsNew;
-        qs('m_claim').textContent = claimsPending;
-        qs('m_app').textContent = appsNew;
-        qs('m_inq').textContent = inquiriesUnread;
-      } catch(err){
-        console.error(err);
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Home metrics failed: ${err.message}`);
-      }
-    }
-
-    // CLAIMS
-    async function loadClaims(){
-      hideMsg();
-      qs('claimsBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.claims).select('*').order('created_at',{ascending:false}).limit(200);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('claimsBody').innerHTML = `<tr><td colspan="6" class="muted">No claims found.</td></tr>`;
-          return;
-        }
-
-        qs('claimsBody').innerHTML = data.map(r=>{
-          const name = pick(r, ['full_name','name','claimer_name','recipient_name']);
-          const email = pick(r, ['email','claimer_email','recipient_email']);
-          const type = pick(r, ['request_type','claim_type','type']) || '—';
-          const listing = pick(r, ['food_title','listing_title','listing_id','food_listing']);
-          const status = pick(r, ['status']) || '—';
-
-          return `
-            <tr>
-              <td>${name || '—'}<div class="muted">${email || ''}</div></td>
-              <td>${type}</td>
-              <td>${listing || '—'}</td>
-              <td>${tag(status)}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__open('Claim', ${encodeURIComponent(JSON.stringify(r))})"><i class="fa-solid fa-eye"></i> View</button>
-                  <button class="smallbtn green" onclick="window.__setStatus('${T.claims}','${r.id}','Approved')"><i class="fa-solid fa-check"></i> Approve</button>
-                  <button class="smallbtn orange" onclick="window.__setStatus('${T.claims}','${r.id}','InProgress')"><i class="fa-solid fa-spinner"></i> In Progress</button>
-                  <button class="smallbtn red" onclick="window.__setStatus('${T.claims}','${r.id}','Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-      } catch(err){
-        console.error(err);
-        qs('claimsBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load claims.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Claims load failed: ${err.message}`);
-      }
-    }
-
-    // DONATIONS
-    async function loadDonations(){
-      hideMsg();
-      qs('donBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.donations).select('*').order('created_at',{ascending:false}).limit(200);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('donBody').innerHTML = `<tr><td colspan="6" class="muted">No donation requests found.</td></tr>`;
-          return;
-        }
-
-        qs('donBody').innerHTML = data.map(r=>{
-          const name = pick(r,['donor_name','full_name','name']);
-          const email = pick(r,['donor_email','email']);
-          const food = pick(r,['food_type','food','category']);
-          const qty = pick(r,['quantity_kg','quantity','kg']);
-          const status = pick(r,['status']) || '—';
-
-          return `
-            <tr>
-              <td>${name || '—'}<div class="muted">${email || ''}</div></td>
-              <td>${food || '—'}</td>
-              <td>${qty || '—'}</td>
-              <td>${tag(status)}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__open('Donation', ${encodeURIComponent(JSON.stringify(r))})"><i class="fa-solid fa-eye"></i> View</button>
-                  <button class="smallbtn green" onclick="window.__setStatus('${T.donations}','${r.id}','Reviewed')"><i class="fa-solid fa-check"></i> Review</button>
-                  <button class="smallbtn orange" onclick="window.__setStatus('${T.donations}','${r.id}','Scheduled')"><i class="fa-solid fa-calendar"></i> Schedule</button>
-                  <button class="smallbtn red" onclick="window.__setStatus('${T.donations}','${r.id}','Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('donBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load donations.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Donations load failed: ${err.message}`);
-      }
-    }
-
-    // VOLUNTEER APPS
-    async function loadVolunteer(){
-      hideMsg();
-      qs('volBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.volunteer).select('*').order('created_at',{ascending:false}).limit(200);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('volBody').innerHTML = `<tr><td colspan="6" class="muted">No volunteer applications found.</td></tr>`;
-          return;
-        }
-
-        qs('volBody').innerHTML = data.map(r=>{
-          const name = pick(r,['full_name','name']);
-          const email = pick(r,['email']);
-          const area = pick(r,['interest_area','area','role_interest']);
-          const status = pick(r,['status']) || '—';
-
-          return `
-            <tr>
-              <td>${name || '—'}<div class="muted">${email || ''}</div></td>
-              <td>${area || '—'}</td>
-              <td>${tag(status)}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__open('Volunteer Application', ${encodeURIComponent(JSON.stringify(r))})"><i class="fa-solid fa-eye"></i> View</button>
-                  <button class="smallbtn green" onclick="window.__setStatus('${T.volunteer}','${r.id}','Approved')"><i class="fa-solid fa-check"></i> Approve</button>
-                  <button class="smallbtn red" onclick="window.__setStatus('${T.volunteer}','${r.id}','Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('volBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load applications.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Volunteer apps load failed: ${err.message}`);
-      }
-    }
-
-    // INQUIRIES
-    async function loadInquiries(){
-      hideMsg();
-      qs('inqBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.inquiries).select('*').order('created_at',{ascending:false}).limit(200);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('inqBody').innerHTML = `<tr><td colspan="6" class="muted">No inquiries found.</td></tr>`;
-          return;
-        }
-
-        qs('inqBody').innerHTML = data.map(r=>{
-          const name = pick(r,['full_name','name']);
-          const email = pick(r,['email']);
-          const topic = pick(r,['topic','subject']) || '—';
-          const status = pick(r,['status']) || '—';
-
-          return `
-            <tr>
-              <td>${name || '—'}<div class="muted">${email || ''}</div></td>
-              <td>${topic}</td>
-              <td>${tag(status)}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__viewInquiry('${r.id}')"><i class="fa-solid fa-eye"></i> View</button>
-                  <button class="smallbtn green" onclick="window.__setStatus('${T.inquiries}','${r.id}','Read')"><i class="fa-solid fa-check"></i> Mark Read</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('inqBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load inquiries.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Inquiries load failed: ${err.message}`);
-      }
-    }
-
-    async function viewInquiry(id){
-      const { data, error } = await supabase.from(T.inquiries).select('*').eq('id', id).maybeSingle();
-      if(error) return showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> View failed: ${error.message}`);
-      openModal('Inquiry', data || {});
-      // best effort: auto mark read
-      await supabase.from(T.inquiries).update({ status:'Read' }).eq('id', id);
-      loadInquiries();
-      loadHome();
-    }
-
-    // INVENTORY (food_listings CRUD)
-    async function loadInventory(){
-      hideMsg();
-      qs('invBody').innerHTML = `<tr><td colspan="7" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.listings).select('*').order('created_at',{ascending:false}).limit(300);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('invBody').innerHTML = `<tr><td colspan="7" class="muted">No inventory items found.</td></tr>`;
-          return;
-        }
-
-        qs('invBody').innerHTML = data.map(r=>{
-          const title = pick(r,['title','food_title','name']) || '—';
-          const qty = pick(r,['quantity_kg','quantity','kg']) || '—';
-          const expiry = pick(r,['expiry_date','expires_on']) || '';
-          const loc = pick(r,['location','pickup_island','island']) || '—';
-          const avail = (r.is_available === true || String(r.is_available).toLowerCase()==='true');
-
-          return `
-            <tr>
-              <td>${title}<div class="muted">${pick(r,['description']) || ''}</div></td>
-              <td>${qty}</td>
-              <td>${expiry ? `<span class="tag">${expiry}</span>` : '—'}</td>
-              <td>${loc}</td>
-              <td>${avail ? `<span class="tag green"><i class="fa-solid fa-circle-check"></i> Available</span>` : `<span class="tag red"><i class="fa-solid fa-ban"></i> Unavailable</span>`}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__editListing('${r.id}', ${encodeURIComponent(JSON.stringify(r))})"><i class="fa-solid fa-pen"></i> Edit</button>
-                  <button class="smallbtn orange" onclick="window.__toggleAvail('${r.id}', ${avail})"><i class="fa-solid fa-toggle-on"></i> Toggle</button>
-                  <button class="smallbtn red" onclick="window.__deleteRow('${T.listings}','${r.id}', 'listing')"><i class="fa-solid fa-trash"></i> Delete</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('invBody').innerHTML = `<tr><td colspan="7" class="muted">Failed to load inventory.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Inventory load failed: ${err.message}`);
-      }
-    }
-
-    async function createListing(e){
-      e.preventDefault();
-      hideMsg();
-      setLoading(true);
-      try{
-        const payload = {
-          title: qs('l_title').value.trim(),
-          description: qs('l_desc').value.trim(),
-          quantity_kg: qs('l_qty').value ? Number(qs('l_qty').value) : null,
-          expiry_date: qs('l_exp').value || null,
-          location: qs('l_loc').value.trim(),
-          is_available: qs('l_av').value === 'true'
-        };
-        const { error } = await supabase.from(T.listings).insert([payload]);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Listing created.`);
-        e.target.reset();
-        await loadInventory();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Create failed: ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    async function editListing(id, encoded){
-      const r = JSON.parse(decodeURIComponent(encoded));
-      // prefill into form as "edit mode"
-      qs('l_editId').value = id;
-      qs('l_title').value = pick(r,['title','food_title','name']) || '';
-      qs('l_desc').value = pick(r,['description']) || '';
-      qs('l_qty').value = pick(r,['quantity_kg','quantity','kg']) || '';
-      qs('l_exp').value = pick(r,['expiry_date','expires_on']) || '';
-      qs('l_loc').value = pick(r,['location','pickup_island','island']) || '';
-      qs('l_av').value = (r.is_available === true || String(r.is_available).toLowerCase()==='true') ? 'true' : 'false';
-      qs('l_submit').textContent = 'Update Listing';
-      qs('l_cancel').style.display = 'inline-flex';
-      window.scrollTo({ top: 0, behavior:'smooth' });
-    }
-
-    async function submitListing(e){
-      e.preventDefault();
-      const editId = qs('l_editId').value;
-      if(editId) return updateListing(e, editId);
-      return createListing(e);
-    }
-
-    async function updateListing(e, id){
-      hideMsg(); setLoading(true);
-      try{
-        const payload = {
-          title: qs('l_title').value.trim(),
-          description: qs('l_desc').value.trim(),
-          quantity_kg: qs('l_qty').value ? Number(qs('l_qty').value) : null,
-          expiry_date: qs('l_exp').value || null,
-          location: qs('l_loc').value.trim(),
-          is_available: qs('l_av').value === 'true'
-        };
-        const { error } = await supabase.from(T.listings).update(payload).eq('id', id);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Listing updated.`);
-        resetListingForm();
-        await loadInventory();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Update failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    function resetListingForm(){
-      qs('listingForm').reset();
-      qs('l_editId').value='';
-      qs('l_submit').textContent='Create Listing';
-      qs('l_cancel').style.display='none';
-    }
-
-    async function toggleAvail(id, current){
-      hideMsg(); setLoading(true);
-      try{
-        const { error } = await supabase.from(T.listings).update({ is_available: !current }).eq('id', id);
-        if(error) throw error;
-        await loadInventory();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Toggle failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    // USERS
-    async function loadUsers(){
-      hideMsg();
-      qs('usersBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.profiles).select('*').order('created_at',{ascending:false}).limit(400);
-        if(error) throw error;
-
-        if(!data?.length){
-          qs('usersBody').innerHTML = `<tr><td colspan="6" class="muted">No users found.</td></tr>`;
-          return;
-        }
-
-        qs('usersBody').innerHTML = data.map(r=>{
-          const name = pick(r,['full_name','name']) || '—';
-          const email = pick(r,['email']) || '';
-          const phone = pick(r,['phone','phone_number']) || '';
-          const role = r.role_id ?? r.role ?? '—';
-
-          return `
-            <tr>
-              <td>${name}<div class="muted">${email}</div></td>
-              <td>${phone || '—'}</td>
-              <td><span class="tag">${role}</span></td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn blue" onclick="window.__open('Profile', ${encodeURIComponent(JSON.stringify(r))})"><i class="fa-solid fa-eye"></i> View</button>
-                  <button class="smallbtn orange" onclick="window.__editRole('${r.id}', '${role}')"><i class="fa-solid fa-user-gear"></i> Edit Role</button>
-                  <button class="smallbtn red" onclick="window.__deleteRow('${T.profiles}','${r.id}','profile row')"><i class="fa-solid fa-trash"></i> Delete</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('usersBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load users.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Users load failed: ${err.message}`);
-      }
-    }
-
-    async function editRole(userId, current){
-      const newRole = prompt('Enter new role ID (1=Admin, 2=Driver/Staff, 3=Volunteer Coordinator):', current);
-      if(newRole === null) return;
-      hideMsg(); setLoading(true);
-      try{
-        const { error } = await supabase.from(T.profiles).update({ role_id: Number(newRole) }).eq('id', userId);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Role updated.`);
-        await loadUsers();
-        await loadHome();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Role update failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    // TASKS (Assign + Manage)
-    let staffList = [];
-    async function loadStaffListForTasks(){
-      const { data, error } = await supabase.from(T.profiles).select('*').order('created_at',{ascending:false}).limit(400);
-      if(error) { showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Staff list failed: ${error.message}`); return; }
-
-      staffList = (data || []).filter(p=>{
-        const rid = Number(p.role_id ?? p.role);
-        return rid === 2 || rid === 3;
-      });
-
-      qs('t_assignee').innerHTML = `<option value="">-- Select Staff --</option>` + staffList.map(p=>{
-        const n = pick(p,['full_name','name']) || p.id;
-        return `<option value="${p.id}">${n}</option>`;
-      }).join('');
-    }
-
-    async function createTask(e){
-      e.preventDefault();
-      hideMsg(); setLoading(true);
-      try{
-        const payload = {
-          title: qs('t_title').value.trim(),
-          description: qs('t_desc').value.trim(),
-          priority: qs('t_priority').value,
-          assigned_to: qs('t_assignee').value,
-          status: 'Assigned'
-        };
-        if(!payload.assigned_to) throw new Error('Please select a staff member.');
-        const { error } = await supabase.from(T.tasks).insert([payload]);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Task assigned.`);
-        e.target.reset();
-        await loadTasksAdmin();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Task create failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    async function loadTasksAdmin(){
-      hideMsg();
-      qs('tasksBody').innerHTML = `<tr><td colspan="6" class="muted">Loading...</td></tr>`;
-      try{
-        const { data, error } = await supabase.from(T.tasks).select('*').order('created_at',{ascending:false}).limit(300);
-        if(error) throw error;
-        if(!data?.length){
-          qs('tasksBody').innerHTML = `<tr><td colspan="6" class="muted">No tasks found.</td></tr>`;
-          return;
-        }
-
-        const nameById = new Map(staffList.map(p=>[p.id, pick(p,['full_name','name']) || p.id]));
-
-        qs('tasksBody').innerHTML = data.map(r=>{
-          const who = nameById.get(r.assigned_to) || r.assigned_to || '—';
-          return `
-            <tr>
-              <td><b>${r.title || 'Untitled'}</b><div class="muted">${r.description || ''}</div></td>
-              <td>${r.priority ? `<span class="tag">${r.priority}</span>` : '—'}</td>
-              <td>${who}</td>
-              <td>${tag(r.status || '—')}</td>
-              <td class="muted">${formatDate(r.created_at)}</td>
-              <td>
-                <div class="rowbtns">
-                  <button class="smallbtn orange" onclick="window.__setStatus('${T.tasks}','${r.id}','InProgress')"><i class="fa-solid fa-spinner"></i> In Progress</button>
-                  <button class="smallbtn green" onclick="window.__setStatus('${T.tasks}','${r.id}','Completed')"><i class="fa-solid fa-check"></i> Complete</button>
-                  <button class="smallbtn red" onclick="window.__deleteRow('${T.tasks}','${r.id}','task')"><i class="fa-solid fa-trash"></i> Delete</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-      } catch(err){
-        console.error(err);
-        qs('tasksBody').innerHTML = `<tr><td colspan="6" class="muted">Failed to load tasks.</td></tr>`;
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Tasks load failed: ${err.message}`);
-      }
-    }
-
-    // SETTINGS (Announcement)
-    async function loadSettings(){
-      hideMsg();
-      qs('s_status').textContent = 'Loading...';
-      try{
-        const { data, error } = await supabase.from(T.settings).select('*').order('created_at',{ascending:false}).limit(1);
-        if(error) throw error;
-        const row = (data && data[0]) ? data[0] : null;
-
-        qs('s_id').value = row?.id || 1;
-        qs('s_announcement').value = row?.announcement || row?.home_announcement || '';
-        qs('s_status').textContent = row ? `Loaded setting ID ${row.id}` : 'No settings row found (will create on save).';
-      } catch(err){
-        qs('s_status').textContent = 'Failed to load.';
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Settings load failed: ${err.message}`);
-      }
-    }
-
-    async function saveSettings(e){
-      e.preventDefault();
-      hideMsg(); setLoading(true);
-      try{
-        const id = Number(qs('s_id').value) || 1;
-        const announcement = qs('s_announcement').value.trim();
-
-        const payload = { id, announcement };
-        const { error } = await supabase.from(T.settings).upsert([payload], { onConflict:'id' });
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Settings saved.`);
-        await loadSettings();
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Save failed: ${err.message} (If this mentions RLS, your settings table policy must allow Admin write.)`);
-      } finally { setLoading(false); }
-    }
-
-    // Generic helpers
-    async function setStatus(table, id, status){
-      hideMsg(); setLoading(true);
-      try{
-        const { error } = await supabase.from(table).update({ status }).eq('id', id);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Status updated to <b>${status}</b>.`);
-        await loadHome();
-        // reload current view
-        const active = document.querySelector('.tab.active')?.id?.replace('tab_','') || 'home';
-        setView(active);
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Update failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    async function deleteRow(table, id, label){
-      if(!confirm(`Delete this ${label}? This cannot be undone.`)) return;
-      hideMsg(); setLoading(true);
-      try{
-        const { error } = await supabase.from(table).delete().eq('id', id);
-        if(error) throw error;
-        showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Deleted.`);
-        await loadHome();
-        const active = document.querySelector('.tab.active')?.id?.replace('tab_','') || 'home';
-        setView(active);
-      } catch(err){
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Delete failed: ${err.message}`);
-      } finally { setLoading(false); }
-    }
-
-    async function logout(){
-      setLoading(true);
-      await supabase.auth.signOut();
-      window.location.href='/staff-login/';
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // expose
-      window.__setStatus = setStatus;
-      window.__deleteRow = deleteRow;
-      window.__editRole = editRole;
-      window.__open = (title, encoded) => openModal(title, JSON.parse(decodeURIComponent(encoded)));
-      window.__viewInquiry = viewInquiry;
-      window.__editListing = editListing;
-      window.__toggleAvail = toggleAvail;
-
-      qs('closeModal').addEventListener('click', closeModal);
-      qs('modalBack').addEventListener('click', (e)=>{ if(e.target===qs('modalBack')) closeModal(); });
-
-      qs('logoutBtn').addEventListener('click', logout);
-
-      qs('listingForm').addEventListener('submit', submitListing);
-      qs('l_cancel').addEventListener('click', (e)=>{ e.preventDefault(); resetListingForm(); });
-
-      qs('taskForm').addEventListener('submit', createTask);
-      qs('settingsForm').addEventListener('submit', saveSettings);
-
-      // tabs
-      const views = ['home','claims','donations','volunteer','inquiries','inventory','users','tasks','settings'];
-      for(const v of views){
-        qs('tab_'+v).addEventListener('click', ()=>setView(v));
-      }
-
-      try{
-        await authGuard();
-        setView('home');
-      } catch(err){
-        console.error(err);
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> ${err.message}`);
-      }
-    });
-  </script>
 </head>
-
 <body>
-  <div id="loading" class="loading"><div class="spinner"></div></div>
 
-  <div id="modalBack" class="modalBack">
-    <div class="modal">
-      <div class="modalHead">
-        <div style="font-weight:1100" id="modalTitle">Details</div>
-        <button id="closeModal" class="closeX" type="button"><i class="fa-solid fa-xmark"></i> Close</button>
-      </div>
-      <div class="modalBody">
-        <pre id="modalPre"></pre>
+  <div class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="../../">
+        <img src="../../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="row">
+        <div class="small" id="who">—</div>
+        <button class="btn small secondary" id="btnReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
       </div>
     </div>
   </div>
 
-  <header>
-    <div class="topbar">
-      <div class="brand">
-        <img src="/image/logo.png" alt="FoodShare Seychelles">
-        <span>FoodShare Seychelles — Admin</span>
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <div class="content">
+        <div class="h2" id="mTitle">Details</div>
+        <div class="sep"></div>
+        <pre id="mBody" style="white-space:pre-wrap;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;background:#f7faf7;border:1px solid var(--border);padding:12px;border-radius:16px"></pre>
       </div>
       <div class="actions">
-        <span class="pill"><i class="fa-solid fa-user"></i> <span id="who">—</span></span>
-        <button id="logoutBtn" class="btn green" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        <button class="btn secondary" id="mClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 class="h1">Admin Dashboard</h1>
+        <p class="p">Full operational control. RLS should restrict all actions to Admin role.</p>
+      </div>
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="home">Home</button>
+        <button class="tab" data-tab="claims">Claims</button>
+        <button class="tab" data-tab="donations">Donations</button>
+        <button class="tab" data-tab="volunteers">Volunteers</button>
+        <button class="tab" data-tab="inquiries">Inquiries</button>
+        <button class="tab" data-tab="inventory">Inventory</button>
+        <button class="tab" data-tab="users">Users</button>
+        <button class="tab" data-tab="tasks">Tasks</button>
+        <button class="tab" data-tab="settings">Settings</button>
       </div>
     </div>
 
-    <div class="nav">
-      <button class="tab active" id="tab_home" type="button"><i class="fa-solid fa-chart-line"></i> Home</button>
-      <button class="tab" id="tab_claims" type="button"><i class="fa-solid fa-hand-holding-heart"></i> Claims</button>
-      <button class="tab" id="tab_donations" type="button"><i class="fa-solid fa-gift"></i> Donations</button>
-      <button class="tab" id="tab_volunteer" type="button"><i class="fa-solid fa-users"></i> Volunteer Apps</button>
-      <button class="tab" id="tab_inquiries" type="button"><i class="fa-solid fa-envelope"></i> Inquiries</button>
-      <button class="tab" id="tab_inventory" type="button"><i class="fa-solid fa-boxes-stacked"></i> Inventory</button>
-      <button class="tab" id="tab_users" type="button"><i class="fa-solid fa-user-gear"></i> Users</button>
-      <button class="tab" id="tab_tasks" type="button"><i class="fa-solid fa-list-check"></i> Assign Tasks</button>
-      <button class="tab" id="tab_settings" type="button"><i class="fa-solid fa-gear"></i> Settings</button>
-    </div>
-  </header>
+    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
 
-  <main>
-    <div class="container">
-      <div id="msg" class="msg"></div>
+    <!-- HOME -->
+    <section class="panel active" id="panel-home" style="margin-top:12px">
+      <div class="grid three">
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between"><div class="h2">Claims</div><span class="badge blue" id="kClaims">—</span></div>
+          <div class="small">Total claims in system</div>
+        </div></div>
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between"><div class="h2">Donations</div><span class="badge blue" id="kDonations">—</span></div>
+          <div class="small">Total donations in system</div>
+        </div></div>
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between"><div class="h2">Listings Available</div><span class="badge" id="kListings">—</span></div>
+          <div class="small">Food listings where is_available = true</div>
+        </div></div>
+      </div>
 
-      <!-- HOME -->
-      <section class="section active" id="sec_home">
-        <div class="hero">
-          <h1>Admin Dashboard</h1>
-          <p class="muted">Live overview of pending actions across the organization.</p>
+      <div class="grid two" style="margin-top:14px">
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between"><div class="h2">Applications</div><span class="badge orange" id="kApps">—</span></div>
+          <div class="small">Volunteer applications in review/new</div>
+        </div></div>
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between"><div class="h2">Users</div><span class="badge blue" id="kUsers">—</span></div>
+          <div class="small">Total profiles (all roles)</div>
+        </div></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="bar"></div>
+        <div class="content">
+          <div class="h2">Quick Admin Notes</div>
+          <p class="p">
+            Creating staff accounts is typically done via Supabase Auth Admin (Dashboard) or an Edge Function using the service role key.
+            This admin panel can update <code class="inline">profiles.role_id</code> for existing accounts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLAIMS -->
+    <section class="panel" id="panel-claims" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">Claims Review</div>
+            <div class="small">Update status, view details, and trigger notifications.</div>
+          </div>
+          <div class="row">
+            <select id="claimsFilter" class="btn secondary" style="padding:10px 12px">
+              <option value="">All</option>
+              <option value="New">New</option>
+              <option value="InReview">InReview</option>
+              <option value="Scheduled">Scheduled</option>
+              <option value="Completed">Completed</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+            <button class="btn small secondary" id="btnClaimsReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Created</th><th>Type</th><th>Name</th><th>Listing</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="claimsRows"></tbody>
+          </table>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- DONATIONS -->
+    <section class="panel" id="panel-donations" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">Donations Review</div>
+            <div class="small">Update status, view details, and create pickup tasks.</div>
+          </div>
+          <button class="btn small secondary" id="btnDonReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Created</th><th>Donor</th><th>Island</th><th>Food</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="donRows"></tbody>
+          </table>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- VOLUNTEERS -->
+    <section class="panel" id="panel-volunteers" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">Volunteer Applications</div>
+            <div class="small">Update status. Staff account creation is handled separately (recommended via Edge Function).</div>
+          </div>
+          <button class="btn small secondary" id="btnVolReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Created</th><th>Name</th><th>Residency</th><th>LinkedIn</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="volRows"></tbody>
+          </table>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- INQUIRIES -->
+    <section class="panel" id="panel-inquiries" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">Inquiries</div>
+            <div class="small">Update status and reply to the user via notifications.</div>
+          </div>
+          <button class="btn small secondary" id="btnInqReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Created</th><th>From</th><th>Subject</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="inqRows"></tbody>
+          </table>
         </div>
 
-        <div class="grid3">
-          <div class="card"><div class="inner">
-            <div class="metricTop">
-              <div><div class="label">New Donation Requests</div><div class="value" id="m_don">—</div></div>
-              <div class="icon"><i class="fa-solid fa-gift"></i></div>
-            </div>
-            <div class="muted" style="margin-top:8px">Rows where status is New/Pending</div>
-          </div></div>
-
-          <div class="card"><div class="inner">
-            <div class="metricTop">
-              <div><div class="label">Pending Claims</div><div class="value" id="m_claim">—</div></div>
-              <div class="icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
-            </div>
-            <div class="muted" style="margin-top:8px">Claims requiring review</div>
-          </div></div>
-
-          <div class="card"><div class="inner">
-            <div class="metricTop">
-              <div><div class="label">New Volunteer Apps</div><div class="value" id="m_app">—</div></div>
-              <div class="icon"><i class="fa-solid fa-users"></i></div>
-            </div>
-            <div class="muted" style="margin-top:8px">Applications awaiting decision</div>
-          </div></div>
-
-          <div class="card"><div class="inner">
-            <div class="metricTop">
-              <div><div class="label">Unread Inquiries</div><div class="value" id="m_inq">—</div></div>
-              <div class="icon"><i class="fa-solid fa-envelope"></i></div>
-            </div>
-            <div class="muted” style="margin-top:8px">Public contact form messages</div>
-          </div></div>
+        <div class="sep"></div>
+        <div class="notice">
+          <b>Reply helper:</b> Click “Reply” on a row to send a notification response (and optionally store admin_messages if your SQL includes it).
         </div>
-      </section>
+      </div></div>
+    </section>
 
-      <!-- CLAIMS -->
-      <section class="section" id="sec_claims">
-        <div class="card"><div class="inner">
-          <h2>Claims Review</h2>
-          <p class="muted">Transport requests + self pickup requests (from the claims table).</p>
-          <div style="overflow:auto;margin-top:10px">
+    <!-- INVENTORY -->
+    <section class="panel" id="panel-inventory" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">Inventory (Food Listings)</div>
+            <div class="small">Create/edit listings. Public page reads only available items.</div>
+          </div>
+          <div class="row">
+            <button class="btn small" id="btnNewListing"><i class="fa-solid fa-plus"></i> New Listing</button>
+            <button class="btn small secondary" id="btnInvReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Created</th><th>Title</th><th>Island</th><th>Qty</th><th>Expiry</th><th>Available</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="invRows"></tbody>
+          </table>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- USERS -->
+    <section class="panel" id="panel-users" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div class="h2">User Management (Profiles)</div>
+            <div class="small">Update role_id. (Creating new auth users is done outside this panel.)</div>
+          </div>
+          <button class="btn small secondary" id="btnUsersReload"><i class="fa-solid fa-rotate"></i> Reload</button>
+        </div>
+        <div class="sep"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="userRows"></tbody>
+          </table>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- TASKS -->
+    <section class="panel" id="panel-tasks" style="margin-top:12px">
+      <div class="grid two">
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="h2">Assign Task</div>
+          <div class="small">Create tasks assigned to staff users (role 2/3).</div>
+          <div class="sep"></div>
+
+          <div class="field"><label>Title</label><input id="t_title" placeholder="e.g., Pickup donation"></div>
+          <div class="field"><label>Description</label><textarea id="t_desc" placeholder="Details, addresses, timing…"></textarea></div>
+          <div class="field"><label>Assign to</label><select id="t_assign"></select></div>
+          <div class="field"><label>Due at (optional)</label><input id="t_due" type="datetime-local"></div>
+
+          <div class="row">
+            <button class="btn blue" id="btnTaskCreate"><i class="fa-solid fa-plus"></i> Create</button>
+            <button class="btn secondary" id="btnTasksReload"><i class="fa-solid fa-rotate"></i> Reload list</button>
+          </div>
+        </div></div>
+
+        <div class="card"><div class="bar"></div><div class="content">
+          <div class="row" style="justify-content:space-between">
+            <div class="h2">All Tasks</div>
+            <span class="badge blue" id="taskTotal">—</span>
+          </div>
+          <div class="sep"></div>
+          <div style="overflow:auto">
             <table>
-              <thead><tr>
-                <th>Requester</th><th>Type</th><th>Food</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="claimsBody"></tbody>
+              <thead><tr><th>Created</th><th>Title</th><th>Assigned To</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="taskRows"></tbody>
             </table>
           </div>
         </div></div>
-      </section>
+      </div>
+    </section>
 
-      <!-- DONATIONS -->
-      <section class="section" id="sec_donations">
-        <div class="card"><div class="inner">
-          <h2>Donations</h2>
-          <p class="muted">Donation form submissions (donations table).</p>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>Donor</th><th>Food Type</th><th>Quantity</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="donBody"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </section>
+    <!-- SETTINGS -->
+    <section class="panel" id="panel-settings" style="margin-top:12px">
+      <div class="card"><div class="bar"></div><div class="content">
+        <div class="h2">Site Settings</div>
+        <div class="small">Homepage reads settings.announcement (row id = 1).</div>
+        <div class="sep"></div>
 
-      <!-- VOLUNTEER -->
-      <section class="section" id="sec_volunteer">
-        <div class="card"><div class="inner">
-          <h2>Volunteer Applications</h2>
-          <p class="muted">Applications from volunteer_applications table.</p>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>Applicant</th><th>Interest Area</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="volBody"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </section>
+        <div class="field"><label>Announcement</label><textarea id="s_announcement" placeholder="Type announcement for homepage…"></textarea></div>
+        <div class="row">
+          <button class="btn blue" id="btnSaveSettings"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          <button class="btn secondary" id="btnLoadSettings"><i class="fa-solid fa-download"></i> Load</button>
+        </div>
+      </div></div>
+    </section>
 
-      <!-- INQUIRIES -->
-      <section class="section" id="sec_inquiries">
-        <div class="card"><div class="inner">
-          <h2>General Inquiries</h2>
-          <p class="muted">Messages from the public (inquiries table).</p>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>Sender</th><th>Topic</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="inqBody"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </section>
-
-      <!-- INVENTORY -->
-      <section class="section" id="sec_inventory">
-        <div class="card"><div class="inner">
-          <h2>Inventory Management</h2>
-          <p class="muted">Add / edit / delete food listings (food_listings table).</p>
-
-          <form id="listingForm" style="margin-top:10px">
-            <input id="l_editId" type="hidden" />
-            <div class="formgrid">
-              <div>
-                <label>Title *</label>
-                <input id="l_title" required placeholder="e.g., Mixed vegetables box" />
-              </div>
-              <div>
-                <label>Quantity (kg)</label>
-                <input id="l_qty" type="number" step="0.1" placeholder="e.g., 12.5" />
-              </div>
-              <div>
-                <label>Expiry Date</label>
-                <input id="l_exp" type="date" />
-              </div>
-              <div>
-                <label>Location</label>
-                <input id="l_loc" placeholder="e.g., Mahé" />
-              </div>
-              <div style="grid-column:1/-1">
-                <label>Description</label>
-                <textarea id="l_desc" placeholder="Details about the listing"></textarea>
-              </div>
-              <div>
-                <label>Availability</label>
-                <select id="l_av">
-                  <option value="true">Available</option>
-                  <option value="false">Unavailable</option>
-                </select>
-              </div>
-              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-                <button id="l_submit" class="btn green" type="submit"><i class="fa-solid fa-plus"></i> Create Listing</button>
-                <button id="l_cancel" class="btn ghost" type="button" style="display:none"><i class="fa-solid fa-ban"></i> Cancel Edit</button>
-              </div>
-            </div>
-          </form>
-
-        </div></div>
-
-        <div class="card" style="margin-top:12px"><div class="inner">
-          <h2>Current Food Listings</h2>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>Item</th><th>Qty</th><th>Expiry</th><th>Location</th><th>Availability</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="invBody"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </section>
-
-      <!-- USERS -->
-      <section class="section" id="sec_users">
-        <div class="card"><div class="inner">
-          <h2>User Management</h2>
-          <p class="muted">All staff/admin users from profiles table (edit roles).</p>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>User</th><th>Phone</th><th>Role</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="usersBody"></tbody>
-            </table>
-          </div>
-          <p class="muted" style="margin-top:10px">
-            Note: Deleting an auth user requires server-side privileges. This delete removes the profile row only.
-          </p>
-        </div></div>
-      </section>
-
-      <!-- TASKS -->
-      <section class="section" id="sec_tasks">
-        <div class="card"><div class="inner">
-          <h2>Assign Task</h2>
-          <p class="muted">Create tasks and assign to staff (tasks table).</p>
-
-          <form id="taskForm" style="margin-top:10px">
-            <div class="formgrid">
-              <div>
-                <label>Title *</label>
-                <input id="t_title" required placeholder="e.g., Pickup donation from location" />
-              </div>
-              <div>
-                <label>Priority</label>
-                <select id="t_priority">
-                  <option value="Low">Low</option>
-                  <option value="Medium" selected>Medium</option>
-                  <option value="High">High</option>
-                  <option value="Urgent">Urgent</option>
-                </select>
-              </div>
-              <div style="grid-column:1/-1">
-                <label>Description</label>
-                <textarea id="t_desc" placeholder="Task details"></textarea>
-              </div>
-              <div>
-                <label>Assign To *</label>
-                <select id="t_assignee" required>
-                  <option value="">-- Select Staff --</option>
-                </select>
-              </div>
-              <div style="display:flex;align-items:flex-end">
-                <button class="btn green" type="submit"><i class="fa-solid fa-paper-plane"></i> Assign</button>
-              </div>
-            </div>
-          </form>
-        </div></div>
-
-        <div class="card" style="margin-top:12px"><div class="inner">
-          <h2>All Tasks</h2>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead><tr>
-                <th>Task</th><th>Priority</th><th>Assigned To</th><th>Status</th><th>Created</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="tasksBody"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </section>
-
-      <!-- SETTINGS -->
-      <section class="section" id="sec_settings">
-        <div class="card"><div class="inner">
-          <h2>Settings</h2>
-          <p class="muted">Update the Home Page announcement (settings table).</p>
-
-          <form id="settingsForm" style="margin-top:10px">
-            <div class="formgrid">
-              <div>
-                <label>Settings ID</label>
-                <input id="s_id" type="number" value="1" />
-              </div>
-              <div style="grid-column:1/-1">
-                <label>Announcement</label>
-                <textarea id="s_announcement" placeholder="Announcement text shown on the home page"></textarea>
-              </div>
-              <div style="display:flex;align-items:flex-end">
-                <button class="btn green" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              </div>
-              <div class="muted" style="display:flex;align-items:flex-end" id="s_status"></div>
-            </div>
-          </form>
-
-          <p class="muted" style="margin-top:10px">
-            If you see “row-level security policy” here, your <b>settings</b> table RLS policy must allow Admin writes.
-          </p>
-        </div></div>
-      </section>
-
-    </div>
   </main>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
+
+    function toast(type, html){
+      const el = document.getElementById("msg");
+      el.className = "notice" + (type ? " "+type : "");
+      el.innerHTML = html;
+      el.style.display = "block";
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function esc(s){ return (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+    function fmt(d){ if(!d) return "—"; try{return new Date(d).toLocaleString()}catch{return String(d)} }
+    function badgeForStatus(st){
+      const s=(st||"").toLowerCase();
+      if(s.includes("completed")||s.includes("approved")) return "badge";
+      if(s.includes("rejected")||s.includes("cancel")) return "badge red";
+      if(s.includes("review")||s.includes("scheduled")||s.includes("inprogress")||s.includes("new")) return "badge orange";
+      return "badge blue";
+    }
+
+    // modal
+    const modal = document.getElementById("modal");
+    const mTitle = document.getElementById("mTitle");
+    const mBody  = document.getElementById("mBody");
+    document.getElementById("mClose").addEventListener("click", ()=> modal.style.display="none");
+    modal.addEventListener("click", (e)=>{ if(e.target===modal) modal.style.display="none"; });
+    function showDetails(title, obj){
+      mTitle.textContent = title;
+      mBody.textContent = JSON.stringify(obj, null, 2);
+      modal.style.display="flex";
+    }
+
+    async function guardAdmin(){
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        location.href = "../../staff-login/";
+        return null;
+      }
+      const { data: u } = await supabase.auth.getUser();
+      const uid = u.user.id;
+
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("id,full_name,email,role_id")
+        .eq("id", uid)
+        .single();
+
+      if(error || !profile){
+        await supabase.auth.signOut();
+        location.href = "../../staff-login/";
+        return null;
+      }
+
+      const role = Number(profile.role_id);
+      if(role !== 1){
+        await supabase.auth.signOut();
+        location.href = "../../staff-login/";
+        return null;
+      }
+
+      document.getElementById("who").innerHTML = `<b>${esc(profile.full_name||"Admin")}</b> <span class="small">• Admin</span>`;
+      return profile;
+    }
+
+    // tabbing
+    document.getElementById("tabs").addEventListener("click", (e)=>{
+      const btn = e.target.closest("[data-tab]");
+      if(!btn) return;
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      btn.classList.add("active");
+      const t = btn.getAttribute("data-tab");
+      document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+      document.getElementById("panel-"+t).classList.add("active");
+    });
+
+    document.getElementById("btnLogout").addEventListener("click", async ()=>{
+      setLoading(true); await supabase.auth.signOut(); setLoading(false);
+      location.href = "../../staff-login/";
+    });
+    document.getElementById("btnReload").addEventListener("click", ()=> location.reload());
+
+    // ---------- loaders ----------
+    async function loadKpis(){
+      // counts (admin can see all)
+      const c1 = await supabase.from("claims").select("id",{count:"exact",head:true});
+      const c2 = await supabase.from("donations").select("id",{count:"exact",head:true});
+      const c3 = await supabase.from("food_listings").select("id",{count:"exact",head:true}).eq("is_available", true);
+      const c4 = await supabase.from("volunteer_applications").select("id",{count:"exact",head:true}).in("status", ["New","InReview"]);
+      const c5 = await supabase.from("profiles").select("id",{count:"exact",head:true});
+
+      document.getElementById("kClaims").textContent = (c1.count ?? "—");
+      document.getElementById("kDonations").textContent = (c2.count ?? "—");
+      document.getElementById("kListings").textContent = (c3.count ?? "—");
+      document.getElementById("kApps").textContent = (c4.count ?? "—");
+      document.getElementById("kUsers").textContent = (c5.count ?? "—");
+    }
+
+    async function notifyUser(user_id, title, message){
+      // Requires your notifications table to allow admin insert for any user.
+      const { error } = await supabase.from("notifications").insert({ user_id, title, message, type:"Admin" });
+      if(error) toast("error", `<b>Notification failed:</b> ${error.message}`);
+      else toast("", "<b>Notification sent.</b>");
+    }
+
+    async function loadClaims(){
+      const filter = document.getElementById("claimsFilter").value.trim();
+      let q = supabase.from("claims")
+        .select("*")
+        .order("created_at",{ascending:false})
+        .limit(200);
+      if(filter) q = q.eq("status", filter);
+
+      const { data, error } = await q;
+      if(error){ toast("error", `<b>Claims load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("claimsRows");
+      tbody.innerHTML = (data||[]).map(r=>`
+        <tr>
+          <td class="small">${fmt(r.created_at)}</td>
+          <td><span class="badge blue">${esc(r.request_type||"—")}</span></td>
+          <td>
+            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
+            <div class="small">${esc(r.email||"")}</div>
+          </td>
+          <td class="small">${esc(r.listing_id||"—")}</td>
+          <td>
+            <select data-claim-status="${r.id}" class="btn secondary" style="padding:8px 10px">
+              ${["New","InReview","Scheduled","Completed","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view="claim" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small" data-save-claim="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+              <button class="btn small blue" data-notify-claim="${r.id}"><i class="fa-solid fa-bell"></i> Notify</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="small">No claims found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view='claim']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-id");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Claim Details", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-save-claim]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-save-claim");
+          const sel = document.querySelector(`[data-claim-status="${id}"]`);
+          const status = sel?.value || "New";
+          setLoading(true);
+          const { error: upErr } = await supabase.from("claims").update({ status }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
+          else toast("", `<b>Updated.</b> Claim set to <b>${status}</b>.`);
+        });
+      });
+      tbody.querySelectorAll("[data-notify-claim]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-notify-claim");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(!obj?.user_id){ toast("warn","No user_id on this claim row (cannot notify)."); return; }
+          await notifyUser(obj.user_id, "Claim update", `Your claim status is now: ${obj.status || "Updated"}.`);
+        });
+      });
+    }
+
+    async function loadDonations(){
+      const { data, error } = await supabase.from("donations").select("*").order("created_at",{ascending:false}).limit(200);
+      if(error){ toast("error", `<b>Donations load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("donRows");
+      tbody.innerHTML = (data||[]).map(r=>`
+        <tr>
+          <td class="small">${fmt(r.created_at)}</td>
+          <td>
+            <div style="font-weight:950">${esc(r.donor_name||"—")}</div>
+            <div class="small">${esc(r.email||"")}</div>
+          </td>
+          <td class="small">${esc(r.island||"—")}</td>
+          <td class="small">${esc(r.food_type||"—")}</td>
+          <td>
+            <select data-don-status="${r.id}" class="btn secondary" style="padding:8px 10px">
+              ${["New","InReview","Approved","PickedUp","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view="don" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small" data-save-don="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+              <button class="btn small blue" data-task-from-don="${r.id}"><i class="fa-solid fa-list-check"></i> Create task</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="small">No donations found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view='don']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-id");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Donation Details", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-save-don]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-save-don");
+          const sel = document.querySelector(`[data-don-status="${id}"]`);
+          const status = sel?.value || "New";
+          setLoading(true);
+          const { error: upErr } = await supabase.from("donations").update({ status }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
+          else toast("", `<b>Updated.</b> Donation set to <b>${status}</b>.`);
+        });
+      });
+      tbody.querySelectorAll("[data-task-from-don]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-task-from-don");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(!obj) return;
+          // prefill task form tab
+          document.querySelector('[data-tab="tasks"]').click();
+          document.getElementById("t_title").value = `Pickup donation: ${obj.donor_name || id}`;
+          document.getElementById("t_desc").value =
+            `Donation ID: ${id}\nDonor: ${obj.donor_name || ""}\nPhone: ${obj.phone || ""}\nIsland: ${obj.island || ""}\nAddress: ${obj.pickup_address || ""}\nTimeframe: ${obj.pickup_timeframe || ""}\n\nFood: ${obj.food_type || ""}\nQty: ${obj.estimated_quantity || ""}\nNotes: ${obj.description || ""}`;
+          toast("", "Task form prefilled. Choose assignee and create.");
+        });
+      });
+    }
+
+    async function loadVolunteers(){
+      const { data, error } = await supabase.from("volunteer_applications").select("*").order("created_at",{ascending:false}).limit(200);
+      if(error){ toast("error", `<b>Volunteer apps load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("volRows");
+      tbody.innerHTML = (data||[]).map(r=>`
+        <tr>
+          <td class="small">${fmt(r.created_at)}</td>
+          <td>
+            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
+            <div class="small">${esc(r.email||"")}</div>
+          </td>
+          <td class="small">${esc(r.residency_status||"—")}${r.island ? " • "+esc(r.island) : ""}</td>
+          <td class="small"><a href="${esc(r.linkedin_url||"#")}" target="_blank" rel="noreferrer">Open</a></td>
+          <td>
+            <select data-vol-status="${r.id}" class="btn secondary" style="padding:8px 10px">
+              ${["New","InReview","Approved","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view="vol" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small" data-save-vol="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="6" class="small">No applications found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view='vol']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-id");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Volunteer Application", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-save-vol]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-save-vol");
+          const sel = document.querySelector(`[data-vol-status="${id}"]`);
+          const status = sel?.value || "New";
+          setLoading(true);
+          const { error: upErr } = await supabase.from("volunteer_applications").update({ status }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
+          else toast("", `<b>Updated.</b> Application set to <b>${status}</b>.`);
+        });
+      });
+    }
+
+    async function loadInquiries(){
+      const { data, error } = await supabase.from("inquiries").select("*").order("created_at",{ascending:false}).limit(200);
+      if(error){ toast("error", `<b>Inquiries load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("inqRows");
+      tbody.innerHTML = (data||[]).map(r=>`
+        <tr>
+          <td class="small">${fmt(r.created_at)}</td>
+          <td>
+            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
+            <div class="small">${esc(r.email||"")}</div>
+          </td>
+          <td class="small">${esc(r.subject||"—")}</td>
+          <td>
+            <select data-inq-status="${r.id}" class="btn secondary" style="padding:8px 10px">
+              ${["New","InReview","Resolved"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view="inq" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small" data-save-inq="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+              <button class="btn small blue" data-reply-inq="${r.id}"><i class="fa-solid fa-reply"></i> Reply</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="small">No inquiries found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view='inq']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-id");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Inquiry", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-save-inq]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-save-inq");
+          const sel = document.querySelector(`[data-inq-status="${id}"]`);
+          const status = sel?.value || "New";
+          setLoading(true);
+          const { error: upErr } = await supabase.from("inquiries").update({ status }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
+          else toast("", `<b>Updated.</b> Inquiry set to <b>${status}</b>.`);
+        });
+      });
+      tbody.querySelectorAll("[data-reply-inq]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-reply-inq");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(!obj){ return; }
+          if(!obj.user_id){ toast("warn","This inquiry row has no user_id (cannot notify)."); return; }
+
+          const reply = prompt("Type your reply (will be sent as a notification):");
+          if(!reply) return;
+
+          setLoading(true);
+          // notification
+          const { error: nErr } = await supabase.from("notifications").insert({
+            user_id: obj.user_id,
+            title: `Reply: ${obj.subject || "Inquiry"}`,
+            message: reply,
+            type: "Admin"
+          });
+          setLoading(false);
+
+          if(nErr) toast("error", `<b>Reply failed:</b> ${nErr.message}`);
+          else toast("", "<b>Reply sent.</b>");
+        });
+      });
+    }
+
+    // Inventory CRUD (simple)
+    async function loadInventory(){
+      const { data, error } = await supabase.from("food_listings").select("*").order("created_at",{ascending:false}).limit(250);
+      if(error){ toast("error", `<b>Inventory load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("invRows");
+      tbody.innerHTML = (data||[]).map(r=>`
+        <tr>
+          <td class="small">${fmt(r.created_at)}</td>
+          <td>
+            <div style="font-weight:950">${esc(r.title||"—")}</div>
+            <div class="small">${esc(r.category||"")}</div>
+          </td>
+          <td class="small">${esc(r.island||"—")}</td>
+          <td class="small">${esc(r.quantity||"—")}</td>
+          <td class="small">${r.expiry_date ? new Date(r.expiry_date).toLocaleDateString() : "—"}</td>
+          <td><span class="${r.is_available ? "badge" : "badge red"}">${r.is_available ? "Yes" : "No"}</span></td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view="inv" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small" data-toggle="${r.id}"><i class="fa-solid fa-toggle-on"></i> Toggle</button>
+              <button class="btn small danger" data-del="${r.id}"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="7" class="small">No listings found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view='inv']").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-id");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Listing", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-toggle]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-toggle");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(!obj) return;
+          setLoading(true);
+          const { error: upErr } = await supabase.from("food_listings").update({ is_available: !obj.is_available }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Toggle failed:</b> ${upErr.message}`);
+          else { toast("", "<b>Updated.</b>"); await loadInventory(); }
+        });
+      });
+      tbody.querySelectorAll("[data-del]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-del");
+          if(!confirm("Delete listing permanently?")) return;
+          setLoading(true);
+          const { error: delErr } = await supabase.from("food_listings").delete().eq("id", id);
+          setLoading(false);
+          if(delErr) toast("error", `<b>Delete failed:</b> ${delErr.message}`);
+          else { toast("", "<b>Deleted.</b>"); await loadInventory(); }
+        });
+      });
+    }
+
+    async function createNewListing(){
+      const title = prompt("Listing title:");
+      if(!title) return;
+      const island = prompt("Island (Mahé/Praslin/La Digue):") || null;
+      const qty = prompt("Quantity (e.g., 10kg / 25 meals):") || null;
+
+      setLoading(true);
+      const { error } = await supabase.from("food_listings").insert({
+        title, island, quantity: qty,
+        is_available: true,
+        urgency: "Normal"
+      });
+      setLoading(false);
+
+      if(error) toast("error", `<b>Create failed:</b> ${error.message}`);
+      else { toast("", "<b>Listing created.</b>"); await loadInventory(); }
+    }
+
+    async function loadUsers(){
+      const { data, error } = await supabase.from("profiles").select("id,full_name,email,phone,role_id").order("created_at",{ascending:false}).limit(300);
+      if(error){ toast("error", `<b>Users load failed:</b> ${error.message}`); return; }
+
+      const tbody = document.getElementById("userRows");
+      tbody.innerHTML = (data||[]).map(u=>`
+        <tr>
+          <td><div style="font-weight:950">${esc(u.full_name||"—")}</div><div class="small">${esc(u.id)}</div></td>
+          <td class="small">${esc(u.email||"—")}</td>
+          <td class="small">${esc(u.phone||"—")}</td>
+          <td>
+            <select data-role="${u.id}" class="btn secondary" style="padding:8px 10px">
+              ${[
+                {id:1,name:"Admin"},
+                {id:2,name:"Driver/Staff"},
+                {id:3,name:"Volunteer Coord"},
+                {id:4,name:"Community"}
+              ].map(r=>`<option value="${r.id}" ${Number(u.role_id)===r.id?"selected":""}>${r.id} - ${r.name}</option>`).join("")}
+            </select>
+          </td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small" data-save-role="${u.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+              <button class="btn small secondary" data-view-user="${u.id}"><i class="fa-solid fa-eye"></i> View</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="small">No users found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view-user]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-view-user");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("User Profile", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-save-role]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-save-role");
+          const sel = document.querySelector(`[data-role="${id}"]`);
+          const role_id = Number(sel.value);
+          setLoading(true);
+          const { error: upErr } = await supabase.from("profiles").update({ role_id }).eq("id", id);
+          setLoading(false);
+          if(upErr) toast("error", `<b>Role update failed:</b> ${upErr.message}`);
+          else toast("", "<b>Role updated.</b>");
+          await loadStaffDropdown();
+        });
+      });
+    }
+
+    async function loadStaffDropdown(){
+      const { data, error } = await supabase.from("profiles").select("id,full_name,role_id").in("role_id",[2,3]).order("full_name",{ascending:true}).limit(500);
+      if(error){ toast("error", `<b>Staff list failed:</b> ${error.message}`); return; }
+      const sel = document.getElementById("t_assign");
+      sel.innerHTML = `<option value="">Select staff</option>` + (data||[]).map(u=>`<option value="${u.id}">${esc(u.full_name||u.id)} (role ${u.role_id})</option>`).join("");
+    }
+
+    async function loadTasks(){
+      const { data, error } = await supabase.from("tasks").select("id,title,status,assigned_to,created_at").order("created_at",{ascending:false}).limit(250);
+      if(error){ toast("error", `<b>Tasks load failed:</b> ${error.message}`); return; }
+
+      document.getElementById("taskTotal").textContent = `${(data||[]).length} tasks`;
+
+      const tbody = document.getElementById("taskRows");
+      tbody.innerHTML = (data||[]).map(t=>`
+        <tr>
+          <td class="small">${fmt(t.created_at)}</td>
+          <td><div style="font-weight:950">${esc(t.title||"—")}</div></td>
+          <td class="small">${esc(t.assigned_to||"—")}</td>
+          <td><span class="${badgeForStatus(t.status)}">${esc(t.status||"Assigned")}</span></td>
+          <td>
+            <div class="row" style="gap:8px">
+              <button class="btn small secondary" data-view-task="${t.id}"><i class="fa-solid fa-eye"></i> View</button>
+              <button class="btn small danger" data-del-task="${t.id}"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="small">No tasks found.</td></tr>`;
+
+      tbody.querySelectorAll("[data-view-task]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-view-task");
+          const obj = (data||[]).find(x=>String(x.id)===String(id));
+          if(obj) showDetails("Task", obj);
+        });
+      });
+      tbody.querySelectorAll("[data-del-task]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const id = btn.getAttribute("data-del-task");
+          if(!confirm("Delete task?")) return;
+          setLoading(true);
+          const { error: delErr } = await supabase.from("tasks").delete().eq("id", id);
+          setLoading(false);
+          if(delErr) toast("error", `<b>Delete failed:</b> ${delErr.message}`);
+          else { toast("", "<b>Deleted.</b>"); await loadTasks(); }
+        });
+      });
+    }
+
+    async function createTask(){
+      const title = document.getElementById("t_title").value.trim();
+      const description = document.getElementById("t_desc").value.trim();
+      const assigned_to = document.getElementById("t_assign").value || null;
+      const dueRaw = document.getElementById("t_due").value;
+      const due_at = dueRaw ? new Date(dueRaw).toISOString() : null;
+
+      if(!title || !assigned_to){
+        toast("warn","Task title and assignee are required.");
+        return;
+      }
+
+      setLoading(true);
+      const { error } = await supabase.from("tasks").insert({
+        title, description: description || null,
+        assigned_to,
+        status: "Assigned",
+        due_at
+      });
+      setLoading(false);
+
+      if(error) toast("error", `<b>Create failed:</b> ${error.message}`);
+      else {
+        toast("", "<b>Task created.</b>");
+        document.getElementById("t_title").value="";
+        document.getElementById("t_desc").value="";
+        document.getElementById("t_due").value="";
+        await loadTasks();
+      }
+    }
+
+    async function loadSettings(){
+      const { data, error } = await supabase.from("settings").select("id,announcement").eq("id",1).single();
+      if(error){ toast("error", `<b>Load settings failed:</b> ${error.message}`); return; }
+      document.getElementById("s_announcement").value = data?.announcement || "";
+      toast("", "<b>Settings loaded.</b>");
+    }
+    async function saveSettings(){
+      const announcement = document.getElementById("s_announcement").value.trim();
+      setLoading(true);
+      const { error } = await supabase.from("settings").update({ announcement }).eq("id",1);
+      setLoading(false);
+      if(error) toast("error", `<b>Save failed:</b> ${error.message}`);
+      else toast("", "<b>Saved.</b> Homepage will reflect this announcement.");
+    }
+
+    // wire buttons
+    document.getElementById("btnClaimsReload").addEventListener("click", loadClaims);
+    document.getElementById("claimsFilter").addEventListener("change", loadClaims);
+    document.getElementById("btnDonReload").addEventListener("click", loadDonations);
+    document.getElementById("btnVolReload").addEventListener("click", loadVolunteers);
+    document.getElementById("btnInqReload").addEventListener("click", loadInquiries);
+    document.getElementById("btnInvReload").addEventListener("click", loadInventory);
+    document.getElementById("btnNewListing").addEventListener("click", createNewListing);
+    document.getElementById("btnUsersReload").addEventListener("click", loadUsers);
+    document.getElementById("btnTasksReload").addEventListener("click", loadTasks);
+    document.getElementById("btnTaskCreate").addEventListener("click", createTask);
+    document.getElementById("btnLoadSettings").addEventListener("click", loadSettings);
+    document.getElementById("btnSaveSettings").addEventListener("click", saveSettings);
+
+    // boot
+    (async ()=>{
+      const admin = await guardAdmin();
+      if(!admin) return;
+
+      setLoading(true);
+      await loadKpis();
+      await loadClaims();
+      await loadDonations();
+      await loadVolunteers();
+      await loadInquiries();
+      await loadInventory();
+      await loadUsers();
+      await loadStaffDropdown();
+      await loadTasks();
+      await loadSettings();
+      setLoading(false);
+    })();
+  </script>
 </body>
 </html>
