@@ -7,147 +7,130 @@
   <link rel="icon" href="../image/logo.png">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <!-- SAME THEME CSS AS HOME (kept identical for easy copy/replace) -->
   <style>
-    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1200px}
     *{box-sizing:border-box} html,body{margin:0;padding:0}
     body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
     a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
     .container{max-width:var(--maxw);margin:0 auto;padding:18px}
-    .grid{display:grid;gap:14px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid{display:grid;gap:14px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
     @media(max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
     .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
     .brand img{width:34px;height:34px;border-radius:10px}
     .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
-    .nav-links a{padding:8px 10px;border-radius:12px} .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-links a{padding:8px 10px;border-radius:12px}
+    .nav-links a:hover{background:#eef6ee;text-decoration:none}
     .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
     .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
-    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))} .card .content{padding:14px}
-    .h1{font-size:34px;line-height:1.1;margin:0} .h2{font-size:20px;margin:0}
-    .p{margin:10px 0;color:var(--muted)} .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap} .sep{height:1px;background:var(--border);margin:12px 0}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;background:#eef6ee;border:1px solid #d7ead7;color:var(--green-dark)}
-    .badge.blue{background:#e3f2fd;border-color:#bbdefb;color:#0b5aa5} .badge.orange{background:#fff3e0;border-color:#ffe0b2;color:#b26a00}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)}
+    .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
+    .card .content{padding:14px}
+    .h1{font-size:34px;margin:0}
+    .p{margin:10px 0;color:var(--muted)}
+    .sep{height:1px;background:var(--border);margin:12px 0}
     .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
-    .notice.warn{border-color:#ffe0b2;background:#fff3e0} .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
+    .notice.error{border-color:#ffcdd2;background:#ffebee}
     .small{font-size:12px;color:var(--muted)}
-    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0} .field label{font-weight:800}
-    .field input,.field select{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
-    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
-    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px} @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:12px;border:1px solid var(--border);background:#fff}
+    .tag.orange{background:#fff3e0;border-color:#ffe0b2}
+    .tag.blue{background:#e3f2fd;border-color:#bbdefb}
+    .filters{display:flex;gap:10px;flex-wrap:wrap}
+    .filters input,.filters select{padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff}
     .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
     .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
     .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:100;padding:18px}
-    .modal{width:min(760px,100%);background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-    .modal .content{padding:14px} .modal .actions{padding:14px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+    @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
   </style>
 </head>
-
 <body>
-  <!-- NAV -->
   <div class="navbar">
     <div class="container nav-inner">
       <a class="brand" href="../">
-        <img src="../image/logo.png" alt="FoodShare Seychelles logo" onerror="this.style.display='none'">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
         <span>FoodShare Seychelles</span>
       </a>
       <div class="nav-links">
         <a href="../available-food/">Find Food</a>
-        <a href="../our-impact/">Our Impact</a>
+        <a href="../donate-now/">Donate</a>
+        <a href="../volunteer-now/">Volunteer</a>
+        <a href="../our-impact/">Impact</a>
         <a href="../about/">About</a>
         <a href="../our-partners/">Partners</a>
         <a href="../staff-login/">Staff Login</a>
       </div>
-      <div class="nav-cta" id="navAuth">
-        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
-        <a class="btn small secondary" href="../account/login/">Login</a>
-        <a class="btn small" href="../account/signup/">Sign up</a>
-      </div>
+      <div class="nav-cta" id="navAuth"></div>
     </div>
   </div>
 
-  <!-- LOADING -->
   <div class="loading" id="loading">
     <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
   </div>
 
   <main class="container">
-    <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="row" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
       <div>
         <h1 class="h1">Available Food</h1>
-        <p class="p">Browsing is public. To submit a claim, you must be logged in.</p>
+        <p class="p">Browse listings. To submit a claim, you must be logged in.</p>
       </div>
-      <div class="row">
-        <a class="btn secondary" href="../account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        <a class="btn" href="../account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
+      <div class="row" style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <a class="btn secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
       </div>
     </div>
+
+    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
 
     <div class="card" style="margin-top:12px">
       <div class="bar"></div>
       <div class="content">
-        <div class="grid three">
-          <div class="field">
-            <label>Island</label>
-            <select id="f_island">
-              <option value="">All</option>
-              <option>Mahé</option>
-              <option>Praslin</option>
-              <option>La Digue</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Category</label>
-            <input id="f_category" placeholder="e.g., Produce, Bakery, Prepared">
-          </div>
-          <div class="field">
-            <label>Search</label>
-            <input id="f_q" placeholder="title / notes">
-          </div>
-        </div>
-        <div class="row" style="justify-content:space-between">
-          <div class="small" id="count">—</div>
-          <div class="row">
-            <button class="btn small secondary" id="btnClear"><i class="fa-solid fa-eraser"></i> Clear</button>
-            <button class="btn small" id="btnRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-          </div>
+        <div class="filters">
+          <input id="q" placeholder="Search title/description…">
+          <select id="island">
+            <option value="">All islands</option>
+            <option>Mahé</option>
+            <option>Praslin</option>
+            <option>La Digue</option>
+          </select>
+          <select id="category">
+            <option value="">All categories</option>
+            <option>Produce</option>
+            <option>Cooked Meals</option>
+            <option>Bakery</option>
+            <option>Dry Goods</option>
+            <option>Dairy</option>
+            <option>Other</option>
+          </select>
+          <select id="urgency">
+            <option value="">All urgency</option>
+            <option>Normal</option>
+            <option>High</option>
+            <option>Urgent</option>
+          </select>
+          <button class="btn small secondary" id="btnApply"><i class="fa-solid fa-filter"></i> Apply</button>
         </div>
       </div>
     </div>
 
-    <div class="grid three" id="list" style="margin-top:12px"></div>
-
-    <!-- Modal -->
-    <div class="modal-backdrop" id="modal">
-      <div class="modal">
-        <div class="content">
-          <div class="h2">Claim this listing</div>
-          <p class="p" id="m_desc">—</p>
-          <div class="notice warn" id="m_warn" style="display:none"></div>
-        </div>
-        <div class="actions">
-          <button class="btn secondary" id="m_close">Close</button>
-          <a class="btn blue" id="m_transport" href="#"><i class="fa-solid fa-truck"></i> Request Transport</a>
-          <a class="btn" id="m_pickup" href="#"><i class="fa-solid fa-person-walking"></i> Self Pickup</a>
-        </div>
-      </div>
-    </div>
+    <div id="list" class="grid two" style="margin-top:12px"></div>
   </main>
 
-  <!-- FOOTER -->
   <div class="footer">
     <div class="container">
       <div class="cols">
         <div>
-          <div class="badge"><i class="fa-solid fa-leaf"></i> Reduce food waste • Feed communities</div>
-          <p class="p">To contact without an account: <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></p>
+          <div class="notice"><b>Contact (no login):</b> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></div>
+          <p class="small" style="margin-top:10px">Forms require login for dashboard replies and notifications.</p>
         </div>
         <div>
           <div class="h2" style="margin-bottom:8px">Learn</div>
@@ -167,167 +150,178 @@
         </div>
       </div>
       <div class="sep"></div>
-      <div class="row" style="justify-content:space-between">
+      <div class="row" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
         <div class="small">Powered by Supabase</div>
       </div>
     </div>
   </div>
+
   <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-    const SUPABASE_URL = "https://edotvuleaydztulkxehe.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw";
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
 
     const loading = document.getElementById("loading");
-    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+    const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
+    const msg = document.getElementById("msg");
+    const list = document.getElementById("list");
+
+    function toast(type, html){
+      msg.className = "notice" + (type ? " "+type : "");
+      msg.innerHTML = html;
+      msg.style.display = "block";
+    }
+    function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+    function fmtDate(d){
+      if(!d) return "—";
+      try{ return new Date(d).toLocaleDateString(); }catch{ return String(d); }
+    }
 
     async function setNav(){
       const nav = document.getElementById("navAuth");
       const { data } = await supabase.auth.getSession();
-      const session = data.session;
-
-      if(session){
+      if(!data.session){
         nav.innerHTML = `
-          <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+          <a class="btn small secondary" href="../account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a class="btn small" href="../account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
+        `;
+      }else{
+        nav.innerHTML = `
           <a class="btn small secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
           <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         `;
         document.getElementById("btnLogout").addEventListener("click", async ()=>{
-          setLoading(true);
-          await supabase.auth.signOut();
-          setLoading(false);
-          location.href = "../";
+          setLoading(true); await supabase.auth.signOut(); setLoading(false);
+          location.reload();
         });
       }
     }
 
-    const elList = document.getElementById("list");
-    const elCount = document.getElementById("count");
-
-    const modal = document.getElementById("modal");
-    const mDesc = document.getElementById("m_desc");
-    const mWarn = document.getElementById("m_warn");
-    const mTransport = document.getElementById("m_transport");
-    const mPickup = document.getElementById("m_pickup");
-    document.getElementById("m_close").addEventListener("click", ()=> modal.style.display = "none");
-    modal.addEventListener("click", (e)=>{ if(e.target===modal) modal.style.display="none"; });
-
-    let cached = [];
-
-    function cardHtml(l){
-      const expiry = l.expiry_date ? new Date(l.expiry_date).toLocaleDateString() : "—";
-      const urgency = (l.urgency || "").toLowerCase();
-      let badge = `<span class="badge"><i class="fa-solid fa-circle-info"></i> Available</span>`;
-      if(urgency.includes("high")) badge = `<span class="badge orange"><i class="fa-solid fa-triangle-exclamation"></i> Urgent</span>`;
+    function renderCard(x){
+      const urgency = (x.urgency||"Normal");
+      const urgCls = urgency==="Urgent" ? "orange" : urgency==="High" ? "blue" : "";
+      const exp = x.expiry_date ? fmtDate(x.expiry_date) : "—";
 
       return `
         <div class="card">
           <div class="bar"></div>
           <div class="content">
-            <div class="row" style="justify-content:space-between">
-              <div class="h2">${l.title}</div>
-              ${badge}
+            <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap">
+              <div>
+                <div style="font-weight:950;font-size:18px">${esc(x.title||"—")}</div>
+                <div class="small">${esc(x.island||"—")} • ${esc(x.category||"Other")}</div>
+              </div>
+              <div class="tag ${urgCls}"><i class="fa-solid fa-bolt"></i> ${esc(urgency)}</div>
             </div>
-            <div class="p">${l.description || ""}</div>
-            <div class="row" style="gap:8px; margin:10px 0">
-              <span class="badge blue"><i class="fa-solid fa-location-dot"></i> ${l.island || "—"}</span>
-              <span class="badge"><i class="fa-solid fa-box"></i> ${l.quantity || "—"}</span>
-              <span class="badge"><i class="fa-solid fa-calendar"></i> Exp: ${expiry}</span>
-            </div>
-            ${l.pickup_notes ? `<div class="small"><b>Pickup notes:</b> ${l.pickup_notes}</div>` : ""}
+
             <div class="sep"></div>
-            <button class="btn small" data-claim="${l.id}"><i class="fa-solid fa-hand"></i> Claim</button>
+
+            <div class="small">${esc(x.description||"")}</div>
+            <div class="sep"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <span class="tag"><i class="fa-solid fa-weight-scale"></i> ${esc(x.quantity||"—")}</span>
+              <span class="tag"><i class="fa-solid fa-calendar"></i> Exp: ${exp}</span>
+            </div>
+
+            <div class="sep"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn small blue" data-claim="transport" data-id="${x.id}" data-title="${esc(x.title||"")}">
+                <i class="fa-solid fa-truck"></i> Request Transport
+              </button>
+              <button class="btn small" data-claim="pickup" data-id="${x.id}" data-title="${esc(x.title||"")}">
+                <i class="fa-solid fa-person-walking"></i> Self Pickup
+              </button>
+              <button class="btn small secondary" data-view="1" data-id="${x.id}"><i class="fa-solid fa-eye"></i> Details</button>
+            </div>
+
+            <div class="small" style="margin-top:10px">
+              Claims require login. No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+            </div>
           </div>
         </div>
       `;
     }
 
-    async function openClaim(listing){
-      const { data } = await supabase.auth.getSession();
-      const session = data.session;
+    async function load(){
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const island = document.getElementById("island").value.trim();
+      const category = document.getElementById("category").value.trim();
+      const urgency = document.getElementById("urgency").value.trim();
 
-      if(!session){
-        modal.style.display = "flex";
-        mDesc.textContent = "Login required";
-        mWarn.style.display = "block";
-        mWarn.innerHTML = `You must be logged in to submit a claim.
-          <div class="small" style="margin-top:6px">
-            <a href="../account/login/?next=%2Frequest-transport%2F"><b>Login</b></a> or
-            <a href="../account/signup/"><b>create an account</b></a>.
-          </div>`;
-        mTransport.href = `../account/login/?next=%2Frequest-transport%2F`;
-        mPickup.href = `../account/login/?next=%2Fself-pickup%2F`;
+      setLoading(true);
+      let req = supabase.from("food_listings")
+        .select("id,title,description,quantity,expiry_date,island,category,urgency,pickup_notes,created_at")
+        .eq("is_available", true)
+        .order("created_at",{ascending:false})
+        .limit(200);
+
+      if(island) req = req.eq("island", island);
+      if(category) req = req.eq("category", category);
+      if(urgency) req = req.eq("urgency", urgency);
+
+      const { data, error } = await req;
+      setLoading(false);
+
+      if(error){
+        toast("error", `<b>Failed to load listings:</b> ${error.message}`);
+        list.innerHTML = "";
         return;
       }
 
-      localStorage.setItem("fs_selected_listing", JSON.stringify({
-        id: listing.id,
-        title: listing.title,
-        island: listing.island,
-        expiry_date: listing.expiry_date
-      }));
+      const filtered = (data||[]).filter(x=>{
+        if(!q) return true;
+        const hay = `${x.title||""} ${x.description||""}`.toLowerCase();
+        return hay.includes(q);
+      });
 
-      modal.style.display = "flex";
-      mWarn.style.display = "none";
-      mDesc.textContent = `${listing.title} • ${listing.quantity || "Quantity not specified"} • ${listing.island || "—"}`;
-      mTransport.href = `../request-transport/`;
-      mPickup.href = `../self-pickup/`;
-    }
+      list.innerHTML = filtered.map(renderCard).join("") || `
+        <div class="notice warn" style="grid-column:1/-1">
+          <b>No listings found.</b> Please check back later.
+        </div>
+      `;
 
-    function applyFilters(){
-      const island = document.getElementById("f_island").value.trim().toLowerCase();
-      const category = document.getElementById("f_category").value.trim().toLowerCase();
-      const q = document.getElementById("f_q").value.trim().toLowerCase();
+      // wire claim buttons
+      list.querySelectorAll("[data-claim]").forEach(btn=>{
+        btn.addEventListener("click", async ()=>{
+          const type = btn.getAttribute("data-claim");
+          const id = btn.getAttribute("data-id");
+          const title = btn.getAttribute("data-title");
 
-      let rows = cached.slice();
-      if(island) rows = rows.filter(r => (r.island||"").toLowerCase() === island);
-      if(category) rows = rows.filter(r => (r.category||"").toLowerCase().includes(category));
-      if(q) rows = rows.filter(r => (r.title||"").toLowerCase().includes(q) || (r.description||"").toLowerCase().includes(q) || (r.pickup_notes||"").toLowerCase().includes(q));
+          // save selection for next page
+          localStorage.setItem("fs_selected_listing", JSON.stringify({ id, title }));
 
-      elCount.textContent = `${rows.length} listing(s)`;
-      elList.innerHTML = rows.map(cardHtml).join("");
+          const { data: sess } = await supabase.auth.getSession();
+          if(!sess.session){
+            location.href = `../account/login/?next=${encodeURIComponent("/available-food/")}`;
+            return;
+          }
 
-      elList.querySelectorAll("[data-claim]").forEach(btn=>{
+          if(type === "transport") location.href = "../request-transport/";
+          else location.href = "../self-pickup/";
+        });
+      });
+
+      // details
+      list.querySelectorAll("[data-view]").forEach(btn=>{
         btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-claim");
-          const listing = cached.find(x=>x.id===id);
-          if(listing) openClaim(listing);
+          const id = btn.getAttribute("data-id");
+          const obj = (filtered||[]).find(x=>String(x.id)===String(id));
+          if(!obj) return;
+          alert(
+            `Title: ${obj.title||""}\nIsland: ${obj.island||""}\nCategory: ${obj.category||""}\nUrgency: ${obj.urgency||""}\nQuantity: ${obj.quantity||""}\nExpiry: ${obj.expiry_date||""}\n\nNotes: ${obj.pickup_notes||""}\n\nDescription:\n${obj.description||""}`
+          );
         });
       });
     }
 
-    async function load(){
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("food_listings")
-        .select("id,title,description,category,quantity,expiry_date,island,urgency,pickup_notes")
-        .eq("is_available", true)
-        .order("expiry_date", { ascending:true });
-
-      setLoading(false);
-
-      if(error){
-        elCount.textContent = "Failed to load listings.";
-        elList.innerHTML = `<div class="notice error">Error: ${error.message}</div>`;
-        return;
-      }
-
-      cached = data || [];
-      applyFilters();
-    }
-
-    document.getElementById("btnRefresh").addEventListener("click", load);
-    document.getElementById("btnClear").addEventListener("click", ()=>{
-      document.getElementById("f_island").value = "";
-      document.getElementById("f_category").value = "";
-      document.getElementById("f_q").value = "";
-      applyFilters();
-    });
-    ["f_island","f_category","f_q"].forEach(id => document.getElementById(id).addEventListener("input", applyFilters));
+    document.getElementById("btnApply").addEventListener("click", load);
 
     (async ()=>{
       await setNav();
