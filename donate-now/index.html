@@ -1,499 +1,278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Donate Now — FoodShare Seychelles</title>
-
-  <link rel="icon" href="/image/logo.png" type="image/png" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-
-  <!-- Leaflet (no key required) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-
+  <link rel="icon" href="../image/logo.png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --transition-speed:0.35s;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:var(--font-sans); color:var(--text-dark); background:var(--neutral-bg); min-height:100vh; display:flex; flex-direction:column; }
-    a { text-decoration:none; color:var(--primary-main); }
-    a:hover { color:var(--primary-dark); }
-    main { flex-grow:1; padding:40px 0; }
-    h1,h2,h3 { font-family:var(--font-serif); color:var(--primary-dark); }
-    .content-container { max-width:980px; margin:0 auto; padding:0 25px; }
-
-    /* NAVBAR */
-    #navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 25px; background-color:var(--neutral-card); box-shadow:0 4px 12px rgba(0,0,0,0.08); position:sticky; top:0; z-index:1000; }
-    .logo-container { display:flex; align-items:center; font-size:1.6em; font-weight:bold; color:var(--text-dark); }
-    .logo-img { height:40px; margin-right:10px; }
-    .nav-links-container { display:flex; gap:22px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
-    .nav-link { font-weight:600; padding:8px 0; position:relative; color:var(--text-dark); }
-    .nav-link::after { content:''; position:absolute; width:0; height:2px; bottom:-5px; left:0; background-color:var(--primary-main); transition:width var(--transition-speed); }
-    .nav-link:hover::after { width:100%; }
-    .cta-button { background-color:var(--primary-main); color:#fff; border-radius:999px; padding:10px 18px; font-weight:800; box-shadow:0 10px 18px rgba(0,0,0,0.10); }
-    .cta-button:hover { background-color:var(--primary-dark); }
-    .staff-login { opacity:.9; }
-
-    /* FOOTER */
-    #main-footer { margin-top:auto; background-color:#222; color:var(--neutral-bg); padding:50px 0 20px; font-size:0.9em; }
-    .footer-content { display:flex; justify-content:space-between; flex-wrap:wrap; margin-bottom:30px; max-width:1200px; margin:0 auto 30px; padding:0 25px; gap:18px; }
-    .footer-section { width:20%; min-width:180px; margin-bottom:20px; }
-    .footer-section h3 { color:var(--primary-light); margin-bottom:14px; font-size:1.1em; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:6px; }
-    .footer-section a { color:var(--neutral-bg); display:block; padding:3px 0; }
-    .footer-section a:hover { color:var(--primary-main); text-decoration:underline; }
-    .footer-bottom { text-align:center; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); color:#aaa; font-size:0.85em; }
-
-    /* Card */
-    .panel {
-      background:var(--neutral-card);
-      border-radius:18px;
-      box-shadow:var(--shadow-subtle);
-      border:1px solid rgba(56,142,60,0.14);
-      overflow:hidden;
-      position:relative;
-    }
-    .panel::before{
-      content:"";
-      position:absolute; left:0; top:0; right:0; height:7px;
-      background:linear-gradient(90deg, var(--primary-dark), var(--primary-main), var(--primary-light));
-    }
-    .panel-inner{ padding:22px; }
-    .head h1{ font-size:2rem; margin-bottom:6px; }
-    .sub{ color:var(--text-light); line-height:1.7; }
-
-    form { margin-top:16px; }
-    label { display:block; font-weight:900; margin:12px 0 6px; }
-    input, select, textarea {
-      width:100%;
-      padding:12px 12px;
-      border:1px solid #d0d5dd;
-      border-radius:12px;
-      outline:none;
-      font-size:1rem;
-      background:#fff;
-    }
-    input:focus, textarea:focus, select:focus{
-      border-color: rgba(76,175,80,0.55);
-      box-shadow: 0 0 0 4px rgba(76,175,80,0.14);
-    }
-    textarea { resize: vertical; min-height: 100px; }
-
-    .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width: 680px){ .row{ grid-template-columns:1fr; } }
-
-    .map-box{
-      margin-top:10px;
-      border-radius:14px;
-      overflow:hidden;
-      border:1px solid rgba(0,0,0,0.10);
-      background:#fff;
-    }
-    #map{ width:100%; height:320px; }
-
-    .helper-row{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;
-    }
-    .mini-btn{
-      border:none;
-      background:#fff;
-      border:1px solid rgba(56,142,60,0.22);
-      color:var(--primary-dark);
-      font-weight:900;
-      border-radius:999px;
-      padding:10px 12px;
-      cursor:pointer;
-    }
-    .mini-btn:hover{ background:rgba(129,199,132,0.12); }
-
-    .btn{
-      width:100%;
-      margin-top:16px;
-      border:none;
-      border-radius:999px;
-      padding:12px 14px;
-      background:var(--primary-main);
-      color:#fff;
-      font-weight:900;
-      font-size:1.05rem;
-      cursor:pointer;
-      box-shadow:0 12px 22px rgba(0,0,0,0.12);
-    }
-    .btn:hover{ background:var(--primary-dark); }
-    .btn:disabled{ opacity:.65; cursor:not-allowed; }
-
-    .msg{
-      display:none;
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      font-weight:900;
-      line-height:1.55;
-    }
-    .msg.ok{ background:rgba(129,199,132,0.22); color:var(--primary-dark); border:1px solid rgba(56,142,60,0.18); }
-    .msg.err{ background:rgba(211,47,47,0.10); color:var(--accent-red); border:1px solid rgba(211,47,47,0.22); }
-    .msg.info{ background:rgba(33,150,243,0.10); color:#0f4e8a; border:1px solid rgba(33,150,243,0.18); }
-
-    /* Loading */
-    .loading {
-      position:fixed; inset:0; background:rgba(249,249,249,0.92);
-      display:none; align-items:center; justify-content:center; z-index:5000;
-    }
-    .spinner {
-      width:54px; height:54px; border-radius:50%;
-      border:6px solid rgba(76,175,80,0.18);
-      border-top-color: var(--primary-main);
-      animation: spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg);} }
+    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
+    .grid{display:grid;gap:14px} .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))} .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    @media(max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
+    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
+    .brand img{width:34px;height:34px;border-radius:10px}
+    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{padding:8px 10px;border-radius:12px} .nav-links a:hover{background:#eef6ee;text-decoration:none}
+    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
+    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
+    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))} .card .content{padding:14px}
+    .h1{font-size:34px;line-height:1.1;margin:0} .h2{font-size:20px;margin:0}
+    .p{margin:10px 0;color:var(--muted)} .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
+    .notice.warn{border-color:#ffe0b2;background:#fff3e0} .notice.error{border-color:#ffcdd2;background:#ffebee}
+    .small{font-size:12px;color:var(--muted)}
+    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+    .field label{font-weight:800}
+    .field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
+    textarea{min-height:120px;resize:vertical}
+    code.inline{background:#f1f5f1;border:1px solid var(--border);padding:2px 6px;border-radius:10px}
+    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
+    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px} @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
+    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
+    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
-
-  <script>
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-
-    let supabase;
-
-    let map, marker;
-    let chosenLatLng = null;
-    let chosenAddress = '';
-
-    function qs(id){ return document.getElementById(id); }
-    function setLoading(on){ qs('loading').style.display = on ? 'flex' : 'none'; }
-
-    function showMsg(kind, html){
-      const el = qs('msg');
-      el.className = 'msg ' + kind;
-      el.innerHTML = html;
-      el.style.display = 'block';
-    }
-
-    async function reverseGeocode(lat, lng){
-      try{
-        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
-        const r = await fetch(url, { headers: { 'Accept':'application/json' }});
-        if (!r.ok) throw new Error('reverse failed');
-        const j = await r.json();
-        chosenAddress = j?.display_name ? j.display_name : '';
-      } catch {
-        chosenAddress = '';
-      }
-    }
-
-    function paint(){
-      qs('pickupCoords').value = chosenLatLng ? `${chosenLatLng.lat.toFixed(6)}, ${chosenLatLng.lng.toFixed(6)}` : '';
-      if (chosenAddress) qs('pickupAddress').value = chosenAddress;
-    }
-
-    function initMap(lat, lng){
-      map = L.map('map').setView([lat, lng], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
-
-      marker = L.marker([lat, lng], { draggable:true }).addTo(map);
-      chosenLatLng = { lat, lng };
-
-      marker.on('dragend', async () => {
-        const p = marker.getLatLng();
-        chosenLatLng = { lat: p.lat, lng: p.lng };
-        await reverseGeocode(p.lat, p.lng);
-        paint();
-      });
-
-      map.on('click', async (e) => {
-        marker.setLatLng(e.latlng);
-        chosenLatLng = { lat: e.latlng.lat, lng: e.latlng.lng };
-        await reverseGeocode(e.latlng.lat, e.latlng.lng);
-        paint();
-      });
-    }
-
-    async function useGps(){
-      if (!navigator.geolocation){
-        showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> GPS not supported on this device.`);
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-
-        if (!map){
-          initMap(lat, lng);
-        } else {
-          map.setView([lat, lng], 14);
-          marker.setLatLng([lat, lng]);
-          chosenLatLng = { lat, lng };
-        }
-        await reverseGeocode(lat, lng);
-        paint();
-      }, () => {
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> GPS permission denied. You can still set location using the map pin.`);
-      }, { enableHighAccuracy:true, timeout:10000 });
-    }
-
-    async function ipSeed(){
-      try{
-        const r = await fetch('https://ipapi.co/json/');
-        if (!r.ok) throw new Error('ip failed');
-        const j = await r.json();
-        if (j?.latitude && j?.longitude){
-          return { lat: parseFloat(j.latitude), lng: parseFloat(j.longitude) };
-        }
-      } catch {}
-      // fallback to Seychelles center
-      return { lat: -4.6796, lng: 55.4522 };
-    }
-
-    function val(id){ return qs(id).value.trim(); }
-
-    async function submitDonation(e){
-      e.preventDefault();
-      qs('msg').style.display = 'none';
-
-      if (!chosenLatLng){
-        return showMsg('err', `<i class="fa-solid fa-map-location-dot"></i> Please select your pickup location using the map pin.`);
-      }
-
-      const donor_name = val('donorName');
-      const donor_email = val('donorEmail');
-      const donor_phone = val('donorPhone');
-
-      const food_type = qs('foodType').value;
-      const quantity = parseFloat(qs('quantityKg').value);
-      const expiry_date = qs('expiryDate').value || null;
-      const storage_type = qs('storageType').value;
-      const description = val('description');
-
-      const pickup_island = qs('pickupIsland').value;
-      const preferred_pickup_time = val('pickupTime');
-      const pickup_address = val('pickupAddress');
-
-      if (!food_type) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Please select a food type.`);
-      if (!pickup_island) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Please select an island location.`);
-      if (!Number.isFinite(quantity) || quantity <= 0) return showMsg('err', `<i class="fa-solid fa-triangle-exclamation"></i> Please enter a valid quantity (kg).`);
-
-      const btn = qs('submitBtn');
-      btn.disabled = true;
-      btn.textContent = 'Submitting...';
-
-      // Insert payload (supports common donation schemas)
-      const payload = {
-        donor_name,
-        donor_email,
-        donor_phone,
-        food_type,
-        quantity_kg: quantity,
-        expiry_date,
-        storage_type,
-        description,
-        pickup_address,
-        pickup_island,
-        preferred_pickup_time,
-        pickup_lat: chosenLatLng.lat,
-        pickup_lng: chosenLatLng.lng,
-        status: 'New'
-      };
-
-      const { error } = await supabase.from('donations').insert([payload]);
-
-      if (error){
-        console.error(error);
-        btn.disabled = false;
-        btn.textContent = 'Submit Donation Request';
-        return showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Submission failed: ${error.message}`);
-      }
-
-      showMsg('ok', `<i class="fa-solid fa-circle-check"></i> Thank you, <b>${donor_name}</b>. Your donation request has been submitted successfully.`);
-      qs('donationForm').reset();
-      qs('pickupCoords').value = '';
-      qs('pickupAddress').value = '';
-      btn.style.display = 'none';
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // Wait for Leaflet (defer)
-      const waitLeaflet = () => new Promise((resolve) => {
-        const t = setInterval(() => { if (window.L) { clearInterval(t); resolve(); } }, 60);
-      });
-
-      try{
-        setLoading(true);
-        await waitLeaflet();
-
-        const seed = await ipSeed();
-        initMap(seed.lat, seed.lng);
-        await reverseGeocode(seed.lat, seed.lng);
-        paint();
-
-        qs('gpsBtn').addEventListener('click', useGps);
-        qs('donationForm').addEventListener('submit', submitDonation);
-      } catch (e){
-        console.error(e);
-        showMsg('err', `<i class="fa-solid fa-circle-xmark"></i> Page error: ${e.message || e}`);
-      } finally {
-        setLoading(false);
-      }
-    });
-  </script>
 </head>
-
 <body>
-  <div id="loading" class="loading"><div class="spinner"></div></div>
+  <div class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="../">
+        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
+        <span>FoodShare Seychelles</span>
+      </a>
+      <div class="nav-links">
+        <a href="../available-food/">Find Food</a>
+        <a href="../our-impact/">Our Impact</a>
+        <a href="../about/">About</a>
+        <a href="../our-partners/">Partners</a>
+        <a href="../staff-login/">Staff Login</a>
+      </div>
+      <div class="nav-cta" id="navAuth"></div>
+    </div>
+  </div>
 
-  <header id="navbar">
-    <a href="/" class="logo-container">
-      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-    </a>
+  <div class="loading" id="loading">
+    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+  </div>
 
-    <nav class="nav-links-container">
-      <a href="/available-food/" class="nav-link">Find Food</a>
-      <a href="/donate-now/" class="nav-link">Donate</a>
-      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
-      <a href="/our-impact/" class="nav-link">Impact</a>
-      <a href="/about/" class="nav-link">About Us</a>
-      <a href="/donate-now/" class="cta-button">DONATE NOW</a>
-      <a href="/staff-login/" class="staff-login nav-link">Staff Login</a>
-    </nav>
-  </header>
+  <main class="container">
+    <div class="row" style="justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 class="h1">Donate Food</h1>
+        <p class="p">Login required so we can reply and coordinate pickup via your dashboard notifications.</p>
+      </div>
+      <div class="row">
+        <a class="btn secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+        <a class="btn" href="../available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+      </div>
+    </div>
 
-  <main>
-    <div class="content-container">
-      <section class="panel">
-        <div class="panel-inner">
-          <div class="head">
-            <h1><i class="fa-solid fa-gift"></i> Donate Food</h1>
-            <div class="sub">
-              Help us rescue safe surplus food before it goes to waste. Submit a request and our team will contact you to schedule collection.
+    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
+
+    <div class="card" style="margin-top:12px">
+      <div class="bar"></div>
+      <div class="content">
+        <div class="grid two">
+          <div>
+            <div class="field"><label>Full name / Organization</label><input id="donor_name" placeholder="e.g., John Doe / Company"></div>
+            <div class="grid two">
+              <div class="field"><label>Email</label><input id="email" type="email" placeholder="you@example.com"></div>
+              <div class="field"><label>Phone</label><input id="phone" placeholder="+248 …"></div>
+            </div>
+            <div class="grid two">
+              <div class="field">
+                <label>Island</label>
+                <select id="island">
+                  <option value="">Select</option>
+                  <option>Mahé</option>
+                  <option>Praslin</option>
+                  <option>La Digue</option>
+                </select>
+              </div>
+              <div class="field"><label>Pickup timeframe</label><input id="pickup_timeframe" placeholder="e.g., Today 2pm–5pm"></div>
+            </div>
+            <div class="field"><label>Pickup address / notes</label><input id="pickup_address" placeholder="Address, landmark, instructions"></div>
+
+            <div class="notice" style="margin-top:10px">
+              <b>Location (optional):</b>
+              <div class="small">Click “Use my location” to capture coordinates for staff routing.</div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn small secondary" id="btnGeo"><i class="fa-solid fa-location-crosshairs"></i> Use my location</button>
+                <span class="small">Lat: <code class="inline" id="lat">—</code> Lng: <code class="inline" id="lng">—</code></span>
+              </div>
             </div>
           </div>
 
-          <div id="msg" class="msg"></div>
-
-          <form id="donationForm">
-            <h2 style="font-size:1.25rem; margin-top:12px;">Donor Details</h2>
-
-            <label for="donorName">Full Name / Organization *</label>
-            <input id="donorName" type="text" required placeholder="Your name or organization name" />
+          <div>
+            <div class="field"><label>Food type</label><input id="food_type" placeholder="e.g., cooked meals, produce, bakery"></div>
+            <div class="grid two">
+              <div class="field"><label>Estimated quantity</label><input id="estimated_quantity" placeholder="e.g., 10kg / 25 meals"></div>
+              <div class="field"><label>Expiry date</label><input id="expiry_date" type="date"></div>
+            </div>
+            <div class="field"><label>Storage condition</label><input id="storage_condition" placeholder="e.g., refrigerated / frozen / room temp"></div>
+            <div class="field"><label>Description</label><textarea id="description" placeholder="Any details about packaging, allergens, etc."></textarea></div>
 
             <div class="row">
-              <div>
-                <label for="donorEmail">Email Address *</label>
-                <input id="donorEmail" type="email" required placeholder="you@example.com" />
-              </div>
-              <div>
-                <label for="donorPhone">Phone Number</label>
-                <input id="donorPhone" type="tel" placeholder="e.g., 251-0000" />
-              </div>
+              <button class="btn blue" id="btnSubmit"><i class="fa-solid fa-paper-plane"></i> Submit donation</button>
+              <a class="btn secondary" href="mailto:admin@foodshare-seychelles.online"><i class="fa-solid fa-envelope"></i> Email instead</a>
             </div>
 
-            <h2 style="font-size:1.25rem; margin-top:18px;">Donation Details</h2>
-
-            <div class="row">
-              <div>
-                <label for="foodType">Type of Food *</label>
-                <select id="foodType" required>
-                  <option value="">-- Select Category --</option>
-                  <option value="Produce">Fresh Fruits & Vegetables</option>
-                  <option value="Packaged">Dry & Packaged Goods</option>
-                  <option value="Baked">Baked Goods</option>
-                  <option value="Meat">Meat & Poultry</option>
-                  <option value="Dairy">Dairy & Eggs</option>
-                  <option value="Beverages">Non-Alcoholic Beverages</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label for="quantityKg">Estimated Quantity (kg) *</label>
-                <input id="quantityKg" type="number" step="0.5" min="0.5" required placeholder="e.g., 10" />
-              </div>
+            <div class="small" style="margin-top:10px">
+              No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
             </div>
-
-            <div class="row">
-              <div>
-                <label for="expiryDate">Best Before / Expiry Date</label>
-                <input id="expiryDate" type="date" />
-              </div>
-              <div>
-                <label for="storageType">Current Storage Condition</label>
-                <select id="storageType">
-                  <option value="Ambient">Ambient (Room Temperature)</option>
-                  <option value="Refrigerated">Refrigerated (Chilled)</option>
-                  <option value="Frozen">Frozen</option>
-                </select>
-              </div>
-            </div>
-
-            <label for="description">Detailed Description</label>
-            <textarea id="description" placeholder="e.g., 20kg tomatoes, must be picked up by 4 PM"></textarea>
-
-            <h2 style="font-size:1.25rem; margin-top:18px;"><i class="fa-solid fa-map-location-dot"></i> Pickup Location</h2>
-            <div class="sub">Drag the pin or tap the map to set the exact pickup point.</div>
-
-            <div class="helper-row">
-              <button id="gpsBtn" class="mini-btn" type="button">
-                <i class="fa-solid fa-location-crosshairs"></i> Use my GPS
-              </button>
-              <span class="sub">You can also edit the address text manually if needed.</span>
-            </div>
-
-            <div class="map-box"><div id="map"></div></div>
-
-            <div class="row" style="margin-top:10px;">
-              <div>
-                <label for="pickupCoords">Pickup Coordinates *</label>
-                <input id="pickupCoords" type="text" readonly required />
-              </div>
-              <div>
-                <label for="pickupIsland">Island Location *</label>
-                <select id="pickupIsland" required>
-                  <option value="">-- Select Island --</option>
-                  <option value="Mahe">Mahé</option>
-                  <option value="Praslin">Praslin</option>
-                  <option value="La Digue">La Digue</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            <label for="pickupAddress">Pickup Address *</label>
-            <input id="pickupAddress" type="text" required placeholder="Auto-filled from pin location (edit if needed)" />
-
-            <label for="pickupTime">Preferred Pickup Timeframe</label>
-            <input id="pickupTime" type="text" placeholder="e.g., Tomorrow between 10:00–12:00" />
-
-            <button id="submitBtn" class="btn" type="submit">
-              <i class="fa-solid fa-paper-plane"></i> Submit Donation Request
-            </button>
-          </form>
+          </div>
         </div>
-      </section>
+
+      </div>
     </div>
   </main>
 
-  <footer id="main-footer">
-    <div class="content-container footer-content">
-      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-      <div class="footer-section">
-        <h3>Get In Touch</h3>
-        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
+  <div class="footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <div class="row"><div class="notice"><b>Contact (no login):</b> <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a></div></div>
+          <p class="small" style="margin-top:10px">Submissions here require login to enable dashboard replies.</p>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Learn</div>
+          <div class="grid" style="gap:6px">
+            <a href="../learn/safety/">Food Safety</a>
+            <a href="../learn/faq/">FAQ</a>
+            <a href="../social/">Social</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+        <div>
+          <div class="h2" style="margin-bottom:8px">Legal</div>
+          <div class="grid" style="gap:6px">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms of Use</a>
+          </div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="row" style="justify-content:space-between">
+        <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+        <div class="small">Powered by Supabase</div>
       </div>
     </div>
-    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-  </footer>
+  </div>
+  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    const supabase = createClient(
+      "https://edotvuleaydztulkxehe.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
+    );
+
+    const loading = document.getElementById("loading");
+    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+    function toast(type, html){
+      const el = document.getElementById("msg");
+      el.className = "notice" + (type ? " "+type : "");
+      el.innerHTML = html;
+      el.style.display = "block";
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    let pickup_lat = null, pickup_lng = null;
+
+    async function guard(){
+      const { data } = await supabase.auth.getSession();
+      if(!data.session){
+        location.href = `../account/login/?next=%2Fdonate-now%2F`;
+        return false;
+      }
+      return true;
+    }
+
+    async function setNav(){
+      const nav = document.getElementById("navAuth");
+      nav.innerHTML = `
+        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <a class="btn small secondary" href="../account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      `;
+      document.getElementById("btnLogout").addEventListener("click", async ()=>{
+        setLoading(true); await supabase.auth.signOut(); setLoading(false);
+        location.href = "../";
+      });
+    }
+
+    document.getElementById("btnGeo").addEventListener("click", ()=>{
+      if(!navigator.geolocation){
+        toast("warn","Geolocation not supported on this device.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition((pos)=>{
+        pickup_lat = pos.coords.latitude;
+        pickup_lng = pos.coords.longitude;
+        document.getElementById("lat").textContent = pickup_lat.toFixed(6);
+        document.getElementById("lng").textContent = pickup_lng.toFixed(6);
+      }, (err)=>{
+        toast("warn", `Location permission denied or unavailable: ${err.message}`);
+      }, { enableHighAccuracy:true, timeout:12000 });
+    });
+
+    document.getElementById("btnSubmit").addEventListener("click", async ()=>{
+      const payload = {
+        donor_name: document.getElementById("donor_name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        island: document.getElementById("island").value.trim(),
+        food_type: document.getElementById("food_type").value.trim(),
+        estimated_quantity: document.getElementById("estimated_quantity").value.trim(),
+        expiry_date: document.getElementById("expiry_date").value || null,
+        storage_condition: document.getElementById("storage_condition").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        pickup_address: document.getElementById("pickup_address").value.trim(),
+        pickup_timeframe: document.getElementById("pickup_timeframe").value.trim(),
+        pickup_lat, pickup_lng,
+        status: "New"
+      };
+
+      if(!payload.donor_name || !payload.email || !payload.phone){
+        toast("warn","<b>Missing fields:</b> donor name, email, and phone are required.");
+        return;
+      }
+
+      setLoading(true);
+      const { data, error } = await supabase.from("donations").insert(payload).select("id").single();
+      if(error){
+        setLoading(false);
+        toast("error", `<b>Submit failed:</b> ${error.message}`);
+        return;
+      }
+
+      await supabase.from("notifications").insert({
+        title: "Donation submitted",
+        message: "Thank you. We received your donation submission and will contact you via notifications for pickup coordination.",
+        type: "Info"
+      });
+
+      setLoading(false);
+      toast("", `<b>Submitted.</b> Donation reference: <code class="inline">${data.id}</code>. <a href="../account/dashboard/"><b>Go to dashboard</b></a>.`);
+    });
+
+    (async ()=>{
+      if(!await guard()) return;
+      await setNav();
+    })();
+  </script>
 </body>
 </html>
