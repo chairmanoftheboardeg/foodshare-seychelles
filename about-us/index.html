@@ -4,211 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us | FoodShare Seychelles</title>
-    
     <link rel="icon" type="image/png" href="/image/logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-        :root {
-            --primary: #6bb33b; --primary-dark: #4a802a; --primary-light: #e8f5e9;
-            --text-dark: #1f2937; --text-light: #6b7280; --white: #ffffff; --nav-height: 80px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: white; color: var(--text-dark); line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-        /* --- NAVIGATION (Works for all devices) --- */
-        nav { 
-            height: var(--nav-height); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            background: white; 
-            position: sticky; top: 0; z-index: 2000; 
-            border-bottom: 1px solid #eee; 
-        }
-        .nav-logo img { height: 50px; }
+        :root { --primary: #6bb33b; --text-dark: #1f2937; --text-light: #6b7280; --primary-light: #e8f5e9; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
         
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-links a { font-weight: 600; font-size: 0.95rem; color: var(--text-dark); text-decoration: none; }
-        .nav-links a:hover { color: var(--primary); }
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Hamburger Menu (Hidden on Desktop) */
-        .menu-toggle { display: none; cursor: pointer; font-size: 1.8rem; color: var(--primary); }
+        nav { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; background: white; border-bottom: 1px solid #eee; }
+        .logo img { height: 45px; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; }
 
-        @media (max-width: 992px) {
-            .menu-toggle { display: block; }
-            .nav-links {
-                display: none; /* Hidden by default on mobile */
-                flex-direction: column;
-                position: absolute; top: var(--nav-height); left: 0; width: 100%;
-                background: white; padding: 20px; border-bottom: 2px solid var(--primary);
-                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            }
-            .nav-links.active { display: flex; }
-        }
+        .header { padding: 80px 5%; text-align: center; background: var(--primary-light); }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; }
 
-        /* --- CONTENT SECTIONS --- */
-        .page-header { padding: 80px 0; text-align: center; background: var(--primary-light); }
-        .page-header h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 10px; }
+        .content { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
+        .mission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-bottom: 80px; }
+        .m-card { padding: 30px; border-radius: 20px; background: #f9f9f9; border-left: 5px solid var(--primary); }
 
-        /* Mission & Vision */
-        .intro-section { padding: 80px 0; }
-        .mv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 40px; }
-        .mv-card { padding: 40px; border-radius: 20px; background: #f9f9f9; border-top: 5px solid var(--primary); }
-        .mv-card h3 { color: var(--primary-dark); margin-bottom: 15px; letter-spacing: 1px; }
-
-        /* Team Directory */
-        .team-section { padding: 80px 0; border-top: 1px solid #eee; }
         .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
-        .staff-card { border: 1px solid #eee; padding: 30px; border-radius: 20px; text-align: center; position: relative; }
-        
-        .staff-img-container { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
-        .staff-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-light); }
-        .status-dot { width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; position: absolute; bottom: 5px; right: 10px; }
-        .online { background: #4bb543; }
-        .offline { background: #cbd5e0; }
+        .staff-card { text-align: center; padding: 30px; border-radius: 20px; border: 1px solid #eee; position: relative; }
+        .staff-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
+        .status { position: absolute; top: 110px; right: 95px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white; }
+        .online { background: #4CAF50; } .offline { background: #bbb; }
 
-        /* Hall of Fame */
-        .hof-section { padding: 80px 0; }
-        .hof-container { background: #111; color: white; border-radius: 40px; padding: 60px 20px; text-align: center; }
-        .hof-list { max-width: 700px; margin: 40px auto 0; text-align: left; }
+        .hof { background: #111; color: white; padding: 60px 40px; border-radius: 30px; margin-top: 80px; }
         .donor-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #222; }
 
-        /* Footer */
-        footer { padding: 40px 0; text-align: center; color: var(--text-light); border-top: 1px solid #eee; }
-        footer a { color: var(--primary); font-weight: 700; text-decoration: none; }
+        footer { background: #111; color: #888; padding: 40px 5%; text-align: center; margin-top: 80px; }
+        footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+
+        @media (max-width: 768px) { .nav-links { display: none; } }
     </style>
 </head>
 <body>
 
-    <nav class="container">
-        <a href="/" class="nav-logo"><img src="/image/logo.png" alt="FoodShare"></a>
-        <div class="menu-toggle" id="mobile-menu"><i class="fas fa-bars"></i></div>
-        <ul class="nav-links" id="nav-list">
+    <div id="loader"><div class="spinner"></div></div>
+
+    <nav>
+        <a href="/" class="logo"><img src="/image/logo.png" alt="FoodShare"></a>
+        <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/about-us/">About Us</a></li>
             <li><a href="/available-food/">Find Food</a></li>
             <li><a href="/contact/">Contact</a></li>
-            <li><a href="/donate-now/" style="color: var(--primary);">Donate Now</a></li>
         </ul>
     </nav>
 
-    <header class="page-header">
-        <div class="container">
-            <h1>Our Mission & Vision</h1>
-            <p>Transparency, Technology, and Community.</p>
-        </div>
-    </header>
+    <div class="header">
+        <h1>Our Story & People</h1>
+        <p>Transparency and passion driving every delivery.</p>
+    </div>
 
-    <section class="container intro-section">
-        <div style="max-width: 850px; margin: 0 auto; text-align: center; margin-bottom: 60px;">
-            <h2 style="margin-bottom: 20px;">About FoodShare Seychelles</h2>
-            <p style="font-size: 1.15rem; color: var(--text-light);">
-                FoodShare Seychelles is a non-profit initiative dedicated to reducing food waste and supporting community welfare. 
-                We believe that surplus food is a resource, not waste. By bridging the gap between donors and those in need, 
-                we ensure a more sustainable and food-secure future for our islands.
-            </p>
-        </div>
-
-        <div class="mv-grid">
-            <div class="mv-card">
-                <h3>OUR MISSION</h3>
-                <p>To implement an efficient, safe, and transparent food rescue system that prevents nutritious surplus food from entering landfills, redirecting it to the plates of those who need it most.</p>
+    <div class="content">
+        <div class="mission-grid">
+            <div class="m-card">
+                <h3>Our Mission</h3>
+                <p>To reduce food waste in the Seychelles by connecting surplus resources to those in need via efficient technology.</p>
             </div>
-            <div class="mv-card">
-                <h3>OUR VISION</h3>
-                <p>A Seychelles where every community is empowered by shared resources, and where the synergy of technology and compassion eliminates food insecurity across the islands.</p>
+            <div class="m-card">
+                <h3>Our Vision</h3>
+                <p>A zero-waste Seychelles where food security is a reality for every citizen through community sharing.</p>
             </div>
         </div>
-    </section>
 
-    <section class="team-section container">
-        <div style="text-align: center; margin-bottom: 50px;">
-            <h2>The Team Behind the Action</h2>
-            <p>Our dedicated staff coordinating rescue operations daily.</p>
-        </div>
+        <h2 style="margin-bottom:30px; text-align:center;">The Team</h2>
         <div id="staff-grid" class="team-grid">
-            <p style="grid-column: 1/-1; text-align: center; color: #999;">Fetching team directory...</p>
+            <p style="text-align:center; grid-column:1/-1;">Connecting to directory...</p>
         </div>
-    </section>
 
-    <section class="container hof-section">
-        <div class="hof-container">
-            <h2>Donor Hall of Fame</h2>
-            <p style="color: #888;">Celebrating our community's most consistent heroes.</p>
-            <div id="hof-list" class="hof-list">
-                <p style="text-align: center; color: #444;">Accessing donor records...</p>
+        <div class="hof">
+            <h2 style="text-align:center; margin-bottom:30px;">Donor Hall of Fame</h2>
+            <div id="hof-list">
+                <p style="text-align:center;">Retrieving heroes...</p>
             </div>
         </div>
-    </section>
+    </div>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2025 FoodShare Seychelles. All Rights Reserved.</p>
-            <p style="margin-top: 10px;">Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
-        </div>
+        <p>&copy; 2025 FoodShare Seychelles. Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
     </footer>
 
-    <script src="/js/supabase-config.js"></script>
     <script>
-        // 1. Mobile Menu Toggle Logic
-        const menuToggle = document.getElementById('mobile-menu');
-        const navList = document.getElementById('nav-list');
+        const SB_URL = "https://edotvuleaydztulkxehe.supabase.co";
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw";
+        const _supabase = supabase.createClient(SB_URL, SB_KEY);
 
-        menuToggle.addEventListener('click', () => {
-            navList.classList.toggle('active');
-        });
+        window.onload = async () => {
+            setTimeout(() => { document.getElementById('loader').style.display='none'; }, 800);
 
-        // 2. Database Fetch Logic
-        async function fetchAboutData() {
-            try {
-                // Fetch Staff
-                const { data: staff, error: sErr } = await _supabase.from('staff_directory').select('*');
-                const staffGrid = document.getElementById('staff-grid');
-                
-                if (staff && staff.length > 0) {
-                    staffGrid.innerHTML = staff.map(s => `
-                        <div class="staff-card">
-                            <div class="staff-img-container">
-                                <img src="${s.avatar_url || '/image/logo.png'}" class="staff-img" alt="${s.full_name}">
-                                <div class="status-dot ${s.is_online ? 'online' : 'offline'}"></div>
-                            </div>
-                            <div style="color:var(--primary); font-weight:700; font-size:0.8rem; margin-bottom:5px;">${s.role_id === 1 ? 'ADMIN' : 'STAFF'}</div>
-                            <h3 style="margin-bottom:10px;">${s.full_name}</h3>
-                            <p style="font-size:0.85rem; color:#777;">${s.bio || 'Dedicated to food rescue.'}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    staffGrid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:#999;">No staff members listed in system yet.</p>`;
-                }
-
-                // Fetch Donors
-                const { data: donors, error: dErr } = await _supabase.from('hall_of_fame').select('*').limit(10);
-                const hofList = document.getElementById('hof-list');
-
-                if (donors && donors.length > 0) {
-                    hofList.innerHTML = donors.map((d, i) => `
-                        <div class="donor-row">
-                            <span><strong>${i+1}. ${d.donor_display_name}</strong></span>
-                            <span style="color:var(--primary); font-weight:700;">${d.total_donations} Donations</span>
-                        </div>
-                    `).join('');
-                } else {
-                    hofList.innerHTML = `<p style="text-align:center; color:#555;">The Hall of Fame is waiting for its first entries.</p>`;
-                }
-
-            } catch (err) {
-                console.error("Database connection failed:", err);
+            // Fetch Staff
+            const { data: staff } = await _supabase.from('staff_directory').select('*');
+            if(staff) {
+                document.getElementById('staff-grid').innerHTML = staff.map(s => `
+                    <div class="staff-card">
+                        <img src="${s.avatar_url || '/image/logo.png'}" class="staff-img">
+                        <div class="status ${s.is_online ? 'online' : 'offline'}"></div>
+                        <h3>${s.full_name}</h3>
+                        <p style="color:var(--primary); font-weight:700; font-size:0.8rem;">${s.role_id === 1 ? 'ADMIN' : 'FIELD STAFF'}</p>
+                    </div>
+                `).join('');
             }
-        }
 
-        window.onload = fetchAboutData;
+            // Fetch Donors
+            const { data: donors } = await _supabase.from('hall_of_fame').select('*').limit(5);
+            if(donors && donors.length > 0) {
+                document.getElementById('hof-list').innerHTML = donors.map(d => `
+                    <div class="donor-row">
+                        <span><strong>${d.donor_display_name}</strong></span>
+                        <span style="color:var(--primary); font-weight:700;">${d.total_donations} Donations</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('hof-list').innerHTML = "<p style='text-align:center;'>Waiting for our first heroes.</p>";
+            }
+        };
     </script>
 </body>
 </html>
