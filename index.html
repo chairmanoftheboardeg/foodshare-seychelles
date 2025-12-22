@@ -3,175 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodShare Seychelles | Reducing Waste, Feeding Communities</title>
+    <title>FoodShare Seychelles | Home</title>
     
     <link rel="icon" type="image/png" href="/image/logo.png">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
-            --primary: #6bb33b;       
-            --primary-dark: #4a802a;  
-            --primary-light: #e8f5e9; 
-            --text-dark: #1f2937;
-            --text-light: #6b7280;
-            --white: #ffffff;
-            --nav-height: 80px;
+            --primary: #6bb33b; --primary-dark: #4a802a; --primary-light: #e8f5e9;
+            --text-dark: #1f2937; --text-light: #6b7280; --white: #ffffff; --nav-height: 80px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { color: var(--text-dark); background-color: var(--white); overflow-x: hidden; }
-        a { text-decoration: none; color: inherit; transition: 0.3s; }
-        ul { list-style: none; }
+        body { background: white; color: var(--text-dark); overflow-x: hidden; }
+        a { text-decoration: none; transition: 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* LOADING ANIMATION */
-        #loader {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--white);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            transition: opacity 0.5s ease;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--primary-light);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ANNOUNCEMENT BAR */
+        /* --- ANNOUNCEMENT BAR --- */
         #announcement-bar {
             background: var(--primary-dark);
             color: white;
             text-align: center;
             padding: 12px 20px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            display: none; 
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: none; /* Hidden until JS confirms it's active */
             position: relative;
-            z-index: 1001;
+            z-index: 3000;
         }
 
-        /* NAVIGATION */
-        nav {
-            height: var(--nav-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        /* --- NAVIGATION --- */
+        nav { 
+            height: var(--nav-height); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: white; 
+            position: sticky; top: 0; z-index: 2000; 
+            border-bottom: 1px solid #eee; 
         }
-        .nav-logo img { height: 55px; }
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-links a { font-weight: 500; font-size: 0.9rem; color: var(--text-dark); }
-        .nav-links a:hover { color: var(--primary); }
+        .nav-logo img { height: 45px; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+        
+        .menu-toggle { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
 
-        /* BUTTONS */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .btn { padding: 12px 24px; border-radius: 50px; font-weight: 600; cursor: pointer; display: inline-block; }
-        .btn-primary { background: var(--primary); color: white; border: none; }
-        .btn-outline { border: 2px solid var(--primary); color: var(--primary); }
-
-        /* HERO */
-        .hero { padding: 120px 0; text-align: center; background: radial-gradient(circle at top, var(--primary-light), var(--white)); }
-        .hero h1 { font-size: 3.8rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px; }
+        /* --- HERO SECTION --- */
+        .hero { padding: 60px 0 100px; text-align: center; background: radial-gradient(circle at top, var(--primary-light), var(--white)); }
+        .hero h1 { font-size: clamp(2.2rem, 8vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
         .hero span { color: var(--primary); }
-        .hero p { font-size: 1.25rem; color: var(--text-light); max-width: 700px; margin: 0 auto 40px; line-height: 1.6; }
+        .hero p { font-size: clamp(1rem, 3vw, 1.25rem); color: var(--text-light); max-width: 700px; margin: 0 auto 40px; }
 
-        /* IMPACT STATS */
-        .impact { padding: 100px 0; text-align: center; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 50px; }
-        .stat-card h3 { font-size: 3.5rem; color: var(--primary); margin-bottom: 10px; }
-        .stat-card p { font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); font-size: 0.85rem; }
+        .btn { padding: 15px 30px; border-radius: 50px; font-weight: 700; display: inline-block; border: none; cursor: pointer; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); margin-left: 10px; }
 
-        /* FOOTER */
-        footer { background: #111; color: #eee; padding: 80px 0 30px; }
-        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 50px; padding-bottom: 50px; }
-        /* Logo removed from footer per instructions */
-        .footer-col h4 { color: var(--primary); margin-bottom: 25px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
-        .footer-col ul li { margin-bottom: 12px; }
-        .footer-col ul li a { color: #999; font-size: 0.95rem; }
-        .footer-col ul li a:hover { color: var(--primary); }
-        .footer-bottom { border-top: 1px solid #222; padding-top: 30px; text-align: center; font-size: 0.9rem; color: #666; }
-        .footer-bottom a { color: var(--primary); font-weight: 600; }
+        /* --- MOBILE OVERRIDES --- */
+        @media (max-width: 992px) {
+            .menu-toggle { display: block; }
+            .nav-links {
+                display: none; flex-direction: column; position: absolute; 
+                top: var(--nav-height); left: 0; width: 100%; background: white; 
+                padding: 30px; border-bottom: 3px solid var(--primary);
+            }
+            .nav-links.active { display: flex; }
+            .btn-outline { margin-left: 0; margin-top: 15px; }
+            .hero-btns { display: flex; flex-direction: column; padding: 0 20px; }
+        }
+
+        /* --- FOOTER --- */
+        footer { background: #111; color: #eee; padding: 60px 0 30px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-bottom { border-top: 1px solid #222; padding-top: 20px; text-align: center; font-size: 0.85rem; color: #666; }
+        .footer-bottom a { color: var(--primary); font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <img src="/image/logo.png" alt="FoodShare" style="height: 80px; margin-bottom: 20px;">
-        <div class="spinner"></div>
-    </div>
-
     <div id="announcement-bar"></div>
 
     <nav class="container">
-        <a href="/" class="nav-logo">
-            <img src="/image/logo.png" alt="FoodShare Seychelles">
-        </a>
-        <ul class="nav-links">
+        <a href="/" class="nav-logo"><img src="/image/logo.png" alt="FoodShare"></a>
+        <div class="menu-toggle" id="mobile-menu"><i class="fas fa-bars"></i></div>
+        <ul class="nav-links" id="nav-list">
             <li><a href="/">Home</a></li>
             <li><a href="/about-us/">About Us</a></li>
             <li><a href="/available-food/">Find Food</a></li>
-            <li><a href="/learn/">Learn</a></li>
             <li><a href="/contact/">Contact</a></li>
-            <li id="nav-login-btn"><a href="/staff-login/">Staff Login</a></li>
-            <li><a href="/donate-now/" class="btn btn-primary">Donate Now</a></li>
+            <li><a href="/donate-now/" class="btn btn-primary" style="color:white; padding: 10px 20px;">Donate Now</a></li>
         </ul>
     </nav>
 
     <section class="hero container">
-        <h1>Feeding the <span>Community</span>,<br>Not the Landfill.</h1>
-        <p>FoodShare is the bridge between surplus food and those in need across the Seychelles. Join us in our mission to eliminate food waste.</p>
-        <div style="display: flex; gap: 20px; justify-content: center;">
+        <h1>Feeding <span>Seychelles</span>,<br>Not the Landfill.</h1>
+        <p>Connecting surplus food from businesses to communities in need across the islands.</p>
+        <div class="hero-btns">
             <a href="/available-food/" class="btn btn-primary">Find Available Food</a>
             <a href="/volunteer-now/" class="btn btn-outline">Become a Volunteer</a>
         </div>
     </section>
 
-    <section class="impact container">
-        <div class="section-header">
-            <h2 style="font-size: 2.5rem;">Our Live Impact</h2>
-            <p style="color: var(--text-light);">Operational statistics tracked across the islands.</p>
-        </div>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3 id="stat-meals">0</h3>
-                <p>Meals Provided</p>
+    <section class="container" style="padding-bottom: 80px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+            <div style="padding: 30px; background: #f9f9f9; border-radius: 20px;">
+                <h2 id="stat-meals" style="color: var(--primary); font-size: 2.5rem;">0</h2>
+                <p style="font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 0.8rem;">Meals Provided</p>
             </div>
-            <div class="stat-card">
-                <h3 id="stat-kg">0</h3>
-                <p>KG Food Rescued</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="stat-co2">0</h3>
-                <p>KG CO₂ Offset</p>
+            <div style="padding: 30px; background: #f9f9f9; border-radius: 20px;">
+                <h2 id="stat-kg" style="color: var(--primary); font-size: 2.5rem;">0</h2>
+                <p style="font-weight: 700; color: var(--text-light); text-transform: uppercase; font-size: 0.8rem;">KG Rescued</p>
             </div>
         </div>
     </section>
 
-    <section style="background: #f9f9f9; padding: 60px 0; text-align: center;">
+    <section style="background: #fafafa; padding: 50px 0; text-align: center; border-top: 1px solid #eee;">
         <div class="container">
-            <p style="margin-bottom: 25px; font-weight: 600; color: var(--text-light);">OUR TECHNOLOGY PARTNER</p>
+            <p style="font-size: 0.75rem; font-weight: 800; color: #bbb; letter-spacing: 2px; margin-bottom: 20px;">TECHNOLOGY PARTNER</p>
             <a href="https://tylernicholasgroup.com" target="_blank">
-                <img src="/image/tng-logo.png" alt="Tyler Nicholas Group" style="height: 60px;">
+                <img src="/image/tng-logo.png" alt="Tyler Nicholas Group" style="height: 50px; opacity: 0.8; transition: 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8">
             </a>
         </div>
     </section>
@@ -179,33 +132,15 @@
     <footer>
         <div class="container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <h4 style="color: var(--primary); letter-spacing: 2px;">FOODSHARE</h4>
-                    <p style="color: #888; line-height: 1.6; margin-top: 20px;">Reducing food waste through localized logistics and community-driven action in Seychelles.</p>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 20px;">FOODSHARE</h4>
+                    <p style="color: #888; font-size: 0.9rem; line-height: 1.6;">A digital bridge for food redistribution in the Seychelles, powered by community action.</p>
                 </div>
-                <div class="footer-col">
-                    <h4>Navigate</h4>
-                    <ul>
-                        <li><a href="/about-us/">About Us</a></li>
-                        <li><a href="/our-impact/">Our Impact</a></li>
-                        <li><a href="/our-partners/">Partners</a></li>
-                        <li><a href="/sitemap/">Sitemap</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="/contact/">Contact Us</a></li>
-                        <li><a href="/privacy-policy/">Privacy Policy</a></li>
-                        <li><a href="/terms-of-use/">Terms of Use</a></li>
-                        <li><a href="/learn/">Safety Protocols</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Follow Us</h4>
-                    <div style="display: flex; gap: 15px; margin-top: 10px;">
-                        <a href="/social/"><i class="fa-brands fa-linkedin fa-2xl" style="color: #999;"></i></a>
-                        <a href="/social/"><i class="fa-brands fa-facebook fa-2xl" style="color: #999;"></i></a>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 20px;">FOLLOW US</h4>
+                    <div style="display: flex; gap: 20px;">
+                        <a href="/social/"><i class="fa-brands fa-linkedin fa-2xl" style="color: #444;"></i></a>
+                        <a href="/social/"><i class="fa-brands fa-facebook fa-2xl" style="color: #444;"></i></a>
                     </div>
                 </div>
             </div>
@@ -218,28 +153,29 @@
 
     <script src="/js/supabase-config.js"></script>
     <script>
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-            fetchSettings();
-        });
+        // MOBILE MENU TOGGLE
+        const menuToggle = document.getElementById('mobile-menu');
+        const navList = document.getElementById('nav-list');
+        menuToggle.addEventListener('click', () => navList.classList.toggle('active'));
 
-        async function fetchSettings() {
+        // SUPABASE DATA FETCH (Announcement & Stats)
+        async function initHome() {
             try {
-                const { data, error } = await _supabase.from('settings').select('*').single();
-                if (data) {
-                    animateValue("stat-meals", 0, data.total_meals_served, 1500);
-                    animateValue("stat-kg", 0, Math.floor(data.total_kg_saved), 1500);
-                    animateValue("stat-co2", 0, Math.floor(data.co2_prevented), 1500);
-
-                    if (data.announcement_active && data.announcement_text) {
+                const { data: settings, error } = await _supabase.from('settings').select('*').single();
+                
+                if (settings) {
+                    // 1. Announcement Bar
+                    if (settings.announcement_active && settings.announcement_text) {
                         const bar = document.getElementById('announcement-bar');
-                        bar.innerText = data.announcement_text;
+                        bar.innerText = settings.announcement_text;
                         bar.style.display = 'block';
                     }
+
+                    // 2. Live Stats Animation
+                    animateValue("stat-meals", 0, settings.total_meals_served || 0, 1500);
+                    animateValue("stat-kg", 0, Math.floor(settings.total_kg_saved || 0), 1500);
                 }
-            } catch (e) { console.log(e); }
+            } catch (e) { console.error("Load error:", e); }
         }
 
         function animateValue(id, start, end, duration) {
@@ -254,6 +190,8 @@
             };
             window.requestAnimationFrame(step);
         }
+
+        window.onload = initHome;
     </script>
 </body>
 </html>
