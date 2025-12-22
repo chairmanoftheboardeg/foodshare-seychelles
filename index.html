@@ -1,644 +1,321 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FoodShare Seychelles</title>
-  <link rel="icon" href="image/logo.png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root{
-      /* Pulled from your logo */
-      --brand:#8BC245;       /* main green */
-      --brand-2:#6FA041;     /* secondary green */
-      --brand-deep:#3D5823;  /* deep green */
-      --ink:#102014;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodShare Seychelles | Reducing Waste, Feeding Communities</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-      --bg:#f6f8f6;
-      --card:#ffffff;
-      --muted:#5b6a5f;
-      --border:#e3e9e5;
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      --radius:14px;
-      --shadow:0 10px 28px rgba(10, 20, 12, .10);
+    <style>
+        :root {
+            /* Brand Colors based on Logo */
+            --primary: #6bb33b;       /* Leaf Green */
+            --primary-dark: #4a802a;  /* Darker Green for hover */
+            --primary-light: #e8f5e9; /* Very light green background */
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --white: #ffffff;
+            --alert: #e02424;
+            --nav-height: 80px;
+        }
 
-      --max:1100px;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { color: var(--text-dark); background-color: var(--white); overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.6;
-    }
-    a{color:inherit;text-decoration:none}
-    a:hover{text-decoration:underline}
-    img{max-width:100%;height:auto}
+        /* LOADING ANIMATION (Home Page Only) */
+        #loader {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--white);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--primary-light);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        .loader-logo { width: 100px; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .wrap{max-width:var(--max); margin:0 auto; padding:0 18px}
-    .section{padding:26px 0}
-    .sep{height:1px;background:var(--border);margin:16px 0}
+        /* UTILITIES */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+        .btn-outline:hover { background: var(--primary); color: white; }
 
-    /* Header */
-    header{
-      background:var(--brand-deep);
-      color:#fff;
-      position:sticky;
-      top:0;
-      z-index:50;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:12px 0;
-      flex-wrap:wrap; /* critical for mobile friendliness */
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:950;
-      letter-spacing:.2px;
-      min-width: 220px;
-    }
-    .brand img{
-      width:36px; height:36px;
-      border-radius:10px;
-      background:#fff;
-      object-fit:cover;
-    }
+        /* NAVIGATION */
+        nav {
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-logo img { height: 50px; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a { font-weight: 500; font-size: 0.95rem; color: var(--text-dark); }
+        .nav-links a:hover { color: var(--primary); }
+        .mobile-menu-btn { display: none; font-size: 1.5rem; cursor: pointer; }
 
-    nav.navlinks{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      flex-wrap:wrap;
-      font-size:13px;
-      opacity:.98;
-    }
-    nav.navlinks a{opacity:.95}
-    nav.navlinks a:hover{opacity:1}
+        /* ANNOUNCEMENT BAR */
+        #announcement-bar {
+            background: var(--primary-dark);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.9rem;
+            display: none; /* Hidden by default until JS loads */
+        }
 
-    .right{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-left:auto;
-    }
+        /* HERO SECTION */
+        .hero {
+            padding: 100px 0;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--white), var(--primary-light));
+        }
+        .hero h1 { font-size: 3.5rem; line-height: 1.1; margin-bottom: 20px; color: #111; }
+        .hero span { color: var(--primary); }
+        .hero p { font-size: 1.2rem; color: var(--text-light); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .hero-btns { display: flex; gap: 15px; justify-content: center; }
 
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:9px 12px;
-      border-radius:10px;
-      border:1px solid transparent;
-      font-weight:900;
-      cursor:pointer;
-      font-size:13px;
-      white-space:nowrap;
-    }
-    .btn.light{background:#fff;color:var(--brand-deep)}
-    .btn.outline{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}
-    .btn.brand{background:var(--brand);color:#143118}
-    .btn.danger{background:#D32F2F;color:#fff}
+        /* IMPACT SECTION */
+        .impact { padding: 80px 0; background: var(--white); }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 2.2rem; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center; }
+        .stat-card h3 { font-size: 3rem; color: var(--primary); margin-bottom: 5px; }
+        .stat-card p { font-size: 1.1rem; color: var(--text-light); font-weight: 600; }
 
-    /* Mobile nav select */
-    .navselect{
-      display:none;
-      min-width:210px;
-      padding:9px 10px;
-      border-radius:10px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.08);
-      color:#fff;
-      font-weight:900;
-      outline:none;
-    }
-    .navselect option{color:#000}
+        /* PARTNERS */
+        .partners { padding: 60px 0; background: #fafafa; text-align: center; }
+        .partner-logo { height: 60px; opacity: 0.7; filter: grayscale(100%); transition: 0.3s; }
+        .partner-logo:hover { opacity: 1; filter: grayscale(0%); }
 
-    @media (max-width: 920px){
-      nav.navlinks{display:none}
-      .navselect{display:block}
-      .brand{min-width:auto}
-      .right{width:100%; justify-content:flex-start} /* stack cleanly */
-    }
+        /* FOOTER */
+        footer { background: #1a1a1a; color: #fff; padding: 60px 0 20px; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .footer-col h4 { color: var(--primary); margin-bottom: 20px; font-size: 1.1rem; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col ul li a { color: #aaa; font-size: 0.9rem; }
+        .footer-col ul li a:hover { color: var(--primary); }
+        .footer-bottom { border-top: 1px solid #333; padding-top: 20px; text-align: center; font-size: 0.85rem; color: #777; }
+        .footer-bottom a { color: var(--primary); }
 
-    /* Announcement under header */
-    .announce-wrap{background:#fff;border-bottom:1px solid var(--border)}
-    .announce{display:none;padding:10px 0}
-    .announce-card{
-      background:#eef7e3;
-      border:1px solid rgba(139,194,69,.45);
-      border-radius:12px;
-      padding:10px 12px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .announce-title{
-      font-weight:950;
-      color:#23411a;
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    .announce-text{
-      margin-top:4px;
-      color:#2b3f23;
-      font-weight:750;
-      font-size:13px;
-    }
-
-    /* Cards & layout */
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-    }
-    .pad{padding:18px}
-
-    /* Hero (real homepage hero) */
-    .hero{
-      width:100%;
-      border-radius:16px;
-      overflow:hidden;
-      background:
-        radial-gradient(900px 500px at 10% 0%, rgba(139,194,69,.30), transparent 60%),
-        radial-gradient(900px 500px at 90% 0%, rgba(111,160,65,.22), transparent 60%),
-        linear-gradient(180deg, #ffffff, #fbfdf9);
-    }
-    .hero-inner{
-      display:grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap:16px;
-      align-items:center;
-    }
-    @media (max-width: 920px){
-      .hero-inner{grid-template-columns:1fr}
-    }
-    .hero h1{
-      margin:0;
-      font-size:40px;
-      line-height:1.12;
-      font-weight:980;
-      letter-spacing:-.2px;
-    }
-    @media (max-width: 560px){
-      .hero h1{font-size:30px}
-    }
-    .hero p{
-      margin:12px 0 0;
-      color:var(--muted);
-      font-weight:700;
-      font-size:14px;
-      max-width: 56ch;
-    }
-    .hero-actions{
-      margin-top:16px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .sidebox{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:14px;
-    }
-    .sidebox b{font-weight:950}
-    .sidebox .small{margin-top:6px;color:var(--muted);font-size:13px;font-weight:650}
-
-    /* Section titles */
-    .title-center{
-      max-width:860px;
-      margin:0 auto;
-      text-align:center;
-    }
-    .h2{
-      margin:0;
-      font-size:18px;
-      font-weight:980;
-      color:#1b3413;
-      letter-spacing:.2px;
-    }
-    .lead{
-      margin:10px auto 0;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:700;
-      max-width: 86ch;
-    }
-
-    /* 3 feature blocks */
-    .grid3{
-      max-width:920px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:12px;
-    }
-    @media (max-width: 920px){
-      .grid3{grid-template-columns:1fr}
-    }
-    .mini h3{
-      margin:0;
-      font-size:14px;
-      font-weight:980;
-      color:#183115;
-    }
-    .mini p{
-      margin:8px 0 0;
-      font-size:13px;
-      color:var(--muted);
-      font-weight:650;
-    }
-
-    /* How it works steps */
-    .steps{
-      max-width:920px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:12px;
-    }
-    @media (max-width: 920px){
-      .steps{grid-template-columns:1fr}
-    }
-    .step{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px;
-      background:#fff;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:28px;height:28px;
-      border-radius:10px;
-      background:rgba(139,194,69,.18);
-      border:1px solid rgba(139,194,69,.35);
-      color:#244218;
-      font-weight:980;
-      margin-bottom:10px;
-    }
-
-    /* CTA strip (simple, not spammy) */
-    .cta{
-      max-width:920px;
-      margin:0 auto;
-      background:var(--brand-deep);
-      color:#fff;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.08);
-      padding:14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      box-shadow:var(--shadow);
-    }
-    .cta b{font-weight:980}
-    .cta .btn{background:#fff; color:var(--brand-deep)}
-
-    /* Footer */
-    footer{margin-top:26px;background:var(--brand-deep);color:#dfe8e1}
-    .footer-inner{padding:26px 0}
-    .footgrid{
-      display:grid;
-      grid-template-columns:1.4fr 1fr 1fr;
-      gap:18px;
-    }
-    @media (max-width: 920px){
-      .footgrid{grid-template-columns:1fr}
-    }
-    .foot-title{font-weight:980;color:#fff;margin:0}
-    .footlink{display:block;padding:6px 0;color:#dfe8e1;opacity:.95;font-size:13px}
-    .footlink:hover{opacity:1;text-decoration:none}
-    .fineprint{
-      border-top:1px solid rgba(255,255,255,.12);
-      margin-top:18px;
-      padding-top:14px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      font-size:12px;
-      color:#c9d7ce;
-    }
-
-    /* Loading */
-    .loading{
-      position:fixed; inset:0;
-      display:none;
-      align-items:center; justify-content:center;
-      background:rgba(246,248,246,.88);
-      z-index:200;
-    }
-    .loadbox{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px 14px;
-      box-shadow:var(--shadow);
-      display:flex; gap:10px; align-items:center;
-    }
-    .spin{
-      width:18px;height:18px;border-radius:50%;
-      border:3px solid #d7e7db;
-      border-top-color:var(--brand);
-      animation:sp .9s linear infinite;
-    }
-    @keyframes sp{to{transform:rotate(360deg)}}
-  </style>
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; } /* Mobile menu implementation needed later */
+            .stats-grid, .footer-grid { grid-template-columns: 1fr; }
+            .mobile-menu-btn { display: block; }
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <div class="wrap">
-      <div class="topbar">
-        <a class="brand" href="./">
-          <img src="image/logo.png" alt="FoodShare logo" onerror="this.style.display='none'">
-          <span>FoodShare Seychelles</span>
+    <div id="loader">
+        <img src="/images/logo.png" alt="FoodShare Logo" class="loader-logo">
+        <div class="spinner"></div>
+        <p>Connecting Community...</p>
+    </div>
+
+    <div id="announcement-bar"></div>
+
+    <nav class="container">
+        <a href="/" class="nav-logo">
+            <img src="/images/logo.png" alt="FoodShare Seychelles">
         </a>
+        <div class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about-us/">About Us</a></li>
+            <li><a href="/available-food/">Find Food</a></li>
+            <li><a href="/learn/">Learn</a></li>
+            <li><a href="/contact/">Contact</a></li>
+            
+            <li id="nav-login-btn"><a href="/staff-login/">Login</a></li>
+            <li id="nav-dashboard-btn" style="display: none;"><a href="/account/dashboard/" class="btn btn-outline" style="padding: 8px 16px;">My Dashboard</a></li>
+            <li><a href="/donate-now/" class="btn btn-primary">Donate Food</a></li>
+        </ul>
+    </nav>
 
-        <nav class="navlinks" aria-label="Primary">
-          <a href="./">Home</a>
-          <a href="available-food/">Find Food</a>
-          <a href="donate-now/">Donate</a>
-          <a href="volunteer-now/">Volunteer</a>
-          <a href="our-impact/">Impact</a>
-          <a href="about/">About</a>
-          <a href="our-partners/">Partners</a>
-          <a href="staff-login/">Staff</a>
-        </nav>
-
-        <div class="right">
-          <select class="navselect" id="navSelect" aria-label="Navigate">
-            <option value="./">Home</option>
-            <option value="available-food/">Find Food</option>
-            <option value="donate-now/">Donate</option>
-            <option value="volunteer-now/">Volunteer</option>
-            <option value="our-impact/">Impact</option>
-            <option value="about/">About</option>
-            <option value="our-partners/">Partners</option>
-            <option value="staff-login/">Staff Login</option>
-          </select>
-
-          <div id="authBox" class="right" style="margin-left:0"></div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="announce-wrap">
-    <div class="wrap">
-      <div class="announce" id="announceWrap">
-        <div class="announce-card">
-          <div>
-            <div class="announce-title"><i class="fa-solid fa-bullhorn"></i> Announcement</div>
-            <div class="announce-text" id="announceText"></div>
-          </div>
-          <button class="btn light" id="announceClose" type="button" aria-label="Close announcement">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="loading" id="loading">
-    <div class="loadbox">
-      <div class="spin"></div>
-      <div>
-        <div style="font-weight:980">Loading</div>
-        <div style="font-size:12px;color:var(--muted);font-weight:700">Please wait…</div>
-      </div>
-    </div>
-  </div>
-
-  <main class="wrap">
-
-    <!-- HERO -->
-    <section class="section">
-      <div class="card hero pad">
-        <div class="hero-inner">
-          <div>
-            <h1>Food rescue that serves communities across Seychelles.</h1>
-            <p>
-              FoodShare Seychelles reduces food waste by coordinating donations and connecting available food to people who need it.
-            </p>
-
-            <div class="hero-actions">
-              <a class="btn brand" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
-              <a class="btn light" href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Food</a>
+    <section class="hero">
+        <div class="container">
+            <h1>Don't Waste Good Food.<br><span>Share It.</span></h1>
+            <p>We connect hotels, restaurants, and individuals with surplus food to the Seychelles communities that need it most.</p>
+            <div class="hero-btns">
+                <a href="/available-food/" class="btn btn-primary">Find Food</a>
+                <a href="/volunteer-now/" class="btn btn-outline">Volunteer</a>
             </div>
-
-            <p style="margin-top:12px;font-size:13px;color:var(--muted);font-weight:700">
-              Platform forms require login so we can reply via your dashboard notifications.
-              If you cannot sign in, email <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline;font-weight:950">admin@foodshare-seychelles.online</a>.
-            </p>
-          </div>
-
-          <div class="sidebox">
-            <b>What we focus on</b>
-            <div class="small">Safe handling, clear coordination, and accountable distribution.</div>
-            <div class="sep"></div>
-            <div class="small"><b>Donors:</b> Submit food donations and pickup windows.</div>
-            <div class="small" style="margin-top:6px"><b>Community:</b> Claim available listings (transport or pickup).</div>
-            <div class="small" style="margin-top:6px"><b>Staff & volunteers:</b> Coordinate tasks and updates.</div>
-          </div>
         </div>
-      </div>
     </section>
 
-    <!-- ABOUT / PURPOSE -->
-    <section class="section" style="padding-top:0">
-      <div class="title-center">
-        <h2 class="h2">About FoodShare Seychelles</h2>
-        <div class="lead">
-          We exist to reduce food waste and support food security. We coordinate donations, listings, and claims so that food moves safely and efficiently to the people and communities who need it.
+    <section class="impact">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Impact in Seychelles</h2>
+                <p>Real-time data from our operations across Mahe, Praslin, and La Digue.</p>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="stat-meals">0</h3>
+                    <p>Meals Provided</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-kg">0</h3>
+                    <p>KG Rescued</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-co2">0</h3>
+                    <p>KG CO₂ Prevented</p>
+                </div>
+            </div>
         </div>
-      </div>
     </section>
 
-    <!-- WHAT WE DO -->
-    <section class="section" style="padding-top:0">
-      <div class="grid3">
-        <div class="card pad mini">
-          <h3>Rescue and redistribute</h3>
-          <p>We help direct surplus food to communities through verified listings and structured claims.</p>
+    <section class="partners">
+        <div class="container">
+            <p style="margin-bottom: 20px; color: var(--text-light);">Supported by</p>
+            <a href="https://tylernicholasgroup.com" target="_blank">
+                <img src="/images/tng-logo.png" alt="Tyler Nicholas Group" class="partner-logo">
+            </a>
         </div>
-        <div class="card pad mini">
-          <h3>Coordinate logistics</h3>
-          <p>Staff and volunteers manage pickup and delivery tasks so operations stay organized.</p>
-        </div>
-        <div class="card pad mini">
-          <h3>Provide updates clearly</h3>
-          <p>Signed-in users receive responses and status updates through dashboard notifications.</p>
-        </div>
-      </div>
     </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="section" style="padding-top:0">
-      <div class="title-center">
-        <h2 class="h2">How it works</h2>
-        <div class="lead">Simple steps that keep the process consistent and trackable.</div>
-      </div>
-
-      <div class="steps" style="margin-top:14px">
-        <div class="step">
-          <div class="badge">1</div>
-          <b>Donation submitted</b>
-          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
-            Donors submit details, pickup location, and timeframe.
-          </div>
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="/images/logo.png" style="height: 40px; margin-bottom: 15px; filter: brightness(0) invert(1);" alt="FoodShare">
+                    <p style="color: #aaa; font-size: 0.9rem; line-height: 1.6;">
+                        FoodShare Seychelles is a platform dedicated to reducing food waste and supporting our local community through technology and logistics.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="/about-us/">About Us</a></li>
+                        <li><a href="/available-food/">Find Food</a></li>
+                        <li><a href="/donate-now/">Donate Now</a></li>
+                        <li><a href="/volunteer-now/">Volunteer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal & Safety</h4>
+                    <ul>
+                        <li><a href="/privacy-policy/">Privacy Policy</a></li>
+                        <li><a href="/terms-of-use/">Terms of Use</a></li>
+                        <li><a href="/learn/safety/">Food Safety</a></li>
+                        <li><a href="/sitemap/">Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="/contact/">Contact Support</a></li>
+                        <li><a href="/partners/">Our Partners</a></li>
+                        <li style="margin-top: 10px;">
+                            <a href="#"><i class="fa-brands fa-linkedin fa-lg"></i></a>
+                            <a href="#" style="margin-left: 10px;"><i class="fa-brands fa-facebook fa-lg"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 FoodShare Seychelles. All Rights Reserved.</p>
+                <p style="margin-top: 5px;">
+                    Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a>
+                </p>
+            </div>
         </div>
-        <div class="step">
-          <div class="badge">2</div>
-          <b>Listing published</b>
-          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
-            Staff review donations and publish available listings.
-          </div>
-        </div>
-        <div class="step">
-          <div class="badge">3</div>
-          <b>Claim and coordination</b>
-          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
-            Community members claim items, and staff coordinate updates via notifications.
-          </div>
-        </div>
-      </div>
-    </section>
+    </footer>
 
-    <!-- PARTNER -->
-    <section class="section" style="padding-top:0">
-      <div class="card pad" style="max-width:920px;margin:0 auto">
-        <b>Partner</b>
-        <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
-          Tyler Nicholas Group supports technology, hosting, recruitment, and advertising.
-        </div>
-        <div style="margin-top:14px">
-          <a class="btn light" href="our-partners/"><i class="fa-solid fa-handshake"></i> View Partners</a>
-        </div>
-      </div>
-    </section>
+    <script src="/js/supabase-config.js"></script>
 
-    <!-- CTA -->
-    <section class="section" style="padding-top:0">
-      <div class="cta">
-        <div><b>Want to donate food today?</b> Submit details and we will coordinate the next steps.</div>
-        <a class="btn" href="donate-now/"><i class="fa-solid fa-arrow-right"></i> Start a donation</a>
-      </div>
-    </section>
+    <script>
+        // Remove Loader on Window Load
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
 
-  </main>
+            // Trigger Data Fetch
+            fetchSettings();
+        });
 
-  <footer>
-    <div class="wrap footer-inner">
-      <div class="footgrid">
-        <div>
-          <div class="foot-title">FoodShare Seychelles</div>
-          <div style="margin-top:10px;font-size:13px;color:#cfe0d4;font-weight:650">
-            Contact (no login): <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline;color:#fff;font-weight:950">admin@foodshare-seychelles.online</a>
-          </div>
-          <div style="margin-top:8px;font-size:13px;color:#cfe0d4;font-weight:650">
-            To receive replies via notifications, please sign in and use the platform forms.
-          </div>
-        </div>
+        async function fetchSettings() {
+            // Fetch Announcement and Impact Stats from 'settings' table
+            try {
+                const { data, error } = await _supabase
+                    .from('settings')
+                    .select('*')
+                    .single();
 
-        <div>
-          <div class="foot-title">Quick Links</div>
-          <a class="footlink" href="available-food/">Find Food</a>
-          <a class="footlink" href="donate-now/">Donate</a>
-          <a class="footlink" href="volunteer-now/">Volunteer</a>
-          <a class="footlink" href="staff-login/">Staff Login</a>
-        </div>
+                if (data) {
+                    // Update Stats
+                    animateValue("stat-meals", 0, data.total_meals_served, 2000);
+                    animateValue("stat-kg", 0, data.total_kg_saved, 2000);
+                    animateValue("stat-co2", 0, data.co2_prevented, 2000);
 
-        <div>
-          <div class="foot-title">Legal</div>
-          <a class="footlink" href="privacy-policy/">Privacy Policy</a>
-          <a class="footlink" href="terms-of-use/">Terms of Use</a>
-          <a class="footlink" href="sitemap/">Sitemap</a>
-        </div>
-      </div>
+                    // Update Announcement
+                    if (data.announcement_active && data.announcement_text) {
+                        const bar = document.getElementById('announcement-bar');
+                        bar.style.display = 'block';
+                        bar.innerText = data.announcement_text;
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching settings:", err);
+            }
+        }
 
-      <div class="fineprint">
-        <div>© <span id="yr"></span> FoodShare Seychelles</div>
-        <div>Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer" style="text-decoration:underline;color:#fff;font-weight:950">Tyler Nicholas</a></div>
-      </div>
-    </div>
-  </footer>
-
-  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
-
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-    const supabase = createClient(
-      "https://edotvuleaydztulkxehe.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
-    );
-
-    const loading = document.getElementById("loading");
-    const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
-
-    // Mobile nav select
-    const navSelect = document.getElementById("navSelect");
-    navSelect.value = "./";
-    navSelect.addEventListener("change", ()=> location.href = navSelect.value);
-
-    // Announcement
-    const announceWrap = document.getElementById("announceWrap");
-    const announceText = document.getElementById("announceText");
-    document.getElementById("announceClose").addEventListener("click", ()=> announceWrap.style.display = "none");
-
-    async function loadAnnouncement(){
-      const { data, error } = await supabase.from("settings").select("announcement").eq("id",1).single();
-      if(!error && data?.announcement){
-        announceText.textContent = data.announcement;
-        announceWrap.style.display = "block";
-      }
-    }
-
-    // Auth buttons
-    async function renderAuth(){
-      const box = document.getElementById("authBox");
-      const { data } = await supabase.auth.getSession();
-      const s = data.session;
-
-      if(!s){
-        box.innerHTML = `
-          <a class="btn outline" href="account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-          <a class="btn light" href="account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
-        `;
-      } else {
-        box.innerHTML = `
-          <a class="btn outline" href="account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
-          <button class="btn danger" id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-        `;
-        document.getElementById("logoutBtn").onclick = async ()=>{
-          setLoading(true);
-          await supabase.auth.signOut();
-          setLoading(false);
-          location.reload();
-        };
-      }
-    }
-
-    (async ()=>{
-      await renderAuth();
-      await loadAnnouncement();
-      supabase.auth.onAuthStateChange(()=>renderAuth());
-    })();
-  </script>
+        // Helper to animate numbers counting up
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
 </body>
 </html>
