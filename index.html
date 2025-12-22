@@ -8,21 +8,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root{
-      --brand:#4CAF50;
-      --brand-dark:#1B5E20;
-      --brand-deep:#0F3D14;
-      --accent:#2196F3;
+      /* Pulled from your logo */
+      --brand:#8BC245;       /* main green */
+      --brand-2:#6FA041;     /* secondary green */
+      --brand-deep:#3D5823;  /* deep green */
+      --ink:#102014;
 
-      --bg:#f4f6f5;
+      --bg:#f6f8f6;
       --card:#ffffff;
-      --text:#122013;
       --muted:#5b6a5f;
       --border:#e3e9e5;
 
       --radius:14px;
-      --shadow:0 10px 30px rgba(10, 20, 12, .10);
+      --shadow:0 10px 28px rgba(10, 20, 12, .10);
 
-      --max:1080px;
+      --max:1100px;
     }
 
     *{box-sizing:border-box}
@@ -30,95 +30,108 @@
     body{
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background:var(--bg);
-      color:var(--text);
-      line-height:1.55;
+      color:var(--ink);
+      line-height:1.6;
     }
     a{color:inherit;text-decoration:none}
     a:hover{text-decoration:underline}
+    img{max-width:100%;height:auto}
 
     .wrap{max-width:var(--max); margin:0 auto; padding:0 18px}
-    .spacer{height:18px}
-    .sep{height:1px; background:var(--border); margin:14px 0}
+    .section{padding:26px 0}
+    .sep{height:1px;background:var(--border);margin:16px 0}
 
-    /* Top header + nav */
-    .topbar{
+    /* Header */
+    header{
       background:var(--brand-deep);
       color:#fff;
+      position:sticky;
+      top:0;
+      z-index:50;
       border-bottom:1px solid rgba(255,255,255,.08);
     }
-    .topbar-inner{
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       padding:12px 0;
+      flex-wrap:wrap; /* critical for mobile friendliness */
     }
     .brand{
       display:flex; align-items:center; gap:10px;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:.2px;
+      min-width: 220px;
     }
     .brand img{
-      width:34px; height:34px;
+      width:36px; height:36px;
       border-radius:10px;
       background:#fff;
+      object-fit:cover;
     }
 
-    .navlinks{
-      display:flex; gap:14px; align-items:center; flex-wrap:wrap;
+    nav.navlinks{
+      display:flex;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
       font-size:13px;
+      opacity:.98;
     }
-    .navlinks a{opacity:.95}
-    .navlinks a:hover{opacity:1}
+    nav.navlinks a{opacity:.95}
+    nav.navlinks a:hover{opacity:1}
 
-    .authbox{display:flex; gap:10px; align-items:center}
+    .right{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-left:auto;
+    }
 
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:8px;
       padding:9px 12px;
       border-radius:10px;
       border:1px solid transparent;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
       font-size:13px;
       white-space:nowrap;
     }
-    .btn.light{background:#fff; color:var(--brand-deep)}
-    .btn.outline{background:transparent; color:#fff; border-color:rgba(255,255,255,.25)}
-    .btn.brand{background:var(--brand); color:#fff}
-    .btn.danger{background:#D32F2F; color:#fff}
+    .btn.light{background:#fff;color:var(--brand-deep)}
+    .btn.outline{background:transparent;color:#fff;border-color:rgba(255,255,255,.25)}
+    .btn.brand{background:var(--brand);color:#143118}
+    .btn.danger{background:#D32F2F;color:#fff}
 
     /* Mobile nav select */
     .navselect{
       display:none;
-      min-width:180px;
+      min-width:210px;
       padding:9px 10px;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,.25);
+      border:1px solid rgba(255,255,255,.22);
       background:rgba(255,255,255,.08);
       color:#fff;
-      font-weight:800;
+      font-weight:900;
       outline:none;
     }
     .navselect option{color:#000}
 
-    @media (max-width: 860px){
-      .navlinks{display:none}
+    @media (max-width: 920px){
+      nav.navlinks{display:none}
       .navselect{display:block}
+      .brand{min-width:auto}
+      .right{width:100%; justify-content:flex-start} /* stack cleanly */
     }
 
-    /* Announcement bar under nav */
-    .announce-wrap{
-      background:#fff;
-      border-bottom:1px solid var(--border);
-    }
-    .announce{
-      display:none;
-      padding:10px 0;
-    }
+    /* Announcement under header */
+    .announce-wrap{background:#fff;border-bottom:1px solid var(--border)}
+    .announce{display:none;padding:10px 0}
     .announce-card{
-      background:#EAF6EC;
-      border:1px solid rgba(76,175,80,.35);
+      background:#eef7e3;
+      border:1px solid rgba(139,194,69,.45);
       border-radius:12px;
       padding:10px 12px;
       display:flex;
@@ -127,168 +140,188 @@
       gap:12px;
     }
     .announce-title{
-      font-weight:900;
-      color:var(--brand-dark);
+      font-weight:950;
+      color:#23411a;
       display:flex;
       gap:8px;
       align-items:center;
     }
     .announce-text{
       margin-top:4px;
-      color:#234029;
-      font-weight:700;
+      color:#2b3f23;
+      font-weight:750;
       font-size:13px;
     }
 
-    /* Main sections layout */
-    .section{padding:22px 0}
-    .center{display:flex; justify-content:center}
+    /* Cards & layout */
     .card{
       background:var(--card);
       border:1px solid var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
     }
+    .pad{padding:18px}
 
-    /* Hero card like screenshot */
-    .hero-card{
-      width:min(860px, 100%);
-      background:linear-gradient(180deg, var(--brand-deep), var(--brand-dark));
-      color:#fff;
-      padding:34px 22px;
-      text-align:center;
+    /* Hero (real homepage hero) */
+    .hero{
+      width:100%;
+      border-radius:16px;
+      overflow:hidden;
+      background:
+        radial-gradient(900px 500px at 10% 0%, rgba(139,194,69,.30), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(111,160,65,.22), transparent 60%),
+        linear-gradient(180deg, #ffffff, #fbfdf9);
     }
-    .hero-title{
-      font-size:42px;
-      line-height:1.12;
-      font-weight:950;
+    .hero-inner{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:16px;
+      align-items:center;
+    }
+    @media (max-width: 920px){
+      .hero-inner{grid-template-columns:1fr}
+    }
+    .hero h1{
       margin:0;
+      font-size:40px;
+      line-height:1.12;
+      font-weight:980;
       letter-spacing:-.2px;
     }
-    .hero-sub{
-      max-width:640px;
-      margin:14px auto 0;
+    @media (max-width: 560px){
+      .hero h1{font-size:30px}
+    }
+    .hero p{
+      margin:12px 0 0;
+      color:var(--muted);
+      font-weight:700;
       font-size:14px;
-      opacity:.92;
-      font-weight:650;
+      max-width: 56ch;
     }
     .hero-actions{
-      margin-top:18px;
+      margin-top:16px;
       display:flex;
       gap:10px;
-      justify-content:center;
       flex-wrap:wrap;
     }
-    .hero-actions .btn{font-size:13px}
 
-    @media (max-width: 560px){
-      .hero-title{font-size:32px}
-      .hero-card{padding:26px 16px}
+    .sidebox{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
     }
+    .sidebox b{font-weight:950}
+    .sidebox .small{margin-top:6px;color:var(--muted);font-size:13px;font-weight:650}
 
-    /* Purpose block */
+    /* Section titles */
     .title-center{
-      text-align:center;
-      max-width:760px;
+      max-width:860px;
       margin:0 auto;
+      text-align:center;
     }
     .h2{
       margin:0;
       font-size:18px;
-      font-weight:950;
-      color:var(--brand-dark);
+      font-weight:980;
+      color:#1b3413;
       letter-spacing:.2px;
     }
-    .p{
+    .lead{
       margin:10px auto 0;
-      color:var(--muted);
-      font-weight:650;
       font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+      max-width: 86ch;
     }
 
-    /* Features container with 3 cards like screenshot */
-    .features-wrap{
-      width:min(860px, 100%);
-      padding:18px;
-    }
-    .features-title{
-      text-align:center;
-      font-weight:950;
-      color:var(--brand-dark);
-      margin:0;
-      font-size:16px;
-      letter-spacing:.2px;
-    }
-    .features-grid{
-      margin-top:14px;
+    /* 3 feature blocks */
+    .grid3{
+      max-width:920px;
+      margin:0 auto;
       display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
       gap:12px;
     }
-    @media (max-width: 860px){
-      .features-grid{grid-template-columns:1fr}
+    @media (max-width: 920px){
+      .grid3{grid-template-columns:1fr}
     }
-    .feature{
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:14px;
-      background:#fff;
-    }
-    .feature h3{
+    .mini h3{
       margin:0;
       font-size:14px;
-      font-weight:950;
-      color:#14331a;
+      font-weight:980;
+      color:#183115;
     }
-    .feature p{
+    .mini p{
       margin:8px 0 0;
       font-size:13px;
       color:var(--muted);
       font-weight:650;
     }
-    .feature a{
+
+    /* How it works steps */
+    .steps{
+      max-width:920px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (max-width: 920px){
+      .steps{grid-template-columns:1fr}
+    }
+    .step{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px;
+      background:#fff;
+    }
+    .badge{
       display:inline-flex;
-      margin-top:10px;
-      font-size:13px;
-      font-weight:900;
-      color:var(--brand-dark);
+      align-items:center;
+      justify-content:center;
+      width:28px;height:28px;
+      border-radius:10px;
+      background:rgba(139,194,69,.18);
+      border:1px solid rgba(139,194,69,.35);
+      color:#244218;
+      font-weight:980;
+      margin-bottom:10px;
     }
 
-    /* CTA strip like screenshot bottom */
-    .cta-strip{
-      width:min(860px, 100%);
-      background:var(--brand-dark);
+    /* CTA strip (simple, not spammy) */
+    .cta{
+      max-width:920px;
+      margin:0 auto;
+      background:var(--brand-deep);
       color:#fff;
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:12px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.08);
       padding:14px 16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
+      flex-wrap:wrap;
       box-shadow:var(--shadow);
     }
-    .cta-strip b{font-weight:950}
-    .cta-strip .btn{background:#fff; color:var(--brand-dark)}
+    .cta b{font-weight:980}
+    .cta .btn{background:#fff; color:var(--brand-deep)}
 
-    /* Footer like screenshot */
-    footer{
-      margin-top:26px;
-      background:var(--brand-deep);
-      color:#dfe8e1;
-    }
+    /* Footer */
+    footer{margin-top:26px;background:var(--brand-deep);color:#dfe8e1}
     .footer-inner{padding:26px 0}
     .footgrid{
       display:grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-columns:1.4fr 1fr 1fr;
       gap:18px;
     }
-    @media (max-width: 860px){
+    @media (max-width: 920px){
       .footgrid{grid-template-columns:1fr}
     }
-    .foot-title{font-weight:950; color:#fff; margin:0}
-    .footlink{display:block; padding:6px 0; color:#dfe8e1; opacity:.95; font-size:13px}
-    .footlink:hover{opacity:1; text-decoration:none}
+    .foot-title{font-weight:980;color:#fff;margin:0}
+    .footlink{display:block;padding:6px 0;color:#dfe8e1;opacity:.95;font-size:13px}
+    .footlink:hover{opacity:1;text-decoration:none}
     .fineprint{
       border-top:1px solid rgba(255,255,255,.12);
       margin-top:18px;
@@ -306,7 +339,7 @@
       position:fixed; inset:0;
       display:none;
       align-items:center; justify-content:center;
-      background:rgba(244,246,245,.88);
+      background:rgba(246,248,246,.88);
       z-index:200;
     }
     .loadbox{
@@ -328,16 +361,14 @@
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="topbar">
+  <header>
     <div class="wrap">
-      <div class="topbar-inner">
+      <div class="topbar">
         <a class="brand" href="./">
-          <img src="image/logo.png" alt="logo" onerror="this.style.display='none'">
+          <img src="image/logo.png" alt="FoodShare logo" onerror="this.style.display='none'">
           <span>FoodShare Seychelles</span>
         </a>
 
-        <!-- Desktop links -->
         <nav class="navlinks" aria-label="Primary">
           <a href="./">Home</a>
           <a href="available-food/">Find Food</a>
@@ -349,24 +380,24 @@
           <a href="staff-login/">Staff</a>
         </nav>
 
-        <!-- Mobile select -->
-        <select class="navselect" id="navSelect" aria-label="Navigate">
-          <option value="./">Home</option>
-          <option value="available-food/">Find Food</option>
-          <option value="donate-now/">Donate</option>
-          <option value="volunteer-now/">Volunteer</option>
-          <option value="our-impact/">Impact</option>
-          <option value="about/">About</option>
-          <option value="our-partners/">Partners</option>
-          <option value="staff-login/">Staff Login</option>
-        </select>
+        <div class="right">
+          <select class="navselect" id="navSelect" aria-label="Navigate">
+            <option value="./">Home</option>
+            <option value="available-food/">Find Food</option>
+            <option value="donate-now/">Donate</option>
+            <option value="volunteer-now/">Volunteer</option>
+            <option value="our-impact/">Impact</option>
+            <option value="about/">About</option>
+            <option value="our-partners/">Partners</option>
+            <option value="staff-login/">Staff Login</option>
+          </select>
 
-        <div class="authbox" id="authBox"></div>
+          <div id="authBox" class="right" style="margin-left:0"></div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Announcement (below nav) -->
   <div class="announce-wrap">
     <div class="wrap">
       <div class="announce" id="announceWrap">
@@ -387,128 +418,145 @@
     <div class="loadbox">
       <div class="spin"></div>
       <div>
-        <div style="font-weight:950">Loading</div>
+        <div style="font-weight:980">Loading</div>
         <div style="font-size:12px;color:var(--muted);font-weight:700">Please wait…</div>
       </div>
     </div>
   </div>
 
-  <!-- MAIN -->
   <main class="wrap">
 
     <!-- HERO -->
     <section class="section">
-      <div class="center">
-        <div class="card hero-card">
-          <h1 class="hero-title">Rescuing Food. Serving Communities.</h1>
-          <div class="hero-sub">
-            FoodShare Seychelles connects donors with community members and coordinates pickup and delivery through staff and volunteers.
+      <div class="card hero pad">
+        <div class="hero-inner">
+          <div>
+            <h1>Food rescue that serves communities across Seychelles.</h1>
+            <p>
+              FoodShare Seychelles reduces food waste by coordinating donations and connecting available food to people who need it.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn brand" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+              <a class="btn light" href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Food</a>
+            </div>
+
+            <p style="margin-top:12px;font-size:13px;color:var(--muted);font-weight:700">
+              Platform forms require login so we can reply via your dashboard notifications.
+              If you cannot sign in, email <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline;font-weight:950">admin@foodshare-seychelles.online</a>.
+            </p>
           </div>
-          <div class="hero-actions">
-            <a class="btn brand" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
-            <a class="btn light" href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
-            <a class="btn outline" href="volunteer-now/"><i class="fa-solid fa-people-group"></i> Volunteer</a>
-          </div>
-          <div style="margin-top:14px; font-size:12px; opacity:.92; font-weight:700">
-            Platform forms require login so we can reply via notifications. If you cannot sign in, email
-            <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline; font-weight:950">admin@foodshare-seychelles.online</a>.
+
+          <div class="sidebox">
+            <b>What we focus on</b>
+            <div class="small">Safe handling, clear coordination, and accountable distribution.</div>
+            <div class="sep"></div>
+            <div class="small"><b>Donors:</b> Submit food donations and pickup windows.</div>
+            <div class="small" style="margin-top:6px"><b>Community:</b> Claim available listings (transport or pickup).</div>
+            <div class="small" style="margin-top:6px"><b>Staff & volunteers:</b> Coordinate tasks and updates.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- PURPOSE -->
+    <!-- ABOUT / PURPOSE -->
     <section class="section" style="padding-top:0">
       <div class="title-center">
-        <h2 class="h2">Our Purpose</h2>
-        <p class="p">
-          We reduce food waste across Seychelles and improve access to essential support by making donation, claiming, and coordination simple and accountable.
-        </p>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section class="section" style="padding-top:0">
-      <div class="center">
-        <div class="card features-wrap">
-          <h3 class="features-title">What You Can Do</h3>
-          <div class="features-grid">
-            <div class="feature">
-              <h3>Find Food</h3>
-              <p>Browse live listings and submit a claim for transport or self pickup.</p>
-              <a href="available-food/">Browse listings</a>
-            </div>
-            <div class="feature">
-              <h3>Donate Food</h3>
-              <p>Submit donation details so staff can coordinate collection and distribution.</p>
-              <a href="donate-now/">Donate now</a>
-            </div>
-            <div class="feature">
-              <h3>Volunteer</h3>
-              <p>Apply to support operations, logistics, coordination, and outreach.</p>
-              <a href="volunteer-now/">Apply</a>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <!-- Optional clean stats area -->
-          <div style="display:flex; gap:14px; flex-wrap:wrap; justify-content:space-between; align-items:flex-end">
-            <div>
-              <div style="font-weight:950; color:var(--brand-dark)">Quick Snapshot</div>
-              <div style="font-size:12px; color:var(--muted); font-weight:700; margin-top:4px">
-                Some counts may be hidden by security until you sign in.
-              </div>
-            </div>
-            <div style="display:flex; gap:14px; flex-wrap:wrap">
-              <div style="min-width:160px">
-                <div style="font-size:12px; color:var(--muted); font-weight:800">Available listings</div>
-                <div id="kListings" style="font-size:28px; font-weight:950">0</div>
-              </div>
-              <div style="min-width:160px">
-                <div style="font-size:12px; color:var(--muted); font-weight:800">Donations</div>
-                <div id="kDonations" style="font-size:28px; font-weight:950">0</div>
-              </div>
-              <div style="min-width:160px">
-                <div style="font-size:12px; color:var(--muted); font-weight:800">Claims</div>
-                <div id="kClaims" style="font-size:28px; font-weight:950">0</div>
-              </div>
-            </div>
-          </div>
-
+        <h2 class="h2">About FoodShare Seychelles</h2>
+        <div class="lead">
+          We exist to reduce food waste and support food security. We coordinate donations, listings, and claims so that food moves safely and efficiently to the people and communities who need it.
         </div>
       </div>
     </section>
 
-    <!-- CTA STRIP -->
+    <!-- WHAT WE DO -->
     <section class="section" style="padding-top:0">
-      <div class="center">
-        <div class="cta-strip">
-          <div><b>Ready to contribute to food rescue in Seychelles?</b></div>
-          <a class="btn" href="donate-now/"><i class="fa-solid fa-arrow-right"></i> Start a donation</a>
+      <div class="grid3">
+        <div class="card pad mini">
+          <h3>Rescue and redistribute</h3>
+          <p>We help direct surplus food to communities through verified listings and structured claims.</p>
         </div>
+        <div class="card pad mini">
+          <h3>Coordinate logistics</h3>
+          <p>Staff and volunteers manage pickup and delivery tasks so operations stay organized.</p>
+        </div>
+        <div class="card pad mini">
+          <h3>Provide updates clearly</h3>
+          <p>Signed-in users receive responses and status updates through dashboard notifications.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" style="padding-top:0">
+      <div class="title-center">
+        <h2 class="h2">How it works</h2>
+        <div class="lead">Simple steps that keep the process consistent and trackable.</div>
+      </div>
+
+      <div class="steps" style="margin-top:14px">
+        <div class="step">
+          <div class="badge">1</div>
+          <b>Donation submitted</b>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
+            Donors submit details, pickup location, and timeframe.
+          </div>
+        </div>
+        <div class="step">
+          <div class="badge">2</div>
+          <b>Listing published</b>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
+            Staff review donations and publish available listings.
+          </div>
+        </div>
+        <div class="step">
+          <div class="badge">3</div>
+          <b>Claim and coordination</b>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
+            Community members claim items, and staff coordinate updates via notifications.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARTNER -->
+    <section class="section" style="padding-top:0">
+      <div class="card pad" style="max-width:920px;margin:0 auto">
+        <b>Partner</b>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px;font-weight:650">
+          Tyler Nicholas Group supports technology, hosting, recruitment, and advertising.
+        </div>
+        <div style="margin-top:14px">
+          <a class="btn light" href="our-partners/"><i class="fa-solid fa-handshake"></i> View Partners</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" style="padding-top:0">
+      <div class="cta">
+        <div><b>Want to donate food today?</b> Submit details and we will coordinate the next steps.</div>
+        <a class="btn" href="donate-now/"><i class="fa-solid fa-arrow-right"></i> Start a donation</a>
       </div>
     </section>
 
   </main>
 
-  <!-- FOOTER -->
   <footer>
     <div class="wrap footer-inner">
       <div class="footgrid">
         <div>
           <div class="foot-title">FoodShare Seychelles</div>
-          <div style="margin-top:10px; font-size:13px; color:#cfe0d4; font-weight:650">
-            Contact (no login): <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline; color:#fff; font-weight:900">admin@foodshare-seychelles.online</a>
+          <div style="margin-top:10px;font-size:13px;color:#cfe0d4;font-weight:650">
+            Contact (no login): <a href="mailto:admin@foodshare-seychelles.online" style="text-decoration:underline;color:#fff;font-weight:950">admin@foodshare-seychelles.online</a>
           </div>
-          <div style="margin-top:8px; font-size:13px; color:#cfe0d4; font-weight:650">
-            For platform replies and updates, please sign in and use the forms.
+          <div style="margin-top:8px;font-size:13px;color:#cfe0d4;font-weight:650">
+            To receive replies via notifications, please sign in and use the platform forms.
           </div>
         </div>
 
         <div>
           <div class="foot-title">Quick Links</div>
-          <a class="footlink" href="./">Home</a>
           <a class="footlink" href="available-food/">Find Food</a>
           <a class="footlink" href="donate-now/">Donate</a>
           <a class="footlink" href="volunteer-now/">Volunteer</a>
@@ -525,7 +573,7 @@
 
       <div class="fineprint">
         <div>© <span id="yr"></span> FoodShare Seychelles</div>
-        <div>Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer" style="text-decoration:underline; color:#fff; font-weight:900">Tyler Nicholas</a></div>
+        <div>Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer" style="text-decoration:underline;color:#fff;font-weight:950">Tyler Nicholas</a></div>
       </div>
     </div>
   </footer>
@@ -551,9 +599,7 @@
     // Announcement
     const announceWrap = document.getElementById("announceWrap");
     const announceText = document.getElementById("announceText");
-    document.getElementById("announceClose").addEventListener("click", ()=> {
-      announceWrap.style.display = "none";
-    });
+    document.getElementById("announceClose").addEventListener("click", ()=> announceWrap.style.display = "none");
 
     async function loadAnnouncement(){
       const { data, error } = await supabase.from("settings").select("announcement").eq("id",1).single();
@@ -588,22 +634,9 @@
       }
     }
 
-    async function loadCounts(){
-      // If RLS blocks a count, we keep it at 0 (clean UI, no errors shown).
-      const a = await supabase.from("food_listings").select("id",{count:"exact",head:true}).eq("is_available", true);
-      if(!a.error && typeof a.count === "number") document.getElementById("kListings").textContent = a.count;
-
-      const b = await supabase.from("donations").select("id",{count:"exact",head:true});
-      if(!b.error && typeof b.count === "number") document.getElementById("kDonations").textContent = b.count;
-
-      const c = await supabase.from("claims").select("id",{count:"exact",head:true});
-      if(!c.error && typeof c.count === "number") document.getElementById("kClaims").textContent = c.count;
-    }
-
     (async ()=>{
       await renderAuth();
       await loadAnnouncement();
-      await loadCounts();
       supabase.auth.onAuthStateChange(()=>renderAuth());
     })();
   </script>
