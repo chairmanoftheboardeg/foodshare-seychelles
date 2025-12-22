@@ -1,264 +1,289 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FoodShare Seychelles</title>
   <link rel="icon" href="image/logo.png">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1150px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
-    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
-    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
-    .grid{display:grid;gap:14px}
-    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-    @media(max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
-    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
-    .brand img{width:34px;height:34px;border-radius:10px}
-    .nav-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
-    .nav-links a{padding:8px 10px;border-radius:12px}
-    .nav-links a:hover{background:#eef6ee;text-decoration:none}
-    .nav-cta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
-    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
-    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)}
-    .btn.small{padding:8px 10px;border-radius:12px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
-    .card .content{padding:14px}
-    .h1{font-size:40px;line-height:1.05;margin:0}
-    .h2{font-size:18px;margin:0}
-    .p{margin:10px 0;color:var(--muted)}
-    .hero{padding:18px;border-radius:26px;background:
-      radial-gradient(900px 260px at 10% 0%, rgba(76,175,80,.18), transparent 60%),
-      radial-gradient(900px 260px at 80% 30%, rgba(33,150,243,.12), transparent 60%),
-      #fff;
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
+    :root{
+      --bg:#f7faf8; --card:#ffffff; --text:#132015; --muted:#5d6a5f;
+      --border:#e6efe8; --shadow:0 10px 30px rgba(16,24,16,.06);
+      --green:#4CAF50; --green2:#388E3C; --blue:#2196F3; --danger:#D32F2F;
+      --radius:18px; --max:1120px;
     }
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;font-weight:900}
-    .kpi{display:flex;flex-direction:column;gap:4px}
-    .kpi b{font-size:24px}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--text); line-height:1.5}
+    a{color:inherit;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:var(--max); margin:0 auto; padding:18px}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:10px 14px; border-radius:14px;
+      border:1px solid transparent; font-weight:800; cursor:pointer; text-decoration:none}
+    .btn.primary{background:var(--green); color:#fff; box-shadow:0 12px 24px rgba(76,175,80,.18)}
+    .btn.secondary{background:#fff; color:var(--text); border-color:var(--border)}
+    .btn.blue{background:var(--blue); color:#fff}
+    .btn.danger{background:var(--danger); color:#fff}
+    .btn.small{padding:8px 10px; border-radius:12px; font-weight:800}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .pad{padding:16px}
+    .muted{color:var(--muted)}
+    .h1{font-size:44px; line-height:1.05; margin:0}
+    .h2{font-size:18px; margin:0}
+    @media(max-width:720px){ .h1{font-size:34px} }
     .sep{height:1px;background:var(--border);margin:12px 0}
-    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
-    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
-    .small{font-size:12px;color:var(--muted)}
-    .footer{margin-top:28px;border-top:1px solid var(--border);background:#fff}
-    .footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
-    @media(max-width:900px){.footer .cols{grid-template-columns:1fr}}
-    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
-    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
-    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .tag{display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:999px; border:1px solid var(--border); background:#fff; font-weight:800; font-size:12px}
+    .nav{
+      position:sticky; top:0; z-index:30; background:rgba(255,255,255,.92);
+      backdrop-filter: blur(10px); border-bottom:1px solid var(--border);
+    }
+    .nav-inner{display:flex; align-items:center; justify-content:space-between; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900}
+    .brand img{width:34px; height:34px; border-radius:10px}
+    .menu{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    details.navdrop{position:relative}
+    details.navdrop summary{list-style:none; cursor:pointer}
+    details.navdrop summary::-webkit-details-marker{display:none}
+    .drop{position:absolute; right:0; top:44px; width:240px; background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:10px}
+    .drop a{display:block; padding:10px 10px; border-radius:12px}
+    .drop a:hover{background:#f2f7f3; text-decoration:none}
+    .hero{
+      background: linear-gradient(180deg, rgba(76,175,80,.10), rgba(255,255,255,1));
+      border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .grid{display:grid; gap:12px}
+    .grid2{grid-template-columns: 1.15fr .85fr}
+    .grid3{grid-template-columns: repeat(3, minmax(0,1fr))}
+    @media(max-width:920px){ .grid2{grid-template-columns:1fr} }
+    @media(max-width:920px){ .grid3{grid-template-columns:1fr} }
+    .notice{border:1px solid rgba(76,175,80,.25); background:#f2fbf3; border-radius:16px; padding:12px}
+    .loading{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(247,250,248,.92); z-index:200}
+    .loadbox{background:#fff; border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:14px 16px; display:flex; align-items:center; gap:10px}
+    .spin{width:18px;height:18px;border-radius:50%;border:3px solid #d6ead8;border-top-color:var(--green);animation:sp .9s linear infinite}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    footer{margin-top:26px; padding:18px 0; border-top:1px solid var(--border); background:#fff}
+    .footgrid{display:grid; gap:12px; grid-template-columns:2fr 1fr 1fr}
+    @media(max-width:920px){ .footgrid{grid-template-columns:1fr} }
+    .small{font-size:12px; color:var(--muted)}
   </style>
 </head>
 <body>
-  <div class="navbar">
+  <div class="nav">
     <div class="container nav-inner">
       <a class="brand" href="./">
         <img src="image/logo.png" alt="logo" onerror="this.style.display='none'">
         <span>FoodShare Seychelles</span>
       </a>
-      <div class="nav-links">
-        <a href="available-food/">Find Food</a>
-        <a href="donate-now/">Donate</a>
-        <a href="volunteer-now/">Volunteer</a>
-        <a href="our-impact/">Impact</a>
-        <a href="about/">About</a>
-        <a href="our-partners/">Partners</a>
-        <a href="staff-login/">Staff Login</a>
+
+      <div class="menu">
+        <div id="navAuth" class="row"></div>
+
+        <details class="navdrop">
+          <summary class="btn secondary small"><i class="fa-solid fa-bars"></i> Menu</summary>
+          <div class="drop">
+            <a href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+            <a href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate</a>
+            <a href="volunteer-now/"><i class="fa-solid fa-people-group"></i> Volunteer</a>
+            <a href="our-impact/"><i class="fa-solid fa-chart-line"></i> Impact</a>
+            <a href="about/"><i class="fa-solid fa-circle-info"></i> About</a>
+            <a href="our-partners/"><i class="fa-solid fa-handshake"></i> Partners</a>
+            <a href="staff-login/"><i class="fa-solid fa-lock"></i> Staff Login</a>
+          </div>
+        </details>
       </div>
-      <div class="nav-cta" id="navAuth"></div>
     </div>
   </div>
 
   <div class="loading" id="loading">
-    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
+    <div class="loadbox"><div class="spin"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
   </div>
 
   <main class="container">
     <section class="hero">
-      <div class="grid two" style="align-items:center">
+      <div class="grid grid2" style="align-items:center">
         <div>
-          <div class="row" style="display:flex;gap:10px;flex-wrap:wrap">
-            <span class="pill"><i class="fa-solid fa-leaf"></i> Reduce food waste</span>
-            <span class="pill"><i class="fa-solid fa-hand-holding-heart"></i> Support communities</span>
-            <span class="pill"><i class="fa-solid fa-truck"></i> Coordinate logistics</span>
+          <div class="row">
+            <span class="tag"><i class="fa-solid fa-leaf"></i> Reduce waste</span>
+            <span class="tag"><i class="fa-solid fa-hand-holding-heart"></i> Support communities</span>
+            <span class="tag"><i class="fa-solid fa-truck"></i> Coordinate logistics</span>
           </div>
-          <h1 class="h1" style="margin-top:12px">Connecting donors to recipients across Seychelles.</h1>
-          <p class="p">FoodShare Seychelles coordinates food donations, community claims, and delivery logistics through staff and volunteers.</p>
-          <div class="row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-            <a class="btn" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
+
+          <div style="margin-top:12px">
+            <h1 class="h1">Food rescue and distribution—organized and transparent.</h1>
+            <p class="muted" style="margin:10px 0 0">
+              Donors submit food, community members claim listings, and staff coordinate logistics through tasks and notifications.
+            </p>
+          </div>
+
+          <div class="row" style="margin-top:14px">
+            <a class="btn primary" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Find Food</a>
             <a class="btn blue" href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
             <a class="btn secondary" href="volunteer-now/"><i class="fa-solid fa-people-group"></i> Volunteer</a>
           </div>
+
           <div class="small" style="margin-top:10px">
-            Forms require login for dashboard replies. No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
+            Forms require login so we can reply via your dashboard notifications.
+            No login? Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>.
           </div>
         </div>
 
-        <div>
+        <div class="card pad">
+          <div class="h2">Announcement</div>
+          <div class="sep"></div>
           <div id="announce" class="notice" style="display:none"></div>
+          <div id="announceEmpty" class="muted">No announcements right now.</div>
 
-          <div class="card" style="margin-top:12px">
-            <div class="bar"></div>
-            <div class="content">
-              <div class="h2">Quick Impact Snapshot</div>
-              <div class="sep"></div>
-              <div class="grid three">
-                <div class="kpi"><div class="small">Food listings</div><b id="kListings">—</b></div>
-                <div class="kpi"><div class="small">Donations</div><b id="kDonations">—</b></div>
-                <div class="kpi"><div class="small">Claims</div><b id="kClaims">—</b></div>
-              </div>
-              <div class="sep"></div>
-              <a class="btn small secondary" href="our-impact/"><i class="fa-solid fa-chart-line"></i> View full impact</a>
+          <div class="sep"></div>
+          <div class="h2">Quick snapshot</div>
+          <div class="sep"></div>
+          <div class="grid grid3">
+            <div class="card pad" style="box-shadow:none">
+              <div class="small">Available listings</div>
+              <div style="font-size:28px;font-weight:900" id="kListings">—</div>
+            </div>
+            <div class="card pad" style="box-shadow:none">
+              <div class="small">Donations</div>
+              <div style="font-size:28px;font-weight:900" id="kDonations">—</div>
+            </div>
+            <div class="card pad" style="box-shadow:none">
+              <div class="small">Claims</div>
+              <div style="font-size:28px;font-weight:900" id="kClaims">—</div>
             </div>
           </div>
 
-          <div class="card" style="margin-top:12px">
-            <div class="bar"></div>
-            <div class="content">
-              <div class="h2">Partner</div>
-              <div class="sep"></div>
-              <div class="row" style="justify-content:space-between">
-                <div>
-                  <b>Tyler Nicholas Group</b>
-                  <div class="small">Technology • Recruitment • Hosting • Advertising</div>
-                </div>
-                <a class="btn small secondary" href="our-partners/"><i class="fa-solid fa-handshake"></i> Partners</a>
-              </div>
-            </div>
-          </div>
-
+          <div class="sep"></div>
+          <a class="btn secondary small" href="our-impact/"><i class="fa-solid fa-chart-line"></i> View Impact</a>
         </div>
       </div>
     </section>
 
-    <section style="margin-top:14px" class="grid three">
-      <div class="card"><div class="bar"></div><div class="content">
+    <section class="grid grid3" style="margin-top:14px">
+      <div class="card pad">
         <div class="h2">Find Food</div>
-        <p class="p">See available listings and submit a claim (transport or self pickup).</p>
-        <a class="btn small" href="available-food/"><i class="fa-solid fa-basket-shopping"></i> Browse</a>
-      </div></div>
+        <div class="sep"></div>
+        <div class="muted">Browse available listings and submit a claim (transport or self pickup).</div>
+        <div style="margin-top:12px"><a class="btn primary small" href="available-food/">Browse listings</a></div>
+      </div>
 
-      <div class="card"><div class="bar"></div><div class="content">
+      <div class="card pad">
         <div class="h2">Donate Food</div>
-        <p class="p">Submit donation details so staff can coordinate pickup.</p>
-        <a class="btn small blue" href="donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate</a>
-      </div></div>
+        <div class="sep"></div>
+        <div class="muted">Submit donation details so staff can coordinate pickup.</div>
+        <div style="margin-top:12px"><a class="btn blue small" href="donate-now/">Donate now</a></div>
+      </div>
 
-      <div class="card"><div class="bar"></div><div class="content">
+      <div class="card pad">
         <div class="h2">Volunteer</div>
-        <p class="p">Apply to help with operations, logistics, and community support.</p>
-        <a class="btn small secondary" href="volunteer-now/"><i class="fa-solid fa-people-group"></i> Apply</a>
-      </div></div>
+        <div class="sep"></div>
+        <div class="muted">Apply to help with operations, logistics, and support.</div>
+        <div style="margin-top:12px"><a class="btn secondary small" href="volunteer-now/">Apply</a></div>
+      </div>
     </section>
   </main>
 
-  <div class="footer">
+  <footer>
     <div class="container">
-      <div class="cols">
-        <div>
-          <div class="notice">
-            <b>Contact (no login):</b>
-            <a href="mailto:admin@foodshare-seychelles.online">admin@foodshare-seychelles.online</a>
+      <div class="footgrid">
+        <div class="card pad" style="box-shadow:none">
+          <b>Contact (no login)</b>
+          <div class="sep"></div>
+          <div class="small">
+            Email <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>
           </div>
-          <p class="small" style="margin-top:10px">For dashboard replies and notifications, please create an account and sign in.</p>
+          <div class="small" style="margin-top:8px">For replies via notifications, please sign in and use the platform forms.</div>
         </div>
-        <div>
-          <div class="h2" style="margin-bottom:8px">Learn</div>
-          <div class="grid" style="gap:6px">
-            <a href="learn/safety/">Food Safety</a>
-            <a href="learn/faq/">FAQ</a>
-            <a href="social/">Social</a>
-            <a href="sitemap/">Sitemap</a>
-          </div>
-        </div>
-        <div>
-          <div class="h2" style="margin-bottom:8px">Legal</div>
-          <div class="grid" style="gap:6px">
-            <a href="privacy-policy/">Privacy Policy</a>
-            <a href="terms-of-use/">Terms of Use</a>
-          </div>
-        </div>
-      </div>
-      <div class="sep"></div>
-      <div class="row" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
-        <div class="small">Powered by Supabase</div>
-      </div>
-    </div>
-  </div>
 
-  <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+        <div>
+          <b>Learn</b>
+          <div class="sep"></div>
+          <div class="small"><a href="learn/faq/">FAQ</a></div>
+          <div class="small"><a href="learn/safety/">Food Safety</a></div>
+          <div class="small"><a href="social/">Social</a></div>
+          <div class="small"><a href="sitemap/">Sitemap</a></div>
+        </div>
+
+        <div>
+          <b>Legal</b>
+          <div class="sep"></div>
+          <div class="small"><a href="privacy-policy/">Privacy Policy</a></div>
+          <div class="small"><a href="terms-of-use/">Terms of Use</a></div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+      <div class="small">© <span id="yr"></span> FoodShare Seychelles</div>
+    </div>
+  </footer>
+
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-    const supabase = createClient(
-      "https://edotvuleaydztulkxehe.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
-    );
+
+    const SUPABASE_URL = "https://edotvuleaydztulkxehe.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const loading = document.getElementById("loading");
     const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
 
-    async function setNav(){
-      const nav = document.getElementById("navAuth");
+    async function renderAuth(){
+      const el = document.getElementById("navAuth");
       const { data } = await supabase.auth.getSession();
-      if(!data.session){
-        nav.innerHTML = `
-          <a class="btn small secondary" href="account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-          <a class="btn small" href="account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
+      const s = data.session;
+
+      if(!s){
+        el.innerHTML = `
+          <a class="btn secondary small" href="account/login/"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a class="btn primary small" href="account/signup/"><i class="fa-solid fa-user-plus"></i> Sign up</a>
         `;
-      }else{
-        nav.innerHTML = `
-          <a class="btn small secondary" href="account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
-          <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      } else {
+        el.innerHTML = `
+          <a class="btn secondary small" href="account/dashboard/"><i class="fa-solid fa-user"></i> Dashboard</a>
+          <button class="btn danger small" id="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         `;
-        document.getElementById("btnLogout").addEventListener("click", async ()=>{
-          setLoading(true); await supabase.auth.signOut(); setLoading(false);
+        document.getElementById("logout").onclick = async ()=>{
+          setLoading(true);
+          await supabase.auth.signOut();
+          setLoading(false);
           location.reload();
-        });
+        };
       }
     }
 
     async function loadAnnouncement(){
       const box = document.getElementById("announce");
-      setLoading(true);
+      const empty = document.getElementById("announceEmpty");
+
       const { data, error } = await supabase.from("settings").select("announcement").eq("id",1).single();
-      setLoading(false);
       if(!error && data?.announcement){
-        box.style.display="block";
-        box.innerHTML = `<b>Announcement:</b> ${data.announcement}`;
+        box.style.display = "block";
+        box.textContent = data.announcement;
+        empty.style.display = "none";
       }
     }
 
-    async function loadKpis(){
-      // Safe to show approximate counts. Uses head:true counts (needs RLS select allowed or admin only).
-      // If RLS blocks these for anon, the UI will just keep "—".
-      const [a,b,c] = await Promise.allSettled([
-        supabase.from("food_listings").select("id",{count:"exact",head:true}).eq("is_available", true),
-        supabase.from("donations").select("id",{count:"exact",head:true}),
-        supabase.from("claims").select("id",{count:"exact",head:true})
-      ]);
-      const kListings = document.getElementById("kListings");
-      const kDonations = document.getElementById("kDonations");
-      const kClaims = document.getElementById("kClaims");
-      if(a.status==="fulfilled" && !a.value.error) kListings.textContent = a.value.count ?? "—";
-      if(b.status==="fulfilled" && !b.value.error) kDonations.textContent = b.value.count ?? "—";
-      if(c.status==="fulfilled" && !c.value.error) kClaims.textContent = c.value.count ?? "—";
+    async function loadCounts(){
+      // These counts will work if your RLS allows it.
+      // If blocked, we simply keep "—" (no ugly failure).
+      const a = await supabase.from("food_listings").select("id",{count:"exact",head:true}).eq("is_available", true);
+      if(!a.error) document.getElementById("kListings").textContent = a.count ?? "—";
+
+      const b = await supabase.from("donations").select("id",{count:"exact",head:true});
+      if(!b.error) document.getElementById("kDonations").textContent = b.count ?? "—";
+
+      const c = await supabase.from("claims").select("id",{count:"exact",head:true});
+      if(!c.error) document.getElementById("kClaims").textContent = c.count ?? "—";
     }
 
     (async ()=>{
-      await setNav();
+      await renderAuth();
       await loadAnnouncement();
-      await loadKpis();
+      await loadCounts();
+      supabase.auth.onAuthStateChange(()=>renderAuth());
     })();
   </script>
 </body>
