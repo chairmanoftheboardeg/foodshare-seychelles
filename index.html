@@ -1,587 +1,233 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FoodShare Seychelles — Share Food. Feed Seychelles.</title>
-  <link rel="icon" href="assets/img/logo.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | FoodShare Seychelles</title>
+    <link rel="icon" type="image/png" href="/image/logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-green: #76b543; /* From your logo leaves */
+            --dark-green: #4a7729;
+            --light-bg: #f9fbf7;
+            --text-dark: #2d3436;
+            --white: #ffffff;
+        }
 
-  <style>
-    :root{
-      --bg: #ffffff;
-      --surface: #f6f9f6;
-      --text: #111827;
-      --muted: #6b7280;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            color: var(--text-dark);
+            background-color: var(--light-bg);
+            line-height: 1.6;
+        }
 
-      --green-700:#2f7d32;
-      --green-600:#3f9a3d;
-      --green-500:#5fbf44;
-      --green-400:#7bd64e;
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-      --border: rgba(17,24,39,.10);
-      --shadow: 0 12px 30px rgba(17,24,39,.08);
-      --radius: 16px;
-      --radius-sm: 12px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-    }
-    a{color:inherit}
-    .container{width:min(1120px, calc(100% - 40px)); margin:0 auto;}
-    .page{min-height: calc(100vh - 200px);}
+        .logo-area { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+        .logo-area img { height: 50px; }
 
-    /* NAV (embedded) */
-    .topbar{background:#fff;border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50}
-    .nav{display:flex;align-items:center;justify-content:space-between; gap:14px; padding:12px 0}
-    .brand{display:flex;align-items:center; gap:10px; text-decoration:none}
-    .brand img{width:44px;height:44px;border-radius:10px}
-    .brand .name{font-weight:900; letter-spacing:.2px}
-    .navlinks{display:flex;align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end}
-    .nav-link{font-weight:800; text-decoration:none; color:var(--text); padding:8px 10px; border-radius:10px}
-    .nav-link:hover{background:var(--surface)}
-    .nav-btn{border:1px solid var(--border); background:#fff; border-radius:10px; padding:8px 10px; font-weight:800; cursor:pointer}
-    .lang{display:flex;align-items:center; gap:8px}
-    .lang select{padding:8px 10px; border-radius:10px; border:1px solid var(--border)}
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary-green); }
 
-    /* PAGE UI */
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 12px; border:1px solid var(--border);
-      border-radius:999px; background:#fff; color: var(--green-700);
-      font-weight:600; font-size:13px;
-    }
-    .hero{padding: 48px 0 28px;}
-    .hero-grid{display:grid; grid-template-columns: 1.15fr .85fr; gap: 28px; align-items: stretch;}
-    @media (max-width: 900px){ .hero-grid{grid-template-columns:1fr} }
+        .btn-cta {
+            background: var(--primary-green);
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
 
-    .card{background:#fff; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);}
-    .card-pad{padding: 22px}
-    .h1{font-size: 46px; line-height:1.05; margin: 12px 0 12px}
-    .h2{font-size: 28px; line-height:1.15; margin: 0 0 10px}
-    .h3{font-size: 18px; margin: 0 0 8px}
-    .p{margin: 0 0 12px; color: var(--muted)}
-    .small{font-size: 13px; color: var(--muted)}
-    .hr{height:1px;background:var(--border); margin: 18px 0}
+        /* Announcement Bar */
+        #announcement-bar {
+            background: #e9f5db;
+            color: var(--dark-green);
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+            display: none; /* Hidden until loaded */
+        }
 
-    .btn-row{display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding: 12px 16px; border-radius: 12px;
-      border: 1px solid var(--border);
-      text-decoration:none; font-weight: 800; cursor:pointer; background:#fff;
-    }
-    .btn.primary{background: linear-gradient(90deg, var(--green-600), var(--green-400)); color:#fff; border-color: transparent;}
-    .btn.secondary{background: #fff; color: var(--green-700);}
-    .btn.ghost{background: transparent; color: var(--text);}
-    .btn:disabled{opacity:.6; cursor:not-allowed}
+        /* Hero Section */
+        header {
+            padding: 80px 5%;
+            text-align: center;
+            background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://images.unsplash.com/photo-1488459711635-de86a8969a77?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+        }
 
-    .section{padding: 28px 0;}
-    .section-title{display:flex; align-items:flex-end; justify-content: space-between; gap:16px; margin-bottom: 14px;}
-    .grid-3{display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px;}
-    @media (max-width: 900px){ .grid-3{grid-template-columns:1fr} }
+        .hero-title { font-size: 3rem; margin-bottom: 10px; color: var(--dark-green); }
 
-    .kpi-grid{display:grid; grid-template-columns: repeat(4, 1fr); gap: 14px;}
-    @media (max-width: 900px){ .kpi-grid{grid-template-columns: repeat(2, 1fr)} }
-    .kpi{padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface);}
-    .kpi .num{font-size: 24px; font-weight:900; color: var(--green-700)}
-    .kpi .lbl{font-size: 13px; color: var(--muted)}
+        /* Impact Grid */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 40px 5%;
+            background: var(--white);
+        }
 
-    /* Assistant (embedded) */
-    .assistant-fab{
-      position: fixed; right: 18px; bottom: 18px; z-index: 999;
-      border: 0; border-radius: 999px; padding: 12px 14px;
-      box-shadow: var(--shadow);
-      background: linear-gradient(90deg, var(--green-600), var(--green-400));
-      color: #fff; font-weight: 900; cursor: pointer;
-    }
-    .assistant-modal{
-      position: fixed; right: 18px; bottom: 72px; width: min(420px, calc(100vw - 36px));
-      z-index: 1000; border-radius: 16px; background: #fff;
-      border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden;
-    }
-    .assistant-head{
-      padding: 14px; background: var(--surface); border-bottom: 1px solid var(--border);
-      display:flex; justify-content: space-between; align-items: center; gap: 10px;
-    }
-    .assistant-body{padding: 14px; max-height: 360px; overflow: auto;}
-    .msg{padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; white-space: pre-wrap;}
-    .msg.user{background: #fff}
-    .msg.bot{background: var(--surface)}
-    .assistant-foot{padding: 12px; border-top: 1px solid var(--border); display:flex; gap: 10px;}
-    .assistant-foot input{flex: 1; padding:12px; border-radius:12px; border:1px solid var(--border);}
-    .hidden{display:none !important}
+        .stat-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            background: var(--light-bg);
+            border: 1px solid #eee;
+        }
 
-    /* Footer (embedded, corporate) */
-    .footer{margin-top:30px; background:#0b1220; color:#e5e7eb}
-    .footer a{color:#e5e7eb; text-decoration:none}
-    .footer a:hover{text-decoration:underline}
-    .footer-top{padding:28px 0; border-bottom:1px solid rgba(255,255,255,.12)}
-    .footer-grid{display:grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap:16px}
-    @media (max-width: 900px){.footer-grid{grid-template-columns:1fr 1fr}}
-    .footer-title{font-weight:900; margin:0 0 8px}
-    .footer-list{list-style:none; padding:0; margin:0; display:grid; gap:8px; color:#cbd5e1}
-    .footer-bottom{padding:14px 0; display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color:#cbd5e1}
-    .madeby{display:flex; gap:6px; flex-wrap:wrap}
-  </style>
+        .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--primary-green); display: block; }
+
+        /* Assistant Widget */
+        #assistant-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--dark-green);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background: #222;
+            color: #eee;
+            padding: 40px 5%;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        footer a { color: var(--primary-green); text-decoration: none; }
+    </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <header class="topbar">
-    <div class="container">
-      <nav class="nav" aria-label="Primary">
-        <a class="brand" href="./">
-          <img src="assets/img/logo.png" alt="FoodShare Seychelles logo" />
-          <div>
-            <div class="name">FoodShare Seychelles</div>
-            <div class="small">Operational food rescue & access</div>
-          </div>
+
+    <div id="announcement-bar"></div>
+
+    <nav>
+        <a href="/" class="logo-area">
+            <img src="/image/logo.png" alt="FoodShare Seychelles">
         </a>
-
-        <div class="navlinks">
-          <a class="nav-link" href="./" data-i18n="nav_home">Home</a>
-          <a class="nav-link" href="about-us/" data-i18n="nav_about">About Us</a>
-          <a class="nav-link" href="learn/" data-i18n="nav_learn">Learn</a>
-          <a class="nav-link" href="our-impact/" data-i18n="nav_impact">Our Impact</a>
-          <a class="nav-link" href="our-partners/" data-i18n="nav_partners">Our Partners</a>
-          <a class="nav-link" href="social-media/" data-i18n="nav_social">Social Media</a>
-          <a class="nav-link" href="find-food/" data-i18n="nav_find_food">Find Food</a>
-          <a class="nav-link" href="donate-now/" data-i18n="nav_donate">Donate Now</a>
-          <a class="nav-link" href="volunteer-now/" data-i18n="nav_volunteer">Volunteer Now</a>
-          <a class="nav-link" href="contact-us/" data-i18n="nav_contact">Contact Us</a>
-
-          <div class="lang" aria-label="Language">
-            <select id="langSelect" aria-label="Select language">
-              <option value="en">English</option>
-              <option value="cr">Kreol Seselwa</option>
-              <option value="fr">Français</option>
+        <div class="nav-links">
+            <a href="/find-food/" data-i18n="nav_find">Find Food</a>
+            <a href="/about-us/" data-i18n="nav_about">About</a>
+            <a href="/volunteer-now/" data-i18n="nav_volunteer">Volunteer</a>
+            <a href="/donate-now/" class="btn-cta" data-i18n="nav_donate">Donate Now</a>
+            <select id="langSwitcher" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="crs">Seselwa</option>
+                <option value="fr">Français</option>
             </select>
-          </div>
-
-          <div id="navAuthArea"></div>
+            <a href="/login/" style="font-size: 0.9rem;">Login</a>
         </div>
-      </nav>
-    </div>
-  </header>
+    </nav>
 
-  <main class="page">
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="card card-pad">
-          <span class="badge">Food rescue • Access • Coordination</span>
-          <h1 class="h1" data-i18n="hero_title">Share Food. Feed Seychelles.</h1>
-          <p class="p" data-i18n="hero_sub">
-            A trusted platform that reduces food waste and improves food access through safe coordination and real-world logistics.
-          </p>
+    <header>
+        <h1 class="hero-title" data-i18n="hero_title">Connecting Surplus to Need</h1>
+        <p data-i18n="hero_sub">Help us reduce food waste and support the community in Seychelles.</p>
+    </header>
 
-          <div id="announcementWrap" class="card" style="margin-top:14px; border-radius: 14px;">
-            <div class="card-pad">
-              <div class="h3">Announcement</div>
-              <div id="announcementText" class="p" style="margin:0"></div>
-            </div>
-          </div>
-
-          <div class="btn-row">
-            <a class="btn primary" href="find-food/" data-i18n="cta_find">Find Food</a>
-            <a class="btn secondary" href="donate-now/" data-i18n="cta_donate">Donate Now</a>
-            <a class="btn ghost" href="volunteer-now/" data-i18n="cta_volunteer">Volunteer Now</a>
-          </div>
-
-          <div class="hr"></div>
-          <div class="small">
-            Public transparency: live aggregate impact is sourced from privacy-safe public views.
-          </div>
+    <section class="stats-container" id="impact-stats">
+        <div class="stat-card">
+            <span class="stat-number" id="stat-meals">...</span>
+            <p data-i18n="stat_meals">Meals Shared</p>
         </div>
-
-        <div class="card" style="overflow:hidden">
-          <img src="assets/img/banner.png" alt="FoodShare Seychelles banner" style="width:100%; height:100%; object-fit:cover; display:block" />
+        <div class="stat-card">
+            <span class="stat-number" id="stat-donors">...</span>
+            <p data-i18n="stat_donors">Active Donors</p>
         </div>
-      </div>
+        <div class="stat-card">
+            <span class="stat-number" id="stat-waste">...</span>
+            <p data-i18n="stat_waste">KG Waste Diverted</p>
+        </div>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-title">
-          <div>
-            <h2 class="h2">Impact Snapshot</h2>
-            <p class="p">Live totals (privacy-safe aggregates).</p>
-          </div>
-          <a class="btn secondary" href="our-impact/">View full impact</a>
-        </div>
-
-        <div class="kpi-grid">
-          <div class="kpi">
-            <div class="num" id="kpiDonations">—</div>
-            <div class="lbl">Donations Collected</div>
-          </div>
-          <div class="kpi">
-            <div class="num" id="kpiClaims">—</div>
-            <div class="lbl">Claims Fulfilled</div>
-          </div>
-          <div class="kpi">
-            <div class="num" id="kpiKg">—</div>
-            <div class="lbl">KG Rescued</div>
-          </div>
-          <div class="kpi">
-            <div class="num" id="kpiCo2">—</div>
-            <div class="lbl">CO₂ Prevented (est.)</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" style="background: var(--surface);">
-      <div class="container">
-        <div class="section-title">
-          <div>
-            <h2 class="h2">How FoodShare Works</h2>
-            <p class="p">Simple flows for donors, community members, and volunteers.</p>
-          </div>
-        </div>
-
-        <div class="grid-3">
-          <div class="card card-pad">
-            <h3 class="h3">Donors</h3>
-            <p class="p">Submit surplus food details and preferred pickup window. We coordinate safe collection and distribution.</p>
-            <a class="btn secondary" href="donate-now/">Donate Now</a>
-          </div>
-          <div class="card card-pad">
-            <h3 class="h3">Recipients</h3>
-            <p class="p">Browse available listings, submit a claim, and receive updates once reviewed and fulfilled.</p>
-            <a class="btn secondary" href="find-food/">Find Food</a>
-          </div>
-          <div class="card card-pad">
-            <h3 class="h3">Volunteers</h3>
-            <p class="p">Apply to support coordination, delivery runs, and outreach. Staff assign tasks securely via dashboards.</p>
-            <a class="btn secondary" href="volunteer-now/">Volunteer Now</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-title">
-          <div>
-            <h2 class="h2">Core Partner</h2>
-            <p class="p">Tyler Nicholas Group supports FoodShare Seychelles with recruitment, legal/compliance, and technology enablement.</p>
-          </div>
-          <a class="btn secondary" href="our-partners/">Learn more</a>
-        </div>
-
-        <div class="card card-pad">
-          <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:space-between">
-            <div>
-              <div class="h3">Tyler Nicholas Group</div>
-              <div class="small">Recruitment • Legality • Technology</div>
-            </div>
-            <a class="btn primary" href="https://tylernicholasgroup.com/" target="_blank" rel="noopener">Visit Partner Website</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Assistant -->
-  <button class="assistant-fab" id="assistantFab" type="button">Assistant</button>
-  <div class="assistant-modal hidden" id="assistantModal" role="dialog" aria-modal="true" aria-label="FoodShare Assistant">
-    <div class="assistant-head">
-      <strong>FoodShare Assistant</strong>
-      <button class="nav-btn" id="assistantClose" type="button">Close</button>
-    </div>
-    <div class="assistant-body" id="assistantBody"></div>
-    <div class="assistant-foot">
-      <input id="assistantInput" type="text" placeholder="Ask about donations, volunteering, impact…" />
-      <button class="btn primary" id="assistantSend" type="button">Send</button>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer-top">
-      <div class="container footer-grid">
-        <div>
-          <div class="footer-title">FoodShare Seychelles</div>
-          <div class="small" style="color:#cbd5e1">
-            Reducing food waste and improving food access through safe, coordinated logistics.
-          </div>
-        </div>
-
-        <div>
-          <div class="footer-title" data-i18n="footer_pages">Pages</div>
-          <ul class="footer-list">
-            <li><a href="./">Home</a></li>
-            <li><a href="about-us/">About Us</a></li>
-            <li><a href="learn/">Learn</a></li>
-            <li><a href="our-impact/">Our Impact</a></li>
-            <li><a href="our-partners/">Our Partners</a></li>
-            <li><a href="social-media/">Social Media</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <div class="footer-title">Actions</div>
-          <ul class="footer-list">
-            <li><a href="find-food/">Find Food</a></li>
-            <li><a href="donate-now/">Donate Now</a></li>
-            <li><a href="volunteer-now/">Volunteer Now</a></li>
-            <li><a href="contact-us/">Contact Us</a></li>
-            <li><a href="auth/">Sign Up / Login</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <div class="footer-title">Legal</div>
-          <ul class="footer-list">
-            <li><a href="privacy-policy/">Privacy Policy</a></li>
-            <li><a href="terms-of-use/">Terms Of Use</a></li>
-            <li><a href="sitemap/">Sitemap</a></li>
-          </ul>
-        </div>
-      </div>
+    <div id="assistant-fab" onclick="toggleAssistant()">
+        💬 <span data-i18n="assistant_btn">Ask Assistant</span>
     </div>
 
-    <div class="footer-bottom">
-      <div>© <span id="yr"></span> FoodShare Seychelles</div>
-      <div class="madeby">
-        <span data-i18n="footer_madeby">Website made by</span>
-        <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener">Tyler Nicholas</a>
-      </div>
-    </div>
-  </footer>
+    <footer>
+        <p>&copy; <span id="year"></span> FoodShare Seychelles. Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
+        <div style="margin-top: 10px; font-size: 0.8rem;">
+            <a href="/privacy-policy/">Privacy Policy</a> | <a href="/terms-of-use/">Terms of Use</a> | <a href="/sitemap/">Sitemap</a>
+        </div>
+    </footer>
 
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <script>
-    // YEAR
-    document.getElementById("yr").textContent = new Date().getFullYear();
+        const i18n = {
+            en: {
+                nav_find: "Find Food", nav_about: "About", nav_volunteer: "Volunteer", nav_donate: "Donate Now",
+                hero_title: "Connecting Surplus to Need", stat_meals: "Meals Shared", assistant_btn: "Ask Assistant"
+            },
+            crs: {
+                nav_find: "Rod Manze", nav_about: "Presizyon", nav_volunteer: "Volontè", nav_donate: "Donnen Aprezan",
+                hero_title: "Konekte Sirplis avek Bezwen", stat_meals: "Repa ki'n ganny donnen", assistant_btn: "Demann Asistan"
+            },
+            fr: {
+                nav_find: "Trouver", nav_about: "À Propos", nav_volunteer: "Bénévole", nav_donate: "Faire un Don",
+                hero_title: "Connecter le Surplus au Besoin", stat_meals: "Repas Partagés", assistant_btn: "Aide"
+            }
+        };
 
-    // SUPABASE INIT
-    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    });
+        async function initHome() {
+            document.getElementById('year').innerText = new Date().getFullYear();
 
-    async function getUser() {
-      const { data } = await sb.auth.getUser();
-      return data?.user || null;
-    }
-    async function signOut() {
-      await sb.auth.signOut();
-    }
+            // 1. Fetch Announcement from settings_public
+            const { data: settings } = await supabase.from('settings_public').select('value').eq('key', 'home_announcement').single();
+            if (settings && settings.value) {
+                const bar = document.getElementById('announcement-bar');
+                bar.innerText = settings.value;
+                bar.style.display = 'block';
+            }
 
-    // i18n (navbar labels + hero)
-    const dict = {
-      en: {
-        nav_home:"Home", nav_about:"About Us", nav_learn:"Learn", nav_impact:"Our Impact", nav_partners:"Our Partners",
-        nav_social:"Social Media", nav_find_food:"Find Food", nav_donate:"Donate Now", nav_volunteer:"Volunteer Now",
-        nav_contact:"Contact Us", nav_auth:"Sign Up / Login", nav_dashboard:"User Dashboard", nav_staff_login:"Staff Login",
-        hero_title:"Share Food. Feed Seychelles.",
-        hero_sub:"A trusted platform that reduces food waste and improves food access through safe coordination and real-world logistics.",
-        cta_find:"Find Food", cta_donate:"Donate Now", cta_volunteer:"Volunteer Now",
-        footer_pages:"Pages", footer_madeby:"Website made by"
-      },
-      cr: {
-        nav_home:"Lakour", nav_about:"Kisisa Nou", nav_learn:"Aprann", nav_impact:"Nou Lenpakt", nav_partners:"Nou Bann Partner",
-        nav_social:"Rezo Sosyal", nav_find_food:"Rod Manze", nav_donate:"Done Aster", nav_volunteer:"Vin Volunteer",
-        nav_contact:"Kontak Nou", nav_auth:"Anrezistre / Konekte", nav_dashboard:"Dashboard", nav_staff_login:"Koneksyon Staff",
-        hero_title:"Partaz Manze. Nouri Sesel.",
-        hero_sub:"En platform konfyans pou redwir gaspiyaz manze e ed plis dimoun ganny manze atraver koordinasyon e keksoz pratik.",
-        cta_find:"Rod Manze", cta_donate:"Done Aster", cta_volunteer:"Vin Volunteer",
-        footer_pages:"Paz", footer_madeby:"Sit web krwar par"
-      },
-      fr: {
-        nav_home:"Accueil", nav_about:"À propos", nav_learn:"Apprendre", nav_impact:"Notre impact", nav_partners:"Nos partenaires",
-        nav_social:"Réseaux sociaux", nav_find_food:"Trouver", nav_donate:"Faire un don", nav_volunteer:"Bénévolat",
-        nav_contact:"Contact", nav_auth:"Inscription / Connexion", nav_dashboard:"Tableau de bord", nav_staff_login:"Connexion staff",
-        hero_title:"Partagez la nourriture. Nourrissez les Seychelles.",
-        hero_sub:"Une plateforme fiable pour réduire le gaspillage alimentaire et améliorer l’accès à la nourriture grâce à une coordination réelle.",
-        cta_find:"Trouver", cta_donate:"Donner", cta_volunteer:"Bénévolat",
-        footer_pages:"Pages", footer_madeby:"Site réalisé par"
-      }
-    };
-
-    function getLang(){ return localStorage.getItem("fs_lang") || "en"; }
-    function setLang(l){ localStorage.setItem("fs_lang", l); }
-    function t(key){
-      const l = getLang();
-      return (dict[l] && dict[l][key]) || (dict.en[key]) || key;
-    }
-    function applyI18n(){
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        el.textContent = t(el.getAttribute("data-i18n"));
-      });
-    }
-
-    // Auth links (community)
-    async function updateAuthArea(){
-      const user = await getUser();
-      const box = document.getElementById("navAuthArea");
-      if (!box) return;
-
-      if (!user){
-        box.innerHTML = `
-          <a class="nav-link" href="auth/" data-i18n="nav_auth">Sign Up / Login</a>
-          <a class="nav-link" href="staff-login/" data-i18n="nav_staff_login">Staff Login</a>
-        `;
-        applyI18n();
-        return;
-      }
-
-      box.innerHTML = `
-        <a class="nav-link" href="dashboard/" data-i18n="nav_dashboard">User Dashboard</a>
-        <button class="nav-btn" id="navSignOutBtn" type="button">Sign out</button>
-      `;
-      document.getElementById("navSignOutBtn").addEventListener("click", async ()=>{
-        await signOut();
-        location.href = "auth/";
-      });
-      applyI18n();
-    }
-
-    // Home announcement
-    async function loadAnnouncement(){
-      const wrap = document.getElementById("announcementWrap");
-      const text = document.getElementById("announcementText");
-      if (!wrap || !text) return;
-
-      const { data, error } = await sb.from("settings").select("home_announcement").eq("id", true).maybeSingle();
-      if (error || !data || !data.home_announcement){
-        wrap.classList.add("hidden");
-        return;
-      }
-      text.textContent = data.home_announcement;
-      wrap.classList.remove("hidden");
-    }
-
-    // Home impact KPIs
-    async function loadImpact(){
-      const { data, error } = await sb.from("impact_public").select("*").maybeSingle();
-      if (error || !data) return;
-
-      document.getElementById("kpiDonations").textContent = Number(data.donations_collected||0).toLocaleString();
-      document.getElementById("kpiClaims").textContent = Number(data.claims_fulfilled||0).toLocaleString();
-      document.getElementById("kpiKg").textContent = Number(data.kg_rescued||0).toLocaleString(undefined,{maximumFractionDigits:1});
-      document.getElementById("kpiCo2").textContent = Number(data.co2_prevented||0).toLocaleString();
-    }
-
-    // Assistant (frontend-only, can answer live public data; otherwise send to Contact Us)
-    function addMsg(container, who, text){
-      const div = document.createElement("div");
-      div.className = "msg " + who;
-      div.textContent = text;
-      container.appendChild(div);
-      container.scrollTop = container.scrollHeight;
-    }
-    async function assistantAnswer(qRaw){
-      const q = String(qRaw||"").toLowerCase().trim();
-      const contact = "contact-us/";
-
-      if (!q) return `Ask me about donating, volunteering, finding food, or our impact. If you need help, use Contact Us: ${contact}`;
-
-      if (q.includes("impact") || q.includes("stats") || q.includes("kg") || q.includes("meals") || q.includes("co2")){
-        const { data } = await sb.from("impact_public").select("*").maybeSingle();
-        if (!data) return `I can’t load live impact stats right now. Please use Contact Us: ${contact}`;
-        return [
-          "Live impact (public totals):",
-          `• Donations collected: ${Number(data.donations_collected||0).toLocaleString()}`,
-          `• Claims fulfilled: ${Number(data.claims_fulfilled||0).toLocaleString()}`,
-          `• Food rescued: ${Number(data.kg_rescued||0).toLocaleString(undefined,{maximumFractionDigits:1})} kg`,
-          `• Meals estimated: ${Number(data.meals_estimated||0).toLocaleString()}`,
-          `• CO₂ prevented: ${Number(data.co2_prevented||0).toLocaleString()}`
-        ].join("\n");
-      }
-
-      if (q.includes("announcement") || q.includes("update") || q.includes("news")){
-        const { data } = await sb.from("settings").select("home_announcement").eq("id", true).maybeSingle();
-        const a = data?.home_announcement || null;
-        return a ? `Current announcement:\n${a}` : `No announcement is posted right now. For urgent support: ${contact}`;
-      }
-
-      if (q.includes("find") || q.includes("available") || q.includes("listing") || q.includes("food")){
-        const { data } = await sb.from("food_listings_public").select("title,pickup_area").order("created_at",{ascending:false}).limit(5);
-        if (!data || data.length === 0) return `No active listings are showing right now. Please check again later or contact us: ${contact}`;
-        const lines = data.map(i=>`• ${i.title}${i.pickup_area ? " — "+i.pickup_area : ""}`);
-        return `Here are a few currently available listings:\n${lines.join("\n")}\n\nOpen Find Food: find-food/`;
-      }
-
-      if (q.includes("donate") || q.includes("donation")){
-        return `To donate: go to Donate Now (donate-now/), submit details and pickup window. If urgent, contact us: ${contact}`;
-      }
-
-      if (q.includes("volunteer") || q.includes("help") || q.includes("benevol") || q.includes("bénévol")){
-        return `To volunteer: go to Volunteer Now (volunteer-now/) and submit your availability.`;
-      }
-
-      if (q.includes("partner") || q.includes("tyler") || q.includes("nicholas")){
-        return `Core Partner: Tyler Nicholas Group supports FoodShare Seychelles with recruitment, legal/compliance, and technology. See: our-partners/`;
-      }
-
-      return `I’m not fully sure about that. Please use Contact Us: ${contact}`;
-    }
-
-    function wireAssistant(){
-      const fab = document.getElementById("assistantFab");
-      const modal = document.getElementById("assistantModal");
-      const closeBtn = document.getElementById("assistantClose");
-      const body = document.getElementById("assistantBody");
-      const input = document.getElementById("assistantInput");
-      const send = document.getElementById("assistantSend");
-
-      const open = ()=> modal.classList.remove("hidden");
-      const close = ()=> modal.classList.add("hidden");
-
-      fab.addEventListener("click", ()=>{
-        open();
-        if (body.childElementCount === 0){
-          addMsg(body,"bot","Hi — I’m FoodShare Assistant. Ask about donating, volunteering, finding food, or our impact. If I can’t answer, I’ll direct you to Contact Us.");
+            // 2. Fetch Impact Data via RPC
+            const { data: impact, error } = await supabase.rpc('get_public_impact');
+            if (impact) {
+                document.getElementById('stat-meals').innerText = impact.total_meals || 0;
+                document.getElementById('stat-donors').innerText = impact.total_donors || 0;
+                document.getElementById('stat-waste').innerText = impact.total_waste_kg || 0;
+            }
         }
-        input.focus();
-      });
-      closeBtn.addEventListener("click", close);
 
-      async function run(){
-        const q = input.value;
-        if (!q.trim()) return;
-        addMsg(body,"user",q);
-        input.value = "";
-        send.disabled = true;
-        try{
-          const a = await assistantAnswer(q);
-          addMsg(body,"bot",a);
-        } catch(e){
-          addMsg(body,"bot","Something went wrong. Please use Contact Us: contact-us/");
-        } finally {
-          send.disabled = false;
-          input.focus();
+        function changeLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) el.innerText = i18n[lang][key];
+            });
         }
-      }
 
-      send.addEventListener("click", run);
-      input.addEventListener("keydown",(e)=>{ if(e.key==="Enter") run(); });
-    }
+        function toggleAssistant() {
+            const query = prompt("How can I help you today? (Type: donate, volunteer, find food, or impact)");
+            if (!query) return;
+            
+            const q = query.toLowerCase();
+            if (q.includes('donate')) alert("You can donate by clicking the 'Donate Now' button in the navbar!");
+            else if (q.includes('volunteer')) alert("We always need help! Visit the 'Volunteer Now' page.");
+            else if (q.includes('food')) window.location.href = '/find-food/';
+            else {
+                alert("I'm not sure about that. Redirecting you to our contact team...");
+                window.location.href = '/contact-us/';
+            }
+        }
 
-    // Boot
-    document.addEventListener("DOMContentLoaded", async ()=>{
-      // language init
-      const sel = document.getElementById("langSelect");
-      sel.value = getLang();
-      sel.addEventListener("change", ()=>{ setLang(sel.value); applyI18n(); });
-
-      applyI18n();
-      await updateAuthArea();
-
-      await loadAnnouncement();
-      await loadImpact();
-
-      wireAssistant();
-    });
-  </script>
+        initHome();
+    </script>
 </body>
 </html>
