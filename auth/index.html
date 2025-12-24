@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login / Sign Up — FoodShare Seychelles</title>
+  <meta name="description" content="Login or create a community account for FoodShare Seychelles." />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#fbfcfb;
+      --surface:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --muted-2:#64748b;
+      --border:rgba(15,23,42,.10);
+      --shadow:0 12px 32px rgba(2,6,23,.08);
+      --shadow-soft:0 10px 26px rgba(2,6,23,.06);
+
+      --brand:#73b63b;
+      --brand-2:#5aa52f;
+      --brand-ink:#173a12;
+
+      --dark:#0b1220;
+      --dark-border:rgba(255,255,255,.10);
+
+      --max:1120px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      line-height:1.45;
+    }
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+    .container{ width:100%; max-width:var(--max); margin:0 auto; padding:0 18px; }
+
+    /* Navbar (same style) */
+    .nav-wrap{
+      position:sticky; top:0; z-index:50;
+      background:rgba(255,255,255,.82);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(15,23,42,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      height:76px; gap:14px;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; min-width:160px; }
+    .brand-logo{ width:36px; height:36px; border-radius:10px; object-fit:contain; display:block; }
+    .brand-name{ display:flex; flex-direction:column; line-height:1.1; }
+    .brand-name strong{ font-size:14px; letter-spacing:.2px; }
+    .brand-name span{ font-size:12px; color:var(--muted-2); }
+
+    .nav-links{ display:flex; align-items:center; gap:18px; }
+    .nav-item{
+      font-size:14px; color:var(--muted);
+      padding:10px 10px; border-radius:12px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav-item:hover{ background:rgba(115,182,59,.10); color:var(--brand-ink); text-decoration:none; }
+
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center;
+      background:var(--brand); color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:650;
+      box-shadow:0 8px 22px rgba(115,182,59,.20);
+      transition: transform .15s ease, background .15s ease;
+      white-space:nowrap;
+    }
+    .cta:hover{ background:var(--brand-2); transform:translateY(-1px); text-decoration:none; }
+
+    .dropdown{ position:relative; }
+    .dropdown-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:none; background:transparent; cursor:pointer;
+      color:var(--muted);
+      padding:10px 10px; border-radius:12px;
+      font-size:14px;
+    }
+    .dropdown-btn:hover{ background:rgba(115,182,59,.10); color:var(--brand-ink); }
+    .dropdown-menu{
+      position:absolute; right:0; top:calc(100% + 10px);
+      width:240px; background:var(--surface);
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px; box-shadow:var(--shadow-soft);
+      padding:8px; display:none;
+    }
+    .dropdown-menu a{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 12px; border-radius:12px;
+      font-size:14px; color:var(--muted);
+    }
+    .dropdown-menu a:hover{ background:rgba(115,182,59,.10); color:var(--brand-ink); text-decoration:none; }
+    .dropdown.open .dropdown-menu{ display:block; }
+
+    select.lang{
+      border:1px solid rgba(15,23,42,.14);
+      background:rgba(255,255,255,.85);
+      border-radius:999px;
+      padding:10px 12px;
+      font-size:14px;
+      color:var(--muted);
+      outline:none;
+      cursor:pointer;
+    }
+
+    .mobile-toggle{
+      display:none;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.85);
+      border-radius:14px;
+      padding:10px 12px;
+      cursor:pointer;
+    }
+    .mobile-panel{
+      display:none;
+      border-top:1px solid rgba(15,23,42,.08);
+      padding:12px 0 18px;
+    }
+    .mobile-panel.open{ display:block; }
+    .mobile-panel .stack{ display:flex; flex-direction:column; gap:8px; }
+
+    /* Page */
+    .page{
+      padding:46px 0 56px;
+      position:relative;
+      overflow:hidden;
+    }
+    .page::before{
+      content:"";
+      position:absolute; inset:-120px -120px auto -120px;
+      height:420px;
+      background:
+        radial-gradient(closest-side at 18% 28%, rgba(115,182,59,.16), transparent 62%),
+        radial-gradient(closest-side at 72% 22%, rgba(115,182,59,.10), transparent 60%),
+        radial-gradient(closest-side at 55% 70%, rgba(2,6,23,.06), transparent 62%);
+      pointer-events:none;
+      filter:blur(2px);
+    }
+    .page-inner{ position:relative; }
+
+    .title{ text-align:center; }
+    .title h1{
+      margin:0 auto;
+      font-size:clamp(26px, 3vw, 42px);
+      letter-spacing:-0.4px;
+      line-height:1.08;
+      max-width:900px;
+      color:#2f5b1f;
+      font-weight:850;
+    }
+    .title p{
+      margin:12px auto 0;
+      max-width:820px;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    .card{
+      margin:18px auto 0;
+      max-width:780px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 10px 22px rgba(2,6,23,.04);
+    }
+
+    .tabs{
+      display:flex; gap:10px; flex-wrap:wrap;
+      border-bottom:1px solid rgba(15,23,42,.10);
+      padding-bottom:12px;
+      margin-bottom:14px;
+    }
+    .tab{
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.85);
+      border-radius:999px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:850;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .tab.active{
+      background:rgba(115,182,59,.12);
+      border-color:rgba(115,182,59,.25);
+      color:var(--brand-ink);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .field label{ font-size:12px; font-weight:850; color:var(--muted-2); }
+    .field input{
+      width:100%;
+      border:1px solid rgba(15,23,42,.14);
+      background:rgba(255,255,255,.95);
+      border-radius:14px;
+      padding:11px 12px;
+      font-size:14px;
+      outline:none;
+      color:var(--text);
+    }
+    .field input:focus{
+      box-shadow:0 0 0 4px rgba(115,182,59,.18);
+      border-color:rgba(115,182,59,.55);
+    }
+    .span-2{ grid-column: 1 / -1; }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:11px 14px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.90);
+      color:var(--text);
+      font-weight:850;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:#fff; transform:translateY(-1px); }
+    .btn.primary{
+      background:var(--brand);
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 8px 22px rgba(115,182,59,.20);
+    }
+    .btn.primary:hover{ background:var(--brand-2); }
+
+    .status{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:13px;
+      white-space: pre-wrap;
+    }
+    .ok{ color:#0f5132; }
+    .err{ color:#842029; }
+
+    /* Footer */
+    footer{
+      background: linear-gradient(180deg, var(--dark) 0%, #070b14 100%);
+      color: rgba(255,255,255,.86);
+      border-top: 1px solid var(--dark-border);
+    }
+    .footer-top{ padding:44px 0 22px; }
+    .footer-grid{
+      display:grid;
+      grid-template-columns:1.3fr 1fr 1fr 1fr;
+      gap:18px;
+    }
+    .foot-title{ font-weight:850; color:#fff; margin:0 0 10px; font-size:14px; }
+    .foot-text{ margin:0; color:rgba(255,255,255,.70); font-size:13px; line-height:1.55; }
+    .foot-links{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:13px;
+      color:rgba(255,255,255,.74);
+    }
+    .foot-links a{ color:rgba(255,255,255,.74); }
+    .foot-links a:hover{ color:#fff; text-decoration:none; }
+    .footer-bottom{
+      border-top:1px solid rgba(255,255,255,.10);
+      padding:14px 0;
+      font-size:13px;
+      color:rgba(255,255,255,.70);
+    }
+    .footer-bottom-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .footer-bottom a{ color:rgba(255,255,255,.85); text-decoration:underline; }
+
+    @media (max-width: 860px){
+      .nav-links{ display:none; }
+      .mobile-toggle{ display:inline-flex; }
+      .grid{ grid-template-columns:1fr; }
+      .span-2{ grid-column:auto; }
+      .footer-grid{ grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="../assets/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span>Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/">Find Food</a>
+          <a class="nav-item" href="../about-us/">About</a>
+          <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem">Learn</a>
+              <a href="../our-impact/" role="menuitem">Our Impact</a>
+              <a href="../our-partners/" role="menuitem">Our Partners</a>
+              <a href="../contact-us/" role="menuitem">Contact Us</a>
+              <a href="../social-media/" role="menuitem">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem">Sitemap</a>
+              <a href="../staff-login/" role="menuitem">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="nav-item" id="authSlot" style="padding:0;">
+            <a class="nav-item" href="../auth/" id="authLink">Login</a>
+          </span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
+      </div>
+
+      <!-- MOBILE PANEL -->
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/">Find Food</a>
+            <a class="nav-item" href="../about-us/">About</a>
+            <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+            <a class="nav-item" href="../donate-now/">Donate Now</a>
+            <a class="nav-item" href="../learn/">Learn</a>
+            <a class="nav-item" href="../our-impact/">Our Impact</a>
+            <a class="nav-item" href="../our-partners/">Our Partners</a>
+            <a class="nav-item" href="../contact-us/">Contact Us</a>
+            <a class="nav-item" href="../social-media/">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/">Sitemap</a>
+            <a class="nav-item" href="../staff-login/">Staff Login</a>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option>
+                <option value="cr">Kreol</option>
+                <option value="fr">Français</option>
+              </select>
+              <a class="nav-item" href="../auth/">Login</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <main>
+    <section class="page">
+      <div class="container page-inner">
+        <div class="title">
+          <h1>Login / Sign Up</h1>
+          <p>Create a community account to view your notifications and submission history. Staff/admin accounts use Staff Login.</p>
+        </div>
+
+        <div class="card">
+          <div class="tabs">
+            <button class="tab active" id="tabLogin" type="button">Login</button>
+            <button class="tab" id="tabSignup" type="button">Sign Up</button>
+          </div>
+
+          <form id="authForm" novalidate>
+            <div class="grid">
+              <div class="field span-2" id="displayNameWrap" style="display:none;">
+                <label for="displayName">Display name (optional)</label>
+                <input id="displayName" type="text" placeholder="Your name (shown only in your dashboard)" />
+              </div>
+
+              <div class="field span-2">
+                <label for="email">Email</label>
+                <input id="email" type="email" placeholder="name@email.com" required />
+              </div>
+
+              <div class="field span-2">
+                <label for="password">Password</label>
+                <input id="password" type="password" placeholder="Minimum 6 characters" required />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="btnSubmit" type="submit">Continue</button>
+              <a class="btn" href="../staff-login/">Staff Login</a>
+              <a class="btn" href="../contact-us/">Contact Us</a>
+            </div>
+
+            <div class="status" id="status"></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">
+              A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.
+            </p>
+          </div>
+
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a>
+              <a href="../about-us/">About Us</a>
+              <a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a>
+              <a href="../our-partners/">Our Partners</a>
+              <a href="../social-media/">Social Media</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a>
+              <a href="../donate-now/">Donate Now</a>
+              <a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a>
+              <a href="../auth/">Login</a>
+              <a href="../staff-login/">Staff Login</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a>
+              <a href="../terms-of-use/">Terms Of Use</a>
+              <a href="../sitemap/">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> </span>
+            <span>
+              Website made by
+              <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a>
+            </span>
+          </div>
+          <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Navbar dropdown/mobile
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){
+      moreDropdown?.classList.remove('open');
+      moreBtn?.setAttribute('aria-expanded','false');
+    }
+    moreBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = moreDropdown.classList.toggle('open');
+      moreBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => { if (moreDropdown && !moreDropdown.contains(e.target)) closeMore(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMore(); });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', () => mobilePanel.classList.toggle('open'));
+
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+    }
+
+    // Tabs
+    let mode = "login"; // "login" | "signup"
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const displayNameWrap = document.getElementById('displayNameWrap');
+
+    function setMode(next){
+      mode = next;
+      tabLogin.classList.toggle('active', mode === 'login');
+      tabSignup.classList.toggle('active', mode === 'signup');
+      displayNameWrap.style.display = (mode === 'signup') ? 'block' : 'none';
+      setStatus("");
+    }
+
+    tabLogin.addEventListener('click', () => setMode("login"));
+    tabSignup.addEventListener('click', () => setMode("signup"));
+
+    // Status
+    const status = document.getElementById('status');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    function setStatus(msg, kind=""){
+      status.className = "status " + (kind || "");
+      status.textContent = msg;
+    }
+
+    // Role-based redirect
+    async function redirectByRole(userId){
+      let roleId = 4;
+      try{
+        const { data: prof } = await sb.from('profiles').select('role_id').eq('user_id', userId).single();
+        if (prof?.role_id) roleId = prof.role_id;
+      }catch(_){}
+
+      if (roleId === 1) location.href = "../admin-dashboard/";
+      else if (roleId === 2 || roleId === 3) location.href = "../staff-dashboard/";
+      else location.href = "../dashboard/";
+    }
+
+    // Ensure profile exists (best effort)
+    async function ensureProfile(user){
+      try{
+        const { data: prof } = await sb.from('profiles').select('user_id').eq('user_id', user.id).single();
+        if (prof?.user_id) return;
+
+        const displayName = (document.getElementById('displayName').value || "").trim() || null;
+        // This requires an RLS policy allowing authenticated users to insert their own profile.
+        await sb.from('profiles').insert({ user_id: user.id, role_id: 4, display_name: displayName });
+      }catch(_){}
+    }
+
+    // Submit
+    const authForm = document.getElementById('authForm');
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus("");
+      btnSubmit.disabled = true;
+
+      const email = (document.getElementById('email').value || "").trim();
+      const password = (document.getElementById('password').value || "").trim();
+
+      if (!email || !password){
+        setStatus("Please enter email and password.", "err");
+        btnSubmit.disabled = false;
+        return;
+      }
+
+      try{
+        if (mode === "login"){
+          setStatus("Signing in…");
+          const { data, error } = await sb.auth.signInWithPassword({ email, password });
+          if (error){
+            setStatus(error.message || "Login failed.", "err");
+            btnSubmit.disabled = false;
+            return;
+          }
+          await ensureProfile(data.user);
+          await redirectByRole(data.user.id);
+          return;
+        }
+
+        // signup
+        setStatus("Creating your account…");
+        const displayName = (document.getElementById('displayName').value || "").trim();
+        const { data, error } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { display_name: displayName || null }
+          }
+        });
+
+        if (error){
+          setStatus(error.message || "Sign up failed.", "err");
+          btnSubmit.disabled = false;
+          return;
+        }
+
+        // If email confirmations are enabled, session may be null until verified
+        if (!data.session){
+          setStatus("Account created. Please check your email to confirm, then come back and log in.", "ok");
+          btnSubmit.disabled = false;
+          return;
+        }
+
+        await ensureProfile(data.user);
+        await redirectByRole(data.user.id);
+
+      }catch (ex){
+        setStatus("Unexpected error. Please try again.", "err");
+      }finally{
+        btnSubmit.disabled = false;
+      }
+    });
+
+    // If already logged in, redirect immediately
+    (async function init(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+      const lang = getSavedLang();
+      applyLanguage(lang);
+      document.getElementById('langSelect')?.addEventListener('change', (e) => { localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+      document.getElementById('langSelectMobile')?.addEventListener('change', (e) => { localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+
+      const { data } = await sb.auth.getSession();
+      if (data?.session?.user){
+        await redirectByRole(data.session.user.id);
+      }
+    })();
+  </script>
+</body>
+</html>
