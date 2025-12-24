@@ -314,6 +314,42 @@
               <div id="inqTable"></div>
             </div>
 
+            <!-- MESSAGES -->
+<div class="panel" id="panel-messages">
+  <div class="row2">
+    <div>
+      <label for="msg_user">Select user</label>
+      <select id="msg_user"></select>
+      <div class="hint">Only users with profiles rows appear here.</div>
+    </div>
+    <div>
+      <label for="msg_link">Link (optional)</label>
+      <input id="msg_link" placeholder="/dashboard/ or /staff-dashboard/"/>
+      <div class="hint">Where the notification should send them.</div>
+    </div>
+  </div>
+
+  <div class="row2" style="margin-top:10px">
+    <div>
+      <label for="msg_title">Title</label>
+      <input id="msg_title" placeholder="Short title"/>
+    </div>
+    <div>
+      <label for="msg_body">Message</label>
+      <input id="msg_body" placeholder="Type message to user…"/>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn primary" id="sendMsgBtn" type="button">Send message</button>
+    <span class="chip"><strong>Status:</strong> <span id="msgStatus">Idle</span></span>
+  </div>
+
+  <div class="hint" style="margin-top:10px;">
+    Messages are inserted into <strong>notifications</strong> so the user sees them in the User Dashboard.
+  </div>
+</div>
+
             <!-- INVENTORY -->
             <div class="panel" id="panel-inventory">
               <div class="row2">
