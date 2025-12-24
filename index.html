@@ -1,195 +1,231 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FoodShare Seychelles | Home</title>
-    
-    <link rel="icon" type="image/png" href="/image/logo.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+:root{
+  --bg: #ffffff;
+  --surface: #f6f9f6;
+  --text: #111827;
+  --muted: #6b7280;
 
-    <style>
-        :root {
-            --primary: #6bb33b; --primary-dark: #4a802a; --primary-light: #e8f5e9;
-            --text-dark: #1f2937; --text-light: #6b7280; --white: #ffffff;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        body { background: white; color: var(--text-dark); overflow-x: hidden; }
-        
-        /* PRELOADER */
-        #loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 9999; display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease;
-        }
-        .spinner { width: 50px; height: 50px; border: 5px solid var(--primary-light); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+  --green-700:#2f7d32;
+  --green-600:#3f9a3d;
+  --green-500:#5fbf44;
+  --green-400:#7bd64e;
 
-        /* ANNOUNCEMENT */
-        #announcement { background: var(--primary-dark); color: white; text-align: center; padding: 10px; font-weight: 700; display: none; font-size: 0.9rem; }
+  --border: rgba(17,24,39,.10);
+  --shadow: 0 12px 30px rgba(17,24,39,.08);
+  --radius: 16px;
+  --radius-sm: 12px;
+}
 
-        /* NAV */
-        nav { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; background: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
-        .logo img { height: 50px; }
-        .nav-links { display: flex; gap: 25px; list-style: none; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
-        .btn { padding: 12px 25px; border-radius: 50px; font-weight: 700; text-decoration: none; display: inline-block; transition: 0.3s; }
-        .btn-primary { background: var(--primary); color: white; }
-        
-        .menu-icon { display: none; font-size: 1.5rem; color: var(--primary); cursor: pointer; }
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
 
-        /* HERO */
-        .hero { padding: 100px 5%; text-align: center; background: radial-gradient(circle at top, var(--primary-light), white); opacity: 0; transform: translateY(20px); transition: 1s ease-out forwards; }
-        .hero.visible { opacity: 1; transform: translateY(0); }
-        .hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); line-height: 1.1; margin-bottom: 25px; font-weight: 800; }
-        .hero span { color: var(--primary); }
-        .hero p { font-size: 1.2rem; color: var(--text-light); max-width: 800px; margin: 0 auto 40px; }
+a{color:inherit}
+.container{
+  width:min(1120px, calc(100% - 40px));
+  margin:0 auto;
+}
 
-        /* SECTIONS */
-        section { padding: 100px 5%; }
-        .section-title { text-align: center; margin-bottom: 60px; }
-        .section-title h2 { font-size: 2.5rem; margin-bottom: 15px; }
-        
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { padding: 40px; border-radius: 20px; background: #f9f9f9; transition: 0.3s; border: 1px solid transparent; }
-        .card:hover { border-color: var(--primary); transform: translateY(-10px); background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+.page{
+  min-height: calc(100vh - 200px);
+}
 
-        /* MOBILE MENU */
-        @media (max-width: 992px) {
-            .nav-links { position: fixed; top: 80px; left: -100%; width: 100%; height: calc(100vh - 80px); background: white; flex-direction: column; padding: 50px; transition: 0.4s; }
-            .nav-links.active { left: 0; }
-            .menu-icon { display: block; }
-        }
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
+  color: var(--green-700);
+  font-weight:600;
+  font-size: 13px;
+}
 
-        /* FOOTER */
-        footer { background: #111; color: #888; padding: 80px 5% 40px; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 50px; margin-bottom: 50px; }
-        .footer-col h4 { color: white; margin-bottom: 25px; }
-        .footer-col a { display: block; color: #888; text-decoration: none; margin-bottom: 12px; }
-        .footer-bottom { border-top: 1px solid #222; padding-top: 30px; text-align: center; }
-        .footer-bottom a { color: var(--primary); font-weight: 700; text-decoration: none; }
-    </style>
-</head>
-<body>
+.hero{
+  padding: 48px 0 28px;
+}
+.hero-grid{
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 28px;
+  align-items: stretch;
+}
+@media (max-width: 900px){
+  .hero-grid{grid-template-columns:1fr}
+}
 
-    <div id="loader"><div class="spinner"></div></div>
-    <div id="announcement"></div>
+.card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.card-pad{padding: 22px}
 
-    <nav>
-        <a href="/" class="logo"><img src="/image/logo.png" alt="FoodShare"></a>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="/">Home</a></li>
-            <li><a href="/about-us/">About Us</a></li>
-            <li><a href="/available-food/">Available Food</a></li>
-            <li><a href="/learn/">Learn More</a></li>
-            <li><a href="/contact/">Contact</a></li>
-            <li><a href="/donate-now/" class="btn btn-primary">Donate Now</a></li>
-        </ul>
-        <div class="menu-icon" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
-    </nav>
+.h1{font-size: 46px; line-height:1.05; margin: 12px 0 12px}
+.h2{font-size: 28px; line-height:1.15; margin: 0 0 10px}
+.h3{font-size: 18px; margin: 0 0 8px}
+.p{margin: 0 0 12px; color: var(--muted)}
+.small{font-size: 13px; color: var(--muted)}
+.kpi-grid{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px){
+  .kpi-grid{grid-template-columns: repeat(2, 1fr)}
+}
+.kpi{
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.kpi .num{font-size: 24px; font-weight:800; color: var(--green-700)}
+.kpi .lbl{font-size: 13px; color: var(--muted)}
 
-    <header class="hero" id="hero">
-        <h1>Feeding <span>Seychelles</span>,<br>Not the Landfill.</h1>
-        <p>FoodShare is the bridge between surplus food and those in need. We use technology and community power to ensure no meal goes to waste on our islands.</p>
-        <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;">
-            <a href="/available-food/" class="btn btn-primary">Find Available Food</a>
-            <a href="/volunteer/" class="btn" style="border: 2px solid var(--primary); color: var(--primary);">Become a Volunteer</a>
-        </div>
-    </header>
+.btn-row{display:flex; gap:12px; flex-wrap:wrap; margin-top: 14px}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  text-decoration:none;
+  font-weight: 700;
+  cursor:pointer;
+  background:#fff;
+}
+.btn.primary{
+  background: linear-gradient(90deg, var(--green-600), var(--green-400));
+  color:#fff;
+  border-color: transparent;
+}
+.btn.secondary{
+  background: #fff;
+  color: var(--green-700);
+}
+.btn.ghost{
+  background: transparent;
+  color: var(--text);
+}
+.btn:disabled{opacity:.6; cursor:not-allowed}
 
-    <section>
-        <div class="section-title">
-            <h2>How It Works</h2>
-            <p>A simple process for a massive impact.</p>
-        </div>
-        <div class="grid-3">
-            <div class="card">
-                <i class="fas fa-hotel"></i>
-                <h3>Donors List Surplus</h3>
-                <p>Hotels and stores list surplus food that is still perfectly safe and delicious via our platform.</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-truck-fast"></i>
-                <h3>Rapid Logistics</h3>
-                <p>Our volunteer network is alerted instantly to pick up and deliver the food to verified centers.</p>
-            </div>
-            <div class="card">
-                <i class="fas fa-utensils"></i>
-                <h3>Community Fed</h3>
-                <p>The food is distributed to those who need it most, reducing hunger and environmental waste.</p>
-            </div>
-        </div>
-    </section>
+.section{
+  padding: 28px 0;
+}
+.section-title{
+  display:flex;
+  align-items:flex-end;
+  justify-content: space-between;
+  gap:16px;
+  margin-bottom: 14px;
+}
+.grid-3{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 900px){
+  .grid-3{grid-template-columns:1fr}
+}
 
-    <section style="background: #fdfdfd;">
-        <div class="section-title">
-            <h2>Live Impact Stats</h2>
-            <p>Real-time data directly from our rescue operations.</p>
-        </div>
-        <div class="grid-3" style="text-align:center;">
-            <div><h2 style="font-size:3.5rem; color:var(--primary);" id="stat-meals">0</h2><p>Meals Provided</p></div>
-            <div><h2 style="font-size:3.5rem; color:var(--primary);" id="stat-kg">0</h2><p>KG Food Saved</p></div>
-            <div><h2 style="font-size:3.5rem; color:var(--primary);" id="stat-co2">0</h2><p>KG CO2 Prevented</p></div>
-        </div>
-    </section>
+.list{
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+.hr{height:1px;background:var(--border); margin: 18px 0}
 
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4>FoodShare</h4>
-                <p>Leading the way in sustainable food redistribution in the Seychelles since 2025.</p>
-            </div>
-            <div class="footer-col">
-                <h4>Quick Links</h4>
-                <a href="/about-us/">About Us</a>
-                <a href="/available-food/">Find Food</a>
-                <a href="/contact/">Support</a>
-            </div>
-            <div class="footer-col">
-                <h4>Follow Us</h4>
-                <div style="display:flex; gap:15px; font-size:1.5rem;">
-                    <i class="fa-brands fa-facebook"></i>
-                    <i class="fa-brands fa-instagram"></i>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 FoodShare Seychelles. Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
-        </div>
-    </footer>
+.form{
+  display:grid;
+  gap: 12px;
+}
+.field{
+  display:grid;
+  gap: 6px;
+}
+label{font-weight:700; font-size: 13px}
+input, select, textarea{
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font: inherit;
+}
+textarea{min-height: 120px; resize: vertical}
+.form-status{
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+}
 
-    <script>
-        const SB_URL = "https://edotvuleaydztulkxehe.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw";
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-        window.onload = async () => {
-            // Hide Loader
-            setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(() => document.getElementById('loader').style.display='none', 500); }, 800);
-            document.getElementById('hero').classList.add('visible');
-
-            // Fetch Data
-            try {
-                const { data: settings } = await _supabase.from('settings').select('*').single();
-                if(settings) {
-                    if(settings.announcement_active) {
-                        const bar = document.getElementById('announcement');
-                        bar.innerText = settings.announcement_text;
-                        bar.style.display = 'block';
-                    }
-                    document.getElementById('stat-meals').innerText = settings.total_meals_served || 0;
-                    document.getElementById('stat-kg').innerText = settings.total_kg_saved || 0;
-                    document.getElementById('stat-co2').innerText = settings.co2_prevented || 0;
-                }
-            } catch (e) { console.error("DB Error", e); }
-        };
-
-        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-    </script>
-</body>
-</html>
+/* Assistant widget (site-wide) */
+.assistant-fab{
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 999;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  background: linear-gradient(90deg, var(--green-600), var(--green-400));
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.assistant-modal{
+  position: fixed;
+  right: 18px;
+  bottom: 72px;
+  width: min(420px, calc(100vw - 36px));
+  z-index: 1000;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.assistant-head{
+  padding: 14px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.assistant-body{
+  padding: 14px;
+  max-height: 360px;
+  overflow: auto;
+}
+.msg{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.msg.user{background: #fff}
+.msg.bot{background: var(--surface)}
+.assistant-foot{
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  display:flex;
+  gap: 10px;
+}
+.assistant-foot input{
+  flex: 1;
+}
+.hidden{display:none !important}
