@@ -1,233 +1,1617 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | FoodShare Seychelles</title>
-    <link rel="icon" type="image/png" href="/image/logo.png">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --primary-green: #76b543; /* From your logo leaves */
-            --dark-green: #4a7729;
-            --light-bg: #f9fbf7;
-            --text-dark: #2d3436;
-            --white: #ffffff;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FoodShare Seychelles — Share Food. Feed Seychelles.</title>
+  <meta name="description" content="FoodShare Seychelles connects surplus food to people who need it—reducing waste and supporting food access across Seychelles." />
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            color: var(--text-dark);
-            background-color: var(--light-bg);
-            line-height: 1.6;
-        }
+  <!-- Supabase JS (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        /* Navbar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+  <style>
+    :root{
+      --bg: #fbfcfb;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted-2: #64748b;
+      --border: rgba(15, 23, 42, .10);
+      --shadow: 0 12px 32px rgba(2, 6, 23, .08);
+      --shadow-soft: 0 10px 26px rgba(2, 6, 23, .06);
+      --radius: 18px;
+      --radius-sm: 14px;
 
-        .logo-area { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
-        .logo-area img { height: 50px; }
+      /* Brand (adjust if you want) */
+      --brand: #73b63b;
+      --brand-2: #5aa52f;
+      --brand-ink: #173a12;
 
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: 0.3s; }
-        .nav-links a:hover { color: var(--primary-green); }
+      --dark: #0b1220;
+      --dark-2: #0f172a;
+      --dark-border: rgba(255,255,255,.10);
 
-        .btn-cta {
-            background: var(--primary-green);
-            color: white !important;
-            padding: 8px 20px;
-            border-radius: 25px;
-        }
+      --max: 1120px;
+    }
 
-        /* Announcement Bar */
-        #announcement-bar {
-            background: #e9f5db;
-            color: var(--dark-green);
-            text-align: center;
-            padding: 10px;
-            font-weight: 600;
-            display: none; /* Hidden until loaded */
-        }
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a{ color: inherit; text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+    img{ max-width:100%; height:auto; display:block; }
 
-        /* Hero Section */
-        header {
-            padding: 80px 5%;
-            text-align: center;
-            background: linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)), url('https://images.unsplash.com/photo-1488459711635-de86a8969a77?auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-        }
+    /* Accessibility */
+    .skip-link{
+      position:absolute; left:-999px; top: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 12px; border-radius: 10px;
+      z-index: 9999;
+    }
+    .skip-link:focus{ left: 10px; }
 
-        .hero-title { font-size: 3rem; margin-bottom: 10px; color: var(--dark-green); }
+    .container{ width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 18px; }
 
-        /* Impact Grid */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 40px 5%;
-            background: var(--white);
-        }
+    /* Navbar */
+    .nav-wrap{
+      position: sticky; top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      height: 76px;
+      gap: 14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap: 10px;
+      min-width: 160px;
+    }
+    .brand-logo{
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      object-fit: contain;
+    }
+    .brand-name{
+      display:flex; flex-direction:column;
+      line-height: 1.1;
+    }
+    .brand-name strong{ font-size: 14px; letter-spacing: .2px; }
+    .brand-name span{ font-size: 12px; color: var(--muted-2); }
 
-        .stat-card {
-            text-align: center;
-            padding: 30px;
-            border-radius: 15px;
-            background: var(--light-bg);
-            border: 1px solid #eee;
-        }
+    .nav-links{
+      display:flex; align-items:center; gap: 18px;
+    }
+    .nav-item{
+      font-size: 14px;
+      color: var(--muted);
+      padding: 10px 10px;
+      border-radius: 12px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav-item:hover{
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      text-decoration: none;
+    }
 
-        .stat-number { font-size: 2.5rem; font-weight: bold; color: var(--primary-green); display: block; }
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap: 10px;
+      background: var(--brand);
+      color: #fff;
+      border: 1px solid rgba(0,0,0,.0);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 650;
+      box-shadow: 0 8px 22px rgba(115,182,59,.20);
+      transition: transform .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+    .cta:hover{ background: var(--brand-2); transform: translateY(-1px); text-decoration:none; }
 
-        /* Assistant Widget */
-        #assistant-fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: var(--dark-green);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+    .pill{
+      display:inline-flex; align-items:center; gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.70);
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .pill button{
+      border: none; background: transparent; cursor: pointer; color: inherit;
+      font: inherit;
+      padding: 0;
+    }
+    .pill:hover{ background: rgba(255,255,255,.95); }
 
-        footer {
-            background: #222;
-            color: #eee;
-            padding: 40px 5%;
-            margin-top: 50px;
-            text-align: center;
-        }
+    /* Language select */
+    select.lang{
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.85);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--muted);
+      outline: none;
+      cursor: pointer;
+    }
+    select.lang:focus{ box-shadow: 0 0 0 4px rgba(115,182,59,.18); border-color: rgba(115,182,59,.55); }
 
-        footer a { color: var(--primary-green); text-decoration: none; }
-    </style>
+    /* More dropdown */
+    .dropdown{ position: relative; }
+    .dropdown-btn{
+      display:inline-flex; align-items:center; gap: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 10px 10px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    .dropdown-btn:hover{ background: rgba(115,182,59,.10); color: var(--brand-ink); }
+    .dropdown-menu{
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 240px;
+      background: var(--surface);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      padding: 8px;
+      display: none;
+    }
+    .dropdown-menu a{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .dropdown-menu a:hover{
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      text-decoration:none;
+    }
+    .dropdown.open .dropdown-menu{ display:block; }
+
+    /* Mobile */
+    .mobile-toggle{
+      display:none;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+    .mobile-panel{
+      display:none;
+      border-top: 1px solid rgba(15,23,42,.08);
+      padding: 12px 0 18px;
+    }
+    .mobile-panel .stack{
+      display:flex; flex-direction:column; gap: 8px;
+    }
+    .mobile-panel a, .mobile-panel button{
+      text-align:left;
+      width: 100%;
+    }
+
+    /* Hero */
+    .hero{
+      padding: 54px 0 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset: -120px -120px auto -120px;
+      height: 520px;
+      background:
+        radial-gradient(closest-side at 20% 30%, rgba(115,182,59,.18), transparent 62%),
+        radial-gradient(closest-side at 70% 20%, rgba(115,182,59,.12), transparent 60%),
+        radial-gradient(closest-side at 55% 70%, rgba(2,6,23,.06), transparent 62%);
+      pointer-events:none;
+      filter: blur(2px);
+    }
+    .hero-inner{ position: relative; text-align: center; }
+    .hero h1{
+      margin: 0 auto;
+      font-size: clamp(30px, 3.8vw, 54px);
+      letter-spacing: -0.6px;
+      line-height: 1.06;
+      max-width: 860px;
+      color: #2f5b1f;
+      font-weight: 800;
+    }
+    .hero p{
+      margin: 14px auto 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .hero-ctas{
+      margin-top: 22px;
+      display:flex; justify-content:center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      font-weight: 650;
+      font-size: 14px;
+      transition: transform .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+    .btn:hover{ background: rgba(255,255,255,1); transform: translateY(-1px); text-decoration:none; }
+    .btn.primary{
+      background: var(--brand);
+      border-color: rgba(0,0,0,0);
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(115,182,59,.20);
+    }
+    .btn.primary:hover{ background: var(--brand-2); }
+
+    /* Announcement */
+    .announce{
+      margin-top: 22px;
+      display:none;
+    }
+    .announce .card{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 14px;
+      padding: 16px 16px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(115,182,59,.25);
+      background: rgba(115,182,59,.08);
+    }
+    .announce strong{
+      color: #204417;
+      font-size: 14px;
+      display:block;
+      margin-bottom: 6px;
+    }
+    .announce .text{
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .announce .tag{
+      flex: 0 0 auto;
+      font-size: 12px;
+      font-weight: 700;
+      color: #204417;
+      border: 1px solid rgba(115,182,59,.35);
+      background: rgba(255,255,255,.55);
+      padding: 8px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* Impact */
+    .section{
+      padding: 24px 0 56px;
+    }
+    .section h2{
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.2px;
+    }
+    .section .sub{
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 820px;
+      font-size: 14px;
+    }
+
+    .grid-3{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .kpi{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 22px;
+      padding: 18px 18px;
+      box-shadow: 0 10px 22px rgba(2,6,23,.04);
+      min-height: 120px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .kpi .dots{
+      display:flex; gap: 6px; margin-bottom: 10px;
+    }
+    .kpi .dot{
+      width: 7px; height: 7px; border-radius: 999px;
+      background: rgba(115,182,59,.95);
+      box-shadow: 0 6px 18px rgba(115,182,59,.25);
+    }
+    .kpi .label{
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+    .kpi .value{
+      font-size: 28px;
+      font-weight: 850;
+      letter-spacing: -0.6px;
+      margin-top: 6px;
+      color: var(--text);
+    }
+    .kpi .hint{
+      color: var(--muted-2);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    /* How it works + Partner */
+    .split{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .card{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 10px 22px rgba(2,6,23,.04);
+    }
+    .steps{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .step{
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(251,252,251,.9);
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 130px;
+    }
+    .step .num{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: rgba(115,182,59,.12);
+      border: 1px solid rgba(115,182,59,.25);
+      color: #204417;
+      font-weight: 850;
+      margin-bottom: 10px;
+    }
+    .step h3{
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: -0.1px;
+    }
+    .step p{
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .partner{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 14px;
+    }
+    .partner .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(115,182,59,.25);
+      background: rgba(115,182,59,.08);
+      color: #204417;
+      font-size: 12px;
+      font-weight: 750;
+      width: fit-content;
+    }
+    .partner h3{
+      margin: 10px 0 0;
+      font-size: 18px;
+      letter-spacing: -0.2px;
+    }
+    .partner p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* Updates */
+    .updates{
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    /* Footer */
+    footer{
+      background: linear-gradient(180deg, var(--dark) 0%, #070b14 100%);
+      color: rgba(255,255,255,.86);
+      border-top: 1px solid var(--dark-border);
+    }
+    .footer-top{
+      padding: 44px 0 22px;
+    }
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 18px;
+    }
+    .foot-title{
+      font-weight: 850;
+      color: #fff;
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+    .foot-text{
+      margin: 0;
+      color: rgba(255,255,255,.70);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .foot-links{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,.74);
+    }
+    .foot-links a{ color: rgba(255,255,255,.74); }
+    .foot-links a:hover{ color: #fff; text-decoration:none; }
+
+    .footer-bottom{
+      border-top: 1px solid rgba(255,255,255,.10);
+      padding: 14px 0;
+      font-size: 13px;
+      color: rgba(255,255,255,.70);
+    }
+    .footer-bottom-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-bottom a{ color: rgba(255,255,255,.85); text-decoration: underline; }
+
+    /* Assistant */
+    .assistant-btn{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 60;
+      border: none;
+      cursor: pointer;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px 14px;
+      font-weight: 800;
+      box-shadow: 0 18px 40px rgba(115,182,59,.28);
+      display:flex; align-items:center; gap: 10px;
+    }
+    .assistant-btn:hover{ background: var(--brand-2); }
+
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.55);
+      z-index: 80;
+      display:none;
+      align-items:flex-end;
+      justify-content:flex-end;
+      padding: 18px;
+    }
+    .modal{
+      width: min(520px, 100%);
+      background: var(--surface);
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .modal header strong{ font-size: 14px; }
+    .modal header button{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+    }
+    .modal-body{
+      padding: 14px;
+      max-height: 60vh;
+      overflow:auto;
+    }
+    .chat{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .bubble{
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(15,23,42,.10);
+      font-size: 14px;
+      color: var(--muted);
+      background: rgba(251,252,251,.92);
+      white-space: pre-wrap;
+    }
+    .bubble.me{
+      align-self:flex-end;
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      border-color: rgba(115,182,59,.22);
+    }
+    .quick{
+      display:flex; gap: 8px; flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .chip{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.95);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .chip:hover{ background: rgba(115,182,59,.10); color: var(--brand-ink); border-color: rgba(115,182,59,.22); }
+
+    .modal footer{
+      background: transparent;
+      border-top: 1px solid rgba(15,23,42,.08);
+      padding: 12px;
+      display:flex; gap: 10px;
+    }
+    .modal input{
+      flex: 1;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 12px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .modal input:focus{ box-shadow: 0 0 0 4px rgba(115,182,59,.18); border-color: rgba(115,182,59,.55); }
+    .send{
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 850;
+      cursor:pointer;
+      white-space: nowrap;
+    }
+    .send:hover{ background: var(--brand-2); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .grid-3{ grid-template-columns: 1fr; }
+      .split{ grid-template-columns: 1fr; }
+      .steps{ grid-template-columns: 1fr; }
+      .footer-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px){
+      .nav-links{ display:none; }
+      .mobile-toggle{ display:inline-flex; }
+      .mobile-panel{ display:none; }
+      .mobile-panel.open{ display:block; }
+      .brand{ min-width: 0; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior:auto !important; transition:none !important; }
+    }
+  </style>
 </head>
+
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <div id="announcement-bar"></div>
-
-    <nav>
-        <a href="/" class="logo-area">
-            <img src="/image/logo.png" alt="FoodShare Seychelles">
+  <!-- NAVBAR -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="./">
+          <!-- Put your logo at: /assets/logo.png (or change this path) -->
+          <img class="brand-logo" src="assets/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span data-i18n="nav.tagline">Share Food. Feed Seychelles.</span>
+          </div>
         </a>
-        <div class="nav-links">
-            <a href="/find-food/" data-i18n="nav_find">Find Food</a>
-            <a href="/about-us/" data-i18n="nav_about">About</a>
-            <a href="/volunteer-now/" data-i18n="nav_volunteer">Volunteer</a>
-            <a href="/donate-now/" class="btn-cta" data-i18n="nav_donate">Donate Now</a>
-            <select id="langSwitcher" onchange="changeLanguage(this.value)">
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="find-food/" data-i18n="nav.findFood">Find Food</a>
+          <a class="nav-item" href="about-us/" data-i18n="nav.about">About</a>
+          <a class="nav-item" href="volunteer-now/" data-i18n="nav.volunteer">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="nav.more">
+              More
+              <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="learn/" role="menuitem" data-i18n="nav.learn">Learn</a>
+              <a href="our-impact/" role="menuitem" data-i18n="nav.impact">Our Impact</a>
+              <a href="our-partners/" role="menuitem" data-i18n="nav.partners">Our Partners</a>
+              <a href="contact-us/" role="menuitem" data-i18n="nav.contact">Contact Us</a>
+              <a href="social-media/" role="menuitem" data-i18n="nav.social">Social Media</a>
+              <a href="privacy-policy/" role="menuitem" data-i18n="nav.privacy">Privacy Policy</a>
+              <a href="terms-of-use/" role="menuitem" data-i18n="nav.terms">Terms Of Use</a>
+              <a href="sitemap/" role="menuitem" data-i18n="nav.sitemap">Sitemap</a>
+              <a href="staff-login/" role="menuitem" data-i18n="nav.staffLogin">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="donate-now/" data-i18n="nav.donateNow">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot">
+            <a href="auth/" id="authLink" data-i18n="nav.login">Login</a>
+          </span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">
+          ☰
+        </button>
+      </div>
+
+      <!-- MOBILE PANEL -->
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="find-food/" data-i18n="nav.findFood">Find Food</a>
+            <a class="nav-item" href="about-us/" data-i18n="nav.about">About</a>
+            <a class="nav-item" href="volunteer-now/" data-i18n="nav.volunteer">Volunteer</a>
+            <a class="nav-item" href="donate-now/" data-i18n="nav.donateNow">Donate Now</a>
+
+            <a class="nav-item" href="learn/" data-i18n="nav.learn">Learn</a>
+            <a class="nav-item" href="our-impact/" data-i18n="nav.impact">Our Impact</a>
+            <a class="nav-item" href="our-partners/" data-i18n="nav.partners">Our Partners</a>
+            <a class="nav-item" href="contact-us/" data-i18n="nav.contact">Contact Us</a>
+            <a class="nav-item" href="social-media/" data-i18n="nav.social">Social Media</a>
+            <a class="nav-item" href="privacy-policy/" data-i18n="nav.privacy">Privacy Policy</a>
+            <a class="nav-item" href="terms-of-use/" data-i18n="nav.terms">Terms Of Use</a>
+            <a class="nav-item" href="sitemap/" data-i18n="nav.sitemap">Sitemap</a>
+            <a class="nav-item" href="staff-login/" data-i18n="nav.staffLogin">Staff Login</a>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
                 <option value="en">English</option>
-                <option value="crs">Seselwa</option>
+                <option value="cr">Kreol</option>
                 <option value="fr">Français</option>
-            </select>
-            <a href="/login/" style="font-size: 0.9rem;">Login</a>
+              </select>
+              <span class="pill" id="authSlotMobile">
+                <a href="auth/" id="authLinkMobile" data-i18n="nav.login">Login</a>
+              </span>
+            </div>
+          </div>
         </div>
-    </nav>
+      </div>
+    </div>
+  </div>
 
-    <header>
-        <h1 class="hero-title" data-i18n="hero_title">Connecting Surplus to Need</h1>
-        <p data-i18n="hero_sub">Help us reduce food waste and support the community in Seychelles.</p>
-    </header>
+  <!-- MAIN -->
+  <main id="main">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <h1 data-i18n="home.heroTitle">Connecting Surplus to Need</h1>
+          <p data-i18n="home.heroSubtitle">
+            Help reduce food waste and support the community in Seychelles—through trusted coordination and real-world logistics.
+          </p>
 
-    <section class="stats-container" id="impact-stats">
-        <div class="stat-card">
-            <span class="stat-number" id="stat-meals">...</span>
-            <p data-i18n="stat_meals">Meals Shared</p>
+          <div class="hero-ctas">
+            <a class="btn" href="find-food/" data-i18n="home.ctaFindFood">Find Food</a>
+            <a class="btn primary" href="donate-now/" data-i18n="home.ctaDonate">Donate</a>
+            <a class="btn" href="volunteer-now/" data-i18n="home.ctaVolunteer">Volunteer</a>
+          </div>
+
+          <!-- Announcement (from settings.home_announcement) -->
+          <div class="announce" id="announceWrap">
+            <div class="card">
+              <div>
+                <strong data-i18n="home.announcementTitle">Announcement</strong>
+                <div class="text" id="announcementText"></div>
+              </div>
+              <div class="tag" data-i18n="home.announcementTag">Admin update</div>
+            </div>
+          </div>
+
+          <!-- Impact preview -->
+          <div class="section" style="padding-bottom: 0;">
+            <div style="margin-top: 22px;">
+              <div class="grid-3" aria-label="Impact preview">
+                <div class="kpi">
+                  <div>
+                    <div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="label" data-i18n="home.kpiMeals">Meals Shared (est.)</div>
+                    <div class="value" id="kpiMeals">—</div>
+                    <div class="hint" id="kpiMealsHint" data-i18n="home.kpiHintLive">Live totals (public-safe)</div>
+                  </div>
+                </div>
+
+                <div class="kpi">
+                  <div>
+                    <div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="label" data-i18n="home.kpiDonors">Donors Recognized</div>
+                    <div class="value" id="kpiDonors">—</div>
+                    <div class="hint" data-i18n="home.kpiDonorsHint">Hall of Fame opt-in names only</div>
+                  </div>
+                </div>
+
+                <div class="kpi">
+                  <div>
+                    <div class="dots" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                    <div class="label" data-i18n="home.kpiKg">KG Waste Diverted</div>
+                    <div class="value" id="kpiKg">—</div>
+                    <div class="hint" data-i18n="home.kpiHintLive">Live totals (public-safe)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top: 12px; color: var(--muted-2); font-size: 13px;">
+                <span data-i18n="home.co2LinePrefix">CO₂ prevented (est.):</span>
+                <strong id="kpiCo2" style="color: var(--text);">—</strong>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div class="stat-card">
-            <span class="stat-number" id="stat-donors">...</span>
-            <p data-i18n="stat_donors">Active Donors</p>
-        </div>
-        <div class="stat-card">
-            <span class="stat-number" id="stat-waste">...</span>
-            <p data-i18n="stat_waste">KG Waste Diverted</p>
-        </div>
+      </div>
     </section>
 
-    <div id="assistant-fab" onclick="toggleAssistant()">
-        💬 <span data-i18n="assistant_btn">Ask Assistant</span>
+    <!-- HOW IT WORKS + PARTNER -->
+    <section class="section">
+      <div class="container">
+        <div class="split">
+          <div class="card">
+            <h2 data-i18n="home.howTitle">How it works</h2>
+            <div class="sub" data-i18n="home.howSubtitle">
+              A simple flow that protects privacy while coordinating real pickups and deliveries.
+            </div>
+
+            <div class="steps">
+              <div class="step">
+                <div class="num">1</div>
+                <h3 data-i18n="home.step1Title">Post a donation</h3>
+                <p data-i18n="home.step1Text">Share item details and a pickup window. You can opt into the Hall of Fame.</p>
+              </div>
+              <div class="step">
+                <div class="num">2</div>
+                <h3 data-i18n="home.step2Title">Match & coordinate</h3>
+                <p data-i18n="home.step2Text">Staff/volunteers review and coordinate logistics using secure dashboards.</p>
+              </div>
+              <div class="step">
+                <div class="num">3</div>
+                <h3 data-i18n="home.step3Title">Food reaches people</h3>
+                <p data-i18n="home.step3Text">Claims are fulfilled and impact totals update without exposing personal data.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card partner">
+            <div>
+              <div class="badge" data-i18n="home.partnerBadge">Core Partner</div>
+              <h3 data-i18n="home.partnerTitle">Tyler Nicholas Group</h3>
+              <p data-i18n="home.partnerText">
+                Supporting FoodShare Seychelles with recruitment, legality, and technology—so operations remain trusted and scalable.
+              </p>
+            </div>
+            <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+              <a class="btn primary" href="our-partners/" data-i18n="home.partnerCta">View partnership</a>
+              <a class="btn" href="contact-us/" data-i18n="home.partnerContact">Contact us</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Latest updates (from settings.social_latest_updates) -->
+        <div class="card" style="margin-top: 16px;">
+          <h2 data-i18n="home.updatesTitle">Latest updates</h2>
+          <div class="sub" data-i18n="home.updatesSubtitle">
+            If social feeds are unreliable, we publish official updates here.
+          </div>
+          <div class="updates" id="updatesText">—</div>
+        </div>
+
+        <!-- CTA band -->
+        <div class="card" style="margin-top: 16px; display:flex; justify-content:space-between; gap: 16px; align-items:center; flex-wrap: wrap;">
+          <div>
+            <h2 style="margin:0;" data-i18n="home.ctaBandTitle">Ready to help or need support?</h2>
+            <div class="sub" style="margin-top:8px;" data-i18n="home.ctaBandSubtitle">
+              Donate surplus food, volunteer time, or use the contact form for partnerships and questions.
+            </div>
+          </div>
+          <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+            <a class="btn primary" href="donate-now/" data-i18n="home.ctaBandDonate">Donate now</a>
+            <a class="btn" href="volunteer-now/" data-i18n="home.ctaBandVolunteer">Volunteer</a>
+            <a class="btn" href="contact-us/" data-i18n="home.ctaBandContact">Contact</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text" data-i18n="footer.about">
+              A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.
+            </p>
+          </div>
+
+          <div>
+            <p class="foot-title" data-i18n="footer.pages">Pages</p>
+            <div class="foot-links">
+              <a href="./" data-i18n="footer.home">Home</a>
+              <a href="about-us/" data-i18n="footer.aboutUs">About Us</a>
+              <a href="learn/" data-i18n="footer.learn">Learn</a>
+              <a href="our-impact/" data-i18n="footer.impact">Our Impact</a>
+              <a href="our-partners/" data-i18n="footer.partners">Our Partners</a>
+              <a href="social-media/" data-i18n="footer.social">Social Media</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title" data-i18n="footer.actions">Actions</p>
+            <div class="foot-links">
+              <a href="find-food/" data-i18n="footer.findFood">Find Food</a>
+              <a href="donate-now/" data-i18n="footer.donate">Donate Now</a>
+              <a href="volunteer-now/" data-i18n="footer.volunteer">Volunteer Now</a>
+              <a href="contact-us/" data-i18n="footer.contact">Contact Us</a>
+              <a href="auth/" data-i18n="footer.login">Login</a>
+              <a href="staff-login/" data-i18n="footer.staffLogin">Staff Login</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title" data-i18n="footer.legal">Legal</p>
+            <div class="foot-links">
+              <a href="privacy-policy/" data-i18n="footer.privacy">Privacy Policy</a>
+              <a href="terms-of-use/" data-i18n="footer.terms">Terms Of Use</a>
+              <a href="sitemap/" data-i18n="footer.sitemap">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <footer>
-        <p>&copy; <span id="year"></span> FoodShare Seychelles. Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
-        <div style="margin-top: 10px; font-size: 0.8rem;">
-            <a href="/privacy-policy/">Privacy Policy</a> | <a href="/terms-of-use/">Terms of Use</a> | <a href="/sitemap/">Sitemap</a>
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> </span>
+            <span>
+              <span data-i18n="footer.madeBy">Website made by</span>
+              <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a>
+            </span>
+          </div>
+          <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+            <a href="privacy-policy/" data-i18n="footer.privacy">Privacy Policy</a>
+            <a href="terms-of-use/" data-i18n="footer.terms">Terms Of Use</a>
+            <a href="sitemap/" data-i18n="footer.sitemap">Sitemap</a>
+          </div>
         </div>
-    </footer>
+      </div>
+    </div>
+  </footer>
 
-    <script>
-        const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <!-- Assistant -->
+  <button class="assistant-btn" id="assistantBtn" type="button" aria-haspopup="dialog">
+    <span aria-hidden="true">✦</span>
+    <span data-i18n="assistant.button">Ask Assistant</span>
+  </button>
 
-        const i18n = {
-            en: {
-                nav_find: "Find Food", nav_about: "About", nav_volunteer: "Volunteer", nav_donate: "Donate Now",
-                hero_title: "Connecting Surplus to Need", stat_meals: "Meals Shared", assistant_btn: "Ask Assistant"
-            },
-            crs: {
-                nav_find: "Rod Manze", nav_about: "Presizyon", nav_volunteer: "Volontè", nav_donate: "Donnen Aprezan",
-                hero_title: "Konekte Sirplis avek Bezwen", stat_meals: "Repa ki'n ganny donnen", assistant_btn: "Demann Asistan"
-            },
-            fr: {
-                nav_find: "Trouver", nav_about: "À Propos", nav_volunteer: "Bénévole", nav_donate: "Faire un Don",
-                hero_title: "Connecter le Surplus au Besoin", stat_meals: "Repas Partagés", assistant_btn: "Aide"
-            }
-        };
+  <div class="modal-overlay" id="assistantOverlay" role="dialog" aria-modal="true" aria-label="Assistant">
+    <div class="modal">
+      <header>
+        <strong data-i18n="assistant.title">FoodShare Assistant</strong>
+        <button type="button" id="assistantClose" aria-label="Close">✕</button>
+      </header>
 
-        async function initHome() {
-            document.getElementById('year').innerText = new Date().getFullYear();
+      <div class="modal-body">
+        <div class="chat" id="chat">
+          <div class="bubble" id="assistantWelcome" data-i18n="assistant.welcome">
+            Hi — ask me about donating, volunteering, finding food, privacy, or today’s announcement. If I can’t answer, I’ll send you to Contact Us.
+          </div>
+        </div>
 
-            // 1. Fetch Announcement from settings_public
-            const { data: settings } = await supabase.from('settings_public').select('value').eq('key', 'home_announcement').single();
-            if (settings && settings.value) {
-                const bar = document.getElementById('announcement-bar');
-                bar.innerText = settings.value;
-                bar.style.display = 'block';
-            }
+        <div class="quick" aria-label="Suggested questions">
+          <button class="chip" type="button" data-q="announcement" data-i18n="assistant.chipAnnouncement">What’s the announcement?</button>
+          <button class="chip" type="button" data-q="impact" data-i18n="assistant.chipImpact">Show impact totals</button>
+          <button class="chip" type="button" data-q="donate" data-i18n="assistant.chipDonate">How do I donate?</button>
+          <button class="chip" type="button" data-q="volunteer" data-i18n="assistant.chipVolunteer">How do I volunteer?</button>
+          <button class="chip" type="button" data-q="find food" data-i18n="assistant.chipFindFood">How do I find food?</button>
+        </div>
+      </div>
 
-            // 2. Fetch Impact Data via RPC
-            const { data: impact, error } = await supabase.rpc('get_public_impact');
-            if (impact) {
-                document.getElementById('stat-meals').innerText = impact.total_meals || 0;
-                document.getElementById('stat-donors').innerText = impact.total_donors || 0;
-                document.getElementById('stat-waste').innerText = impact.total_waste_kg || 0;
-            }
+      <footer>
+        <input id="assistantInput" type="text" placeholder="Type a question…" />
+        <button class="send" id="assistantSend" type="button" data-i18n="assistant.send">Send</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ===========================
+    // Supabase
+    // ===========================
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ===========================
+    // i18n (simple dictionary)
+    // ===========================
+    const I18N = {
+      en: {
+        "nav.tagline":"Share Food. Feed Seychelles.",
+        "nav.findFood":"Find Food",
+        "nav.about":"About",
+        "nav.volunteer":"Volunteer",
+        "nav.more":"More",
+        "nav.learn":"Learn",
+        "nav.impact":"Our Impact",
+        "nav.partners":"Our Partners",
+        "nav.contact":"Contact Us",
+        "nav.social":"Social Media",
+        "nav.privacy":"Privacy Policy",
+        "nav.terms":"Terms Of Use",
+        "nav.sitemap":"Sitemap",
+        "nav.staffLogin":"Staff Login",
+        "nav.donateNow":"Donate Now",
+        "nav.login":"Login",
+
+        "home.heroTitle":"Connecting Surplus to Need",
+        "home.heroSubtitle":"Help reduce food waste and support the community in Seychelles—through trusted coordination and real-world logistics.",
+        "home.ctaFindFood":"Find Food",
+        "home.ctaDonate":"Donate",
+        "home.ctaVolunteer":"Volunteer",
+        "home.announcementTitle":"Announcement",
+        "home.announcementTag":"Admin update",
+        "home.kpiMeals":"Meals Shared (est.)",
+        "home.kpiDonors":"Donors Recognized",
+        "home.kpiDonorsHint":"Hall of Fame opt-in names only",
+        "home.kpiKg":"KG Waste Diverted",
+        "home.kpiHintLive":"Live totals (public-safe)",
+        "home.co2LinePrefix":"CO₂ prevented (est.):",
+
+        "home.howTitle":"How it works",
+        "home.howSubtitle":"A simple flow that protects privacy while coordinating real pickups and deliveries.",
+        "home.step1Title":"Post a donation",
+        "home.step1Text":"Share item details and a pickup window. You can opt into the Hall of Fame.",
+        "home.step2Title":"Match & coordinate",
+        "home.step2Text":"Staff/volunteers review and coordinate logistics using secure dashboards.",
+        "home.step3Title":"Food reaches people",
+        "home.step3Text":"Claims are fulfilled and impact totals update without exposing personal data.",
+
+        "home.partnerBadge":"Core Partner",
+        "home.partnerTitle":"Tyler Nicholas Group",
+        "home.partnerText":"Supporting FoodShare Seychelles with recruitment, legality, and technology—so operations remain trusted and scalable.",
+        "home.partnerCta":"View partnership",
+        "home.partnerContact":"Contact us",
+
+        "home.updatesTitle":"Latest updates",
+        "home.updatesSubtitle":"If social feeds are unreliable, we publish official updates here.",
+        "home.ctaBandTitle":"Ready to help or need support?",
+        "home.ctaBandSubtitle":"Donate surplus food, volunteer time, or use the contact form for partnerships and questions.",
+        "home.ctaBandDonate":"Donate now",
+        "home.ctaBandVolunteer":"Volunteer",
+        "home.ctaBandContact":"Contact",
+
+        "footer.about":"A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.",
+        "footer.pages":"Pages",
+        "footer.home":"Home",
+        "footer.aboutUs":"About Us",
+        "footer.learn":"Learn",
+        "footer.impact":"Our Impact",
+        "footer.partners":"Our Partners",
+        "footer.social":"Social Media",
+        "footer.actions":"Actions",
+        "footer.findFood":"Find Food",
+        "footer.donate":"Donate Now",
+        "footer.volunteer":"Volunteer Now",
+        "footer.contact":"Contact Us",
+        "footer.login":"Login",
+        "footer.staffLogin":"Staff Login",
+        "footer.legal":"Legal",
+        "footer.privacy":"Privacy Policy",
+        "footer.terms":"Terms Of Use",
+        "footer.sitemap":"Sitemap",
+        "footer.madeBy":"Website made by",
+
+        "assistant.button":"Ask Assistant",
+        "assistant.title":"FoodShare Assistant",
+        "assistant.welcome":"Hi — ask me about donating, volunteering, finding food, privacy, or today’s announcement. If I can’t answer, I’ll send you to Contact Us.",
+        "assistant.chipAnnouncement":"What’s the announcement?",
+        "assistant.chipImpact":"Show impact totals",
+        "assistant.chipDonate":"How do I donate?",
+        "assistant.chipVolunteer":"How do I volunteer?",
+        "assistant.chipFindFood":"How do I find food?",
+        "assistant.send":"Send",
+      },
+      cr: {
+        "nav.tagline":"Partaz Manze. Nouri Sesel.",
+        "nav.findFood":"Rod Manze",
+        "nav.about":"Lo Nou",
+        "nav.volunteer":"Volonter",
+        "nav.more":"Plis",
+        "nav.learn":"Aprann",
+        "nav.impact":"Nou Lenpak",
+        "nav.partners":"Nou Partener",
+        "nav.contact":"Kontak Nou",
+        "nav.social":"Sosyal Media",
+        "nav.privacy":"Politik Lasanble",
+        "nav.terms":"Kondisyon Itilizasyon",
+        "nav.sitemap":"Plan Sit",
+        "nav.staffLogin":"Login Staff",
+        "nav.donateNow":"Donnen Aster",
+        "nav.login":"Login",
+
+        "home.heroTitle":"Konekte Sipli avek Bezwen",
+        "home.heroSubtitle":"Ed redwir gaspiyaz manze e soutyen kominote Sesel—atraver koordinasyon serye ek keksoz pratik.",
+        "home.ctaFindFood":"Rod Manze",
+        "home.ctaDonate":"Donnen",
+        "home.ctaVolunteer":"Volonter",
+        "home.announcementTitle":"Anons",
+        "home.announcementTag":"Mizazour Admin",
+        "home.kpiMeals":"Repas Partaze (estim.)",
+        "home.kpiDonors":"Donater Onorab",
+        "home.kpiDonorsHint":"Non Lasanble Onorab selman",
+        "home.kpiKg":"KG Manze Sov",
+        "home.kpiHintLive":"Total an dirèk (san done prive)",
+        "home.co2LinePrefix":"CO₂ anpesé (estim.):",
+
+        "home.howTitle":"Kouman i marse",
+        "home.howSubtitle":"En keksoz senp ki protez vi prive pandan i koordin ranmasaz ek livrezon.",
+        "home.step1Title":"Soumet en don",
+        "home.step1Text":"Met detay keksoz ek ler ranmasaz. Ou kapab antre Lasanble Onorab.",
+        "home.step2Title":"Matche & koordin",
+        "home.step2Text":"Staff/volonter revize e koordin keksoz atraver dashboards sekirize.",
+        "home.step3Title":"Manze ariv kot dimoun",
+        "home.step3Text":"Reklam i ganny ranpli e lenpak i met a zour san kestyon prive.",
+
+        "home.partnerBadge":"Partener Prensipal",
+        "home.partnerTitle":"Tyler Nicholas Group",
+        "home.partnerText":"Soutyen FoodShare Seychelles avek rekritman, legalite, ek teknoloji—pou keksoz reste serye e evolitif.",
+        "home.partnerCta":"Vwar partenarya",
+        "home.partnerContact":"Kontak nou",
+
+        "home.updatesTitle":"Derni Mizazour",
+        "home.updatesSubtitle":"Si feed sosyal pa stab, nou pibliy mizazour isi.",
+        "home.ctaBandTitle":"Pare pou ede ouswa bezwen sipor?",
+        "home.ctaBandSubtitle":"Donnen sipli, volonter letan, ouswa servi form kontak pou kestyon ek partenarya.",
+        "home.ctaBandDonate":"Donnen aster",
+        "home.ctaBandVolunteer":"Volonter",
+        "home.ctaBandContact":"Kontak",
+
+        "footer.about":"En keksoz kominoter pou redwir gaspiyaz manze e amelyor keksoz manze Sesel—avek keksoz ki protez vi prive.",
+        "footer.pages":"Paz",
+        "footer.home":"Lakay",
+        "footer.aboutUs":"Lo Nou",
+        "footer.learn":"Aprann",
+        "footer.impact":"Nou Lenpak",
+        "footer.partners":"Nou Partener",
+        "footer.social":"Sosyal Media",
+        "footer.actions":"Aksyon",
+        "footer.findFood":"Rod Manze",
+        "footer.donate":"Donnen Aster",
+        "footer.volunteer":"Volonter Aster",
+        "footer.contact":"Kontak Nou",
+        "footer.login":"Login",
+        "footer.staffLogin":"Login Staff",
+        "footer.legal":"Legal",
+        "footer.privacy":"Politik Lasanble",
+        "footer.terms":"Kondisyon Itilizasyon",
+        "footer.sitemap":"Plan Sit",
+        "footer.madeBy":"Site fer par",
+
+        "assistant.button":"Asistan",
+        "assistant.title":"Asistan FoodShare",
+        "assistant.welcome":"Bonzour — kestyon lo don, volonter, rod manze, vi prive, ouswa anons ozordi. Si mon pa kapab reponn, mon pou anvoy ou lo Kontak Nou.",
+        "assistant.chipAnnouncement":"Ki anons la?",
+        "assistant.chipImpact":"Montre total lenpak",
+        "assistant.chipDonate":"Kouman pou donnen?",
+        "assistant.chipVolunteer":"Kouman pou volonter?",
+        "assistant.chipFindFood":"Kouman pou rod manze?",
+        "assistant.send":"Anvoy",
+      },
+      fr: {
+        "nav.tagline":"Partagez la nourriture. Nourrissez les Seychelles.",
+        "nav.findFood":"Trouver de la nourriture",
+        "nav.about":"À propos",
+        "nav.volunteer":"Bénévolat",
+        "nav.more":"Plus",
+        "nav.learn":"En savoir plus",
+        "nav.impact":"Notre impact",
+        "nav.partners":"Nos partenaires",
+        "nav.contact":"Nous contacter",
+        "nav.social":"Réseaux sociaux",
+        "nav.privacy":"Politique de confidentialité",
+        "nav.terms":"Conditions d’utilisation",
+        "nav.sitemap":"Plan du site",
+        "nav.staffLogin":"Connexion staff",
+        "nav.donateNow":"Faire un don",
+        "nav.login":"Connexion",
+
+        "home.heroTitle":"Relier les surplus aux besoins",
+        "home.heroSubtitle":"Réduisons le gaspillage alimentaire et soutenons la communauté aux Seychelles—avec une coordination fiable et une logistique réelle.",
+        "home.ctaFindFood":"Trouver",
+        "home.ctaDonate":"Donner",
+        "home.ctaVolunteer":"Bénévolat",
+        "home.announcementTitle":"Annonce",
+        "home.announcementTag":"Mise à jour admin",
+        "home.kpiMeals":"Repas partagés (estim.)",
+        "home.kpiDonors":"Donateurs reconnus",
+        "home.kpiDonorsHint":"Noms (Hall of Fame) uniquement",
+        "home.kpiKg":"KG détournés du gaspillage",
+        "home.kpiHintLive":"Totaux en direct (public)",
+        "home.co2LinePrefix":"CO₂ évité (estim.) :",
+
+        "home.howTitle":"Comment ça marche",
+        "home.howSubtitle":"Un parcours simple qui protège la confidentialité tout en coordonnant les collectes et livraisons.",
+        "home.step1Title":"Proposer un don",
+        "home.step1Text":"Ajoutez les détails et une fenêtre de collecte. Option Hall of Fame.",
+        "home.step2Title":"Mise en relation",
+        "home.step2Text":"Staff/bénévoles valident et coordonnent via des tableaux de bord sécurisés.",
+        "home.step3Title":"La nourriture arrive",
+        "home.step3Text":"Les demandes sont servies et l’impact se met à jour sans données personnelles.",
+
+        "home.partnerBadge":"Partenaire principal",
+        "home.partnerTitle":"Tyler Nicholas Group",
+        "home.partnerText":"Soutien en recrutement, juridique et technologie—pour des opérations fiables et évolutives.",
+        "home.partnerCta":"Voir le partenariat",
+        "home.partnerContact":"Nous contacter",
+
+        "home.updatesTitle":"Dernières mises à jour",
+        "home.updatesSubtitle":"Si les flux sociaux sont instables, nous publions les mises à jour ici.",
+        "home.ctaBandTitle":"Prêt à aider ou besoin de support ?",
+        "home.ctaBandSubtitle":"Faites un don, devenez bénévole, ou utilisez le formulaire de contact pour toute question/partenariat.",
+        "home.ctaBandDonate":"Faire un don",
+        "home.ctaBandVolunteer":"Bénévolat",
+        "home.ctaBandContact":"Contact",
+
+        "footer.about":"Une initiative communautaire pour réduire le gaspillage et améliorer l’accès—avec une approche respectueuse de la confidentialité.",
+        "footer.pages":"Pages",
+        "footer.home":"Accueil",
+        "footer.aboutUs":"À propos",
+        "footer.learn":"En savoir plus",
+        "footer.impact":"Notre impact",
+        "footer.partners":"Nos partenaires",
+        "footer.social":"Réseaux sociaux",
+        "footer.actions":"Actions",
+        "footer.findFood":"Trouver",
+        "footer.donate":"Faire un don",
+        "footer.volunteer":"Bénévolat",
+        "footer.contact":"Contact",
+        "footer.login":"Connexion",
+        "footer.staffLogin":"Connexion staff",
+        "footer.legal":"Légal",
+        "footer.privacy":"Confidentialité",
+        "footer.terms":"Conditions",
+        "footer.sitemap":"Plan du site",
+        "footer.madeBy":"Site réalisé par",
+
+        "assistant.button":"Assistant",
+        "assistant.title":"Assistant FoodShare",
+        "assistant.welcome":"Bonjour — posez une question sur les dons, le bénévolat, la recherche de nourriture, la confidentialité ou l’annonce du jour. Si je ne peux pas répondre, je vous renvoie vers Contact.",
+        "assistant.chipAnnouncement":"Quelle est l’annonce ?",
+        "assistant.chipImpact":"Afficher l’impact",
+        "assistant.chipDonate":"Comment faire un don ?",
+        "assistant.chipVolunteer":"Comment devenir bénévole ?",
+        "assistant.chipFindFood":"Comment trouver ?",
+        "assistant.send":"Envoyer",
+      }
+    };
+
+    function applyLanguage(lang){
+      const dict = I18N[lang] || I18N.en;
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      // Keep selects in sync
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+
+      // Assistant input placeholder (not in data-i18n)
+      const input = document.getElementById('assistantInput');
+      if (input){
+        input.placeholder =
+          (lang === 'fr') ? 'Tapez une question…' :
+          (lang === 'cr') ? 'Tap kestyon ou kestyon…' :
+          'Type a question…';
+      }
+    }
+
+    function getSavedLang(){
+      return localStorage.getItem('fs_lang') || 'en';
+    }
+
+    // ===========================
+    // UI: navbar dropdown + mobile
+    // ===========================
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){
+      if (!moreDropdown) return;
+      moreDropdown.classList.remove('open');
+      moreBtn?.setAttribute('aria-expanded', 'false');
+    }
+    moreBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = moreDropdown.classList.toggle('open');
+      moreBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (!moreDropdown) return;
+      if (!moreDropdown.contains(e.target)) closeMore();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMore();
+    });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', () => {
+      mobilePanel.classList.toggle('open');
+    });
+
+    // ===========================
+    // Auth slot
+    // ===========================
+    async function setAuthUI(){
+      const { data } = await sb.auth.getSession();
+      const isLoggedIn = !!data?.session?.user;
+
+      const desktopLink = document.getElementById('authLink');
+      const mobileLink = document.getElementById('authLinkMobile');
+
+      const authSlot = document.getElementById('authSlot');
+      const authSlotMobile = document.getElementById('authSlotMobile');
+
+      if (!desktopLink || !mobileLink || !authSlot || !authSlotMobile) return;
+
+      if (!isLoggedIn){
+        desktopLink.textContent = (I18N[getSavedLang()]||I18N.en)["nav.login"] || "Login";
+        desktopLink.href = "auth/";
+        mobileLink.textContent = desktopLink.textContent;
+        mobileLink.href = "auth/";
+        authSlot.onclick = null;
+        authSlotMobile.onclick = null;
+        return;
+      }
+
+      // If logged in, route by role_id if available
+      const user = data.session.user;
+      let roleId = 4;
+      try{
+        const { data: prof, error } = await sb
+          .from('profiles')
+          .select('role_id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!error && prof?.role_id) roleId = prof.role_id;
+      }catch(_){}
+
+      let target = "dashboard/";
+      if (roleId === 1) target = "admin-dashboard/";
+      else if (roleId === 2 || roleId === 3) target = "staff-dashboard/";
+
+      // Replace the pill contents with Dashboard + Sign out
+      authSlot.innerHTML = `
+        <a href="${target}" style="text-decoration:none; font-weight:750;">Dashboard</a>
+        <span style="opacity:.45; padding:0 8px;">|</span>
+        <button type="button" id="signOutBtn" style="font-weight:750;">Sign out</button>
+      `;
+      authSlotMobile.innerHTML = `
+        <a href="${target}" style="text-decoration:none; font-weight:750;">Dashboard</a>
+        <span style="opacity:.45; padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnMobile" style="font-weight:750;">Sign out</button>
+      `;
+
+      document.getElementById('signOutBtn')?.addEventListener('click', async () => {
+        await sb.auth.signOut();
+        location.reload();
+      });
+      document.getElementById('signOutBtnMobile')?.addEventListener('click', async () => {
+        await sb.auth.signOut();
+        location.reload();
+      });
+    }
+
+    // ===========================
+    // Data: settings + impact + donors
+    // ===========================
+    let liveAnnouncement = "";
+    let liveUpdates = "";
+    let liveImpact = { kg: 0, meals: 0, co2: 0, donors: 0 };
+
+    function formatNumber(n, decimals = 0){
+      if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
+      const num = Number(n);
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits: decimals }).format(num);
+    }
+
+    async function loadSettings(){
+      // settings table has a single row with id=true
+      const { data, error } = await sb
+        .from('settings')
+        .select('home_announcement, social_latest_updates')
+        .eq('id', true)
+        .single();
+
+      if (!error && data){
+        liveAnnouncement = (data.home_announcement || "").trim();
+        liveUpdates = (data.social_latest_updates || "").trim();
+      }
+
+      const announceWrap = document.getElementById('announceWrap');
+      const announcementText = document.getElementById('announcementText');
+      if (announceWrap && announcementText && liveAnnouncement){
+        announcementText.textContent = liveAnnouncement;
+        announceWrap.style.display = "block";
+      }
+
+      const updatesText = document.getElementById('updatesText');
+      if (updatesText){
+        updatesText.textContent = liveUpdates || "No updates posted yet.";
+      }
+    }
+
+    async function loadImpact(){
+      // Attempt 1: PostgREST aggregate
+      let kg = 0, meals = 0, co2 = 0;
+
+      try{
+        const { data, error } = await sb
+          .from('impact_events')
+          .select('kg.sum(), meals_estimate.sum(), co2_estimate.sum()');
+
+        if (!error && data && data[0]){
+          kg = Number(data[0]["kg"]?.sum || 0);
+          meals = Number(data[0]["meals_estimate"]?.sum || 0);
+          co2 = Number(data[0]["co2_estimate"]?.sum || 0);
+        } else {
+          throw new Error("Aggregate not available");
         }
+      } catch(_){
+        // Attempt 2: fetch limited rows and sum client-side
+        try{
+          const { data, error } = await sb
+            .from('impact_events')
+            .select('kg, meals_estimate, co2_estimate')
+            .order('created_at', { ascending: false })
+            .limit(1000);
 
-        function changeLanguage(lang) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[lang][key]) el.innerText = i18n[lang][key];
-            });
+          if (!error && Array.isArray(data)){
+            kg = data.reduce((a,r)=> a + (Number(r.kg)||0), 0);
+            meals = data.reduce((a,r)=> a + (Number(r.meals_estimate)||0), 0);
+            co2 = data.reduce((a,r)=> a + (Number(r.co2_estimate)||0), 0);
+          }
+        }catch(__){}
+      }
+
+      // Donors recognized (Hall of Fame count)
+      let donors = 0;
+      try{
+        const { count, error } = await sb
+          .from('hall_of_fame_entries')
+          .select('*', { count: 'exact', head: true });
+        if (!error && typeof count === "number") donors = count;
+      }catch(_){}
+
+      liveImpact = { kg, meals, co2, donors };
+
+      // Update UI
+      const kpiMeals = document.getElementById('kpiMeals');
+      const kpiKg = document.getElementById('kpiKg');
+      const kpiCo2 = document.getElementById('kpiCo2');
+      const kpiDonors = document.getElementById('kpiDonors');
+
+      if (kpiMeals) kpiMeals.textContent = formatNumber(meals, 0);
+      if (kpiKg) kpiKg.textContent = formatNumber(kg, 0);
+      if (kpiCo2) kpiCo2.textContent = formatNumber(co2, 0);
+      if (kpiDonors) kpiDonors.textContent = formatNumber(donors, 0);
+    }
+
+    // ===========================
+    // Assistant (rule-based)
+    // ===========================
+    const assistantBtn = document.getElementById('assistantBtn');
+    const overlay = document.getElementById('assistantOverlay');
+    const closeBtn = document.getElementById('assistantClose');
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('assistantInput');
+    const sendBtn = document.getElementById('assistantSend');
+
+    function openAssistant(){
+      overlay.style.display = "flex";
+      setTimeout(()=> input?.focus(), 50);
+    }
+    function closeAssistant(){
+      overlay.style.display = "none";
+    }
+    assistantBtn?.addEventListener('click', openAssistant);
+    closeBtn?.addEventListener('click', closeAssistant);
+    overlay?.addEventListener('click', (e) => {
+      if (e.target === overlay) closeAssistant();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && overlay.style.display === "flex") closeAssistant();
+    });
+
+    function addBubble(text, who="bot"){
+      const div = document.createElement('div');
+      div.className = `bubble ${who === "me" ? "me" : ""}`;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.parentElement.scrollTop = chat.parentElement.scrollHeight;
+    }
+
+    function answer(q){
+      const s = (q || "").toLowerCase().trim();
+      const lang = getSavedLang();
+
+      const contactLine =
+        (lang === 'fr') ? "Je ne suis pas sûr — utilisez le formulaire Contact : /contact-us/" :
+        (lang === 'cr') ? "Mon pa sir — silvouple servi form Kontak : /contact-us/" :
+        "I’m not fully sure — please use the Contact form: /contact-us/";
+
+      if (!s) return contactLine;
+
+      if (s.includes("announcement") || s.includes("anons") || s.includes("annonce")){
+        if (liveAnnouncement) return liveAnnouncement;
+        return (lang === 'fr') ? "Aucune annonce publiée pour le moment." :
+               (lang === 'cr') ? "Pa ena anons pou lemoman." :
+               "No announcement posted at the moment.";
+      }
+
+      if (s.includes("impact") || s.includes("lenpak") || s.includes("impacto") || s.includes("stats")){
+        const meals = formatNumber(liveImpact.meals, 0);
+        const kg = formatNumber(liveImpact.kg, 0);
+        const co2 = formatNumber(liveImpact.co2, 0);
+        const donors = formatNumber(liveImpact.donors, 0);
+
+        if (lang === 'fr'){
+          return `Impact (totaux publics) :\n• Repas (estim.) : ${meals}\n• KG sauvés : ${kg}\n• CO₂ évité (estim.) : ${co2}\n• Donateurs reconnus : ${donors}`;
         }
-
-        function toggleAssistant() {
-            const query = prompt("How can I help you today? (Type: donate, volunteer, find food, or impact)");
-            if (!query) return;
-            
-            const q = query.toLowerCase();
-            if (q.includes('donate')) alert("You can donate by clicking the 'Donate Now' button in the navbar!");
-            else if (q.includes('volunteer')) alert("We always need help! Visit the 'Volunteer Now' page.");
-            else if (q.includes('food')) window.location.href = '/find-food/';
-            else {
-                alert("I'm not sure about that. Redirecting you to our contact team...");
-                window.location.href = '/contact-us/';
-            }
+        if (lang === 'cr'){
+          return `Lenpak (total piblik) :\n• Repas (estim.) : ${meals}\n• KG sov : ${kg}\n• CO₂ anpesé (estim.) : ${co2}\n• Donater Onorab : ${donors}`;
         }
+        return `Impact (public totals):\n• Meals (est.): ${meals}\n• KG diverted: ${kg}\n• CO₂ prevented (est.): ${co2}\n• Donors recognized: ${donors}`;
+      }
 
-        initHome();
-    </script>
+      if (s.includes("donate") || s.includes("donnen") || s.includes("don")){
+        if (lang === 'fr') return "Allez à /donate-now/ et remplissez le formulaire (coordonnées + fenêtre de collecte + détails). Vous pouvez ajouter un nom public (Hall of Fame).";
+        if (lang === 'cr') return "Al lo /donate-now/ pou ranpli form (kontak + ler ranmasaz + detay keksoz). Ou kapab met non Lasanble Onorab.";
+        return "Go to /donate-now/ and complete the form (contact + pickup window + details). You can opt into the Hall of Fame name.";
+      }
+
+      if (s.includes("volunteer") || s.includes("volonter") || s.includes("bénévol")){
+        if (lang === 'fr') return "Allez à /volunteer-now/ pour soumettre votre disponibilité et vos intérêts. Nous vous recontacterons après examen.";
+        if (lang === 'cr') return "Al lo /volunteer-now/ pou soumet ou disponibilite ek keksoz ki enteres ou. Nou pou kontakte ou apre revizyon.";
+        return "Go to /volunteer-now/ to submit your availability and interests. We’ll contact you after review.";
+      }
+
+      if (s.includes("find") || s.includes("food") || s.includes("rod") || s.includes("nourriture")){
+        if (lang === 'fr') return "Allez à /find-food/ pour voir les disponibilités et soumettre une demande (claim).";
+        if (lang === 'cr') return "Al lo /find-food/ pou vwar keksoz ki disponib e soumet en claim.";
+        return "Go to /find-food/ to view available listings and submit a claim.";
+      }
+
+      if (s.includes("privacy") || s.includes("confidential") || s.includes("vi prive")){
+        if (lang === 'fr') return "Nous n’affichons jamais vos coordonnées publiquement. Les pages publiques montrent uniquement des agrégats et des noms opt-in (Hall of Fame).";
+        if (lang === 'cr') return "Nou pa afis ou kontak an piblik. Paz piblik i montre zis total keksoz ek non Lasanble Onorab (opt-in).";
+        return "We do not publish personal contact details. Public pages show only aggregates and opt-in Hall of Fame names.";
+      }
+
+      return contactLine;
+    }
+
+    function sendQuestion(q){
+      addBubble(q, "me");
+      const a = answer(q);
+      addBubble(a, "bot");
+    }
+
+    sendBtn?.addEventListener('click', () => {
+      const q = input.value;
+      input.value = "";
+      sendQuestion(q);
+    });
+    input?.addEventListener('keydown', (e) => {
+      if (e.key === "Enter"){
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sendQuestion(btn.getAttribute('data-q'));
+      });
+    });
+
+    // ===========================
+    // Init
+    // ===========================
+    (async function init(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      const saved = getSavedLang();
+      applyLanguage(saved);
+
+      document.getElementById('langSelect')?.addEventListener('change', (e) => {
+        localStorage.setItem('fs_lang', e.target.value);
+        applyLanguage(e.target.value);
+      });
+      document.getElementById('langSelectMobile')?.addEventListener('change', (e) => {
+        localStorage.setItem('fs_lang', e.target.value);
+        applyLanguage(e.target.value);
+      });
+
+      await setAuthUI();
+      await loadSettings();
+      await loadImpact();
+    })();
+  </script>
 </body>
 </html>
