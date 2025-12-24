@@ -1,183 +1,475 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Staff Login — FoodShare Seychelles</title>
-  <link rel="icon" href="../image/logo.png">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="description" content="Secure staff and admin login for FoodShare Seychelles operations." />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1100px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    :root{
+      --bg:#fbfcfb; --surface:#fff; --text:#0f172a; --muted:#475569; --muted2:#64748b;
+      --border:rgba(15,23,42,.10); --shadowSoft:0 10px 26px rgba(2,6,23,.06);
+      --brand:#73b63b; --brand2:#5aa52f; --brandInk:#173a12;
+      --dark:#0b1220; --darkBorder:rgba(255,255,255,.10);
+      --max:1120px;
+      --danger:#b42318;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.45}
     a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
-    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
-    .navbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:900}
-    .brand img{width:34px;height:34px;border-radius:10px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:800;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
-    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
-    .btn.blue{background:var(--blue)} .btn.danger{background:var(--red)} .btn.small{padding:8px 10px;border-radius:12px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
-    .card .content{padding:14px}
-    .h1{font-size:30px;margin:0}
-    .p{margin:10px 0;color:var(--muted)}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .sep{height:1px;background:var(--border);margin:12px 0}
-    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
-    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
-    .notice.error{border-color:#ffcdd2;background:#ffebee}
-    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
-    .field label{font-weight:800}
-    .field input{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
-    .small{font-size:12px;color:var(--muted)}
-    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
-    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
-    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .container{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+    /* NAV */
+    .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,23,42,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:74px;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px}
+    .brand-logo{width:36px;height:36px;border-radius:10px;object-fit:contain;display:block}
+    .brand-name{display:flex;flex-direction:column;line-height:1.1}
+    .brand-name strong{font-size:14px;letter-spacing:.2px}
+    .brand-name span{font-size:12px;color:var(--muted2)}
+    .nav-links{display:flex;align-items:center;gap:18px}
+    .nav-item{font-size:14px;color:var(--muted);padding:10px 10px;border-radius:12px;transition:background .15s,color .15s}
+    .nav-item:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .cta{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(115,182,59,.20);transition:transform .15s,background .15s;white-space:nowrap}
+    .cta:hover{background:var(--brand2);transform:translateY(-1px);text-decoration:none}
+    select.lang{border:1px solid rgba(15,23,42,.14);background:rgba(255,255,255,.92);border-radius:999px;padding:10px 12px;font-size:14px;color:var(--muted);outline:none;cursor:pointer}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.80);color:var(--muted);font-size:14px;white-space:nowrap}
+    .pill button{border:none;background:transparent;cursor:pointer;color:inherit;font:inherit;padding:0}
+    .dropdown{position:relative}
+    .dropdown-btn{display:inline-flex;align-items:center;gap:8px;border:none;background:transparent;cursor:pointer;color:var(--muted);padding:10px 10px;border-radius:12px;font-size:14px}
+    .dropdown-btn:hover{background:rgba(115,182,59,.10);color:var(--brandInk)}
+    .dropdown-menu{position:absolute;right:0;top:calc(100% + 10px);width:240px;background:var(--surface);border:1px solid rgba(15,23,42,.10);border-radius:16px;box-shadow:var(--shadowSoft);padding:8px;display:none}
+    .dropdown-menu a{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;font-size:14px;color:var(--muted)}
+    .dropdown-menu a:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .dropdown.open .dropdown-menu{display:block}
+    .mobile-toggle{display:none;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.92);border-radius:14px;padding:10px 12px;cursor:pointer}
+    .mobile-panel{display:none;border-top:1px solid rgba(15,23,42,.08);padding:12px 0 18px}
+    .mobile-panel.open{display:block}
+    .stack{display:flex;flex-direction:column;gap:8px}
+
+    /* PAGE */
+    .page{padding:42px 0 60px}
+    .hero{text-align:center}
+    .hero h1{margin:0 auto;font-size:clamp(26px,3vw,42px);letter-spacing:-.5px;line-height:1.08;max-width:880px;color:#2f5b1f;font-weight:950}
+    .hero p{margin:12px auto 0;max-width:860px;color:var(--muted);font-size:15px}
+    .grid{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .card{background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:22px;padding:18px;box-shadow:0 10px 22px rgba(2,6,23,.04)}
+    .card h2{margin:0;font-size:18px;letter-spacing:-.2px}
+    .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.55}
+
+    .form{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+    label{font-size:13px;color:var(--muted2);font-weight:800}
+    input{
+      width:100%; padding:12px 12px; border-radius:14px;
+      border:1px solid rgba(15,23,42,.14); background:rgba(255,255,255,.95);
+      outline:none; font-size:14px; color:var(--text);
+    }
+    input:focus{border-color:rgba(115,182,59,.55); box-shadow:0 0 0 4px rgba(115,182,59,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.95);color:var(--text);font-weight:950;font-size:14px;cursor:pointer;transition:transform .15s,background .15s;white-space:nowrap}
+    .btn:hover{background:#fff;transform:translateY(-1px)}
+    .btn.primary{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(115,182,59,.20)}
+    .btn.primary:hover{background:var(--brand2)}
+    .note{
+      margin-top:12px; padding:12px 14px; border-radius:18px;
+      border:1px solid rgba(15,23,42,.10); background:rgba(251,252,251,.98);
+      color:var(--muted); font-size:13px; line-height:1.55;
+    }
+    .error{
+      border-color:rgba(180,35,24,.35);
+      background:rgba(180,35,24,.06);
+      color:var(--danger);
+      font-weight:800;
+    }
+    .ok{
+      border-color:rgba(90,165,47,.35);
+      background:rgba(90,165,47,.08);
+      color:#1d4d12;
+      font-weight:800;
+    }
+    details{margin-top:10px}
+    details summary{cursor:pointer;color:var(--brandInk);font-weight:950}
+    .mono{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--muted)}
+
+    /* FOOTER */
+    footer{background:linear-gradient(180deg,var(--dark) 0%,#070b14 100%);color:rgba(255,255,255,.86);border-top:1px solid var(--darkBorder)}
+    .footer-top{padding:44px 0 22px}
+    .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:18px}
+    .foot-title{font-weight:950;color:#fff;margin:0 0 10px;font-size:14px}
+    .foot-text{margin:0;color:rgba(255,255,255,.70);font-size:13px;line-height:1.55}
+    .foot-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:rgba(255,255,255,.74)}
+    .foot-links a{color:rgba(255,255,255,.74)} .foot-links a:hover{color:#fff;text-decoration:none}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.10);padding:14px 0;font-size:13px;color:rgba(255,255,255,.70)}
+    .footer-bottom-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .footer-bottom a{color:rgba(255,255,255,.85);text-decoration:underline}
+
+    @media(max-width:980px){.grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:860px){.nav-links{display:none}.mobile-toggle{display:inline-flex}}
+    @media(max-width:560px){.row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
+  <!-- NAV -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="/image/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span>Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
 
-  <div class="navbar">
-    <div class="container nav-inner">
-      <a class="brand" href="../">
-        <img src="../image/logo.png" alt="logo" onerror="this.style.display='none'">
-        <span>FoodShare Seychelles</span>
-      </a>
-      <div class="row">
-        <a class="btn small secondary" href="../account/login/"><i class="fa-solid fa-user"></i> Community Login</a>
-        <a class="btn small blue" href="../donate-now/"><i class="fa-solid fa-hand-holding-heart"></i> Donate Now</a>
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/">Find Food</a>
+          <a class="nav-item" href="../about-us/">About</a>
+          <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem">Learn</a>
+              <a href="../our-impact/" role="menuitem">Our Impact</a>
+              <a href="../our-partners/" role="menuitem">Our Partners</a>
+              <a href="../contact-us/" role="menuitem">Contact Us</a>
+              <a href="../social-media/" role="menuitem">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem">Sitemap</a>
+              <a href="../staff-login/" role="menuitem">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot"><a href="../auth/" id="authLink">Login</a></span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
       </div>
+
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/">Find Food</a>
+            <a class="nav-item" href="../about-us/">About</a>
+            <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+            <a class="nav-item" href="../donate-now/">Donate Now</a>
+            <a class="nav-item" href="../learn/">Learn</a>
+            <a class="nav-item" href="../our-impact/">Our Impact</a>
+            <a class="nav-item" href="../our-partners/">Our Partners</a>
+            <a class="nav-item" href="../contact-us/">Contact Us</a>
+            <a class="nav-item" href="../social-media/">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/">Sitemap</a>
+            <a class="nav-item" href="../staff-login/">Staff Login</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option><option value="cr">Kreol</option><option value="fr">Français</option>
+              </select>
+              <span class="pill" id="authSlotMobile"><a href="../auth/" id="authLinkMobile">Login</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <div class="loading" id="loading">
-    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
-  </div>
+  <main>
+    <section class="page">
+      <div class="container">
+        <div class="hero">
+          <h1>Staff & Admin Login</h1>
+          <p>Secure access for operational dashboards. Community members should use the regular login page.</p>
+        </div>
 
-  <main class="container">
-    <div class="card" style="max-width:720px;margin:18px auto;">
-      <div class="bar"></div>
-      <div class="content">
-        <div class="row" style="justify-content:space-between;align-items:flex-start">
-          <div>
-            <h1 class="h1">Staff / Admin Login</h1>
-            <p class="p">Use your staff credentials. Access is enforced by role checks.</p>
+        <div class="grid">
+          <div class="card">
+            <h2>Sign in</h2>
+            <div class="sub">Use the staff account email and password provided by an administrator.</div>
+
+            <form class="form" id="staffLoginForm">
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" required placeholder="name@foodshare.sc" />
+              </div>
+
+              <div>
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Your password" />
+              </div>
+
+              <div class="row">
+                <button class="btn primary" type="submit" id="signInBtn">Sign in</button>
+                <button class="btn" type="button" id="forgotBtn">Forgot password</button>
+              </div>
+
+              <div class="note" id="msgBox" style="display:none;"></div>
+
+              <details>
+                <summary>Debug</summary>
+                <div class="mono" id="debugBox"></div>
+              </details>
+            </form>
           </div>
-          <div class="notice">
-            <b>Roles</b>
-            <div class="small">Admin (1) • Driver/Staff (2) • Volunteer Coordinator (3)</div>
+
+          <div class="card">
+            <h2>Access rules</h2>
+            <div class="sub">What happens after you sign in.</div>
+            <div class="note">
+              <div style="font-weight:950;color:var(--text);margin-bottom:8px;">Role routing</div>
+              <div>Admin (role_id 1) → Admin Dashboard</div>
+              <div>Driver/Staff (role_id 2) → Staff Dashboard</div>
+              <div>Volunteer Coordinator (role_id 3) → Staff Dashboard</div>
+              <div>Community Member (role_id 4) → Blocked (use normal login)</div>
+            </div>
+
+            <div class="note" style="margin-top:12px;">
+              If your login works but you get “blocked by policy,” it means your account does not have the correct role in the <span style="font-weight:950;">profiles</span> table.
+            </div>
+
+            <div class="note" style="margin-top:12px;">
+              Community login: <a href="../auth/" style="font-weight:950;color:var(--brandInk);text-decoration:underline;">Go to normal login</a>
+            </div>
           </div>
-        </div>
-
-        <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
-        <div class="sep"></div>
-
-        <div class="field">
-          <label>Email</label>
-          <input id="email" type="email" placeholder="staff@example.com" autocomplete="username">
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
-        </div>
-
-        <div class="row" style="margin-top:10px">
-          <button class="btn" id="btnLogin"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
-          <a class="btn secondary" href="../"><i class="fa-solid fa-house"></i> Back to site</a>
-        </div>
-
-        <div class="sep"></div>
-        <div class="small">
-          If you are a public user, use <a href="../account/login/"><b>Community Login</b></a>.
-          For non-login contact: <a href="mailto:admin@foodshare-seychelles.online"><b>admin@foodshare-seychelles.online</b></a>
         </div>
       </div>
-    </div>
+    </section>
   </main>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.</p>
+          </div>
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a><a href="../about-us/">About Us</a><a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a><a href="../our-partners/">Our Partners</a><a href="../social-media/">Social Media</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a><a href="../donate-now/">Donate Now</a><a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a><a href="../auth/">Login</a><a href="../staff-login/">Staff Login</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a><a href="../terms-of-use/">Terms Of Use</a><a href="../sitemap/">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    const supabase = createClient(
-      "https://edotvuleaydztulkxehe.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
-    );
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a></span>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-    const loading = document.getElementById("loading");
-    const setLoading = (on) => loading.style.display = on ? "flex" : "none";
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function toast(type, html){
-      const el = document.getElementById("msg");
-      el.className = "notice" + (type ? " "+type : "");
-      el.innerHTML = html;
-      el.style.display = "block";
+    const msgBox = document.getElementById('msgBox');
+    const debugBox = document.getElementById('debugBox');
+
+    function showMsg(text, kind){
+      msgBox.style.display = "block";
+      msgBox.textContent = text;
+      msgBox.className = "note " + (kind === "error" ? "error" : kind === "ok" ? "ok" : "");
+    }
+    function logDebug(line){
+      debugBox.textContent = (debugBox.textContent ? debugBox.textContent + "\n" : "") + line;
     }
 
-    async function routeByRole(){
-      const { data: u } = await supabase.auth.getUser();
-      const uid = u?.user?.id;
-      if(!uid){
-        toast("error","No authenticated user found.");
+    // Navbar behaviors
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){ moreDropdown?.classList.remove('open'); moreBtn?.setAttribute('aria-expanded','false'); }
+    moreBtn?.addEventListener('click', (e)=>{ e.preventDefault(); const open = moreDropdown.classList.toggle('open'); moreBtn.setAttribute('aria-expanded', String(open)); });
+    document.addEventListener('click', (e)=>{ if (moreDropdown && !moreDropdown.contains(e.target)) closeMore(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMore(); });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', ()=> mobilePanel.classList.toggle('open'));
+
+    // Language (simple persistence; you can expand to real translations later)
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+    }
+    const lang = getSavedLang(); applyLanguage(lang);
+    document.getElementById('langSelect')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+    document.getElementById('langSelectMobile')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+
+    // Auth UI slot (shows sign out if already logged in)
+    async function refreshAuthSlot(){
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user || null;
+
+      const slot = document.getElementById('authSlot');
+      const slotM = document.getElementById('authSlotMobile');
+
+      if (!slot || !slotM) return;
+
+      if (!user){
+        slot.innerHTML = `<a href="../auth/" id="authLink">Login</a>`;
+        slotM.innerHTML = `<a href="../auth/" id="authLinkMobile">Login</a>`;
         return;
       }
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("role_id,full_name")
-        .eq("id", uid)
-        .single();
+      slot.innerHTML = `<span style="font-weight:950;">Signed in</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtn">Sign out</button>`;
+      slotM.innerHTML = `<span style="font-weight:950;">Signed in</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnMobile">Sign out</button>`;
 
-      if(error || !profile){
-        await supabase.auth.signOut();
-        toast("error","Profile not found or access denied. Contact admin.");
-        return;
-      }
-
-      const r = Number(profile.role_id);
-      if(r === 1){
-        location.href = "../admin/dashboard/home.html";
-      } else if(r === 2 || r === 3){
-        location.href = "../staff/dashboard.html";
-      } else {
-        await supabase.auth.signOut();
-        toast("error","This account is not authorized for staff/admin access.");
-      }
+      document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.reload(); });
+      document.getElementById('signOutBtnMobile')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.reload(); });
     }
 
-    document.getElementById("btnLogin").addEventListener("click", async ()=>{
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+    // After sign-in, route by role
+    async function routeByRole(userId){
+      const { data, error } = await sb
+        .from('profiles')
+        .select('role_id, is_active')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if(!email || !password){
-        toast("warn","Email and password are required.");
+      if (error){
+        logDebug("profiles select error: " + (error.message || ""));
+        showMsg("Signed in, but your profile could not be checked (RLS / policy). Contact an admin.", "error");
+        return;
+      }
+      if (!data){
+        showMsg("Signed in, but your staff profile does not exist. Contact an admin to assign a staff role.", "error");
+        return;
+      }
+      if (data.is_active === false){
+        showMsg("Your account is inactive. Contact an admin.", "error");
         return;
       }
 
-      setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      setLoading(false);
+      const roleId = data.role_id;
 
-      if(error){
-        toast("error", `<b>Login failed:</b> ${error.message}`);
+      if (roleId === 1) { location.href = "../admin-dashboard/"; return; }
+      if (roleId === 2 || roleId === 3) { location.href = "../staff-dashboard/"; return; }
+
+      // Role 4 (community) or anything else
+      showMsg("This account is not staff. Please use the normal login page.", "error");
+      setTimeout(()=> location.href = "../auth/", 900);
+    }
+
+    document.getElementById('staffLoginForm')?.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      msgBox.style.display = "none";
+      debugBox.textContent = "";
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password){
+        showMsg("Please enter email and password.", "error");
         return;
       }
 
-      toast("", "<b>Logged in.</b> Checking permissions…");
-      await routeByRole();
+      const btn = document.getElementById('signInBtn');
+      btn.disabled = true;
+      btn.textContent = "Signing in…";
+
+      try{
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error){
+          logDebug("signInWithPassword error: " + (error.message || ""));
+          showMsg(error.message || "Login failed. Please try again.", "error");
+          return;
+        }
+
+        showMsg("Signed in. Checking staff role…", "ok");
+        await routeByRole(data.user.id);
+
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Sign in";
+      }
     });
 
-    // If already logged in, route immediately
+    document.getElementById('forgotBtn')?.addEventListener('click', async ()=>{
+      msgBox.style.display = "none";
+      debugBox.textContent = "";
+
+      const email = document.getElementById('email').value.trim();
+      if (!email){
+        showMsg("Enter your email first, then click Forgot password.", "error");
+        return;
+      }
+
+      // IMPORTANT: set this to your real URL that hosts staff-login (GitHub Pages)
+      // Example: https://yourusername.github.io/foodshare-seychelles/staff-login/
+      const redirectTo = location.origin + location.pathname; // keeps it simple
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error){
+        logDebug("resetPasswordForEmail error: " + (error.message || ""));
+        showMsg(error.message || "Could not send reset email.", "error");
+        return;
+      }
+      showMsg("Password reset email sent. Check your inbox.", "ok");
+    });
+
+    // init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    refreshAuthSlot();
+
+    // If already signed in, route immediately
     (async ()=>{
-      const { data } = await supabase.auth.getSession();
-      if(data.session){
-        setLoading(true);
-        await routeByRole();
-        setLoading(false);
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user || null;
+      if (user){
+        showMsg("You are already signed in. Checking staff role…", "ok");
+        await routeByRole(user.id);
       }
     })();
   </script>
