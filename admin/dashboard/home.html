@@ -1,982 +1,1357 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Admin Dashboard — FoodShare Seychelles</title>
-  <link rel="icon" href="../../image/logo.png">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta name="description" content="Admin operations dashboard for FoodShare Seychelles."/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    :root{--green:#4CAF50;--green-dark:#388E3C;--green-light:#81C784;--blue:#2196F3;--orange:#FF9800;--red:#D32F2F;--bg:#f6f8f7;--card:#fff;--text:#1f2a1f;--muted:#667066;--border:#e4ebe4;--shadow:0 10px 30px rgba(0,0,0,.06);--radius:18px;--maxw:1300px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+    :root{
+      --bg:#fbfcfb; --surface:#fff; --text:#0f172a; --muted:#475569; --muted2:#64748b;
+      --border:rgba(15,23,42,.10); --shadowSoft:0 10px 26px rgba(2,6,23,.06);
+      --brand:#73b63b; --brand2:#5aa52f; --brandInk:#173a12;
+      --dark:#0b1220; --darkBorder:rgba(255,255,255,.10);
+      --max:1200px;
+      --danger:#b42318; --warn:#9a6700;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.45}
     a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
-    .container{max-width:var(--maxw);margin:0 auto;padding:18px}
-    .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .top-inner{display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:950}
-    .brand img{width:34px;height:34px;border-radius:10px}
-    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:14px;border:1px solid transparent;background:var(--green);color:#fff;font-weight:900;box-shadow:0 10px 22px rgba(76,175,80,.18);cursor:pointer}
-    .btn.secondary{background:#fff;color:var(--text);border-color:var(--border);box-shadow:none}
-    .btn.blue{background:var(--blue)} .btn.orange{background:var(--orange)} .btn.danger{background:var(--red)}
-    .btn.small{padding:8px 10px;border-radius:12px}
-    .grid{display:grid;gap:14px}
-    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-    @media(max-width:1000px){.grid.two,.grid.three{grid-template-columns:1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .card .bar{height:6px;background:linear-gradient(90deg,var(--green),var(--green-light))}
-    .card .content{padding:14px}
-    .h1{font-size:28px;margin:0}
-    .h2{font-size:18px;margin:0}
-    .p{margin:10px 0;color:var(--muted)}
-    .sep{height:1px;background:var(--border);margin:12px 0}
-    .notice{border:1px solid #d7ead7;background:#eef6ee;border-radius:16px;padding:12px 14px}
-    .notice.warn{border-color:#ffe0b2;background:#fff3e0}
-    .notice.error{border-color:#ffcdd2;background:#ffebee}
-    .small{font-size:12px;color:var(--muted)}
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:12px;background:#eef6ee;border:1px solid #d7ead7;color:var(--green-dark)}
-    .badge.blue{background:#e3f2fd;border-color:#bbdefb;color:#0b5aa5}
-    .badge.orange{background:#fff3e0;border-color:#ffe0b2;color:#b26a00}
-    .badge.red{background:#ffebee;border-color:#ffcdd2;color:#a10f0f}
-    .tabs{display:flex;gap:10px;flex-wrap:wrap}
-    .tab{padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;font-weight:900;cursor:pointer}
-    .tab.active{background:#eef6ee;border-color:#d7ead7;color:var(--green-dark)}
-    .panel{display:none}
+    .container{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+    /* NAV */
+    .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,23,42,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:74px;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px}
+    .brand-logo{width:36px;height:36px;border-radius:10px;object-fit:contain;display:block}
+    .brand-name{display:flex;flex-direction:column;line-height:1.1}
+    .brand-name strong{font-size:14px;letter-spacing:.2px}
+    .brand-name span{font-size:12px;color:var(--muted2)}
+    .nav-links{display:flex;align-items:center;gap:18px}
+    .nav-item{font-size:14px;color:var(--muted);padding:10px 10px;border-radius:12px;transition:background .15s,color .15s}
+    .nav-item:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .cta{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(115,182,59,.20);transition:transform .15s,background .15s;white-space:nowrap}
+    .cta:hover{background:var(--brand2);transform:translateY(-1px);text-decoration:none}
+    select.lang{border:1px solid rgba(15,23,42,.14);background:rgba(255,255,255,.92);border-radius:999px;padding:10px 12px;font-size:14px;color:var(--muted);outline:none;cursor:pointer}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.80);color:var(--muted);font-size:14px;white-space:nowrap}
+    .pill button{border:none;background:transparent;cursor:pointer;color:inherit;font:inherit;padding:0}
+    .dropdown{position:relative}
+    .dropdown-btn{display:inline-flex;align-items:center;gap:8px;border:none;background:transparent;cursor:pointer;color:var(--muted);padding:10px 10px;border-radius:12px;font-size:14px}
+    .dropdown-btn:hover{background:rgba(115,182,59,.10);color:var(--brandInk)}
+    .dropdown-menu{position:absolute;right:0;top:calc(100% + 10px);width:240px;background:var(--surface);border:1px solid rgba(15,23,42,.10);border-radius:16px;box-shadow:var(--shadowSoft);padding:8px;display:none}
+    .dropdown-menu a{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;font-size:14px;color:var(--muted)}
+    .dropdown-menu a:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .dropdown.open .dropdown-menu{display:block}
+    .mobile-toggle{display:none;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.92);border-radius:14px;padding:10px 12px;cursor:pointer}
+    .mobile-panel{display:none;border-top:1px solid rgba(15,23,42,.08);padding:12px 0 18px}
+    .mobile-panel.open{display:block}
+    .stack{display:flex;flex-direction:column;gap:8px}
+
+    /* PAGE */
+    .page{padding:36px 0 56px}
+    .title{text-align:center}
+    .title h1{margin:0 auto;font-size:clamp(26px,3vw,40px);letter-spacing:-.4px;line-height:1.1;max-width:980px;color:#2f5b1f;font-weight:950}
+    .title p{margin:12px auto 0;max-width:980px;color:var(--muted);font-size:15px}
+
+    .grid{margin-top:18px;display:grid;grid-template-columns:1fr;gap:16px}
+    .card{background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:22px;padding:18px;box-shadow:0 10px 22px rgba(2,6,23,.04)}
+    .card h2{margin:0;font-size:18px;letter-spacing:-.2px}
+    .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.55}
+    .status{margin-top:10px;color:var(--muted);font-size:13px;white-space:pre-wrap}
+
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .tab{padding:9px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.92);color:var(--muted);font-weight:950;font-size:13px;cursor:pointer}
+    .tab.active{background:rgba(115,182,59,.12);border-color:rgba(115,182,59,.28);color:var(--brandInk)}
+    .panel{display:none;margin-top:14px}
     .panel.active{display:block}
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    th,td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top}
-    th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-align:left}
-    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0}
-    .field label{font-weight:900}
-    .field input,.field textarea,.field select{width:100%;padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:#fff;outline:none}
-    textarea{min-height:120px;resize:vertical}
-    code.inline{background:#f1f5f1;border:1px solid var(--border);padding:2px 6px;border-radius:10px}
-    .loading{position:fixed;inset:0;background:rgba(246,248,247,.92);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(6px)}
-    .loading .box{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
-    .spinner{width:18px;height:18px;border-radius:50%;border:3px solid #d7ead7;border-top-color:var(--green);animation:spin .9s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:220;padding:18px}
-    .modal{width:min(900px,100%);background:#fff;border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-    .modal .content{padding:14px}
-    .modal .actions{padding:14px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.95);color:var(--text);font-weight:950;font-size:13px;cursor:pointer;transition:transform .15s,background .15s;white-space:nowrap}
+    .btn:hover{background:#fff;transform:translateY(-1px)}
+    .btn.primary{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(115,182,59,.20)}
+    .btn.primary:hover{background:var(--brand2)}
+    .btn.danger{border-color:rgba(180,35,24,.25);background:rgba(180,35,24,.06);color:var(--danger)}
+    .btn.warn{border-color:rgba(154,103,0,.25);background:rgba(154,103,0,.08);color:var(--warn)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+    .form{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    label{font-size:12px;color:var(--muted2);font-weight:950}
+    input, textarea, select{
+      width:100%; padding:11px 12px; border-radius:14px;
+      border:1px solid rgba(15,23,42,.14); background:rgba(255,255,255,.95);
+      outline:none; font-size:14px; color:var(--text);
+    }
+    textarea{min-height:110px;resize:vertical}
+    input:focus, textarea:focus, select:focus{border-color:rgba(115,182,59,.55); box-shadow:0 0 0 4px rgba(115,182,59,.12)}
+    .hint{font-size:12px;color:var(--muted2)}
+    .mono{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--muted)}
+
+    table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:12px}
+    th{font-size:12px;color:var(--muted2);text-align:left;padding:0 10px}
+    td{background:rgba(251,252,251,.98);border:1px solid rgba(15,23,42,.10);padding:10px;border-left:none;border-right:none;font-size:13px;color:var(--muted);vertical-align:top}
+    tr td:first-child{border-left:1px solid rgba(15,23,42,.10);border-top-left-radius:14px;border-bottom-left-radius:14px}
+    tr td:last-child{border-right:1px solid rgba(15,23,42,.10);border-top-right-radius:14px;border-bottom-right-radius:14px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.92);color:var(--muted);font-size:12px}
+    .chip strong{color:var(--text)}
+
+    details{margin-top:10px}
+    details summary{cursor:pointer;color:var(--brandInk);font-weight:950}
+
+    /* FOOTER */
+    footer{background:linear-gradient(180deg,var(--dark) 0%,#070b14 100%);color:rgba(255,255,255,.86);border-top:1px solid var(--darkBorder)}
+    .footer-top{padding:44px 0 22px}
+    .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:18px}
+    .foot-title{font-weight:950;color:#fff;margin:0 0 10px;font-size:14px}
+    .foot-text{margin:0;color:rgba(255,255,255,.70);font-size:13px;line-height:1.55}
+    .foot-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:rgba(255,255,255,.74)}
+    .foot-links a{color:rgba(255,255,255,.74)} .foot-links a:hover{color:#fff;text-decoration:none}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.10);padding:14px 0;font-size:13px;color:rgba(255,255,255,.70)}
+    .footer-bottom-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .footer-bottom a{color:rgba(255,255,255,.85);text-decoration:underline}
+
+    @media(max-width:1100px){.row2{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:860px){.nav-links{display:none}.mobile-toggle{display:inline-flex}}
   </style>
 </head>
 <body>
+  <!-- NAV -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="/image/logo.png" alt="FoodShare Seychelles logo"/>
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span>Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
 
-  <div class="topbar">
-    <div class="container top-inner">
-      <a class="brand" href="../../">
-        <img src="../../image/logo.png" alt="logo" onerror="this.style.display='none'">
-        <span>FoodShare Seychelles</span>
-      </a>
-      <div class="row">
-        <div class="small" id="who">—</div>
-        <button class="btn small secondary" id="btnReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-        <button class="btn small danger" id="btnLogout"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/">Find Food</a>
+          <a class="nav-item" href="../about-us/">About</a>
+          <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem">Learn</a>
+              <a href="../our-impact/" role="menuitem">Our Impact</a>
+              <a href="../our-partners/" role="menuitem">Our Partners</a>
+              <a href="../contact-us/" role="menuitem">Contact Us</a>
+              <a href="../social-media/" role="menuitem">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem">Sitemap</a>
+              <a href="../staff-login/" role="menuitem">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot"><a href="../auth/" id="authLink">Login</a></span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
       </div>
+
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/">Find Food</a>
+            <a class="nav-item" href="../about-us/">About</a>
+            <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+            <a class="nav-item" href="../donate-now/">Donate Now</a>
+            <a class="nav-item" href="../learn/">Learn</a>
+            <a class="nav-item" href="../our-impact/">Our Impact</a>
+            <a class="nav-item" href="../our-partners/">Our Partners</a>
+            <a class="nav-item" href="../contact-us/">Contact Us</a>
+            <a class="nav-item" href="../social-media/">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/">Sitemap</a>
+            <a class="nav-item" href="../staff-login/">Staff Login</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option><option value="cr">Kreol</option><option value="fr">Français</option>
+              </select>
+              <span class="pill" id="authSlotMobile"><a href="../auth/" id="authLinkMobile">Login</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <div class="loading" id="loading">
-    <div class="box"><div class="spinner"></div><div><b>Loading</b><div class="small">Please wait…</div></div></div>
-  </div>
+  <main>
+    <section class="page">
+      <div class="container">
+        <div class="title">
+          <h1>Admin Dashboard</h1>
+          <p>Review submissions, manage inventory and tasks, manage users, and control homepage announcements through settings.</p>
+        </div>
 
-  <div class="modal-backdrop" id="modal">
-    <div class="modal">
-      <div class="content">
-        <div class="h2" id="mTitle">Details</div>
-        <div class="sep"></div>
-        <pre id="mBody" style="white-space:pre-wrap;margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;background:#f7faf7;border:1px solid var(--border);padding:12px;border-radius:16px"></pre>
+        <div class="grid">
+          <div class="card">
+            <h2>Admin session</h2>
+            <div class="sub">Admins only (role_id 1). If you are not an admin, you will be redirected.</div>
+            <div class="status" id="whoami">Loading…</div>
+            <div class="toolbar">
+              <button class="btn" type="button" id="refreshAllBtn">Refresh</button>
+              <button class="btn danger" type="button" id="signOutBtn">Sign out</button>
+            </div>
+            <details>
+              <summary>Debug</summary>
+              <div class="mono" id="debugBox"></div>
+            </details>
+          </div>
+
+          <div class="card">
+            <h2>Admin tools</h2>
+            <div class="sub">Use tabs to keep the UI clean and fast.</div>
+
+            <div class="tabs" id="tabs">
+              <button class="tab active" data-tab="settings">Settings</button>
+              <button class="tab" data-tab="donations">Donations</button>
+              <button class="tab" data-tab="claims">Claims</button>
+              <button class="tab" data-tab="volunteers">Volunteer Apps</button>
+              <button class="tab" data-tab="inquiries">Inquiries</button>
+              <button class="tab" data-tab="inventory">Inventory</button>
+              <button class="tab" data-tab="tasks">Tasks</button>
+              <button class="tab" data-tab="users">Users</button>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="panel active" id="panel-settings">
+              <div class="row2">
+                <div>
+                  <label for="home_announcement">Homepage announcement</label>
+                  <textarea id="home_announcement" placeholder="Short announcement shown on Home page…"></textarea>
+                  <div class="hint">This is read publicly from <strong>settings</strong>.</div>
+                </div>
+                <div>
+                  <label for="social_latest_updates">Social “Latest updates”</label>
+                  <textarea id="social_latest_updates" placeholder="Short updates shown on Social Media page…"></textarea>
+                  <div class="hint">Use when automatic embeds are unreliable.</div>
+                </div>
+              </div>
+
+              <div class="row2" style="margin-top:10px">
+                <div>
+                  <label for="co2_per_kg">CO₂ per kg factor</label>
+                  <input id="co2_per_kg" type="number" step="0.01" placeholder="0.00"/>
+                </div>
+                <div>
+                  <label for="meals_per_kg">Meals per kg factor</label>
+                  <input id="meals_per_kg" type="number" step="0.01" placeholder="0.00"/>
+                </div>
+              </div>
+
+              <div class="row2" style="margin-top:10px">
+                <div>
+                  <label for="impact_map_enabled">Impact map enabled</label>
+                  <select id="impact_map_enabled">
+                    <option value="false">Disabled</option>
+                    <option value="true">Enabled</option>
+                  </select>
+                  <div class="hint">Only show anonymized heat layer when enabled.</div>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+                  <button class="btn primary" id="saveSettingsBtn" type="button">Save settings</button>
+                  <span class="chip"><strong>Status:</strong> <span id="settingsStatus">Loading…</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- DONATIONS -->
+            <div class="panel" id="panel-donations">
+              <div class="toolbar">
+                <button class="btn" id="reloadDonationsBtn" type="button">Reload</button>
+                <span class="chip"><strong>Rows:</strong> <span id="donationsCount">0</span></span>
+                <span class="chip"><strong>Status:</strong> <span id="donationsStatus">Idle</span></span>
+              </div>
+              <div id="donationsTable"></div>
+            </div>
+
+            <!-- CLAIMS -->
+            <div class="panel" id="panel-claims">
+              <div class="toolbar">
+                <button class="btn" id="reloadClaimsBtn" type="button">Reload</button>
+                <span class="chip"><strong>Rows:</strong> <span id="claimsCount">0</span></span>
+                <span class="chip"><strong>Status:</strong> <span id="claimsStatus">Idle</span></span>
+              </div>
+              <div id="claimsTable"></div>
+            </div>
+
+            <!-- VOLUNTEERS -->
+            <div class="panel" id="panel-volunteers">
+              <div class="toolbar">
+                <button class="btn" id="reloadVolBtn" type="button">Reload</button>
+                <span class="chip"><strong>Rows:</strong> <span id="volCount">0</span></span>
+                <span class="chip"><strong>Status:</strong> <span id="volStatus">Idle</span></span>
+              </div>
+              <div id="volTable"></div>
+            </div>
+
+            <!-- INQUIRIES -->
+            <div class="panel" id="panel-inquiries">
+              <div class="toolbar">
+                <button class="btn" id="reloadInqBtn" type="button">Reload</button>
+                <span class="chip"><strong>Rows:</strong> <span id="inqCount">0</span></span>
+                <span class="chip"><strong>Status:</strong> <span id="inqStatus">Idle</span></span>
+              </div>
+              <div id="inqTable"></div>
+            </div>
+
+            <!-- INVENTORY -->
+            <div class="panel" id="panel-inventory">
+              <div class="row2">
+                <div class="card" style="box-shadow:none;margin:0;padding:14px;">
+                  <h2 style="font-size:16px;margin:0;">Create listing</h2>
+                  <div class="sub">Admins can create food listings for Find Food.</div>
+
+                  <div class="form">
+                    <div class="row2">
+                      <div>
+                        <label for="inv_title">Title</label>
+                        <input id="inv_title" placeholder="e.g., Mixed vegetables pack"/>
+                      </div>
+                      <div>
+                        <label for="inv_listing_type">Listing type</label>
+                        <select id="inv_listing_type">
+                          <option value="item">Item</option>
+                          <option value="surprise_bag">Surprise Bag</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div class="row2">
+                      <div>
+                        <label for="inv_category">Category</label>
+                        <input id="inv_category" placeholder="Produce / Bakery / Cooked / etc."/>
+                      </div>
+                      <div>
+                        <label for="inv_estimated_kg">Estimated kg</label>
+                        <input id="inv_estimated_kg" type="number" step="0.1" placeholder="e.g., 5"/>
+                      </div>
+                    </div>
+
+                    <div class="row2">
+                      <div>
+                        <label for="inv_pickup_area">Pickup area</label>
+                        <input id="inv_pickup_area" placeholder="e.g., Victoria"/>
+                      </div>
+                      <div>
+                        <label for="inv_quantity_text">Quantity text</label>
+                        <input id="inv_quantity_text" placeholder="e.g., 10 portions"/>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label for="inv_desc">Description</label>
+                      <textarea id="inv_desc" placeholder="Short description…"></textarea>
+                    </div>
+
+                    <div class="row2">
+                      <div>
+                        <label for="inv_pickup_notes_public">Pickup notes (public)</label>
+                        <input id="inv_pickup_notes_public" placeholder="e.g., Call on arrival"/>
+                      </div>
+                      <div>
+                        <label for="inv_expires_at">Expires at</label>
+                        <input id="inv_expires_at" type="datetime-local"/>
+                      </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                      <button class="btn primary" id="createListingBtn" type="button">Create listing</button>
+                      <span class="chip"><strong>Status:</strong> <span id="invCreateStatus">Idle</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card" style="box-shadow:none;margin:0;padding:14px;">
+                  <h2 style="font-size:16px;margin:0;">Existing listings</h2>
+                  <div class="sub">Edit or deactivate listings.</div>
+                  <div class="toolbar">
+                    <button class="btn" id="reloadInvBtn" type="button">Reload</button>
+                    <span class="chip"><strong>Rows:</strong> <span id="invCount">0</span></span>
+                    <span class="chip"><strong>Status:</strong> <span id="invStatus">Idle</span></span>
+                  </div>
+                  <div id="invTable"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TASKS -->
+            <div class="panel" id="panel-tasks">
+              <div class="row2">
+                <div>
+                  <label for="task_assigned_to">Assign to (staff user)</label>
+                  <select id="task_assigned_to"></select>
+                  <div class="hint">Populated from profiles where role_id is 2 or 3.</div>
+                </div>
+                <div>
+                  <label for="task_type">Task type</label>
+                  <input id="task_type" placeholder="pickup / dropoff / followup"/>
+                </div>
+              </div>
+
+              <div class="row2" style="margin-top:10px">
+                <div>
+                  <label for="task_contact_name">Contact name</label>
+                  <input id="task_contact_name" placeholder="Optional"/>
+                </div>
+                <div>
+                  <label for="task_contact_phone">Contact phone</label>
+                  <input id="task_contact_phone" placeholder="Optional"/>
+                </div>
+              </div>
+
+              <div class="row2" style="margin-top:10px">
+                <div>
+                  <label for="task_pickup_address_private">Pickup address (private)</label>
+                  <input id="task_pickup_address_private" placeholder="Private address for staff"/>
+                </div>
+                <div>
+                  <label for="task_scheduled_at">Scheduled at</label>
+                  <input id="task_scheduled_at" type="datetime-local"/>
+                </div>
+              </div>
+
+              <div class="row2" style="margin-top:10px">
+                <div>
+                  <label for="task_geo_fence_meters">Geo fence meters</label>
+                  <input id="task_geo_fence_meters" type="number" step="1" value="100"/>
+                </div>
+                <div>
+                  <label for="task_notes">Notes</label>
+                  <input id="task_notes" placeholder="Optional"/>
+                </div>
+              </div>
+
+              <div class="toolbar">
+                <button class="btn primary" id="createTaskBtn" type="button">Create task</button>
+                <span class="chip"><strong>Status:</strong> <span id="taskCreateStatus">Idle</span></span>
+                <button class="btn" id="reloadTasksBtn" type="button">Reload tasks</button>
+                <span class="chip"><strong>Rows:</strong> <span id="tasksCount">0</span></span>
+              </div>
+
+              <div id="tasksTable"></div>
+            </div>
+
+            <!-- USERS -->
+            <div class="panel" id="panel-users">
+              <div class="toolbar">
+                <button class="btn" id="reloadUsersBtn" type="button">Reload</button>
+                <span class="chip"><strong>Rows:</strong> <span id="usersCount">0</span></span>
+                <span class="chip"><strong>Status:</strong> <span id="usersStatus">Idle</span></span>
+              </div>
+              <div id="usersTable"></div>
+              <div class="hint" style="margin-top:10px;">If you cannot update roles, your profiles RLS update policy is missing admin permissions.</div>
+            </div>
+
+          </div>
+        </div>
       </div>
-      <div class="actions">
-        <button class="btn secondary" id="mClose">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <main class="container">
-    <div class="row" style="justify-content:space-between;align-items:flex-end">
-      <div>
-        <h1 class="h1">Admin Dashboard</h1>
-        <p class="p">Full operational control. RLS should restrict all actions to Admin role.</p>
-      </div>
-      <div class="tabs" id="tabs">
-        <button class="tab active" data-tab="home">Home</button>
-        <button class="tab" data-tab="claims">Claims</button>
-        <button class="tab" data-tab="donations">Donations</button>
-        <button class="tab" data-tab="volunteers">Volunteers</button>
-        <button class="tab" data-tab="inquiries">Inquiries</button>
-        <button class="tab" data-tab="inventory">Inventory</button>
-        <button class="tab" data-tab="users">Users</button>
-        <button class="tab" data-tab="tasks">Tasks</button>
-        <button class="tab" data-tab="settings">Settings</button>
-      </div>
-    </div>
-
-    <div id="msg" class="notice" style="display:none;margin-top:12px"></div>
-
-    <!-- HOME -->
-    <section class="panel active" id="panel-home" style="margin-top:12px">
-      <div class="grid three">
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between"><div class="h2">Claims</div><span class="badge blue" id="kClaims">—</span></div>
-          <div class="small">Total claims in system</div>
-        </div></div>
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between"><div class="h2">Donations</div><span class="badge blue" id="kDonations">—</span></div>
-          <div class="small">Total donations in system</div>
-        </div></div>
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between"><div class="h2">Listings Available</div><span class="badge" id="kListings">—</span></div>
-          <div class="small">Food listings where is_available = true</div>
-        </div></div>
-      </div>
-
-      <div class="grid two" style="margin-top:14px">
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between"><div class="h2">Applications</div><span class="badge orange" id="kApps">—</span></div>
-          <div class="small">Volunteer applications in review/new</div>
-        </div></div>
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between"><div class="h2">Users</div><span class="badge blue" id="kUsers">—</span></div>
-          <div class="small">Total profiles (all roles)</div>
-        </div></div>
-      </div>
-
-      <div class="card" style="margin-top:14px">
-        <div class="bar"></div>
-        <div class="content">
-          <div class="h2">Quick Admin Notes</div>
-          <p class="p">
-            Creating staff accounts is typically done via Supabase Auth Admin (Dashboard) or an Edge Function using the service role key.
-            This admin panel can update <code class="inline">profiles.role_id</code> for existing accounts.
-          </p>
-        </div>
-      </div>
     </section>
-
-    <!-- CLAIMS -->
-    <section class="panel" id="panel-claims" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">Claims Review</div>
-            <div class="small">Update status, view details, and trigger notifications.</div>
-          </div>
-          <div class="row">
-            <select id="claimsFilter" class="btn secondary" style="padding:10px 12px">
-              <option value="">All</option>
-              <option value="New">New</option>
-              <option value="InReview">InReview</option>
-              <option value="Scheduled">Scheduled</option>
-              <option value="Completed">Completed</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-            <button class="btn small secondary" id="btnClaimsReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-          </div>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Created</th><th>Type</th><th>Name</th><th>Listing</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="claimsRows"></tbody>
-          </table>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- DONATIONS -->
-    <section class="panel" id="panel-donations" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">Donations Review</div>
-            <div class="small">Update status, view details, and create pickup tasks.</div>
-          </div>
-          <button class="btn small secondary" id="btnDonReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Created</th><th>Donor</th><th>Island</th><th>Food</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="donRows"></tbody>
-          </table>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- VOLUNTEERS -->
-    <section class="panel" id="panel-volunteers" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">Volunteer Applications</div>
-            <div class="small">Update status. Staff account creation is handled separately (recommended via Edge Function).</div>
-          </div>
-          <button class="btn small secondary" id="btnVolReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Created</th><th>Name</th><th>Residency</th><th>LinkedIn</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="volRows"></tbody>
-          </table>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- INQUIRIES -->
-    <section class="panel" id="panel-inquiries" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">Inquiries</div>
-            <div class="small">Update status and reply to the user via notifications.</div>
-          </div>
-          <button class="btn small secondary" id="btnInqReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Created</th><th>From</th><th>Subject</th><th>Status</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="inqRows"></tbody>
-          </table>
-        </div>
-
-        <div class="sep"></div>
-        <div class="notice">
-          <b>Reply helper:</b> Click “Reply” on a row to send a notification response (and optionally store admin_messages if your SQL includes it).
-        </div>
-      </div></div>
-    </section>
-
-    <!-- INVENTORY -->
-    <section class="panel" id="panel-inventory" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">Inventory (Food Listings)</div>
-            <div class="small">Create/edit listings. Public page reads only available items.</div>
-          </div>
-          <div class="row">
-            <button class="btn small" id="btnNewListing"><i class="fa-solid fa-plus"></i> New Listing</button>
-            <button class="btn small secondary" id="btnInvReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-          </div>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Created</th><th>Title</th><th>Island</th><th>Qty</th><th>Expiry</th><th>Available</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="invRows"></tbody>
-          </table>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- USERS -->
-    <section class="panel" id="panel-users" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="h2">User Management (Profiles)</div>
-            <div class="small">Update role_id. (Creating new auth users is done outside this panel.)</div>
-          </div>
-          <button class="btn small secondary" id="btnUsersReload"><i class="fa-solid fa-rotate"></i> Reload</button>
-        </div>
-        <div class="sep"></div>
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="userRows"></tbody>
-          </table>
-        </div>
-      </div></div>
-    </section>
-
-    <!-- TASKS -->
-    <section class="panel" id="panel-tasks" style="margin-top:12px">
-      <div class="grid two">
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="h2">Assign Task</div>
-          <div class="small">Create tasks assigned to staff users (role 2/3).</div>
-          <div class="sep"></div>
-
-          <div class="field"><label>Title</label><input id="t_title" placeholder="e.g., Pickup donation"></div>
-          <div class="field"><label>Description</label><textarea id="t_desc" placeholder="Details, addresses, timing…"></textarea></div>
-          <div class="field"><label>Assign to</label><select id="t_assign"></select></div>
-          <div class="field"><label>Due at (optional)</label><input id="t_due" type="datetime-local"></div>
-
-          <div class="row">
-            <button class="btn blue" id="btnTaskCreate"><i class="fa-solid fa-plus"></i> Create</button>
-            <button class="btn secondary" id="btnTasksReload"><i class="fa-solid fa-rotate"></i> Reload list</button>
-          </div>
-        </div></div>
-
-        <div class="card"><div class="bar"></div><div class="content">
-          <div class="row" style="justify-content:space-between">
-            <div class="h2">All Tasks</div>
-            <span class="badge blue" id="taskTotal">—</span>
-          </div>
-          <div class="sep"></div>
-          <div style="overflow:auto">
-            <table>
-              <thead><tr><th>Created</th><th>Title</th><th>Assigned To</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="taskRows"></tbody>
-            </table>
-          </div>
-        </div></div>
-      </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section class="panel" id="panel-settings" style="margin-top:12px">
-      <div class="card"><div class="bar"></div><div class="content">
-        <div class="h2">Site Settings</div>
-        <div class="small">Homepage reads settings.announcement (row id = 1).</div>
-        <div class="sep"></div>
-
-        <div class="field"><label>Announcement</label><textarea id="s_announcement" placeholder="Type announcement for homepage…"></textarea></div>
-        <div class="row">
-          <button class="btn blue" id="btnSaveSettings"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-          <button class="btn secondary" id="btnLoadSettings"><i class="fa-solid fa-download"></i> Load</button>
-        </div>
-      </div></div>
-    </section>
-
   </main>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-    const supabase = createClient(
-      "https://edotvuleaydztulkxehe.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw"
-    );
-
-    const loading = document.getElementById("loading");
-    const setLoading = (on)=> loading.style.display = on ? "flex" : "none";
-
-    function toast(type, html){
-      const el = document.getElementById("msg");
-      el.className = "notice" + (type ? " "+type : "");
-      el.innerHTML = html;
-      el.style.display = "block";
-      el.scrollIntoView({behavior:"smooth", block:"start"});
-    }
-
-    function esc(s){ return (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-    function fmt(d){ if(!d) return "—"; try{return new Date(d).toLocaleString()}catch{return String(d)} }
-    function badgeForStatus(st){
-      const s=(st||"").toLowerCase();
-      if(s.includes("completed")||s.includes("approved")) return "badge";
-      if(s.includes("rejected")||s.includes("cancel")) return "badge red";
-      if(s.includes("review")||s.includes("scheduled")||s.includes("inprogress")||s.includes("new")) return "badge orange";
-      return "badge blue";
-    }
-
-    // modal
-    const modal = document.getElementById("modal");
-    const mTitle = document.getElementById("mTitle");
-    const mBody  = document.getElementById("mBody");
-    document.getElementById("mClose").addEventListener("click", ()=> modal.style.display="none");
-    modal.addEventListener("click", (e)=>{ if(e.target===modal) modal.style.display="none"; });
-    function showDetails(title, obj){
-      mTitle.textContent = title;
-      mBody.textContent = JSON.stringify(obj, null, 2);
-      modal.style.display="flex";
-    }
-
-    async function guardAdmin(){
-      const { data } = await supabase.auth.getSession();
-      if(!data.session){
-        location.href = "../../staff-login/";
-        return null;
-      }
-      const { data: u } = await supabase.auth.getUser();
-      const uid = u.user.id;
-
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("id,full_name,email,role_id")
-        .eq("id", uid)
-        .single();
-
-      if(error || !profile){
-        await supabase.auth.signOut();
-        location.href = "../../staff-login/";
-        return null;
-      }
-
-      const role = Number(profile.role_id);
-      if(role !== 1){
-        await supabase.auth.signOut();
-        location.href = "../../staff-login/";
-        return null;
-      }
-
-      document.getElementById("who").innerHTML = `<b>${esc(profile.full_name||"Admin")}</b> <span class="small">• Admin</span>`;
-      return profile;
-    }
-
-    // tabbing
-    document.getElementById("tabs").addEventListener("click", (e)=>{
-      const btn = e.target.closest("[data-tab]");
-      if(!btn) return;
-      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-      btn.classList.add("active");
-      const t = btn.getAttribute("data-tab");
-      document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-      document.getElementById("panel-"+t).classList.add("active");
-    });
-
-    document.getElementById("btnLogout").addEventListener("click", async ()=>{
-      setLoading(true); await supabase.auth.signOut(); setLoading(false);
-      location.href = "../../staff-login/";
-    });
-    document.getElementById("btnReload").addEventListener("click", ()=> location.reload());
-
-    // ---------- loaders ----------
-    async function loadKpis(){
-      // counts (admin can see all)
-      const c1 = await supabase.from("claims").select("id",{count:"exact",head:true});
-      const c2 = await supabase.from("donations").select("id",{count:"exact",head:true});
-      const c3 = await supabase.from("food_listings").select("id",{count:"exact",head:true}).eq("is_available", true);
-      const c4 = await supabase.from("volunteer_applications").select("id",{count:"exact",head:true}).in("status", ["New","InReview"]);
-      const c5 = await supabase.from("profiles").select("id",{count:"exact",head:true});
-
-      document.getElementById("kClaims").textContent = (c1.count ?? "—");
-      document.getElementById("kDonations").textContent = (c2.count ?? "—");
-      document.getElementById("kListings").textContent = (c3.count ?? "—");
-      document.getElementById("kApps").textContent = (c4.count ?? "—");
-      document.getElementById("kUsers").textContent = (c5.count ?? "—");
-    }
-
-    async function notifyUser(user_id, title, message){
-      // Requires your notifications table to allow admin insert for any user.
-      const { error } = await supabase.from("notifications").insert({ user_id, title, message, type:"Admin" });
-      if(error) toast("error", `<b>Notification failed:</b> ${error.message}`);
-      else toast("", "<b>Notification sent.</b>");
-    }
-
-    async function loadClaims(){
-      const filter = document.getElementById("claimsFilter").value.trim();
-      let q = supabase.from("claims")
-        .select("*")
-        .order("created_at",{ascending:false})
-        .limit(200);
-      if(filter) q = q.eq("status", filter);
-
-      const { data, error } = await q;
-      if(error){ toast("error", `<b>Claims load failed:</b> ${error.message}`); return; }
-
-      const tbody = document.getElementById("claimsRows");
-      tbody.innerHTML = (data||[]).map(r=>`
-        <tr>
-          <td class="small">${fmt(r.created_at)}</td>
-          <td><span class="badge blue">${esc(r.request_type||"—")}</span></td>
-          <td>
-            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
-            <div class="small">${esc(r.email||"")}</div>
-          </td>
-          <td class="small">${esc(r.listing_id||"—")}</td>
-          <td>
-            <select data-claim-status="${r.id}" class="btn secondary" style="padding:8px 10px">
-              ${["New","InReview","Scheduled","Completed","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
-            </select>
-          </td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view="claim" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small" data-save-claim="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              <button class="btn small blue" data-notify-claim="${r.id}"><i class="fa-solid fa-bell"></i> Notify</button>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.</p>
+          </div>
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a><a href="../about-us/">About Us</a><a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a><a href="../our-partners/">Our Partners</a><a href="../social-media/">Social Media</a>
             </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="6" class="small">No claims found.</td></tr>`;
-
-      tbody.querySelectorAll("[data-view='claim']").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-id");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Claim Details", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-save-claim]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-save-claim");
-          const sel = document.querySelector(`[data-claim-status="${id}"]`);
-          const status = sel?.value || "New";
-          setLoading(true);
-          const { error: upErr } = await supabase.from("claims").update({ status }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
-          else toast("", `<b>Updated.</b> Claim set to <b>${status}</b>.`);
-        });
-      });
-      tbody.querySelectorAll("[data-notify-claim]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-notify-claim");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(!obj?.user_id){ toast("warn","No user_id on this claim row (cannot notify)."); return; }
-          await notifyUser(obj.user_id, "Claim update", `Your claim status is now: ${obj.status || "Updated"}.`);
-        });
-      });
-    }
-
-    async function loadDonations(){
-      const { data, error } = await supabase.from("donations").select("*").order("created_at",{ascending:false}).limit(200);
-      if(error){ toast("error", `<b>Donations load failed:</b> ${error.message}`); return; }
-
-      const tbody = document.getElementById("donRows");
-      tbody.innerHTML = (data||[]).map(r=>`
-        <tr>
-          <td class="small">${fmt(r.created_at)}</td>
-          <td>
-            <div style="font-weight:950">${esc(r.donor_name||"—")}</div>
-            <div class="small">${esc(r.email||"")}</div>
-          </td>
-          <td class="small">${esc(r.island||"—")}</td>
-          <td class="small">${esc(r.food_type||"—")}</td>
-          <td>
-            <select data-don-status="${r.id}" class="btn secondary" style="padding:8px 10px">
-              ${["New","InReview","Approved","PickedUp","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
-            </select>
-          </td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view="don" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small" data-save-don="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              <button class="btn small blue" data-task-from-don="${r.id}"><i class="fa-solid fa-list-check"></i> Create task</button>
+          </div>
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a><a href="../donate-now/">Donate Now</a><a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a><a href="../auth/">Login</a><a href="../staff-login/">Staff Login</a>
             </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="6" class="small">No donations found.</td></tr>`;
-
-      tbody.querySelectorAll("[data-view='don']").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-id");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Donation Details", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-save-don]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-save-don");
-          const sel = document.querySelector(`[data-don-status="${id}"]`);
-          const status = sel?.value || "New";
-          setLoading(true);
-          const { error: upErr } = await supabase.from("donations").update({ status }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
-          else toast("", `<b>Updated.</b> Donation set to <b>${status}</b>.`);
-        });
-      });
-      tbody.querySelectorAll("[data-task-from-don]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-task-from-don");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(!obj) return;
-          // prefill task form tab
-          document.querySelector('[data-tab="tasks"]').click();
-          document.getElementById("t_title").value = `Pickup donation: ${obj.donor_name || id}`;
-          document.getElementById("t_desc").value =
-            `Donation ID: ${id}\nDonor: ${obj.donor_name || ""}\nPhone: ${obj.phone || ""}\nIsland: ${obj.island || ""}\nAddress: ${obj.pickup_address || ""}\nTimeframe: ${obj.pickup_timeframe || ""}\n\nFood: ${obj.food_type || ""}\nQty: ${obj.estimated_quantity || ""}\nNotes: ${obj.description || ""}`;
-          toast("", "Task form prefilled. Choose assignee and create.");
-        });
-      });
-    }
-
-    async function loadVolunteers(){
-      const { data, error } = await supabase.from("volunteer_applications").select("*").order("created_at",{ascending:false}).limit(200);
-      if(error){ toast("error", `<b>Volunteer apps load failed:</b> ${error.message}`); return; }
-
-      const tbody = document.getElementById("volRows");
-      tbody.innerHTML = (data||[]).map(r=>`
-        <tr>
-          <td class="small">${fmt(r.created_at)}</td>
-          <td>
-            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
-            <div class="small">${esc(r.email||"")}</div>
-          </td>
-          <td class="small">${esc(r.residency_status||"—")}${r.island ? " • "+esc(r.island) : ""}</td>
-          <td class="small"><a href="${esc(r.linkedin_url||"#")}" target="_blank" rel="noreferrer">Open</a></td>
-          <td>
-            <select data-vol-status="${r.id}" class="btn secondary" style="padding:8px 10px">
-              ${["New","InReview","Approved","Rejected"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
-            </select>
-          </td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view="vol" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small" data-save-vol="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          </div>
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a><a href="../terms-of-use/">Terms Of Use</a><a href="../sitemap/">Sitemap</a>
             </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="6" class="small">No applications found.</td></tr>`;
+          </div>
+        </div>
+      </div>
+    </div>
 
-      tbody.querySelectorAll("[data-view='vol']").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-id");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Volunteer Application", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-save-vol]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-save-vol");
-          const sel = document.querySelector(`[data-vol-status="${id}"]`);
-          const status = sel?.value || "New";
-          setLoading(true);
-          const { error: upErr } = await supabase.from("volunteer_applications").update({ status }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
-          else toast("", `<b>Updated.</b> Application set to <b>${status}</b>.`);
-        });
-      });
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a></span>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const whoami = document.getElementById('whoami');
+    const debugBox = document.getElementById('debugBox');
+
+    function logDebug(line){
+      debugBox.textContent = (debugBox.textContent ? debugBox.textContent + "\n" : "") + line;
+    }
+    function esc(s){
+      return String(s ?? "").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+    }
+    function fmtDate(ts){ try{ return ts ? new Date(ts).toLocaleString() : "—"; } catch { return "—"; } }
+    function isoLocalToIsoZ(v){
+      if (!v) return null;
+      // Treat input as local time; convert to ISO string
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString();
     }
 
-    async function loadInquiries(){
-      const { data, error } = await supabase.from("inquiries").select("*").order("created_at",{ascending:false}).limit(200);
-      if(error){ toast("error", `<b>Inquiries load failed:</b> ${error.message}`); return; }
+    // NAV behaviors
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){ moreDropdown?.classList.remove('open'); moreBtn?.setAttribute('aria-expanded','false'); }
+    moreBtn?.addEventListener('click', (e)=>{ e.preventDefault(); const open = moreDropdown.classList.toggle('open'); moreBtn.setAttribute('aria-expanded', String(open)); });
+    document.addEventListener('click', (e)=>{ if (moreDropdown && !moreDropdown.contains(e.target)) closeMore(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMore(); });
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', ()=> mobilePanel.classList.toggle('open'));
 
-      const tbody = document.getElementById("inqRows");
-      tbody.innerHTML = (data||[]).map(r=>`
-        <tr>
-          <td class="small">${fmt(r.created_at)}</td>
-          <td>
-            <div style="font-weight:950">${esc(r.full_name||"—")}</div>
-            <div class="small">${esc(r.email||"")}</div>
-          </td>
-          <td class="small">${esc(r.subject||"—")}</td>
-          <td>
-            <select data-inq-status="${r.id}" class="btn secondary" style="padding:8px 10px">
-              ${["New","InReview","Resolved"].map(s=>`<option ${r.status===s?"selected":""}>${s}</option>`).join("")}
-            </select>
-          </td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view="inq" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small" data-save-inq="${r.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              <button class="btn small blue" data-reply-inq="${r.id}"><i class="fa-solid fa-reply"></i> Reply</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="5" class="small">No inquiries found.</td></tr>`;
-
-      tbody.querySelectorAll("[data-view='inq']").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-id");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Inquiry", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-save-inq]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-save-inq");
-          const sel = document.querySelector(`[data-inq-status="${id}"]`);
-          const status = sel?.value || "New";
-          setLoading(true);
-          const { error: upErr } = await supabase.from("inquiries").update({ status }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Update failed:</b> ${upErr.message}`);
-          else toast("", `<b>Updated.</b> Inquiry set to <b>${status}</b>.`);
-        });
-      });
-      tbody.querySelectorAll("[data-reply-inq]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-reply-inq");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(!obj){ return; }
-          if(!obj.user_id){ toast("warn","This inquiry row has no user_id (cannot notify)."); return; }
-
-          const reply = prompt("Type your reply (will be sent as a notification):");
-          if(!reply) return;
-
-          setLoading(true);
-          // notification
-          const { error: nErr } = await supabase.from("notifications").insert({
-            user_id: obj.user_id,
-            title: `Reply: ${obj.subject || "Inquiry"}`,
-            message: reply,
-            type: "Admin"
-          });
-          setLoading(false);
-
-          if(nErr) toast("error", `<b>Reply failed:</b> ${nErr.message}`);
-          else toast("", "<b>Reply sent.</b>");
-        });
-      });
+    // Language persistence only
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
     }
+    const lang = getSavedLang(); applyLanguage(lang);
+    document.getElementById('langSelect')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+    document.getElementById('langSelectMobile')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
 
-    // Inventory CRUD (simple)
-    async function loadInventory(){
-      const { data, error } = await supabase.from("food_listings").select("*").order("created_at",{ascending:false}).limit(250);
-      if(error){ toast("error", `<b>Inventory load failed:</b> ${error.message}`); return; }
+    // Auth slot
+    async function refreshAuthSlot(){
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user || null;
 
-      const tbody = document.getElementById("invRows");
-      tbody.innerHTML = (data||[]).map(r=>`
-        <tr>
-          <td class="small">${fmt(r.created_at)}</td>
-          <td>
-            <div style="font-weight:950">${esc(r.title||"—")}</div>
-            <div class="small">${esc(r.category||"")}</div>
-          </td>
-          <td class="small">${esc(r.island||"—")}</td>
-          <td class="small">${esc(r.quantity||"—")}</td>
-          <td class="small">${r.expiry_date ? new Date(r.expiry_date).toLocaleDateString() : "—"}</td>
-          <td><span class="${r.is_available ? "badge" : "badge red"}">${r.is_available ? "Yes" : "No"}</span></td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view="inv" data-id="${r.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small" data-toggle="${r.id}"><i class="fa-solid fa-toggle-on"></i> Toggle</button>
-              <button class="btn small danger" data-del="${r.id}"><i class="fa-solid fa-trash"></i> Delete</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="7" class="small">No listings found.</td></tr>`;
+      const slot = document.getElementById('authSlot');
+      const slotM = document.getElementById('authSlotMobile');
+      if (!slot || !slotM) return;
 
-      tbody.querySelectorAll("[data-view='inv']").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-id");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Listing", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-toggle]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-toggle");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(!obj) return;
-          setLoading(true);
-          const { error: upErr } = await supabase.from("food_listings").update({ is_available: !obj.is_available }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Toggle failed:</b> ${upErr.message}`);
-          else { toast("", "<b>Updated.</b>"); await loadInventory(); }
-        });
-      });
-      tbody.querySelectorAll("[data-del]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-del");
-          if(!confirm("Delete listing permanently?")) return;
-          setLoading(true);
-          const { error: delErr } = await supabase.from("food_listings").delete().eq("id", id);
-          setLoading(false);
-          if(delErr) toast("error", `<b>Delete failed:</b> ${delErr.message}`);
-          else { toast("", "<b>Deleted.</b>"); await loadInventory(); }
-        });
-      });
-    }
-
-    async function createNewListing(){
-      const title = prompt("Listing title:");
-      if(!title) return;
-      const island = prompt("Island (Mahé/Praslin/La Digue):") || null;
-      const qty = prompt("Quantity (e.g., 10kg / 25 meals):") || null;
-
-      setLoading(true);
-      const { error } = await supabase.from("food_listings").insert({
-        title, island, quantity: qty,
-        is_available: true,
-        urgency: "Normal"
-      });
-      setLoading(false);
-
-      if(error) toast("error", `<b>Create failed:</b> ${error.message}`);
-      else { toast("", "<b>Listing created.</b>"); await loadInventory(); }
-    }
-
-    async function loadUsers(){
-      const { data, error } = await supabase.from("profiles").select("id,full_name,email,phone,role_id").order("created_at",{ascending:false}).limit(300);
-      if(error){ toast("error", `<b>Users load failed:</b> ${error.message}`); return; }
-
-      const tbody = document.getElementById("userRows");
-      tbody.innerHTML = (data||[]).map(u=>`
-        <tr>
-          <td><div style="font-weight:950">${esc(u.full_name||"—")}</div><div class="small">${esc(u.id)}</div></td>
-          <td class="small">${esc(u.email||"—")}</td>
-          <td class="small">${esc(u.phone||"—")}</td>
-          <td>
-            <select data-role="${u.id}" class="btn secondary" style="padding:8px 10px">
-              ${[
-                {id:1,name:"Admin"},
-                {id:2,name:"Driver/Staff"},
-                {id:3,name:"Volunteer Coord"},
-                {id:4,name:"Community"}
-              ].map(r=>`<option value="${r.id}" ${Number(u.role_id)===r.id?"selected":""}>${r.id} - ${r.name}</option>`).join("")}
-            </select>
-          </td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small" data-save-role="${u.id}"><i class="fa-solid fa-floppy-disk"></i> Save</button>
-              <button class="btn small secondary" data-view-user="${u.id}"><i class="fa-solid fa-eye"></i> View</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="5" class="small">No users found.</td></tr>`;
-
-      tbody.querySelectorAll("[data-view-user]").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-view-user");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("User Profile", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-save-role]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-save-role");
-          const sel = document.querySelector(`[data-role="${id}"]`);
-          const role_id = Number(sel.value);
-          setLoading(true);
-          const { error: upErr } = await supabase.from("profiles").update({ role_id }).eq("id", id);
-          setLoading(false);
-          if(upErr) toast("error", `<b>Role update failed:</b> ${upErr.message}`);
-          else toast("", "<b>Role updated.</b>");
-          await loadStaffDropdown();
-        });
-      });
-    }
-
-    async function loadStaffDropdown(){
-      const { data, error } = await supabase.from("profiles").select("id,full_name,role_id").in("role_id",[2,3]).order("full_name",{ascending:true}).limit(500);
-      if(error){ toast("error", `<b>Staff list failed:</b> ${error.message}`); return; }
-      const sel = document.getElementById("t_assign");
-      sel.innerHTML = `<option value="">Select staff</option>` + (data||[]).map(u=>`<option value="${u.id}">${esc(u.full_name||u.id)} (role ${u.role_id})</option>`).join("");
-    }
-
-    async function loadTasks(){
-      const { data, error } = await supabase.from("tasks").select("id,title,status,assigned_to,created_at").order("created_at",{ascending:false}).limit(250);
-      if(error){ toast("error", `<b>Tasks load failed:</b> ${error.message}`); return; }
-
-      document.getElementById("taskTotal").textContent = `${(data||[]).length} tasks`;
-
-      const tbody = document.getElementById("taskRows");
-      tbody.innerHTML = (data||[]).map(t=>`
-        <tr>
-          <td class="small">${fmt(t.created_at)}</td>
-          <td><div style="font-weight:950">${esc(t.title||"—")}</div></td>
-          <td class="small">${esc(t.assigned_to||"—")}</td>
-          <td><span class="${badgeForStatus(t.status)}">${esc(t.status||"Assigned")}</span></td>
-          <td>
-            <div class="row" style="gap:8px">
-              <button class="btn small secondary" data-view-task="${t.id}"><i class="fa-solid fa-eye"></i> View</button>
-              <button class="btn small danger" data-del-task="${t.id}"><i class="fa-solid fa-trash"></i> Delete</button>
-            </div>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="5" class="small">No tasks found.</td></tr>`;
-
-      tbody.querySelectorAll("[data-view-task]").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          const id = btn.getAttribute("data-view-task");
-          const obj = (data||[]).find(x=>String(x.id)===String(id));
-          if(obj) showDetails("Task", obj);
-        });
-      });
-      tbody.querySelectorAll("[data-del-task]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-del-task");
-          if(!confirm("Delete task?")) return;
-          setLoading(true);
-          const { error: delErr } = await supabase.from("tasks").delete().eq("id", id);
-          setLoading(false);
-          if(delErr) toast("error", `<b>Delete failed:</b> ${delErr.message}`);
-          else { toast("", "<b>Deleted.</b>"); await loadTasks(); }
-        });
-      });
-    }
-
-    async function createTask(){
-      const title = document.getElementById("t_title").value.trim();
-      const description = document.getElementById("t_desc").value.trim();
-      const assigned_to = document.getElementById("t_assign").value || null;
-      const dueRaw = document.getElementById("t_due").value;
-      const due_at = dueRaw ? new Date(dueRaw).toISOString() : null;
-
-      if(!title || !assigned_to){
-        toast("warn","Task title and assignee are required.");
+      if (!user){
+        slot.innerHTML = `<a href="../auth/" id="authLink">Login</a>`;
+        slotM.innerHTML = `<a href="../auth/" id="authLinkMobile">Login</a>`;
         return;
       }
 
-      setLoading(true);
-      const { error } = await supabase.from("tasks").insert({
-        title, description: description || null,
-        assigned_to,
-        status: "Assigned",
-        due_at
-      });
-      setLoading(false);
+      slot.innerHTML = `<span style="font-weight:950;">Admin</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnTop">Sign out</button>`;
+      slotM.innerHTML = `<span style="font-weight:950;">Admin</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnTopM">Sign out</button>`;
 
-      if(error) toast("error", `<b>Create failed:</b> ${error.message}`);
-      else {
-        toast("", "<b>Task created.</b>");
-        document.getElementById("t_title").value="";
-        document.getElementById("t_desc").value="";
-        document.getElementById("t_due").value="";
-        await loadTasks();
+      document.getElementById('signOutBtnTop')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+      document.getElementById('signOutBtnTopM')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+    }
+
+    // Tabs
+    const tabsEl = document.getElementById('tabs');
+    function setTab(name){
+      document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.tab === name));
+      document.querySelectorAll('.panel').forEach(p=> p.classList.toggle('active', p.id === `panel-${name}`));
+      localStorage.setItem('admin_tab', name);
+    }
+    tabsEl?.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.tab');
+      if (!btn) return;
+      setTab(btn.dataset.tab);
+    });
+
+    // Require admin
+    async function requireAdmin(){
+      const { data: sessData, error: sessErr } = await sb.auth.getSession();
+      if (sessErr) logDebug("getSession error: " + (sessErr.message || ""));
+      const user = sessData?.session?.user || null;
+
+      if (!user){
+        location.href = "../staff-login/";
+        return null;
       }
+
+      const { data: prof, error: pErr } = await sb
+        .from('profiles')
+        .select('role_id, display_name, is_active')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (pErr){
+        logDebug("profiles select error: " + (pErr.message || ""));
+        whoami.textContent = "Signed in, but cannot read your profile (RLS/policy).";
+        return null;
+      }
+      if (!prof){
+        whoami.textContent = "Signed in, but profile missing.";
+        return null;
+      }
+      if (prof.is_active === false){
+        whoami.textContent = "Your account is inactive.";
+        return null;
+      }
+
+      if (prof.role_id !== 1){
+        if (prof.role_id === 2 || prof.role_id === 3) location.href = "../staff-dashboard/";
+        else location.href = "../dashboard/";
+        return null;
+      }
+
+      whoami.textContent = `Signed in as: ${user.email || "—"}\nRole: Admin\nAccount: Active`;
+      return { user, prof };
     }
 
+    // ---------- SETTINGS ----------
     async function loadSettings(){
-      const { data, error } = await supabase.from("settings").select("id,announcement").eq("id",1).single();
-      if(error){ toast("error", `<b>Load settings failed:</b> ${error.message}`); return; }
-      document.getElementById("s_announcement").value = data?.announcement || "";
-      toast("", "<b>Settings loaded.</b>");
+      const statusEl = document.getElementById('settingsStatus');
+      statusEl.textContent = "Loading…";
+
+      const { data, error } = await sb.from('settings')
+        .select('home_announcement, social_latest_updates, co2_per_kg, meals_per_kg, impact_map_enabled')
+        .eq('id', true)
+        .maybeSingle();
+
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("settings select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('home_announcement').value = data?.home_announcement || "";
+      document.getElementById('social_latest_updates').value = data?.social_latest_updates || "";
+      document.getElementById('co2_per_kg').value = data?.co2_per_kg ?? 0;
+      document.getElementById('meals_per_kg').value = data?.meals_per_kg ?? 0;
+      document.getElementById('impact_map_enabled').value = String(!!data?.impact_map_enabled);
+
+      statusEl.textContent = "Ready";
     }
+
     async function saveSettings(){
-      const announcement = document.getElementById("s_announcement").value.trim();
-      setLoading(true);
-      const { error } = await supabase.from("settings").update({ announcement }).eq("id",1);
-      setLoading(false);
-      if(error) toast("error", `<b>Save failed:</b> ${error.message}`);
-      else toast("", "<b>Saved.</b> Homepage will reflect this announcement.");
+      const statusEl = document.getElementById('settingsStatus');
+      statusEl.textContent = "Saving…";
+
+      const payload = {
+        home_announcement: document.getElementById('home_announcement').value.trim() || null,
+        social_latest_updates: document.getElementById('social_latest_updates').value.trim() || null,
+        co2_per_kg: Number(document.getElementById('co2_per_kg').value || 0),
+        meals_per_kg: Number(document.getElementById('meals_per_kg').value || 0),
+        impact_map_enabled: document.getElementById('impact_map_enabled').value === "true",
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await sb.from('settings')
+        .update(payload)
+        .eq('id', true);
+
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("settings update error: " + (error.message || ""));
+        return;
+      }
+
+      statusEl.textContent = "Saved";
+      setTimeout(()=> statusEl.textContent = "Ready", 1200);
     }
 
-    // wire buttons
-    document.getElementById("btnClaimsReload").addEventListener("click", loadClaims);
-    document.getElementById("claimsFilter").addEventListener("change", loadClaims);
-    document.getElementById("btnDonReload").addEventListener("click", loadDonations);
-    document.getElementById("btnVolReload").addEventListener("click", loadVolunteers);
-    document.getElementById("btnInqReload").addEventListener("click", loadInquiries);
-    document.getElementById("btnInvReload").addEventListener("click", loadInventory);
-    document.getElementById("btnNewListing").addEventListener("click", createNewListing);
-    document.getElementById("btnUsersReload").addEventListener("click", loadUsers);
-    document.getElementById("btnTasksReload").addEventListener("click", loadTasks);
-    document.getElementById("btnTaskCreate").addEventListener("click", createTask);
-    document.getElementById("btnLoadSettings").addEventListener("click", loadSettings);
-    document.getElementById("btnSaveSettings").addEventListener("click", saveSettings);
+    document.getElementById('saveSettingsBtn')?.addEventListener('click', saveSettings);
 
-    // boot
-    (async ()=>{
-      const admin = await guardAdmin();
-      if(!admin) return;
+    // ---------- GENERIC TABLE RENDER ----------
+    function renderTable(cols, rows, rowHtmlFn){
+      if (!rows || rows.length === 0) return `<div class="status">No rows.</div>`;
+      const head = `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>`;
+      const body = rows.map(rowHtmlFn).join('');
+      return head + body + `</tbody></table>`;
+    }
 
-      setLoading(true);
-      await loadKpis();
-      await loadClaims();
+    // ---------- DONATIONS ----------
+    async function loadDonations(){
+      const status = document.getElementById('donationsStatus');
+      status.textContent = "Loading…";
+      const { data, error } = await sb.from('donations')
+        .select('id, created_at, donor_display_name, donor_type, donor_email, donor_phone, pickup_address, preferred_pickup_window, estimated_kg, status, admin_notes')
+        .order('created_at', { ascending:false })
+        .limit(50);
+
+      if (error){
+        status.textContent = "Blocked";
+        logDebug("donations select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('donationsCount').textContent = String(data?.length || 0);
+      status.textContent = "Ready";
+
+      const html = renderTable(
+        ["Date","Donor","Type","Contact","Pickup","KG","Status","Admin notes","Actions"],
+        data,
+        (d)=>`
+          <tr>
+            <td>${esc(fmtDate(d.created_at))}</td>
+            <td>${esc(d.donor_display_name || "—")}</td>
+            <td>${esc(d.donor_type || "—")}</td>
+            <td>${esc([d.donor_email,d.donor_phone].filter(Boolean).join(" / ") || "—")}</td>
+            <td>${esc(d.pickup_address || "—")}<div class="hint">${esc(d.preferred_pickup_window || "")}</div></td>
+            <td>${esc(d.estimated_kg ?? "—")}</td>
+            <td>
+              <select data-don-status="${esc(d.id)}">
+                ${["submitted","approved","scheduled","picked_up","completed","rejected"].map(s=>`<option ${d.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td><input data-don-notes="${esc(d.id)}" value="${esc(d.admin_notes || "")}" placeholder="Notes"/></td>
+            <td><button class="btn primary" data-don-save="${esc(d.id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      document.getElementById('donationsTable').innerHTML = html;
+
+      document.querySelectorAll('[data-don-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-don-save');
+          const statusSel = document.querySelector(`[data-don-status="${id}"]`);
+          const notesInp = document.querySelector(`[data-don-notes="${id}"]`);
+          const newStatus = statusSel?.value;
+          const notes = notesInp?.value || null;
+
+          status.textContent = "Saving…";
+          const { error: upErr } = await sb.from('donations')
+            .update({ status:newStatus, admin_notes:notes })
+            .eq('id', id);
+
+          if (upErr){
+            status.textContent = "Blocked";
+            logDebug("donations update error: " + (upErr.message || ""));
+            return;
+          }
+          status.textContent = "Saved";
+          setTimeout(()=> status.textContent="Ready", 900);
+        });
+      });
+    }
+    document.getElementById('reloadDonationsBtn')?.addEventListener('click', loadDonations);
+
+    // ---------- CLAIMS ----------
+    async function loadClaims(){
+      const status = document.getElementById('claimsStatus');
+      status.textContent = "Loading…";
+
+      const { data, error } = await sb.from('claims')
+        .select('id, created_at, user_id, listing_id, claim_notes, status, admin_notes')
+        .order('created_at', { ascending:false })
+        .limit(50);
+
+      if (error){
+        status.textContent = "Blocked";
+        logDebug("claims select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('claimsCount').textContent = String(data?.length || 0);
+      status.textContent = "Ready";
+
+      const html = renderTable(
+        ["Date","User","Listing","Notes","Status","Admin notes","Actions"],
+        data,
+        (c)=>`
+          <tr>
+            <td>${esc(fmtDate(c.created_at))}</td>
+            <td>${esc(c.user_id ? String(c.user_id).slice(0,8)+"…" : "—")}</td>
+            <td>${esc(c.listing_id ? String(c.listing_id).slice(0,8)+"…" : "—")}</td>
+            <td>${esc(c.claim_notes || "—")}</td>
+            <td>
+              <select data-claim-status="${esc(c.id)}">
+                ${["submitted","approved","scheduled","completed","rejected"].map(s=>`<option ${c.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td><input data-claim-notes="${esc(c.id)}" value="${esc(c.admin_notes || "")}" placeholder="Notes"/></td>
+            <td><button class="btn primary" data-claim-save="${esc(c.id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      document.getElementById('claimsTable').innerHTML = html;
+
+      document.querySelectorAll('[data-claim-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-claim-save');
+          const statusSel = document.querySelector(`[data-claim-status="${id}"]`);
+          const notesInp = document.querySelector(`[data-claim-notes="${id}"]`);
+          const newStatus = statusSel?.value;
+          const notes = notesInp?.value || null;
+
+          status.textContent = "Saving…";
+          const { error: upErr } = await sb.from('claims')
+            .update({ status:newStatus, admin_notes:notes })
+            .eq('id', id);
+
+          if (upErr){
+            status.textContent = "Blocked";
+            logDebug("claims update error: " + (upErr.message || ""));
+            return;
+          }
+          status.textContent = "Saved";
+          setTimeout(()=> status.textContent="Ready", 900);
+        });
+      });
+    }
+    document.getElementById('reloadClaimsBtn')?.addEventListener('click', loadClaims);
+
+    // ---------- VOLUNTEER APPLICATIONS ----------
+    async function loadVolunteers(){
+      const status = document.getElementById('volStatus');
+      status.textContent = "Loading…";
+
+      const { data, error } = await sb.from('volunteer_applications')
+        .select('id, created_at, user_id, full_name, email, phone, areas_of_interest, availability, status, admin_notes')
+        .order('created_at', { ascending:false })
+        .limit(50);
+
+      if (error){
+        status.textContent = "Blocked";
+        logDebug("volunteer_applications select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('volCount').textContent = String(data?.length || 0);
+      status.textContent = "Ready";
+
+      const html = renderTable(
+        ["Date","Applicant","Contact","Interest","Availability","Status","Admin notes","Actions"],
+        data,
+        (v)=>`
+          <tr>
+            <td>${esc(fmtDate(v.created_at))}</td>
+            <td>${esc(v.full_name || "—")}</td>
+            <td>${esc([v.email,v.phone].filter(Boolean).join(" / ") || "—")}</td>
+            <td>${esc(v.areas_of_interest || "—")}</td>
+            <td>${esc(v.availability || "—")}</td>
+            <td>
+              <select data-vol-status="${esc(v.id)}">
+                ${["submitted","reviewing","approved","rejected","onboarded"].map(s=>`<option ${v.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td><input data-vol-notes="${esc(v.id)}" value="${esc(v.admin_notes || "")}" placeholder="Notes"/></td>
+            <td><button class="btn primary" data-vol-save="${esc(v.id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      document.getElementById('volTable').innerHTML = html;
+
+      document.querySelectorAll('[data-vol-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-vol-save');
+          const statusSel = document.querySelector(`[data-vol-status="${id}"]`);
+          const notesInp = document.querySelector(`[data-vol-notes="${id}"]`);
+          const newStatus = statusSel?.value;
+          const notes = notesInp?.value || null;
+
+          status.textContent = "Saving…";
+          const { error: upErr } = await sb.from('volunteer_applications')
+            .update({ status:newStatus, admin_notes:notes })
+            .eq('id', id);
+
+          if (upErr){
+            status.textContent = "Blocked";
+            logDebug("volunteer_applications update error: " + (upErr.message || ""));
+            return;
+          }
+          status.textContent = "Saved";
+          setTimeout(()=> status.textContent="Ready", 900);
+        });
+      });
+    }
+    document.getElementById('reloadVolBtn')?.addEventListener('click', loadVolunteers);
+
+    // ---------- INQUIRIES ----------
+    async function loadInquiries(){
+      const status = document.getElementById('inqStatus');
+      status.textContent = "Loading…";
+
+      const { data, error } = await sb.from('inquiries')
+        .select('id, created_at, name, email, category, message, status, admin_notes')
+        .order('created_at', { ascending:false })
+        .limit(50);
+
+      if (error){
+        status.textContent = "Blocked";
+        logDebug("inquiries select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('inqCount').textContent = String(data?.length || 0);
+      status.textContent = "Ready";
+
+      const html = renderTable(
+        ["Date","Name","Email","Category","Message","Status","Admin notes","Actions"],
+        data,
+        (i)=>`
+          <tr>
+            <td>${esc(fmtDate(i.created_at))}</td>
+            <td>${esc(i.name || "—")}</td>
+            <td>${esc(i.email || "—")}</td>
+            <td>${esc(i.category || "—")}</td>
+            <td>${esc(i.message || "—")}</td>
+            <td>
+              <select data-inq-status="${esc(i.id)}">
+                ${["open","in_progress","closed"].map(s=>`<option ${i.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td><input data-inq-notes="${esc(i.id)}" value="${esc(i.admin_notes || "")}" placeholder="Notes"/></td>
+            <td><button class="btn primary" data-inq-save="${esc(i.id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      document.getElementById('inqTable').innerHTML = html;
+
+      document.querySelectorAll('[data-inq-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-inq-save');
+          const statusSel = document.querySelector(`[data-inq-status="${id}"]`);
+          const notesInp = document.querySelector(`[data-inq-notes="${id}"]`);
+          const newStatus = statusSel?.value;
+          const notes = notesInp?.value || null;
+
+          status.textContent = "Saving…";
+          const { error: upErr } = await sb.from('inquiries')
+            .update({ status:newStatus, admin_notes:notes })
+            .eq('id', id);
+
+          if (upErr){
+            status.textContent = "Blocked";
+            logDebug("inquiries update error: " + (upErr.message || ""));
+            return;
+          }
+          status.textContent = "Saved";
+          setTimeout(()=> status.textContent="Ready", 900);
+        });
+      });
+    }
+    document.getElementById('reloadInqBtn')?.addEventListener('click', loadInquiries);
+
+    // ---------- INVENTORY ----------
+    async function createListing(){
+      const statusEl = document.getElementById('invCreateStatus');
+      statusEl.textContent = "Creating…";
+
+      const payload = {
+        title: document.getElementById('inv_title').value.trim(),
+        description: document.getElementById('inv_desc').value.trim() || null,
+        listing_type: document.getElementById('inv_listing_type').value,
+        category: document.getElementById('inv_category').value.trim() || null,
+        quantity_text: document.getElementById('inv_quantity_text').value.trim() || null,
+        estimated_kg: document.getElementById('inv_estimated_kg').value ? Number(document.getElementById('inv_estimated_kg').value) : null,
+        pickup_area: document.getElementById('inv_pickup_area').value.trim() || null,
+        pickup_notes_public: document.getElementById('inv_pickup_notes_public').value.trim() || null,
+        expires_at: isoLocalToIsoZ(document.getElementById('inv_expires_at').value),
+        status: "active"
+      };
+
+      if (!payload.title){
+        statusEl.textContent = "Missing title";
+        return;
+      }
+
+      const { error } = await sb.from('food_listings').insert(payload);
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("food_listings insert error: " + (error.message || ""));
+        return;
+      }
+
+      statusEl.textContent = "Created";
+      setTimeout(()=> statusEl.textContent="Idle", 1000);
+
+      // clear basic fields
+      document.getElementById('inv_title').value = "";
+      document.getElementById('inv_desc').value = "";
+      document.getElementById('inv_category').value = "";
+      document.getElementById('inv_quantity_text').value = "";
+      document.getElementById('inv_estimated_kg').value = "";
+      document.getElementById('inv_pickup_area').value = "";
+      document.getElementById('inv_pickup_notes_public').value = "";
+      document.getElementById('inv_expires_at').value = "";
+
+      await loadInventory();
+    }
+    document.getElementById('createListingBtn')?.addEventListener('click', createListing);
+
+    async function loadInventory(){
+      const statusEl = document.getElementById('invStatus');
+      statusEl.textContent = "Loading…";
+
+      const { data, error } = await sb.from('food_listings')
+        .select('id, created_at, title, listing_type, category, pickup_area, estimated_kg, expires_at, status')
+        .order('created_at', { ascending:false })
+        .limit(60);
+
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("food_listings select error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('invCount').textContent = String(data?.length || 0);
+      statusEl.textContent = "Ready";
+
+      const html = renderTable(
+        ["Date","Title","Type","Area","KG","Expires","Status","Actions"],
+        data,
+        (l)=>`
+          <tr>
+            <td>${esc(fmtDate(l.created_at))}</td>
+            <td>
+              <input data-inv-title="${esc(l.id)}" value="${esc(l.title || "")}"/>
+              <div class="hint">${esc(l.category || "")}</div>
+            </td>
+            <td>
+              <select data-inv-type="${esc(l.id)}">
+                ${["item","surprise_bag"].map(t=>`<option ${l.listing_type===t?"selected":""} value="${t}">${t}</option>`).join("")}
+              </select>
+            </td>
+            <td><input data-inv-area="${esc(l.id)}" value="${esc(l.pickup_area || "")}"/></td>
+            <td><input data-inv-kg="${esc(l.id)}" type="number" step="0.1" value="${esc(l.estimated_kg ?? "")}"/></td>
+            <td>${esc(l.expires_at ? new Date(l.expires_at).toLocaleString() : "—")}</td>
+            <td>
+              <select data-inv-status="${esc(l.id)}">
+                ${["active","inactive","claimed","expired"].map(s=>`<option ${l.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn primary" data-inv-save="${esc(l.id)}">Save</button>
+                <button class="btn warn" data-inv-deactivate="${esc(l.id)}">Deactivate</button>
+              </div>
+            </td>
+          </tr>
+        `
+      );
+
+      document.getElementById('invTable').innerHTML = html;
+
+      document.querySelectorAll('[data-inv-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-inv-save');
+          statusEl.textContent = "Saving…";
+          const payload = {
+            title: document.querySelector(`[data-inv-title="${id}"]`)?.value?.trim() || null,
+            listing_type: document.querySelector(`[data-inv-type="${id}"]`)?.value || "item",
+            pickup_area: document.querySelector(`[data-inv-area="${id}"]`)?.value?.trim() || null,
+            estimated_kg: (()=>{ const v=document.querySelector(`[data-inv-kg="${id}"]`)?.value; return v===""?null:Number(v); })(),
+            status: document.querySelector(`[data-inv-status="${id}"]`)?.value || "active"
+          };
+
+          const { error: upErr } = await sb.from('food_listings').update(payload).eq('id', id);
+          if (upErr){
+            statusEl.textContent = "Blocked";
+            logDebug("food_listings update error: " + (upErr.message || ""));
+            return;
+          }
+          statusEl.textContent = "Saved";
+          setTimeout(()=> statusEl.textContent="Ready", 900);
+        });
+      });
+
+      document.querySelectorAll('[data-inv-deactivate]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-inv-deactivate');
+          statusEl.textContent = "Deactivating…";
+          const { error: upErr } = await sb.from('food_listings').update({ status:"inactive" }).eq('id', id);
+          if (upErr){
+            statusEl.textContent = "Blocked";
+            logDebug("food_listings deactivate error: " + (upErr.message || ""));
+            return;
+          }
+          statusEl.textContent = "Deactivated";
+          setTimeout(()=> statusEl.textContent="Ready", 900);
+          await loadInventory();
+        });
+      });
+    }
+    document.getElementById('reloadInvBtn')?.addEventListener('click', loadInventory);
+
+    // ---------- USERS ----------
+    async function loadUsers(){
+      const statusEl = document.getElementById('usersStatus');
+      statusEl.textContent = "Loading…";
+
+      const { data, error } = await sb.from('profiles')
+        .select('user_id, role_id, display_name, phone, is_active, created_at')
+        .order('created_at', { ascending:false })
+        .limit(80);
+
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("profiles select (users) error: " + (error.message || ""));
+        return;
+      }
+
+      document.getElementById('usersCount').textContent = String(data?.length || 0);
+      statusEl.textContent = "Ready";
+
+      const html = renderTable(
+        ["Created","User","Role","Active","Display name","Phone","Actions"],
+        data,
+        (p)=>`
+          <tr>
+            <td>${esc(fmtDate(p.created_at))}</td>
+            <td class="mono">${esc(p.user_id)}</td>
+            <td>
+              <select data-user-role="${esc(p.user_id)}">
+                <option value="1" ${p.role_id===1?"selected":""}>1 Admin</option>
+                <option value="2" ${p.role_id===2?"selected":""}>2 Driver/Staff</option>
+                <option value="3" ${p.role_id===3?"selected":""}>3 Volunteer Coordinator</option>
+                <option value="4" ${p.role_id===4?"selected":""}>4 Community</option>
+              </select>
+            </td>
+            <td>
+              <select data-user-active="${esc(p.user_id)}">
+                <option value="true" ${p.is_active===true?"selected":""}>true</option>
+                <option value="false" ${p.is_active===false?"selected":""}>false</option>
+              </select>
+            </td>
+            <td><input data-user-name="${esc(p.user_id)}" value="${esc(p.display_name||"")}"/></td>
+            <td><input data-user-phone="${esc(p.user_id)}" value="${esc(p.phone||"")}"/></td>
+            <td><button class="btn primary" data-user-save="${esc(p.user_id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      document.getElementById('usersTable').innerHTML = html;
+
+      document.querySelectorAll('[data-user-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-user-save');
+          statusEl.textContent = "Saving…";
+
+          const payload = {
+            role_id: Number(document.querySelector(`[data-user-role="${id}"]`)?.value || 4),
+            is_active: document.querySelector(`[data-user-active="${id}"]`)?.value === "true",
+            display_name: document.querySelector(`[data-user-name="${id}"]`)?.value?.trim() || null,
+            phone: document.querySelector(`[data-user-phone="${id}"]`)?.value?.trim() || null,
+            updated_at: new Date().toISOString()
+          };
+
+          const { error: upErr } = await sb.from('profiles').update(payload).eq('user_id', id);
+          if (upErr){
+            statusEl.textContent = "Blocked";
+            logDebug("profiles update (users) error: " + (upErr.message || ""));
+            return;
+          }
+          statusEl.textContent = "Saved";
+          setTimeout(()=> statusEl.textContent="Ready", 900);
+        });
+      });
+    }
+    document.getElementById('reloadUsersBtn')?.addEventListener('click', loadUsers);
+
+    // ---------- TASKS ----------
+    async function loadStaffOptions(){
+      const sel = document.getElementById('task_assigned_to');
+      sel.innerHTML = `<option value="">Loading…</option>`;
+
+      const { data, error } = await sb.from('profiles')
+        .select('user_id, role_id, display_name')
+        .in('role_id', [2,3])
+        .order('created_at', { ascending:false })
+        .limit(200);
+
+      if (error){
+        sel.innerHTML = `<option value="">Blocked</option>`;
+        logDebug("profiles select (staff options) error: " + (error.message || ""));
+        return;
+      }
+
+      if (!data || data.length === 0){
+        sel.innerHTML = `<option value="">No staff found</option>`;
+        return;
+      }
+
+      sel.innerHTML = `<option value="">Select staff…</option>` + data.map(p=>{
+        const label = `${p.display_name ? p.display_name + " — " : ""}${String(p.user_id).slice(0,8)}… (${p.role_id===2?"Staff":"Coordinator"})`;
+        return `<option value="${esc(p.user_id)}">${esc(label)}</option>`;
+      }).join("");
+    }
+
+    async function createTask(){
+      const statusEl = document.getElementById('taskCreateStatus');
+      statusEl.textContent = "Creating…";
+
+      const assigned_to = document.getElementById('task_assigned_to').value;
+      const task_type = document.getElementById('task_type').value.trim();
+
+      if (!assigned_to || !task_type){
+        statusEl.textContent = "Missing fields";
+        return;
+      }
+
+      const payload = {
+        task_type,
+        status: "assigned",
+        assigned_to,
+        contact_name: document.getElementById('task_contact_name').value.trim() || null,
+        contact_phone: document.getElementById('task_contact_phone').value.trim() || null,
+        pickup_address_private: document.getElementById('task_pickup_address_private').value.trim() || null,
+        scheduled_at: isoLocalToIsoZ(document.getElementById('task_scheduled_at').value),
+        geo_fence_meters: Number(document.getElementById('task_geo_fence_meters').value || 100),
+        notes: document.getElementById('task_notes').value.trim() || null
+      };
+
+      const { error } = await sb.from('tasks').insert(payload);
+      if (error){
+        statusEl.textContent = "Blocked";
+        logDebug("tasks insert error: " + (error.message || ""));
+        return;
+      }
+
+      statusEl.textContent = "Created";
+      setTimeout(()=> statusEl.textContent="Idle", 1000);
+
+      // clear a few fields
+      document.getElementById('task_type').value = "";
+      document.getElementById('task_contact_name').value = "";
+      document.getElementById('task_contact_phone').value = "";
+      document.getElementById('task_pickup_address_private').value = "";
+      document.getElementById('task_scheduled_at').value = "";
+      document.getElementById('task_notes').value = "";
+
+      await loadTasks();
+    }
+    document.getElementById('createTaskBtn')?.addEventListener('click', createTask);
+
+    async function loadTasks(){
+      const countEl = document.getElementById('tasksCount');
+      const tableEl = document.getElementById('tasksTable');
+
+      tableEl.innerHTML = `<div class="status">Loading…</div>`;
+
+      const { data, error } = await sb.from('tasks')
+        .select('id, created_at, task_type, status, assigned_to, scheduled_at, pickup_address_private, geo_fence_meters')
+        .order('created_at', { ascending:false })
+        .limit(60);
+
+      if (error){
+        tableEl.innerHTML = `<div class="status">Tasks unavailable (blocked by policy).</div>`;
+        logDebug("tasks select error: " + (error.message || ""));
+        return;
+      }
+
+      countEl.textContent = String(data?.length || 0);
+
+      const html = renderTable(
+        ["Date","Type","Status","Assigned to","Scheduled","Pickup","Fence","Actions"],
+        data,
+        (t)=>`
+          <tr>
+            <td>${esc(fmtDate(t.created_at))}</td>
+            <td>${esc(t.task_type||"—")}</td>
+            <td>
+              <select data-task-status="${esc(t.id)}">
+                ${["assigned","in_progress","completed","cancelled"].map(s=>`<option ${t.status===s?"selected":""} value="${s}">${s}</option>`).join("")}
+              </select>
+            </td>
+            <td class="mono">${esc(t.assigned_to ? String(t.assigned_to).slice(0,8)+"…" : "—")}</td>
+            <td>${esc(t.scheduled_at ? new Date(t.scheduled_at).toLocaleString() : "—")}</td>
+            <td>${esc(t.pickup_address_private || "—")}</td>
+            <td>${esc(t.geo_fence_meters ?? "—")}</td>
+            <td><button class="btn primary" data-task-save="${esc(t.id)}">Save</button></td>
+          </tr>
+        `
+      );
+
+      tableEl.innerHTML = html;
+
+      document.querySelectorAll('[data-task-save]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-task-save');
+          const newStatus = document.querySelector(`[data-task-status="${id}"]`)?.value;
+
+          const { error: upErr } = await sb.from('tasks').update({ status:newStatus }).eq('id', id);
+          if (upErr){
+            logDebug("tasks update error: " + (upErr.message || ""));
+            alert("Task update blocked by policy (RLS).");
+            return;
+          }
+          await loadTasks();
+        });
+      });
+    }
+    document.getElementById('reloadTasksBtn')?.addEventListener('click', loadTasks);
+
+    // Top controls
+    document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+    document.getElementById('refreshAllBtn')?.addEventListener('click', async ()=>{ await refreshAll(); });
+
+    async function refreshAll(){
+      debugBox.textContent = "";
+      await loadSettings();
       await loadDonations();
+      await loadClaims();
       await loadVolunteers();
       await loadInquiries();
       await loadInventory();
-      await loadUsers();
-      await loadStaffDropdown();
+      await loadStaffOptions();
       await loadTasks();
-      await loadSettings();
-      setLoading(false);
+      await loadUsers();
+    }
+
+    // init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    refreshAuthSlot();
+
+    (async ()=>{
+      const ctx = await requireAdmin();
+      if (!ctx) return;
+
+      const savedTab = localStorage.getItem('admin_tab') || 'settings';
+      setTab(savedTab);
+
+      await refreshAll();
     })();
   </script>
 </body>
