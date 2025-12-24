@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Staff Dashboard — FoodShare Seychelles</title>
+  <meta name="description" content="Operational dashboard for FoodShare Seychelles staff." />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#fbfcfb; --surface:#fff; --text:#0f172a; --muted:#475569; --muted2:#64748b;
+      --border:rgba(15,23,42,.10); --shadowSoft:0 10px 26px rgba(2,6,23,.06);
+      --brand:#73b63b; --brand2:#5aa52f; --brandInk:#173a12;
+      --dark:#0b1220; --darkBorder:rgba(255,255,255,.10);
+      --max:1120px;
+      --danger:#b42318; --warn:#9a6700;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+    /* NAV */
+    .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,23,42,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:74px;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px}
+    .brand-logo{width:36px;height:36px;border-radius:10px;object-fit:contain;display:block}
+    .brand-name{display:flex;flex-direction:column;line-height:1.1}
+    .brand-name strong{font-size:14px;letter-spacing:.2px}
+    .brand-name span{font-size:12px;color:var(--muted2)}
+    .nav-links{display:flex;align-items:center;gap:18px}
+    .nav-item{font-size:14px;color:var(--muted);padding:10px 10px;border-radius:12px;transition:background .15s,color .15s}
+    .nav-item:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .cta{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(115,182,59,.20);transition:transform .15s,background .15s;white-space:nowrap}
+    .cta:hover{background:var(--brand2);transform:translateY(-1px);text-decoration:none}
+    select.lang{border:1px solid rgba(15,23,42,.14);background:rgba(255,255,255,.92);border-radius:999px;padding:10px 12px;font-size:14px;color:var(--muted);outline:none;cursor:pointer}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.80);color:var(--muted);font-size:14px;white-space:nowrap}
+    .pill button{border:none;background:transparent;cursor:pointer;color:inherit;font:inherit;padding:0}
+    .dropdown{position:relative}
+    .dropdown-btn{display:inline-flex;align-items:center;gap:8px;border:none;background:transparent;cursor:pointer;color:var(--muted);padding:10px 10px;border-radius:12px;font-size:14px}
+    .dropdown-btn:hover{background:rgba(115,182,59,.10);color:var(--brandInk)}
+    .dropdown-menu{position:absolute;right:0;top:calc(100% + 10px);width:240px;background:var(--surface);border:1px solid rgba(15,23,42,.10);border-radius:16px;box-shadow:var(--shadowSoft);padding:8px;display:none}
+    .dropdown-menu a{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;font-size:14px;color:var(--muted)}
+    .dropdown-menu a:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .dropdown.open .dropdown-menu{display:block}
+    .mobile-toggle{display:none;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.92);border-radius:14px;padding:10px 12px;cursor:pointer}
+    .mobile-panel{display:none;border-top:1px solid rgba(15,23,42,.08);padding:12px 0 18px}
+    .mobile-panel.open{display:block}
+    .stack{display:flex;flex-direction:column;gap:8px}
+
+    /* PAGE */
+    .page{padding:40px 0 56px}
+    .title{text-align:center}
+    .title h1{margin:0 auto;font-size:clamp(26px,3vw,40px);letter-spacing:-.4px;line-height:1.1;max-width:980px;color:#2f5b1f;font-weight:950}
+    .title p{margin:12px auto 0;max-width:920px;color:var(--muted);font-size:15px}
+
+    .grid{margin-top:18px;display:grid;grid-template-columns:1fr;gap:16px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .card{background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:22px;padding:18px;box-shadow:0 10px 22px rgba(2,6,23,.04)}
+    .card h2{margin:0;font-size:18px;letter-spacing:-.2px}
+    .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.55}
+    .status{margin-top:10px;color:var(--muted);font-size:13px;white-space:pre-wrap}
+
+    .toolbar{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.95);color:var(--text);font-weight:950;font-size:13px;cursor:pointer;transition:transform .15s,background .15s;white-space:nowrap}
+    .btn:hover{background:#fff;transform:translateY(-1px)}
+    .btn.primary{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(115,182,59,.20)}
+    .btn.primary:hover{background:var(--brand2)}
+    .btn.danger{border-color:rgba(180,35,24,.25);background:rgba(180,35,24,.06);color:var(--danger)}
+    .btn.warn{border-color:rgba(154,103,0,.25);background:rgba(154,103,0,.08);color:var(--warn)}
+    .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .pillTag{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.92);color:var(--muted);font-size:12px;white-space:nowrap}
+    .pillTag strong{color:var(--text)}
+    .sep{height:1px;background:rgba(15,23,42,.10);margin:14px 0}
+
+    table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:12px}
+    th{font-size:12px;color:var(--muted2);text-align:left;padding:0 10px}
+    td{background:rgba(251,252,251,.98);border:1px solid rgba(15,23,42,.10);padding:10px;border-left:none;border-right:none;font-size:13px;color:var(--muted);vertical-align:top}
+    tr td:first-child{border-left:1px solid rgba(15,23,42,.10);border-top-left-radius:14px;border-bottom-left-radius:14px}
+    tr td:last-child{border-right:1px solid rgba(15,23,42,.10);border-top-right-radius:14px;border-bottom-right-radius:14px}
+    .mono{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--muted)}
+
+    /* FOOTER */
+    footer{background:linear-gradient(180deg,var(--dark) 0%,#070b14 100%);color:rgba(255,255,255,.86);border-top:1px solid var(--darkBorder)}
+    .footer-top{padding:44px 0 22px}
+    .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:18px}
+    .foot-title{font-weight:950;color:#fff;margin:0 0 10px;font-size:14px}
+    .foot-text{margin:0;color:rgba(255,255,255,.70);font-size:13px;line-height:1.55}
+    .foot-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:rgba(255,255,255,.74)}
+    .foot-links a{color:rgba(255,255,255,.74)} .foot-links a:hover{color:#fff;text-decoration:none}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.10);padding:14px 0;font-size:13px;color:rgba(255,255,255,.70)}
+    .footer-bottom-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .footer-bottom a{color:rgba(255,255,255,.85);text-decoration:underline}
+
+    @media(max-width:980px){.row2{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:860px){.nav-links{display:none}.mobile-toggle{display:inline-flex}}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="/image/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span>Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/">Find Food</a>
+          <a class="nav-item" href="../about-us/">About</a>
+          <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem">Learn</a>
+              <a href="../our-impact/" role="menuitem">Our Impact</a>
+              <a href="../our-partners/" role="menuitem">Our Partners</a>
+              <a href="../contact-us/" role="menuitem">Contact Us</a>
+              <a href="../social-media/" role="menuitem">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem">Sitemap</a>
+              <a href="../staff-login/" role="menuitem">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot"><a href="../auth/" id="authLink">Login</a></span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
+      </div>
+
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/">Find Food</a>
+            <a class="nav-item" href="../about-us/">About</a>
+            <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+            <a class="nav-item" href="../donate-now/">Donate Now</a>
+            <a class="nav-item" href="../learn/">Learn</a>
+            <a class="nav-item" href="../our-impact/">Our Impact</a>
+            <a class="nav-item" href="../our-partners/">Our Partners</a>
+            <a class="nav-item" href="../contact-us/">Contact Us</a>
+            <a class="nav-item" href="../social-media/">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/">Sitemap</a>
+            <a class="nav-item" href="../staff-login/">Staff Login</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option><option value="cr">Kreol</option><option value="fr">Français</option>
+              </select>
+              <span class="pill" id="authSlotMobile"><a href="../auth/" id="authLinkMobile">Login</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <main>
+    <section class="page">
+      <div class="container">
+        <div class="title">
+          <h1>Staff Dashboard</h1>
+          <p>See your assigned tasks, record progress, and (optionally) check in on-site for pickups and shifts.</p>
+        </div>
+
+        <div class="grid">
+          <div class="row2">
+            <div class="card">
+              <h2>Signed-in staff</h2>
+              <div class="sub">This dashboard is only for staff roles (2 or 3). Admins are redirected automatically.</div>
+              <div class="status" id="whoami">Loading…</div>
+              <div class="toolbar">
+                <button class="btn" id="refreshBtn" type="button">Refresh</button>
+                <button class="btn danger" id="signOutBtn" type="button">Sign out</button>
+              </div>
+              <details>
+                <summary>Debug</summary>
+                <div class="mono" id="debugBox"></div>
+              </details>
+            </div>
+
+            <div class="card">
+              <h2>How it works</h2>
+              <div class="sub">
+                You will only see tasks assigned to you. Starting/completing tasks is enforced by RLS.
+                Check-ins are optional and may be blocked if policies are not enabled.
+              </div>
+              <div class="sep"></div>
+              <div class="pillTag"><strong>Status meanings:</strong> assigned → in_progress → completed</div>
+              <div style="margin-top:10px" class="pillTag"><strong>Tip:</strong> On mobile, allow Location for check-in.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Your assigned tasks</h2>
+            <div class="sub">Operational tasks: pickups, drop-offs, follow-ups, etc.</div>
+            <div class="status" id="taskStatus">Loading…</div>
+            <div id="taskTableWrap"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.</p>
+          </div>
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a><a href="../about-us/">About Us</a><a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a><a href="../our-partners/">Our Partners</a><a href="../social-media/">Social Media</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a><a href="../donate-now/">Donate Now</a><a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a><a href="../auth/">Login</a><a href="../staff-login/">Staff Login</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a><a href="../terms-of-use/">Terms Of Use</a><a href="../sitemap/">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a></span>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const whoami = document.getElementById('whoami');
+    const debugBox = document.getElementById('debugBox');
+    const taskStatus = document.getElementById('taskStatus');
+    const taskTableWrap = document.getElementById('taskTableWrap');
+
+    function logDebug(line){
+      if (!debugBox) return;
+      debugBox.textContent = (debugBox.textContent ? debugBox.textContent + "\n" : "") + line;
+    }
+    function esc(s){
+      return String(s ?? "").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+    }
+    function fmtDate(ts){
+      try{ return ts ? new Date(ts).toLocaleString() : "—"; } catch { return "—"; }
+    }
+
+    // Navbar behaviors
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){ moreDropdown?.classList.remove('open'); moreBtn?.setAttribute('aria-expanded','false'); }
+    moreBtn?.addEventListener('click', (e)=>{ e.preventDefault(); const open = moreDropdown.classList.toggle('open'); moreBtn.setAttribute('aria-expanded', String(open)); });
+    document.addEventListener('click', (e)=>{ if (moreDropdown && !moreDropdown.contains(e.target)) closeMore(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMore(); });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', ()=> mobilePanel.classList.toggle('open'));
+
+    // Language (persistence only)
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+    }
+    const lang = getSavedLang(); applyLanguage(lang);
+    document.getElementById('langSelect')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+    document.getElementById('langSelectMobile')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+
+    // Auth slot shows sign out
+    async function refreshAuthSlot(){
+      const { data } = await sb.auth.getSession();
+      const user = data?.session?.user || null;
+
+      const slot = document.getElementById('authSlot');
+      const slotM = document.getElementById('authSlotMobile');
+      if (!slot || !slotM) return;
+
+      if (!user){
+        slot.innerHTML = `<a href="../auth/" id="authLink">Login</a>`;
+        slotM.innerHTML = `<a href="../auth/" id="authLinkMobile">Login</a>`;
+        return;
+      }
+
+      slot.innerHTML = `<span style="font-weight:950;">Staff</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnTop">Sign out</button>`;
+      slotM.innerHTML = `<span style="font-weight:950;">Staff</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnTopM">Sign out</button>`;
+
+      document.getElementById('signOutBtnTop')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+      document.getElementById('signOutBtnTopM')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+    }
+
+    async function requireStaff(){
+      const { data: sessData, error: sessErr } = await sb.auth.getSession();
+      if (sessErr) logDebug("getSession error: " + (sessErr.message || ""));
+      const user = sessData?.session?.user || null;
+
+      if (!user){
+        location.href = "../staff-login/";
+        return null;
+      }
+
+      // profile check
+      const { data: prof, error: pErr } = await sb
+        .from('profiles')
+        .select('role_id, display_name, is_active')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (pErr){
+        logDebug("profiles select error: " + (pErr.message || ""));
+        whoami.textContent = "Signed in, but cannot read your staff profile (RLS/policy). Contact an admin.";
+        return null;
+      }
+
+      if (!prof){
+        whoami.textContent = "Signed in, but your profile is missing. Contact an admin to assign a staff role.";
+        return null;
+      }
+
+      if (prof.is_active === false){
+        whoami.textContent = "Your account is inactive. Contact an admin.";
+        return null;
+      }
+
+      // route by role
+      if (prof.role_id === 1){
+        location.href = "../admin-dashboard/";
+        return null;
+      }
+      if (prof.role_id === 4){
+        location.href = "../dashboard/";
+        return null;
+      }
+      if (prof.role_id !== 2 && prof.role_id !== 3){
+        whoami.textContent = "Unknown role. Contact an admin.";
+        return null;
+      }
+
+      whoami.textContent =
+        `Signed in as: ${user.email || "—"}\nRole: ${prof.role_id === 2 ? "Driver/Staff" : "Volunteer Coordinator"}\nAccount: Active`;
+
+      return { user, prof };
+    }
+
+    function renderTasks(rows){
+      if (!rows || rows.length === 0){
+        taskTableWrap.innerHTML = "";
+        taskStatus.textContent = "No assigned tasks right now.";
+        return;
+      }
+
+      const head = `
+        <table>
+          <thead>
+            <tr>
+              <th>Created</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Scheduled</th>
+              <th>Contact</th>
+              <th>Pickup (private)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      const body = rows.map(t=>{
+        const contact = [t.contact_name, t.contact_phone].filter(Boolean).join(" / ") || "—";
+        const addr = t.pickup_address_private || "—";
+        const scheduled = t.scheduled_at ? fmtDate(t.scheduled_at) : "—";
+        const status = t.status || "—";
+
+        const canStart = status === "assigned";
+        const canComplete = status === "in_progress";
+
+        return `
+          <tr>
+            <td>${esc(fmtDate(t.created_at))}</td>
+            <td>${esc(t.task_type || "—")}</td>
+            <td>${esc(status)}</td>
+            <td>${esc(scheduled)}</td>
+            <td>${esc(contact)}</td>
+            <td>
+              ${esc(addr)}
+              ${t.geo_fence_meters ? `<div style="margin-top:6px;color:var(--muted2);font-size:12px;">Fence: ${esc(t.geo_fence_meters)}m</div>` : ``}
+            </td>
+            <td>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn warn" data-checkin="${esc(t.id)}">Check-in</button>
+                <button class="btn" data-start="${esc(t.id)}" ${canStart ? "" : "disabled"}>Start</button>
+                <button class="btn primary" data-complete="${esc(t.id)}" ${canComplete ? "" : "disabled"}>Complete</button>
+              </div>
+              ${t.notes ? `<div style="margin-top:8px;color:var(--muted2);font-size:12px;">Notes: ${esc(t.notes)}</div>` : ``}
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      const foot = `</tbody></table>`;
+      taskTableWrap.innerHTML = head + body + foot;
+
+      // wire actions
+      document.querySelectorAll('[data-start]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-start');
+          await updateTaskStatus(id, "in_progress");
+        });
+      });
+      document.querySelectorAll('[data-complete]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-complete');
+          await updateTaskStatus(id, "completed");
+        });
+      });
+      document.querySelectorAll('[data-checkin]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-checkin');
+          await doCheckIn(id);
+        });
+      });
+    }
+
+    async function loadTasks(userId){
+      taskStatus.textContent = "Loading tasks…";
+      taskTableWrap.innerHTML = "";
+
+      const { data, error } = await sb
+        .from('tasks')
+        .select('id, created_at, task_type, status, scheduled_at, contact_name, contact_phone, pickup_address_private, geo_fence_meters, pickup_lat, pickup_lng, notes')
+        .eq('assigned_to', userId)
+        .order('created_at', { ascending:false })
+        .limit(50);
+
+      if (error){
+        taskStatus.textContent = "Tasks unavailable (blocked by policy).";
+        logDebug("tasks select error: " + (error.message || ""));
+        return;
+      }
+
+      taskStatus.textContent = "";
+      renderTasks(data);
+    }
+
+    async function updateTaskStatus(taskId, newStatus){
+      taskStatus.textContent = "Updating task…";
+
+      const { error } = await sb
+        .from('tasks')
+        .update({ status: newStatus })
+        .eq('id', taskId);
+
+      if (error){
+        taskStatus.textContent = "Update blocked by policy (RLS).";
+        logDebug("tasks update error: " + (error.message || ""));
+        return;
+      }
+
+      await refresh();
+    }
+
+    function getCurrentPosition(opts){
+      return new Promise((resolve, reject)=>{
+        if (!navigator.geolocation) return reject(new Error("Geolocation not supported"));
+        navigator.geolocation.getCurrentPosition(resolve, reject, opts);
+      });
+    }
+
+    // Haversine distance (meters)
+    function distanceMeters(lat1, lon1, lat2, lon2){
+      const R = 6371000;
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(lat2-lat1);
+      const dLon = toRad(lon2-lon1);
+      const a =
+        Math.sin(dLat/2)*Math.sin(dLat/2) +
+        Math.cos(toRad(lat1))*Math.cos(toRad(lat2)) *
+        Math.sin(dLon/2)*Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R*c;
+    }
+
+    async function doCheckIn(taskId){
+      taskStatus.textContent = "Requesting location permission…";
+
+      // get task fence coords
+      const { data: task, error: tErr } = await sb
+        .from('tasks')
+        .select('id, pickup_lat, pickup_lng, geo_fence_meters')
+        .eq('id', taskId)
+        .maybeSingle();
+
+      if (tErr){
+        taskStatus.textContent = "Check-in blocked (policy).";
+        logDebug("tasks select for check-in error: " + (tErr.message || ""));
+        return;
+      }
+
+      const fenceLat = task?.pickup_lat;
+      const fenceLng = task?.pickup_lng;
+      const fenceM = task?.geo_fence_meters ?? 100;
+
+      try{
+        const pos = await getCurrentPosition({ enableHighAccuracy:true, timeout:12000, maximumAge:0 });
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        let dist = null;
+        let within = null;
+
+        if (typeof fenceLat === "number" && typeof fenceLng === "number"){
+          dist = distanceMeters(lat, lng, fenceLat, fenceLng);
+          within = dist <= fenceM;
+        }
+
+        taskStatus.textContent = "Saving check-in…";
+
+        const { error: insErr } = await sb.from('task_checkins').insert({
+          task_id: taskId,
+          user_id: (await sb.auth.getUser()).data.user.id,
+          lat, lng,
+          distance_meters: dist,
+          is_within_fence: within
+        });
+
+        if (insErr){
+          taskStatus.textContent = "Check-in insert blocked by policy (RLS).";
+          logDebug("task_checkins insert error: " + (insErr.message || ""));
+          return;
+        }
+
+        taskStatus.textContent = within === null
+          ? "Check-in saved (no fence coordinates set for this task)."
+          : within
+            ? `Check-in saved (within fence, ~${Math.round(dist)}m).`
+            : `Check-in saved (outside fence, ~${Math.round(dist)}m).`;
+
+      } catch(err){
+        taskStatus.textContent = "Could not get location (permission / timeout).";
+        logDebug("geolocation error: " + (err.message || String(err)));
+      }
+    }
+
+    async function refresh(){
+      const ctx = await requireStaff();
+      if (!ctx) return;
+      await loadTasks(ctx.user.id);
+    }
+
+    document.getElementById('refreshBtn')?.addEventListener('click', refresh);
+    document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+
+    // init
+    document.getElementById('year').textContent = new Date().getFullYear();
+    refreshAuthSlot();
+
+    // start
+    refresh();
+
+  </script>
+</body>
+</html>
