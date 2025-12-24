@@ -1,618 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Dashboard — FoodShare Seychelles</title>
-  <link rel="icon" href="/image/logo.png" type="image/png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Dashboard — FoodShare Seychelles</title>
+  <meta name="description" content="Your FoodShare Seychelles dashboard: profile, notifications, and your submission history." />
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --primary-light:#81C784; --primary-main:#4CAF50; --primary-dark:#388E3C;
-      --accent-blue:#2196F3; --accent-orange:#FF9800; --accent-red:#D32F2F;
-      --neutral-bg:#F9F9F9; --neutral-card:#FFFFFF; --text-dark:#333333; --text-light:#666666;
-      --shadow-subtle:0 10px 28px rgba(0,0,0,0.10);
-      --font-serif:'Georgia', serif; --font-sans:'Helvetica Neue', Arial, sans-serif;
-      --transition-speed:0.35s;
+    :root{
+      --bg:#fbfcfb; --surface:#fff; --text:#0f172a; --muted:#475569; --muted2:#64748b;
+      --border:rgba(15,23,42,.10); --shadowSoft:0 10px 26px rgba(2,6,23,.06);
+      --brand:#73b63b; --brand2:#5aa52f; --brandInk:#173a12;
+      --dark:#0b1220; --darkBorder:rgba(255,255,255,.10);
+      --max:1120px;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-sans);color:var(--text-dark);background:var(--neutral-bg);min-height:100vh;display:flex;flex-direction:column}
-    a{text-decoration:none;color:var(--primary-main)}
-    a:hover{color:var(--primary-dark)}
-    main{flex:1;padding:34px 0}
-    .content-container{max-width:1150px;margin:0 auto;padding:0 25px}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.45}
+    a{color:inherit;text-decoration:none} a:hover{text-decoration:underline}
+    .container{max-width:var(--max);margin:0 auto;padding:0 18px}
 
-    /* NAVBAR */
-    #navbar{display:flex;justify-content:space-between;align-items:center;padding:18px 25px;background:var(--neutral-card);box-shadow:0 4px 12px rgba(0,0,0,0.08);position:sticky;top:0;z-index:1000}
-    .logo-container{display:flex;align-items:center;font-size:1.6em;font-weight:bold;color:var(--text-dark)}
-    .logo-img{height:40px;margin-right:10px}
-    .nav-links-container{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-    .nav-link{font-weight:600;padding:8px 0;position:relative;color:var(--text-dark)}
-    .nav-link::after{content:'';position:absolute;width:0;height:2px;bottom:-5px;left:0;background:var(--primary-main);transition:width var(--transition-speed)}
-    .nav-link:hover::after{width:100%}
+    /* NAV */
+    .nav-wrap{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,23,42,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:74px;gap:14px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:170px}
+    .brand-logo{width:36px;height:36px;border-radius:10px;object-fit:contain;display:block}
+    .brand-name{display:flex;flex-direction:column;line-height:1.1}
+    .brand-name strong{font-size:14px;letter-spacing:.2px}
+    .brand-name span{font-size:12px;color:var(--muted2)}
+    .nav-links{display:flex;align-items:center;gap:18px}
+    .nav-item{font-size:14px;color:var(--muted);padding:10px 10px;border-radius:12px;transition:background .15s,color .15s}
+    .nav-item:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .cta{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;padding:10px 14px;border-radius:999px;font-size:14px;font-weight:750;box-shadow:0 8px 22px rgba(115,182,59,.20);transition:transform .15s,background .15s;white-space:nowrap}
+    .cta:hover{background:var(--brand2);transform:translateY(-1px);text-decoration:none}
+    select.lang{border:1px solid rgba(15,23,42,.14);background:rgba(255,255,255,.92);border-radius:999px;padding:10px 12px;font-size:14px;color:var(--muted);outline:none;cursor:pointer}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.80);color:var(--muted);font-size:14px;white-space:nowrap}
+    .pill button{border:none;background:transparent;cursor:pointer;color:inherit;font:inherit;padding:0}
+    .dropdown{position:relative}
+    .dropdown-btn{display:inline-flex;align-items:center;gap:8px;border:none;background:transparent;cursor:pointer;color:var(--muted);padding:10px 10px;border-radius:12px;font-size:14px}
+    .dropdown-btn:hover{background:rgba(115,182,59,.10);color:var(--brandInk)}
+    .dropdown-menu{position:absolute;right:0;top:calc(100% + 10px);width:240px;background:var(--surface);border:1px solid rgba(15,23,42,.10);border-radius:16px;box-shadow:var(--shadowSoft);padding:8px;display:none}
+    .dropdown-menu a{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;font-size:14px;color:var(--muted)}
+    .dropdown-menu a:hover{background:rgba(115,182,59,.10);color:var(--brandInk);text-decoration:none}
+    .dropdown.open .dropdown-menu{display:block}
+    .mobile-toggle{display:none;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.92);border-radius:14px;padding:10px 12px;cursor:pointer}
+    .mobile-panel{display:none;border-top:1px solid rgba(15,23,42,.08);padding:12px 0 18px}
+    .mobile-panel.open{display:block}
+    .stack{display:flex;flex-direction:column;gap:8px}
 
-    .nav-actions{display:flex;align-items:center;gap:12px}
-    .icon-btn{
-      position:relative; border:1px solid rgba(56,142,60,0.16);
-      background:#fff; border-radius:999px; padding:10px 12px; cursor:pointer;
-      transition:transform .12s ease, box-shadow .2s ease;
-    }
-    .icon-btn:hover{box-shadow:0 10px 18px rgba(0,0,0,0.08)}
-    .icon-btn:active{transform:translateY(1px)}
-    .badge{
-      position:absolute; top:-6px; right:-6px;
-      background:var(--accent-red); color:#fff; font-weight:900;
-      font-size:.75rem; padding:4px 7px; border-radius:999px;
-      border:2px solid #fff;
-      display:none;
-    }
-    .user-chip{
-      display:flex;align-items:center;gap:10px;
-      padding:8px 10px;border-radius:999px;background:rgba(129,199,132,0.15);
-      border:1px solid rgba(56,142,60,0.18);
-      max-width:260px;
-    }
-    .avatar{
-      width:34px;height:34px;border-radius:50%;object-fit:cover;
-      border:2px solid rgba(56,142,60,0.25); background:#fff;
-    }
-    .user-chip b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .user-chip span{display:block;font-size:.82rem;color:var(--text-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* PAGE */
+    .page{padding:36px 0 56px}
+    .title{text-align:center}
+    .title h1{margin:0 auto;font-size:clamp(26px,3vw,40px);letter-spacing:-.4px;line-height:1.1;max-width:900px;color:#2f5b1f;font-weight:900}
+    .title p{margin:12px auto 0;max-width:900px;color:var(--muted);font-size:15px}
+
+    .grid{margin-top:18px;display:grid;grid-template-columns:1fr;gap:16px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .card{background:rgba(255,255,255,.95);border:1px solid rgba(15,23,42,.10);border-radius:22px;padding:18px;box-shadow:0 10px 22px rgba(2,6,23,.04)}
+    .card h2{margin:0;font-size:18px;letter-spacing:-.2px}
+    .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.55}
+    .status{margin-top:10px;color:var(--muted);font-size:13px;white-space:pre-wrap}
+
+    .kvs{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .kv{border:1px solid rgba(15,23,42,.10);border-radius:18px;padding:12px 14px;background:rgba(251,252,251,.98)}
+    .kv strong{display:block;font-size:12px;color:var(--muted2)}
+    .kv span{display:block;margin-top:6px;font-weight:900;color:var(--text);font-size:14px}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:999px;border:1px solid rgba(15,23,42,.12);background:rgba(255,255,255,.95);color:var(--text);font-weight:900;font-size:13px;cursor:pointer;transition:transform .15s,background .15s;white-space:nowrap}
+    .btn:hover{background:#fff;transform:translateY(-1px)}
+    .btn.primary{background:var(--brand);color:#fff;border-color:transparent;box-shadow:0 8px 22px rgba(115,182,59,.20)}
+    .btn.primary:hover{background:var(--brand2)}
+    .btn.link{background:transparent;border:none;padding:0;color:var(--brandInk);font-weight:900}
+    .btn.link:hover{text-decoration:underline;transform:none}
+
+    table{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:12px}
+    th{font-size:12px;color:var(--muted2);text-align:left;padding:0 10px}
+    td{background:rgba(251,252,251,.98);border:1px solid rgba(15,23,42,.10);padding:10px;border-left:none;border-right:none;font-size:13px;color:var(--muted)}
+    tr td:first-child{border-left:1px solid rgba(15,23,42,.10);border-top-left-radius:14px;border-bottom-left-radius:14px}
+    tr td:last-child{border-right:1px solid rgba(15,23,42,.10);border-top-right-radius:14px;border-bottom-right-radius:14px}
+    .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(15,23,42,.10);background:rgba(255,255,255,.92);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
+
+    details{margin-top:10px}
+    details summary{cursor:pointer;color:var(--brandInk);font-weight:900}
 
     /* FOOTER */
-    #main-footer{margin-top:auto;background:#222;color:var(--neutral-bg);padding:50px 0 20px;font-size:.9em}
-    .footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:30px;max-width:1200px;margin:0 auto 30px;padding:0 25px;gap:18px}
-    .footer-section{width:20%;min-width:180px;margin-bottom:20px}
-    .footer-section h3{color:var(--primary-light);margin-bottom:14px;font-size:1.1em;border-bottom:1px solid rgba(255,255,255,0.12);padding-bottom:6px}
-    .footer-section a{color:var(--neutral-bg);display:block;padding:3px 0}
-    .footer-section a:hover{color:var(--primary-main);text-decoration:underline}
-    .footer-bottom{text-align:center;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);color:#aaa;font-size:.85em}
+    footer{background:linear-gradient(180deg,var(--dark) 0%,#070b14 100%);color:rgba(255,255,255,.86);border-top:1px solid var(--darkBorder)}
+    .footer-top{padding:44px 0 22px}
+    .footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:18px}
+    .foot-title{font-weight:900;color:#fff;margin:0 0 10px;font-size:14px}
+    .foot-text{margin:0;color:rgba(255,255,255,.70);font-size:13px;line-height:1.55}
+    .foot-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:rgba(255,255,255,.74)}
+    .foot-links a{color:rgba(255,255,255,.74)} .foot-links a:hover{color:#fff;text-decoration:none}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.10);padding:14px 0;font-size:13px;color:rgba(255,255,255,.70)}
+    .footer-bottom-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .footer-bottom a{color:rgba(255,255,255,.85);text-decoration:underline}
 
-    /* LAYOUT */
-    .grid{display:grid;grid-template-columns: 1.05fr 0.95fr;gap:18px;align-items:start}
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
-
-    .card{
-      background:var(--neutral-card);
-      border-radius:16px;
-      box-shadow:var(--shadow-subtle);
-      border:1px solid rgba(56,142,60,0.14);
-      overflow:hidden;
-      position:relative;
-    }
-    .card::before{
-      content:"";position:absolute;left:0;top:0;right:0;height:6px;
-      background:linear-gradient(90deg,var(--primary-dark),var(--primary-main),var(--primary-light));
-    }
-    .card-inner{padding:22px}
-    h1,h2{font-family:var(--font-serif);color:var(--primary-dark)}
-    h1{font-size:1.85rem;margin-bottom:6px}
-    .sub{color:var(--text-light);line-height:1.7}
-
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-    .btn{
-      border:none;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer;
-      background:var(--primary-main);color:#fff;box-shadow:0 10px 18px rgba(0,0,0,0.10);
-    }
-    .btn:hover{background:var(--primary-dark)}
-    .btn.ghost{
-      background:#fff;color:var(--primary-dark);border:1px solid rgba(56,142,60,0.22);box-shadow:none;
-    }
-    .btn.ghost:hover{background:rgba(129,199,132,0.12)}
-    .btn:disabled{opacity:.6;cursor:not-allowed}
-
-    .list{margin-top:14px;display:grid;gap:10px}
-    .item{
-      border:1px solid rgba(0,0,0,0.06);
-      border-radius:14px;
-      padding:12px;
-      background:#fff;
-    }
-    .item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-    .pill{
-      font-size:.78rem;font-weight:900;padding:6px 10px;border-radius:999px;
-      background:rgba(129,199,132,0.18);
-      border:1px solid rgba(56,142,60,0.22);
-      color:var(--primary-dark);
-      white-space:nowrap;
-    }
-    .item p{margin-top:6px;color:var(--text-light);line-height:1.55}
-    .muted{color:var(--text-light);font-size:.95rem}
-
-    /* Notification dropdown */
-    .dropdown{
-      position:absolute; right:0; top:54px;
-      width:min(420px, 92vw);
-      background:#fff;
-      border:1px solid rgba(0,0,0,0.10);
-      border-radius:14px;
-      box-shadow:0 18px 40px rgba(0,0,0,0.12);
-      display:none;
-      overflow:hidden;
-      z-index:2000;
-    }
-    .dropdown header{
-      padding:12px 14px;
-      display:flex;justify-content:space-between;align-items:center;gap:10px;
-      background:rgba(129,199,132,0.16);
-      border-bottom:1px solid rgba(56,142,60,0.14);
-      font-weight:900;color:var(--primary-dark);
-    }
-    .dropdown .body{max-height:420px;overflow:auto}
-    .drop-item{
-      padding:12px 14px;border-bottom:1px solid rgba(0,0,0,0.06);
-    }
-    .drop-item:last-child{border-bottom:none}
-    .drop-item b{display:block}
-    .drop-item .meta{margin-top:4px;font-size:.85rem;color:var(--text-light)}
-    .drop-item.unread{background:rgba(33,150,243,0.06)}
-    .link-btn{border:none;background:transparent;color:var(--accent-blue);font-weight:900;cursor:pointer}
-    .link-btn:hover{text-decoration:underline}
-
-    /* Toast */
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%);
-      bottom:20px;
-      background:#fff;
-      border:1px solid rgba(0,0,0,0.12);
-      box-shadow:0 18px 40px rgba(0,0,0,0.12);
-      border-radius:14px;
-      padding:12px 14px;
-      width:min(520px, 92vw);
-      display:none;
-      z-index:3000;
-    }
-    .toast b{color:var(--primary-dark)}
-    .toast p{margin-top:4px;color:var(--text-light);line-height:1.45}
-
-    /* Loading overlay */
-    .loading{
-      position:fixed; inset:0; background:rgba(249,249,249,0.9);
-      display:flex; align-items:center; justify-content:center; z-index:5000;
-    }
-    .spinner{
-      width:52px;height:52px;border-radius:50%;
-      border:5px solid rgba(76,175,80,0.18);
-      border-top-color: var(--primary-main);
-      animation: spin .9s linear infinite;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* Floating assistance button (stub now; links to your assistance form) */
-    .assist-btn{
-      position:fixed; right:18px; bottom:18px;
-      width:56px; height:56px; border-radius:50%;
-      background:var(--accent-blue); color:#fff;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 18px 40px rgba(0,0,0,0.18);
-      cursor:pointer; z-index:2500;
-      border: none;
-    }
-    .assist-btn:hover{filter:brightness(0.95)}
+    @media(max-width:980px){.row2{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:860px){.nav-links{display:none}.mobile-toggle{display:inline-flex}}
   </style>
+</head>
+<body>
+  <!-- NAV -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="/image/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span>Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/">Find Food</a>
+          <a class="nav-item" href="../about-us/">About</a>
+          <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem">Learn</a>
+              <a href="../our-impact/" role="menuitem">Our Impact</a>
+              <a href="../our-partners/" role="menuitem">Our Partners</a>
+              <a href="../contact-us/" role="menuitem">Contact Us</a>
+              <a href="../social-media/" role="menuitem">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem">Sitemap</a>
+              <a href="../staff-login/" role="menuitem">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot"><a href="../auth/" id="authLink">Login</a></span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
+      </div>
+
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/">Find Food</a>
+            <a class="nav-item" href="../about-us/">About</a>
+            <a class="nav-item" href="../volunteer-now/">Volunteer</a>
+            <a class="nav-item" href="../donate-now/">Donate Now</a>
+            <a class="nav-item" href="../learn/">Learn</a>
+            <a class="nav-item" href="../our-impact/">Our Impact</a>
+            <a class="nav-item" href="../our-partners/">Our Partners</a>
+            <a class="nav-item" href="../contact-us/">Contact Us</a>
+            <a class="nav-item" href="../social-media/">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/">Sitemap</a>
+            <a class="nav-item" href="../staff-login/">Staff Login</a>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option><option value="cr">Kreol</option><option value="fr">Français</option>
+              </select>
+              <span class="pill" id="authSlotMobile"><a href="../auth/" id="authLinkMobile">Login</a></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <main>
+    <section class="page">
+      <div class="container">
+        <div class="title">
+          <h1>Your Dashboard</h1>
+          <p>Profile, notifications, and your own submission history. If a section says “blocked by policy,” it means your RLS rules don’t allow that action.</p>
+        </div>
+
+        <div class="grid">
+          <div class="card">
+            <h2>Profile</h2>
+            <div class="sub">This is private to you (and admins when needed).</div>
+            <div class="kvs" id="profileKvs"></div>
+            <div class="status" id="profileStatus"></div>
+          </div>
+
+          <div class="row2">
+            <div class="card">
+              <h2>Notifications</h2>
+              <div class="sub">You can read your notifications. Marking “read” may be blocked depending on policies.</div>
+              <div class="status" id="notifStatus"></div>
+              <div id="notifList"></div>
+            </div>
+
+            <div class="card">
+              <h2>Quick actions</h2>
+              <div class="sub">Common actions for community members.</div>
+              <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+                <a class="btn primary" href="../find-food/">Find Food</a>
+                <a class="btn" href="../donate-now/">Donate Now</a>
+                <a class="btn" href="../volunteer-now/">Volunteer Now</a>
+                <a class="btn" href="../contact-us/">Contact Us</a>
+              </div>
+              <div class="status" id="roleNote" style="margin-top:12px;"></div>
+
+              <details>
+                <summary>Debug (show technical errors)</summary>
+                <div class="status" id="debugLog"></div>
+              </details>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="card">
+              <h2>Your Donations</h2>
+              <div class="sub">Read-only list of your donations.</div>
+              <div class="status" id="donStatus"></div>
+              <div id="donTableWrap"></div>
+            </div>
+
+            <div class="card">
+              <h2>Your Claims</h2>
+              <div class="sub">Read-only list of your claims (requests).</div>
+              <div class="status" id="claimStatus"></div>
+              <div id="claimTableWrap"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Your Volunteer Applications</h2>
+            <div class="sub">Read-only list of your volunteer application status.</div>
+            <div class="status" id="volStatus"></div>
+            <div id="volTableWrap"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.</p>
+          </div>
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a><a href="../about-us/">About Us</a><a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a><a href="../our-partners/">Our Partners</a><a href="../social-media/">Social Media</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a><a href="../donate-now/">Donate Now</a><a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a><a href="../auth/">Login</a><a href="../staff-login/">Staff Login</a>
+            </div>
+          </div>
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a><a href="../terms-of-use/">Terms Of Use</a><a href="../sitemap/">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> Website made by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a></span>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script>
     const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
-    let supabase;
-    let currentUser = null;
-    let lastToastAt = 0;
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function qs(id){ return document.getElementById(id); }
-
-    function setLoading(show){
-      qs('loading').style.display = show ? 'flex' : 'none';
+    // ---------- small helpers ----------
+    const debugEl = document.getElementById('debugLog');
+    function logDebug(msg){
+      if (!debugEl) return;
+      debugEl.textContent = (debugEl.textContent ? debugEl.textContent + "\n" : "") + msg;
+    }
+    function esc(s){
+      return String(s ?? "").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+    }
+    function niceErr(prefix, err){
+      const raw = (err && (err.message || err.error_description)) ? (err.message || err.error_description) : String(err || "");
+      logDebug(prefix + ": " + raw);
+      return raw || "Unknown error";
     }
 
-    function toggleDropdown(show){
-      qs('notifDropdown').style.display = show ? 'block' : 'none';
+    // ---------- navbar ----------
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){ moreDropdown?.classList.remove('open'); moreBtn?.setAttribute('aria-expanded','false'); }
+    moreBtn?.addEventListener('click', (e)=>{ e.preventDefault(); const open = moreDropdown.classList.toggle('open'); moreBtn.setAttribute('aria-expanded', String(open)); });
+    document.addEventListener('click', (e)=>{ if (moreDropdown && !moreDropdown.contains(e.target)) closeMore(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeMore(); });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', ()=> mobilePanel.classList.toggle('open'));
+
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
     }
 
-    function setBadge(count){
-      const b = qs('notifBadge');
-      if (!count || count <= 0){ b.style.display = 'none'; b.textContent = ''; return; }
-      b.style.display = 'inline-block';
-      b.textContent = String(count);
-    }
-
-    function fmtTime(ts){
-      try { return new Date(ts).toLocaleString(); } catch { return ''; }
-    }
-
-    function toast(title, body){
-      const now = Date.now();
-      if (now - lastToastAt < 2500) return;
-      lastToastAt = now;
-
-      qs('toastTitle').textContent = title || 'Update';
-      qs('toastBody').textContent = body || '';
-      qs('toast').style.display = 'block';
-      setTimeout(() => { qs('toast').style.display = 'none'; }, 5200);
-    }
-
-    async function authGuard(){
-      const { data } = await supabase.auth.getSession();
-      if (!data?.session?.user){
-        window.location.href = '/account/';
+    // ---------- auth + role gating ----------
+    async function getUserOrRedirect(){
+      const { data, error } = await sb.auth.getSession();
+      if (error) logDebug("getSession error: " + (error.message || ""));
+      const user = data?.session?.user || null;
+      if (!user){
+        location.href = "../auth/";
         return null;
       }
-      currentUser = data.session.user;
-      return currentUser;
+      return user;
     }
 
-    async function loadProfile(){
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('full_name,email,phone,avatar_url,role,linkedin_url')
-        .eq('id', currentUser.id)
-        .single();
+    async function getOrCreateProfile(user){
+      // Try read profile (may be missing for new users)
+      let prof = null;
 
-      if (error){
-        qs('welcomeName').textContent = 'Welcome';
-        return;
+      const res = await sb.from('profiles')
+        .select('role_id, display_name, phone, is_active')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (res.error){
+        // If RLS blocks profile read, we still continue with safe defaults
+        niceErr("profiles select blocked", res.error);
+        return { role_id: 4, display_name: null, phone: null, is_active: true, _blocked:true };
       }
 
-      const name = data.full_name || 'Community Member';
-      qs('welcomeName').textContent = `Welcome, ${name}`;
-      qs('chipName').textContent = name;
-      qs('chipEmail').textContent = data.email || currentUser.email || '';
+      prof = res.data;
 
-      const avatar = data.avatar_url && data.avatar_url.trim() ? data.avatar_url.trim() : '/image/logo.png';
-      qs('avatarImg').src = avatar;
-      qs('avatarImg').alt = name + ' avatar';
+      if (!prof){
+        // Best-effort insert (only works if your RLS allows user to create own profile)
+        const ins = await sb.from('profiles').insert({
+          user_id: user.id,
+          role_id: 4,
+          display_name: null,
+          phone: null,
+          is_active: true
+        });
 
-      qs('profileName').textContent = name;
-      qs('profileEmail').textContent = data.email || currentUser.email || '';
-      qs('profilePhone').textContent = data.phone || 'Not set';
-      qs('profileLinkedIn').innerHTML = data.linkedin_url
-        ? `<a href="${data.linkedin_url}" target="_blank" rel="noopener">View LinkedIn</a>`
-        : 'Not set';
-    }
+        if (ins.error){
+          niceErr("profiles insert failed", ins.error);
+          // Continue with defaults anyway
+          return { role_id: 4, display_name: null, phone: null, is_active: true, _insertFailed:true };
+        }
 
-    async function updateAvatar(){
-      const url = prompt('Paste your profile picture URL (must be a direct image URL):');
-      if (!url) return;
+        // read again
+        const again = await sb.from('profiles')
+          .select('role_id, display_name, phone, is_active')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({ avatar_url: url, updated_at: new Date().toISOString() })
-        .eq('id', currentUser.id);
-
-      if (error) return toast('Update failed', error.message);
-      toast('Profile updated', 'Your profile picture has been updated.');
-      await loadProfile();
-    }
-
-    async function loadNotifications(){
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('id,title,body,type,is_read,created_at')
-        .eq('user_id', currentUser.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error){
-        qs('notifList').innerHTML = `<div class="drop-item">Failed to load notifications.</div>`;
-        setBadge(0);
-        return;
+        if (again.error){
+          niceErr("profiles re-select failed", again.error);
+          return { role_id: 4, display_name: null, phone: null, is_active: true };
+        }
+        prof = again.data;
       }
 
-      const unread = data.filter(n => !n.is_read).length;
-      setBadge(unread);
-
-      if (!data.length){
-        qs('notifList').innerHTML = `<div class="drop-item">No notifications yet.</div>`;
-        return;
-      }
-
-      qs('notifList').innerHTML = data.map(n => `
-        <div class="drop-item ${n.is_read ? '' : 'unread'}">
-          <b>${n.title}</b>
-          <div class="meta">${fmtTime(n.created_at)} • ${n.type}</div>
-          <div class="meta" style="margin-top:6px;">${n.body}</div>
-          ${n.is_read ? '' : `<div style="margin-top:8px;"><button class="link-btn" onclick="markNotifRead('${n.id}')">Mark read</button></div>`}
-        </div>
-      `).join('');
+      return prof || { role_id: 4, display_name: null, phone: null, is_active: true };
     }
 
-    async function markNotifRead(id){
-      const { error } = await supabase
+    async function setAuthUI(user, roleId){
+      const desktop = document.getElementById('authSlot');
+      const mobile = document.getElementById('authSlotMobile');
+      const desktopLink = document.getElementById('authLink');
+      const mobileLink = document.getElementById('authLinkMobile');
+
+      if (!desktop || !mobile) return;
+
+      // Redirect staff/admin away from user dashboard
+      if (roleId === 1) { location.href = "../admin-dashboard/"; return; }
+      if (roleId === 2 || roleId === 3) { location.href = "../staff-dashboard/"; return; }
+
+      // Show signed in UI
+      desktop.innerHTML = `<span style="font-weight:900;">Dashboard</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtn" style="font-weight:900;">Sign out</button>`;
+      mobile.innerHTML = `<span style="font-weight:900;">Dashboard</span>
+        <span style="opacity:.45;padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnMobile" style="font-weight:900;">Sign out</button>`;
+
+      document.getElementById('signOutBtn')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+      document.getElementById('signOutBtnMobile')?.addEventListener('click', async ()=>{ await sb.auth.signOut(); location.href="../"; });
+
+      // keep links sane if they exist
+      if (desktopLink) desktopLink.href = "#";
+      if (mobileLink) mobileLink.href = "#";
+    }
+
+    function renderProfile(user, prof){
+      const wrap = document.getElementById('profileKvs');
+      const st = document.getElementById('profileStatus');
+      const roleNote = document.getElementById('roleNote');
+
+      if (!wrap || !st || !roleNote) return;
+
+      wrap.innerHTML = `
+        <div class="kv"><strong>Email</strong><span>${esc(user.email || "—")}</span></div>
+        <div class="kv"><strong>Display name</strong><span>${esc(prof.display_name || "—")}</span></div>
+        <div class="kv"><strong>Phone</strong><span>${esc(prof.phone || "—")}</span></div>
+        <div class="kv"><strong>Account status</strong><span>${prof.is_active === false ? "Inactive" : "Active"}</span></div>
+      `;
+
+      st.textContent = prof._blocked
+        ? "Profile read may be blocked by policy (RLS). Dashboard will still work with limited profile details."
+        : "";
+
+      roleNote.textContent = "You are signed in as a Community Member. You can view your own submissions and notifications.";
+    }
+
+    function renderTable(cols, rows){
+      const head = cols.map(c=>`<th>${esc(c.label)}</th>`).join('');
+      const body = rows.map(r=>{
+        const tds = cols.map(c=>`<td>${esc(c.get(r))}</td>`).join('');
+        return `<tr>${tds}</tr>`;
+      }).join('');
+      return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    }
+
+    // ---------- loaders (each isolated so one failure doesn't break the page) ----------
+    async function loadNotifications(userId){
+      const st = document.getElementById('notifStatus');
+      const list = document.getElementById('notifList');
+      if (!st || !list) return;
+
+      st.textContent = "Loading notifications…";
+      list.innerHTML = "";
+
+      const { data, error } = await sb
         .from('notifications')
-        .update({ is_read: true })
-        .eq('id', id)
-        .eq('user_id', currentUser.id);
-
-      if (error) return toast('Update failed', error.message);
-      await loadNotifications();
-    }
-
-    async function markAllRead(){
-      const { error } = await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', currentUser.id)
-        .eq('is_read', false);
-
-      if (error) return toast('Update failed', error.message);
-      await loadNotifications();
-    }
-
-    async function loadAdminMessages(){
-      const { data, error } = await supabase
-        .from('admin_messages')
-        .select('id,subject,message,created_at,is_read')
-        .eq('recipient_id', currentUser.id)
-        .order('created_at', { ascending: false })
+        .select('id, created_at, title, body, link_path, is_read')
+        .eq('user_id', userId)
+        .order('created_at', { ascending:false })
         .limit(10);
 
       if (error){
-        qs('msgList').innerHTML = `<div class="item"><b>Messages</b><p>Failed to load messages.</p></div>`;
+        st.textContent = "Notifications unavailable (blocked by policy).";
+        niceErr("notifications select", error);
         return;
       }
 
-      if (!data.length){
-        qs('msgList').innerHTML = `<div class="item"><b>No messages yet</b><p class="muted">When admins contact you, messages will appear here.</p></div>`;
+      if (!data || data.length === 0){
+        st.textContent = "No notifications yet.";
         return;
       }
 
-      qs('msgList').innerHTML = data.map(m => `
-        <div class="item">
-          <div class="top">
-            <div>
-              <b>${m.subject}</b>
-              <div class="muted">${fmtTime(m.created_at)} ${m.is_read ? '' : '• Unread'}</div>
+      st.textContent = "";
+      list.innerHTML = data.map(n=>`
+        <div style="border:1px solid rgba(15,23,42,.10);border-radius:18px;padding:12px 14px;background:rgba(251,252,251,.98);margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <span class="badge">${n.is_read ? "Read" : "Unread"}</span>
+              <strong style="color:var(--text);font-size:13px;">${esc(n.title)}</strong>
             </div>
-            ${m.is_read ? '' : `<button class="btn ghost" onclick="markMsgRead('${m.id}')">Mark read</button>`}
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              ${n.link_path ? `<a class="btn link" href="${esc(n.link_path)}">Open</a>` : ``}
+              ${!n.is_read ? `<button class="btn" data-markread="${esc(n.id)}">Mark read</button>` : ``}
+            </div>
           </div>
-          <p>${m.message}</p>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px;">${esc(n.body)}</div>
+          <div style="margin-top:8px;color:var(--muted2);font-size:12px;">${new Date(n.created_at).toLocaleString()}</div>
         </div>
       `).join('');
-    }
 
-    async function markMsgRead(id){
-      const { error } = await supabase
-        .from('admin_messages')
-        .update({ is_read: true })
-        .eq('id', id)
-        .eq('recipient_id', currentUser.id);
+      // Best-effort mark read (won’t crash if blocked)
+      document.querySelectorAll('[data-markread]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-markread');
+          const { error: upErr } = await sb.from('notifications')
+            .update({ is_read:true })
+            .eq('id', id)
+            .eq('user_id', userId);
 
-      if (error) return toast('Update failed', error.message);
-      await loadAdminMessages();
-    }
-
-    async function loadMyActivity(){
-      // Optional: show recent claims/donations/apps if those tables exist
-      let html = '';
-
-      // Claims
-      try {
-        const { data } = await supabase
-          .from('claims')
-          .select('id,claim_type,status,created_at,listing_ref')
-          .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false })
-          .limit(5);
-        if (data?.length){
-          html += `<div class="item"><div class="top"><b>Recent Claims</b><span class="pill">Last 5</span></div>
-                   <p class="muted">${data.map(x => `${x.claim_type} • ${x.status} • ${fmtTime(x.created_at)}`).join('<br>')}</p></div>`;
-        }
-      } catch {}
-
-      // Donations
-      try {
-        const { data } = await supabase
-          .from('donations')
-          .select('id,status,created_at,food_type,quantity_kg')
-          .eq('user_id', currentUser.id)
-          .order('created_at', { ascending: false })
-          .limit(5);
-        if (data?.length){
-          html += `<div class="item"><div class="top"><b>Recent Donations</b><span class="pill">Last 5</span></div>
-                   <p class="muted">${data.map(x => `${x.food_type || 'Donation'} • ${x.status || 'Submitted'} • ${fmtTime(x.created_at)}`).join('<br>')}</p></div>`;
-        }
-      } catch {}
-
-      // Volunteer apps
-      try {
-        const { data } = await supabase
-          .from('volunteer_applications')
-          .select('id,status,submitted_at')
-          .eq('user_id', currentUser.id)
-          .order('submitted_at', { ascending: false })
-          .limit(3);
-        if (data?.length){
-          html += `<div class="item"><div class="top"><b>Volunteer Application</b><span class="pill">Latest</span></div>
-                   <p class="muted">${data.map(x => `${x.status || 'Submitted'} • ${fmtTime(x.submitted_at)}`).join('<br>')}</p></div>`;
-        }
-      } catch {}
-
-      if (!html) html = `<div class="item"><b>No recent activity yet</b><p class="muted">Once you submit a claim, donation, or application, it will appear here.</p></div>`;
-      qs('activityList').innerHTML = html;
-    }
-
-    async function logout(){
-      await supabase.auth.signOut();
-      window.location.href = '/account/';
-    }
-
-    async function pollNewNotifications(){
-      // lightweight: just refresh counts + show toast if new unread arrives
-      await loadNotifications();
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      setLoading(true);
-      const u = await authGuard();
-      if (!u) return;
-
-      await loadProfile();
-      await loadNotifications();
-      await loadAdminMessages();
-      await loadMyActivity();
-
-      // Navbar actions
-      qs('notifBtn').addEventListener('click', () => {
-        const open = qs('notifDropdown').style.display === 'block';
-        toggleDropdown(!open);
+          if (upErr){
+            niceErr("notifications update blocked", upErr);
+            alert("Mark read is blocked by policy (RLS).");
+            return;
+          }
+          await loadNotifications(userId);
+        });
       });
-      document.addEventListener('click', (e) => {
-        const dd = qs('notifDropdown');
-        const btn = qs('notifBtn');
-        if (!dd.contains(e.target) && !btn.contains(e.target)) toggleDropdown(false);
-      });
+    }
 
-      qs('markAllReadBtn').addEventListener('click', markAllRead);
-      qs('logoutBtn').addEventListener('click', logout);
-      qs('updateAvatarBtn').addEventListener('click', updateAvatar);
+    async function loadDonations(userId){
+      const st = document.getElementById('donStatus');
+      const wrap = document.getElementById('donTableWrap');
+      if (!st || !wrap) return;
 
-      // Poll notifications every 25s (simple + reliable)
-      setInterval(pollNewNotifications, 25000);
+      st.textContent = "Loading donations…";
+      wrap.innerHTML = "";
 
-      setLoading(false);
-    });
+      const { data, error } = await sb
+        .from('donations')
+        .select('created_at, donor_type, pickup_address, preferred_pickup_window, estimated_kg, status')
+        .eq('user_id', userId)
+        .order('created_at', { ascending:false })
+        .limit(10);
+
+      if (error){
+        st.textContent = "Donations unavailable (blocked by policy).";
+        niceErr("donations select", error);
+        return;
+      }
+      if (!data || data.length === 0){
+        st.textContent = "No donations yet.";
+        return;
+      }
+
+      st.textContent = "";
+      wrap.innerHTML = renderTable(
+        [
+          { label:"Date", get:r=> new Date(r.created_at).toLocaleDateString() },
+          { label:"Type", get:r=> r.donor_type || "—" },
+          { label:"Pickup", get:r=> r.pickup_address || "—" },
+          { label:"Window", get:r=> r.preferred_pickup_window || "—" },
+          { label:"KG", get:r=> (r.estimated_kg ?? "—") },
+          { label:"Status", get:r=> r.status || "—" }
+        ],
+        data
+      );
+    }
+
+    async function loadClaims(userId){
+      const st = document.getElementById('claimStatus');
+      const wrap = document.getElementById('claimTableWrap');
+      if (!st || !wrap) return;
+
+      st.textContent = "Loading claims…";
+      wrap.innerHTML = "";
+
+      const { data, error } = await sb
+        .from('claims')
+        .select('created_at, status, claim_notes, listing_id')
+        .eq('user_id', userId)
+        .order('created_at', { ascending:false })
+        .limit(10);
+
+      if (error){
+        st.textContent = "Claims unavailable (blocked by policy).";
+        niceErr("claims select", error);
+        return;
+      }
+      if (!data || data.length === 0){
+        st.textContent = "No claims yet.";
+        return;
+      }
+
+      st.textContent = "";
+      wrap.innerHTML = renderTable(
+        [
+          { label:"Date", get:r=> new Date(r.created_at).toLocaleDateString() },
+          { label:"Listing", get:r=> (r.listing_id ? String(r.listing_id).slice(0,8) + "…" : "—") },
+          { label:"Notes", get:r=> (r.claim_notes || "—") },
+          { label:"Status", get:r=> r.status || "—" }
+        ],
+        data
+      );
+    }
+
+    async function loadVolunteerApps(userId){
+      const st = document.getElementById('volStatus');
+      const wrap = document.getElementById('volTableWrap');
+      if (!st || !wrap) return;
+
+      st.textContent = "Loading volunteer applications…";
+      wrap.innerHTML = "";
+
+      const { data, error } = await sb
+        .from('volunteer_applications')
+        .select('created_at, areas_of_interest, availability, status')
+        .eq('user_id', userId)
+        .order('created_at', { ascending:false })
+        .limit(10);
+
+      if (error){
+        st.textContent = "Volunteer applications unavailable (blocked by policy).";
+        niceErr("volunteer_applications select", error);
+        return;
+      }
+      if (!data || data.length === 0){
+        st.textContent = "No volunteer applications yet.";
+        return;
+      }
+
+      st.textContent = "";
+      wrap.innerHTML = renderTable(
+        [
+          { label:"Date", get:r=> new Date(r.created_at).toLocaleDateString() },
+          { label:"Interest", get:r=> r.areas_of_interest || "—" },
+          { label:"Availability", get:r=> r.availability || "—" },
+          { label:"Status", get:r=> r.status || "—" }
+        ],
+        data
+      );
+    }
+
+    // ---------- init ----------
+    (async function init(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      const lang = getSavedLang();
+      applyLanguage(lang);
+      document.getElementById('langSelect')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+      document.getElementById('langSelectMobile')?.addEventListener('change', (e)=>{ localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+
+      // Catch unexpected runtime errors and show them in Debug
+      window.addEventListener('error', (ev)=> logDebug("Runtime error: " + (ev.message || "unknown")));
+      window.addEventListener('unhandledrejection', (ev)=> logDebug("Unhandled promise: " + (ev.reason?.message || String(ev.reason||"unknown"))));
+
+      const user = await getUserOrRedirect();
+      if (!user) return;
+
+      const prof = await getOrCreateProfile(user);
+      const roleId = prof?.role_id ?? 4;
+
+      await setAuthUI(user, roleId);
+      renderProfile(user, prof);
+
+      // Load sections in parallel (fast), but isolated (won’t break each other)
+      await Promise.allSettled([
+        loadNotifications(user.id),
+        loadDonations(user.id),
+        loadClaims(user.id),
+        loadVolunteerApps(user.id)
+      ]);
+    })();
   </script>
-</head>
-
-<body>
-  <div id="loading" class="loading" aria-label="Loading">
-    <div class="spinner" aria-hidden="true"></div>
-  </div>
-
-  <header id="navbar">
-    <a href="/" class="logo-container">
-      <img src="/image/logo.png" alt="FoodShare Seychelles Logo" class="logo-img">
-      FoodShare <span style="color: var(--primary-main);">Seychelles</span>
-    </a>
-
-    <nav class="nav-links-container">
-      <a href="/available-food/" class="nav-link">Find Food</a>
-      <a href="/donate-now/" class="nav-link">Donate</a>
-      <a href="/volunteer-now/" class="nav-link">Volunteer</a>
-      <a href="/our-impact/" class="nav-link">Impact</a>
-      <a href="/about/" class="nav-link">About Us</a>
-    </nav>
-
-    <div class="nav-actions" style="position:relative;">
-      <div class="user-chip" title="My account">
-        <img id="avatarImg" class="avatar" src="/image/logo.png" alt="avatar">
-        <div style="min-width:0;">
-          <b id="chipName">Loading...</b>
-          <span id="chipEmail">...</span>
-        </div>
-      </div>
-
-      <button id="notifBtn" class="icon-btn" type="button" aria-label="Notifications">
-        <i class="fa-solid fa-bell"></i>
-        <span id="notifBadge" class="badge">0</span>
-      </button>
-
-      <button id="logoutBtn" class="icon-btn" type="button" aria-label="Logout">
-        <i class="fa-solid fa-right-from-bracket"></i>
-      </button>
-
-      <div id="notifDropdown" class="dropdown" role="dialog" aria-label="Notifications dropdown">
-        <header>
-          <span>Notifications</span>
-          <button id="markAllReadBtn" class="link-btn" type="button">Mark all read</button>
-        </header>
-        <div id="notifList" class="body"></div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <div class="content-container">
-      <div class="row" style="margin-bottom:14px;">
-        <div>
-          <h1 id="welcomeName">Welcome</h1>
-          <div class="sub">This is your personal dashboard. You will receive updates here after you submit requests.</div>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn" href="/available-food/"><i class="fa-solid fa-basket-shopping" style="margin-right:8px;"></i>Find Food</a>
-          <a class="btn ghost" href="/donate-now/"><i class="fa-solid fa-hand-holding-heart" style="margin-right:8px;"></i>Donate</a>
-        </div>
-      </div>
-
-      <div class="grid">
-        <section class="card">
-          <div class="card-inner">
-            <h2 style="margin-bottom:6px;">My Profile</h2>
-            <div class="sub">Keep your details up to date for smoother communication.</div>
-
-            <div class="list">
-              <div class="item">
-                <div class="top">
-                  <div>
-                    <b id="profileName">—</b>
-                    <div class="muted" id="profileEmail">—</div>
-                  </div>
-                  <button id="updateAvatarBtn" class="btn ghost" type="button">Update Photo</button>
-                </div>
-                <p><b>Phone:</b> <span id="profilePhone">—</span></p>
-                <p><b>LinkedIn:</b> <span id="profileLinkedIn">—</span></p>
-              </div>
-
-              <div class="item">
-                <div class="top">
-                  <b>Quick Actions</b>
-                  <span class="pill">v1.1</span>
-                </div>
-                <p class="muted">
-                  Submit requests using the website pages:
-                  <br>• Claim food: <a href="/available-food/">Find Food</a>
-                  <br>• Donate: <a href="/donate-now/">Donate Now</a>
-                  <br>• Volunteer: <a href="/volunteer-now/">Volunteer Now</a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside class="card">
-          <div class="card-inner">
-            <h2 style="margin-bottom:6px;">Updates & Messages</h2>
-            <div class="sub">Official messages from admins will appear below.</div>
-
-            <div class="list" id="msgList" style="margin-top:14px;"></div>
-
-            <div style="margin-top:16px;">
-              <h2 style="margin-bottom:6px;">My Activity</h2>
-              <div class="sub">Your recent submissions (claims/donations/applications).</div>
-              <div class="list" id="activityList"></div>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </main>
-
-  <!-- Floating assistance button (currently links to your assistance form) -->
-  <button class="assist-btn" type="button" title="Need help?"
-    onclick="window.location.href='/general/assistance/'" aria-label="Need help">
-    <i class="fa-solid fa-headset"></i>
-  </button>
-
-  <div id="toast" class="toast" role="status" aria-live="polite">
-    <b id="toastTitle">Update</b>
-    <p id="toastBody"></p>
-  </div>
-
-  <footer id="main-footer">
-    <div class="content-container footer-content">
-      <div class="footer-section"><h3>Quick Links</h3><ul><li><a href="/available-food/">Find Food</a></li><li><a href="/donate-now/">Donate</a></li><li><a href="/volunteer-now/">Volunteer</a></li><li><a href="/our-impact/">Impact</a></li><li><a href="/contact-general/">General Contact</a></li></ul></div>
-      <div class="footer-section"><h3>Learn More</h3><ul><li><a href="/about/">About FoodShare</a></li><li><a href="/our-partners/">Our Partners</a></li><li><a href="/learn/safety/">Food Safety Protocol</a></li><li><a href="/learn/faq/">General FAQ</a></li></ul></div>
-      <div class="footer-section"><h3>Support & Legal</h3><ul><li><a href="/privacy-policy/">Privacy Policy</a></li><li><a href="/terms-of-use/">Terms of Use</a></li><li><a href="/sitemap/">Site Structure</a></li><li><a href="/staff-login/">Staff Login</a></li></ul></div>
-      <div class="footer-section">
-        <h3>Get In Touch</h3>
-        <p>Email: <a href="mailto:admin@foodshare-seychelles.online" style="color: var(--primary-main);">admin@foodshare-seychelles.online</a></p>
-        <p>Follow us on <a href="/social/" style="color: var(--primary-main); display:inline;">Social Media</a></p>
-      </div>
-    </div>
-    <div class="footer-bottom">&copy; 2025 Foodshare Seychelles. All Rights Reserved.</div>
-  </footer>
 </body>
 </html>
