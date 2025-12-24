@@ -1,130 +1,339 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us | FoodShare Seychelles</title>
-    <link rel="icon" type="image/png" href="/image/logo.png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root { --primary: #6bb33b; --text-dark: #1f2937; --text-light: #6b7280; --primary-light: #e8f5e9; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
-        
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Us — FoodShare Seychelles</title>
+  <link rel="icon" href="../assets/img/logo.png" />
 
-        nav { height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; background: white; border-bottom: 1px solid #eee; }
-        .logo img { height: 45px; }
-        .nav-links { display: flex; gap: 20px; list-style: none; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; }
+  <style>
+    :root{
+      --bg:#fff; --surface:#f6f9f6; --text:#111827; --muted:#6b7280;
+      --green-700:#2f7d32; --green-600:#3f9a3d; --green-400:#7bd64e;
+      --border: rgba(17,24,39,.10); --shadow: 0 12px 30px rgba(17,24,39,.08);
+      --radius:16px; --radius-sm:12px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--text); line-height:1.5}
+    a{color:inherit}
+    .container{width:min(1120px, calc(100% - 40px)); margin:0 auto}
+    .page{min-height: calc(100vh - 200px);}
 
-        .header { padding: 80px 5%; text-align: center; background: var(--primary-light); }
-        .header h1 { font-size: 3rem; margin-bottom: 15px; }
+    .topbar{background:#fff;border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50}
+    .nav{display:flex;align-items:center;justify-content:space-between; gap:14px; padding:12px 0}
+    .brand{display:flex;align-items:center; gap:10px; text-decoration:none}
+    .brand img{width:44px;height:44px;border-radius:10px}
+    .brand .name{font-weight:900}
+    .navlinks{display:flex;align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end}
+    .nav-link{font-weight:800; text-decoration:none; color:var(--text); padding:8px 10px; border-radius:10px}
+    .nav-link:hover{background:var(--surface)}
+    .nav-btn{border:1px solid var(--border); background:#fff; border-radius:10px; padding:8px 10px; font-weight:800; cursor:pointer}
+    .lang{display:flex;align-items:center; gap:8px}
+    .lang select{padding:8px 10px; border-radius:10px; border:1px solid var(--border)}
 
-        .content { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
-        .mission-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-bottom: 80px; }
-        .m-card { padding: 30px; border-radius: 20px; background: #f9f9f9; border-left: 5px solid var(--primary); }
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border:1px solid var(--border); border-radius:999px; background:#fff; color:var(--green-700); font-weight:700; font-size:13px}
+    .hero{padding:48px 0 28px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card-pad{padding:22px}
+    .h1{font-size:46px; line-height:1.05; margin:12px 0}
+    .h2{font-size:28px; margin:0 0 10px}
+    .h3{font-size:18px; margin:0 0 8px}
+    .p{margin:0 0 12px; color:var(--muted)}
+    .small{font-size:13px; color:var(--muted)}
+    .section{padding:28px 0}
+    .grid-3{display:grid; grid-template-columns: repeat(3,1fr); gap:14px}
+    @media (max-width: 900px){.grid-3{grid-template-columns:1fr}}
+    .hr{height:1px;background:var(--border); margin:18px 0}
 
-        .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
-        .staff-card { text-align: center; padding: 30px; border-radius: 20px; border: 1px solid #eee; position: relative; }
-        .staff-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; }
-        .status { position: absolute; top: 110px; right: 95px; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white; }
-        .online { background: #4CAF50; } .offline { background: #bbb; }
+    .assistant-fab{position:fixed; right:18px; bottom:18px; z-index:999; border:0; border-radius:999px; padding:12px 14px; box-shadow:var(--shadow); background:linear-gradient(90deg,var(--green-600),var(--green-400)); color:#fff; font-weight:900; cursor:pointer}
+    .assistant-modal{position:fixed; right:18px; bottom:72px; width:min(420px, calc(100vw - 36px)); z-index:1000; border-radius:16px; background:#fff; border:1px solid var(--border); box-shadow:var(--shadow); overflow:hidden}
+    .assistant-head{padding:14px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center}
+    .assistant-body{padding:14px; max-height:360px; overflow:auto}
+    .msg{padding:10px 12px; border-radius:12px; border:1px solid var(--border); margin-bottom:10px; white-space:pre-wrap}
+    .msg.bot{background:var(--surface)}
+    .assistant-foot{padding:12px; border-top:1px solid var(--border); display:flex; gap:10px}
+    .assistant-foot input{flex:1; padding:12px; border-radius:12px; border:1px solid var(--border)}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border-radius:12px; font-weight:900; border:1px solid var(--border); background:#fff; cursor:pointer}
+    .btn.primary{background: linear-gradient(90deg,var(--green-600),var(--green-400)); color:#fff; border-color:transparent}
+    .hidden{display:none !important}
 
-        .hof { background: #111; color: white; padding: 60px 40px; border-radius: 30px; margin-top: 80px; }
-        .donor-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #222; }
-
-        footer { background: #111; color: #888; padding: 40px 5%; text-align: center; margin-top: 80px; }
-        footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
-
-        @media (max-width: 768px) { .nav-links { display: none; } }
-    </style>
+    .footer{margin-top:30px; background:#0b1220; color:#e5e7eb}
+    .footer a{color:#e5e7eb; text-decoration:none}
+    .footer a:hover{text-decoration:underline}
+    .footer-top{padding:28px 0; border-bottom:1px solid rgba(255,255,255,.12)}
+    .footer-grid{display:grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap:16px}
+    @media (max-width: 900px){.footer-grid{grid-template-columns:1fr 1fr}}
+    .footer-title{font-weight:900; margin:0 0 8px}
+    .footer-list{list-style:none; padding:0; margin:0; display:grid; gap:8px; color:#cbd5e1}
+    .footer-bottom{padding:14px 0; display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color:#cbd5e1}
+    .madeby{display:flex; gap:6px; flex-wrap:wrap}
+  </style>
 </head>
 <body>
+  <header class="topbar">
+    <div class="container">
+      <nav class="nav" aria-label="Primary">
+        <a class="brand" href="../">
+          <img src="../assets/img/logo.png" alt="FoodShare Seychelles logo" />
+          <div>
+            <div class="name">FoodShare Seychelles</div>
+            <div class="small">Operational food rescue & access</div>
+          </div>
+        </a>
 
-    <div id="loader"><div class="spinner"></div></div>
+        <div class="navlinks">
+          <a class="nav-link" href="../" data-i18n="nav_home">Home</a>
+          <a class="nav-link" href="../about-us/" data-i18n="nav_about">About Us</a>
+          <a class="nav-link" href="../learn/" data-i18n="nav_learn">Learn</a>
+          <a class="nav-link" href="../our-impact/" data-i18n="nav_impact">Our Impact</a>
+          <a class="nav-link" href="../our-partners/" data-i18n="nav_partners">Our Partners</a>
+          <a class="nav-link" href="../social-media/" data-i18n="nav_social">Social Media</a>
+          <a class="nav-link" href="../find-food/" data-i18n="nav_find_food">Find Food</a>
+          <a class="nav-link" href="../donate-now/" data-i18n="nav_donate">Donate Now</a>
+          <a class="nav-link" href="../volunteer-now/" data-i18n="nav_volunteer">Volunteer Now</a>
+          <a class="nav-link" href="../contact-us/" data-i18n="nav_contact">Contact Us</a>
 
-    <nav>
-        <a href="/" class="logo"><img src="/image/logo.png" alt="FoodShare"></a>
-        <ul class="nav-links">
-            <li><a href="/">Home</a></li>
-            <li><a href="/about-us/">About Us</a></li>
-            <li><a href="/available-food/">Find Food</a></li>
-            <li><a href="/contact/">Contact</a></li>
-        </ul>
-    </nav>
+          <div class="lang">
+            <select id="langSelect" aria-label="Select language">
+              <option value="en">English</option>
+              <option value="cr">Kreol Seselwa</option>
+              <option value="fr">Français</option>
+            </select>
+          </div>
 
-    <div class="header">
-        <h1>Our Story & People</h1>
-        <p>Transparency and passion driving every delivery.</p>
+          <div id="navAuthArea"></div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="container">
+        <span class="badge">Mission • Values • Transparency</span>
+        <h1 class="h1">About FoodShare Seychelles</h1>
+        <p class="p">
+          FoodShare Seychelles reduces food waste and supports food access by connecting donors and recipients
+          while coordinating real-world logistics through staff and volunteers.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container grid-3">
+        <div class="card card-pad">
+          <h3 class="h3">Our Mission</h3>
+          <p class="p">Rescue safe surplus food and redirect it to people who need it—efficiently, responsibly, and with dignity.</p>
+        </div>
+        <div class="card card-pad">
+          <h3 class="h3">Our Values</h3>
+          <ul style="margin:0; padding-left:18px; color:var(--muted)">
+            <li>Safety-first food handling and clear guidance</li>
+            <li>Privacy and data minimization by design</li>
+            <li>Operational accountability with transparent impact</li>
+          </ul>
+        </div>
+        <div class="card card-pad">
+          <h3 class="h3">How We Operate</h3>
+          <p class="p">Submissions are reviewed by staff/admin, tasks are assigned securely, and outcomes are recorded for impact reporting.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background: var(--surface);">
+      <div class="container">
+        <h2 class="h2">Hall of Fame</h2>
+        <p class="p">We only display donor names when donors opt-in. No contact details are ever shown.</p>
+
+        <div class="card card-pad">
+          <div id="hofList" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+          <div id="hofEmpty" class="small hidden">No donor names are displayed yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="h2">Core Partner Support</h2>
+        <p class="p">Tyler Nicholas Group supports FoodShare Seychelles with recruitment, legal/compliance guidance, and technology.</p>
+        <div class="card card-pad">
+          <div class="small">This partnership enables sustainable operations, compliant handling, and reliable technology delivery.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="assistant-fab" id="assistantFab" type="button">Assistant</button>
+  <div class="assistant-modal hidden" id="assistantModal" role="dialog" aria-modal="true" aria-label="FoodShare Assistant">
+    <div class="assistant-head">
+      <strong>FoodShare Assistant</strong>
+      <button class="nav-btn" id="assistantClose" type="button">Close</button>
+    </div>
+    <div class="assistant-body" id="assistantBody"></div>
+    <div class="assistant-foot">
+      <input id="assistantInput" type="text" placeholder="Ask about donations, volunteering, impact…" />
+      <button class="btn primary" id="assistantSend" type="button">Send</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div>
+          <div class="footer-title">FoodShare Seychelles</div>
+          <div class="small" style="color:#cbd5e1">Reducing food waste and improving food access through safe, coordinated logistics.</div>
+        </div>
+        <div>
+          <div class="footer-title" data-i18n="footer_pages">Pages</div>
+          <ul class="footer-list">
+            <li><a href="../">Home</a></li>
+            <li><a href="../about-us/">About Us</a></li>
+            <li><a href="../learn/">Learn</a></li>
+            <li><a href="../our-impact/">Our Impact</a></li>
+            <li><a href="../our-partners/">Our Partners</a></li>
+            <li><a href="../social-media/">Social Media</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Actions</div>
+          <ul class="footer-list">
+            <li><a href="../find-food/">Find Food</a></li>
+            <li><a href="../donate-now/">Donate Now</a></li>
+            <li><a href="../volunteer-now/">Volunteer Now</a></li>
+            <li><a href="../contact-us/">Contact Us</a></li>
+            <li><a href="../auth/">Sign Up / Login</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Legal</div>
+          <ul class="footer-list">
+            <li><a href="../privacy-policy/">Privacy Policy</a></li>
+            <li><a href="../terms-of-use/">Terms Of Use</a></li>
+            <li><a href="../sitemap/">Sitemap</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
 
-    <div class="content">
-        <div class="mission-grid">
-            <div class="m-card">
-                <h3>Our Mission</h3>
-                <p>To reduce food waste in the Seychelles by connecting surplus resources to those in need via efficient technology.</p>
-            </div>
-            <div class="m-card">
-                <h3>Our Vision</h3>
-                <p>A zero-waste Seychelles where food security is a reality for every citizen through community sharing.</p>
-            </div>
-        </div>
-
-        <h2 style="margin-bottom:30px; text-align:center;">The Team</h2>
-        <div id="staff-grid" class="team-grid">
-            <p style="text-align:center; grid-column:1/-1;">Connecting to directory...</p>
-        </div>
-
-        <div class="hof">
-            <h2 style="text-align:center; margin-bottom:30px;">Donor Hall of Fame</h2>
-            <div id="hof-list">
-                <p style="text-align:center;">Retrieving heroes...</p>
-            </div>
-        </div>
+    <div class="footer-bottom">
+      <div>© <span id="yr"></span> FoodShare Seychelles</div>
+      <div class="madeby">
+        <span data-i18n="footer_madeby">Website made by</span>
+        <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noopener">Tyler Nicholas</a>
+      </div>
     </div>
+  </footer>
 
-    <footer>
-        <p>&copy; 2025 FoodShare Seychelles. Website by <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank">Tyler Nicholas</a></p>
-    </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true} });
 
-    <script>
-        const SB_URL = "https://edotvuleaydztulkxehe.supabase.co";
-        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw";
-        const _supabase = supabase.createClient(SB_URL, SB_KEY);
+    async function getUser(){ const {data} = await sb.auth.getUser(); return data?.user || null; }
+    async function signOut(){ await sb.auth.signOut(); }
 
-        window.onload = async () => {
-            setTimeout(() => { document.getElementById('loader').style.display='none'; }, 800);
+    const dict = {
+      en:{nav_home:"Home",nav_about:"About Us",nav_learn:"Learn",nav_impact:"Our Impact",nav_partners:"Our Partners",nav_social:"Social Media",nav_find_food:"Find Food",nav_donate:"Donate Now",nav_volunteer:"Volunteer Now",nav_contact:"Contact Us",nav_auth:"Sign Up / Login",nav_dashboard:"User Dashboard",nav_staff_login:"Staff Login",footer_pages:"Pages",footer_madeby:"Website made by"},
+      cr:{nav_home:"Lakour",nav_about:"Kisisa Nou",nav_learn:"Aprann",nav_impact:"Nou Lenpakt",nav_partners:"Nou Bann Partner",nav_social:"Rezo Sosyal",nav_find_food:"Rod Manze",nav_donate:"Done Aster",nav_volunteer:"Vin Volunteer",nav_contact:"Kontak Nou",nav_auth:"Anrezistre / Konekte",nav_dashboard:"Dashboard",nav_staff_login:"Koneksyon Staff",footer_pages:"Paz",footer_madeby:"Sit web krwar par"},
+      fr:{nav_home:"Accueil",nav_about:"À propos",nav_learn:"Apprendre",nav_impact:"Notre impact",nav_partners:"Nos partenaires",nav_social:"Réseaux sociaux",nav_find_food:"Trouver",nav_donate:"Faire un don",nav_volunteer:"Bénévolat",nav_contact:"Contact",nav_auth:"Inscription / Connexion",nav_dashboard:"Tableau de bord",nav_staff_login:"Connexion staff",footer_pages:"Pages",footer_madeby:"Site réalisé par"}
+    };
+    function getLang(){return localStorage.getItem("fs_lang")||"en";}
+    function setLang(l){localStorage.setItem("fs_lang",l);}
+    function t(k){const l=getLang(); return (dict[l]&&dict[l][k])||dict.en[k]||k;}
+    function applyI18n(){document.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=t(el.getAttribute("data-i18n")));}
 
-            // Fetch Staff
-            const { data: staff } = await _supabase.from('staff_directory').select('*');
-            if(staff) {
-                document.getElementById('staff-grid').innerHTML = staff.map(s => `
-                    <div class="staff-card">
-                        <img src="${s.avatar_url || '/image/logo.png'}" class="staff-img">
-                        <div class="status ${s.is_online ? 'online' : 'offline'}"></div>
-                        <h3>${s.full_name}</h3>
-                        <p style="color:var(--primary); font-weight:700; font-size:0.8rem;">${s.role_id === 1 ? 'ADMIN' : 'FIELD STAFF'}</p>
-                    </div>
-                `).join('');
-            }
+    async function updateAuthArea(){
+      const user = await getUser();
+      const box = document.getElementById("navAuthArea");
+      if(!box) return;
+      if(!user){
+        box.innerHTML = `
+          <a class="nav-link" href="../auth/" data-i18n="nav_auth">Sign Up / Login</a>
+          <a class="nav-link" href="../staff-login/" data-i18n="nav_staff_login">Staff Login</a>
+        `;
+        applyI18n();
+        return;
+      }
+      box.innerHTML = `
+        <a class="nav-link" href="../dashboard/" data-i18n="nav_dashboard">User Dashboard</a>
+        <button class="nav-btn" id="navSignOutBtn" type="button">Sign out</button>
+      `;
+      document.getElementById("navSignOutBtn").addEventListener("click", async ()=>{ await signOut(); location.href="../auth/"; });
+      applyI18n();
+    }
 
-            // Fetch Donors
-            const { data: donors } = await _supabase.from('hall_of_fame').select('*').limit(5);
-            if(donors && donors.length > 0) {
-                document.getElementById('hof-list').innerHTML = donors.map(d => `
-                    <div class="donor-row">
-                        <span><strong>${d.donor_display_name}</strong></span>
-                        <span style="color:var(--primary); font-weight:700;">${d.total_donations} Donations</span>
-                    </div>
-                `).join('');
-            } else {
-                document.getElementById('hof-list').innerHTML = "<p style='text-align:center;'>Waiting for our first heroes.</p>";
-            }
-        };
-    </script>
+    function addMsg(c,who,text){const d=document.createElement("div"); d.className="msg "+who; d.textContent=text; c.appendChild(d); c.scrollTop=c.scrollHeight;}
+    async function assistantAnswer(qRaw){
+      const q=String(qRaw||"").toLowerCase().trim();
+      const contact="../contact-us/";
+      if(!q) return `Ask about donating, volunteering, finding food, or our impact. Contact Us: ${contact}`;
+      if(q.includes("impact")||q.includes("stats")||q.includes("kg")||q.includes("meals")||q.includes("co2")){
+        const {data}=await sb.from("impact_public").select("*").maybeSingle();
+        if(!data) return `Can't load live impact now. Contact Us: ${contact}`;
+        return [
+          "Live impact (public totals):",
+          `• Donations collected: ${Number(data.donations_collected||0).toLocaleString()}`,
+          `• Claims fulfilled: ${Number(data.claims_fulfilled||0).toLocaleString()}`,
+          `• Food rescued: ${Number(data.kg_rescued||0).toLocaleString(undefined,{maximumFractionDigits:1})} kg`,
+          `• Meals estimated: ${Number(data.meals_estimated||0).toLocaleString()}`,
+          `• CO₂ prevented: ${Number(data.co2_prevented||0).toLocaleString()}`
+        ].join("\n");
+      }
+      if(q.includes("find")||q.includes("available")||q.includes("listing")||q.includes("food")){
+        const {data}=await sb.from("food_listings_public").select("title,pickup_area").order("created_at",{ascending:false}).limit(5);
+        if(!data||data.length===0) return `No active listings right now. Contact Us: ${contact}`;
+        return `A few available listings:\n${data.map(i=>`• ${i.title}${i.pickup_area?" — "+i.pickup_area:""}`).join("\n")}\n\nOpen Find Food: ../find-food/`;
+      }
+      if(q.includes("donate")) return `Donate: ../donate-now/. If urgent, Contact Us: ${contact}`;
+      if(q.includes("volunteer")||q.includes("help")) return `Volunteer: ../volunteer-now/.`;
+      return `I'm not fully sure. Please use Contact Us: ${contact}`;
+    }
+    function wireAssistant(){
+      const fab=document.getElementById("assistantFab");
+      const modal=document.getElementById("assistantModal");
+      const closeBtn=document.getElementById("assistantClose");
+      const body=document.getElementById("assistantBody");
+      const input=document.getElementById("assistantInput");
+      const send=document.getElementById("assistantSend");
+
+      fab.addEventListener("click", ()=>{ modal.classList.remove("hidden"); if(body.childElementCount===0){addMsg(body,"bot","Hi — FoodShare Assistant. Ask about donating, volunteering, finding food, or impact.");} input.focus(); });
+      closeBtn.addEventListener("click", ()=>modal.classList.add("hidden"));
+
+      async function run(){
+        const q=input.value; if(!q.trim()) return;
+        addMsg(body,"user",q); input.value=""; send.disabled=true;
+        try{ addMsg(body,"bot", await assistantAnswer(q)); }
+        catch(e){ addMsg(body,"bot","Something went wrong. Please use Contact Us: ../contact-us/"); }
+        finally{ send.disabled=false; input.focus(); }
+      }
+      send.addEventListener("click", run);
+      input.addEventListener("keydown",(e)=>{if(e.key==="Enter") run();});
+    }
+
+    async function loadHOF(){
+      const list=document.getElementById("hofList");
+      const empty=document.getElementById("hofEmpty");
+      const {data, error} = await sb.from("hall_of_fame_public").select("donor_display_name,created_at").order("created_at",{ascending:false}).limit(12);
+      if(error || !data || data.length===0){
+        empty.classList.remove("hidden");
+        return;
+      }
+      list.innerHTML = data.map(r=>`<span class="badge">${(r.donor_display_name||"").trim()}</span>`).join(" ");
+    }
+
+    document.addEventListener("DOMContentLoaded", async ()=>{
+      const sel=document.getElementById("langSelect");
+      sel.value=getLang();
+      sel.addEventListener("change", ()=>{ setLang(sel.value); applyI18n(); });
+
+      applyI18n();
+      await updateAuthArea();
+      wireAssistant();
+      await loadHOF();
+    });
+  </script>
 </body>
 </html>
