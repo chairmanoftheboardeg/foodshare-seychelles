@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Find Food — FoodShare Seychelles</title>
+  <meta name="description" content="Browse available food listings and submit a claim through FoodShare Seychelles." />
+
+  <!-- Supabase JS (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg: #fbfcfb;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted-2: #64748b;
+      --border: rgba(15, 23, 42, .10);
+      --shadow: 0 12px 32px rgba(2, 6, 23, .08);
+      --shadow-soft: 0 10px 26px rgba(2, 6, 23, .06);
+      --radius: 18px;
+      --radius-sm: 14px;
+
+      --brand: #73b63b;
+      --brand-2: #5aa52f;
+      --brand-ink: #173a12;
+
+      --dark: #0b1220;
+      --dark-border: rgba(255,255,255,.10);
+
+      --max: 1120px;
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a{ color: inherit; text-decoration:none; }
+    a:hover{ text-decoration: underline; }
+    .container{ width:100%; max-width: var(--max); margin: 0 auto; padding: 0 18px; }
+
+    .skip-link{
+      position:absolute; left:-999px; top:10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 10px 12px; border-radius: 10px;
+      z-index: 9999;
+    }
+    .skip-link:focus{ left:10px; }
+
+    /* Navbar */
+    .nav-wrap{
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      height: 76px; gap: 14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 160px;
+    }
+    .brand-logo{
+      width:36px; height:36px;
+      border-radius: 10px;
+      object-fit: contain;
+      display:block;
+    }
+    .brand-name{ display:flex; flex-direction:column; line-height:1.1; }
+    .brand-name strong{ font-size:14px; letter-spacing:.2px; }
+    .brand-name span{ font-size:12px; color: var(--muted-2); }
+
+    .nav-links{ display:flex; align-items:center; gap:18px; }
+    .nav-item{
+      font-size:14px; color: var(--muted);
+      padding: 10px 10px; border-radius: 12px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav-item:hover{
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      text-decoration:none;
+    }
+
+    .cta{
+      display:inline-flex; align-items:center; justify-content:center;
+      background: var(--brand);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size:14px;
+      font-weight: 650;
+      box-shadow: 0 8px 22px rgba(115,182,59,.20);
+      transition: transform .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+    .cta:hover{ background: var(--brand-2); transform: translateY(-1px); text-decoration:none; }
+
+    .pill{
+      display:inline-flex; align-items:center; gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.70);
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .pill button{
+      border: none; background: transparent; cursor: pointer; color: inherit;
+      font: inherit; padding: 0;
+    }
+    .pill:hover{ background: rgba(255,255,255,.95); }
+
+    select.lang{
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.85);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size:14px;
+      color: var(--muted);
+      outline:none;
+      cursor:pointer;
+    }
+    select.lang:focus{ box-shadow: 0 0 0 4px rgba(115,182,59,.18); border-color: rgba(115,182,59,.55); }
+
+    .dropdown{ position: relative; }
+    .dropdown-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      border:none; background: transparent; cursor:pointer;
+      color: var(--muted);
+      padding: 10px 10px; border-radius: 12px;
+      font-size:14px;
+    }
+    .dropdown-btn:hover{ background: rgba(115,182,59,.10); color: var(--brand-ink); }
+    .dropdown-menu{
+      position:absolute;
+      right:0; top: calc(100% + 10px);
+      width: 240px;
+      background: var(--surface);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      padding: 8px;
+      display:none;
+    }
+    .dropdown-menu a{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .dropdown-menu a:hover{
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      text-decoration:none;
+    }
+    .dropdown.open .dropdown-menu{ display:block; }
+
+    .mobile-toggle{
+      display:none;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor:pointer;
+    }
+    .mobile-panel{
+      display:none;
+      border-top: 1px solid rgba(15,23,42,.08);
+      padding: 12px 0 18px;
+    }
+    .mobile-panel.open{ display:block; }
+    .mobile-panel .stack{ display:flex; flex-direction:column; gap: 8px; }
+
+    /* Page header */
+    .page{
+      padding: 42px 0 56px;
+      position: relative;
+      overflow:hidden;
+    }
+    .page::before{
+      content:"";
+      position:absolute; inset: -120px -120px auto -120px;
+      height: 420px;
+      background:
+        radial-gradient(closest-side at 18% 28%, rgba(115,182,59,.16), transparent 62%),
+        radial-gradient(closest-side at 72% 22%, rgba(115,182,59,.10), transparent 60%),
+        radial-gradient(closest-side at 55% 70%, rgba(2,6,23,.06), transparent 62%);
+      pointer-events:none;
+      filter: blur(2px);
+    }
+    .page-inner{ position: relative; }
+    .title{
+      text-align:center;
+    }
+    .title h1{
+      margin:0 auto;
+      font-size: clamp(26px, 3vw, 42px);
+      letter-spacing: -0.4px;
+      line-height: 1.08;
+      max-width: 900px;
+      color: #2f5b1f;
+      font-weight: 850;
+    }
+    .title p{
+      margin: 12px auto 0;
+      max-width: 780px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    /* Filters */
+    .filters{
+      margin-top: 22px;
+      display:grid;
+      grid-template-columns: 1.5fr 1fr 1fr auto;
+      gap: 10px;
+      align-items:center;
+      background: rgba(255,255,255,.90);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 10px 22px rgba(2,6,23,.04);
+    }
+    .filters input, .filters select{
+      width: 100%;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline:none;
+      color: var(--text);
+    }
+    .filters input:focus, .filters select:focus{
+      box-shadow: 0 0 0 4px rgba(115,182,59,.18);
+      border-color: rgba(115,182,59,.55);
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      font-weight: 750;
+      font-size: 14px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      white-space: nowrap;
+    }
+    .btn:hover{ background:#fff; transform: translateY(-1px); }
+    .btn.primary{
+      background: var(--brand);
+      color:#fff;
+      border-color: transparent;
+      box-shadow: 0 8px 22px rgba(115,182,59,.20);
+    }
+    .btn.primary:hover{ background: var(--brand-2); }
+
+    /* Listing grid */
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .card{
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 0 10px 22px rgba(2,6,23,.04);
+      display:flex;
+      flex-direction:column;
+      min-height: 210px;
+    }
+    .meta-top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .pill-mini{
+      display:inline-flex;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(115,182,59,.25);
+      background: rgba(115,182,59,.08);
+      color: #204417;
+      white-space: nowrap;
+    }
+    .card h3{
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.2px;
+    }
+    .card p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .kv{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .kv strong{ color: var(--text); font-weight: 800; }
+    .actions{
+      margin-top: auto;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 14px;
+    }
+
+    .empty{
+      margin-top: 18px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 22px;
+      padding: 18px;
+      color: var(--muted);
+      box-shadow: 0 10px 22px rgba(2,6,23,.04);
+    }
+
+    /* Claim modal */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.55);
+      z-index: 80;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .modal{
+      width: min(720px, 100%);
+      background: var(--surface);
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .modal header strong{ font-size: 14px; }
+    .modal header button{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+    }
+    .modal-body{
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 12px;
+    }
+    .box{
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(251,252,251,.92);
+    }
+    .box h4{ margin:0; font-size: 14px; }
+    .box .sub{ margin-top: 8px; color: var(--muted); font-size: 13px; white-space: pre-wrap; }
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .form label{ font-size: 12px; color: var(--muted-2); font-weight: 800; }
+    .form input, .form textarea{
+      width: 100%;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-size: 14px;
+      outline:none;
+      color: var(--text);
+      resize: vertical;
+    }
+    .form input:focus, .form textarea:focus{
+      box-shadow: 0 0 0 4px rgba(115,182,59,.18);
+      border-color: rgba(115,182,59,.55);
+    }
+    .modal footer{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:flex-end;
+      padding: 12px 14px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      background: rgba(255,255,255,.92);
+    }
+    .note{
+      margin-right: auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Footer */
+    footer{
+      background: linear-gradient(180deg, var(--dark) 0%, #070b14 100%);
+      color: rgba(255,255,255,.86);
+      border-top: 1px solid var(--dark-border);
+    }
+    .footer-top{ padding: 44px 0 22px; }
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      gap: 18px;
+    }
+    .foot-title{
+      font-weight: 850;
+      color: #fff;
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+    .foot-text{
+      margin: 0;
+      color: rgba(255,255,255,.70);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .foot-links{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,.74);
+    }
+    .foot-links a{ color: rgba(255,255,255,.74); }
+    .foot-links a:hover{ color:#fff; text-decoration:none; }
+    .footer-bottom{
+      border-top: 1px solid rgba(255,255,255,.10);
+      padding: 14px 0;
+      font-size: 13px;
+      color: rgba(255,255,255,.70);
+    }
+    .footer-bottom-inner{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-bottom a{ color: rgba(255,255,255,.85); text-decoration: underline; }
+
+    /* Assistant */
+    .assistant-btn{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 60;
+      border: none;
+      cursor: pointer;
+      background: var(--brand);
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px 14px;
+      font-weight: 850;
+      box-shadow: 0 18px 40px rgba(115,182,59,.28);
+      display:flex; align-items:center; gap: 10px;
+    }
+    .assistant-btn:hover{ background: var(--brand-2); }
+
+    .assistant-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.55);
+      z-index: 80;
+      display:none;
+      align-items:flex-end;
+      justify-content:flex-end;
+      padding: 18px;
+    }
+    .assistant-modal{
+      width: min(520px, 100%);
+      background: var(--surface);
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .assistant-modal header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .assistant-modal header strong{ font-size: 14px; }
+    .assistant-modal header button{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+    }
+    .assistant-body{
+      padding: 14px;
+      max-height: 60vh;
+      overflow:auto;
+    }
+    .chat{ display:flex; flex-direction:column; gap: 10px; }
+    .bubble{
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(15,23,42,.10);
+      font-size: 14px;
+      color: var(--muted);
+      background: rgba(251,252,251,.92);
+      white-space: pre-wrap;
+    }
+    .bubble.me{
+      align-self:flex-end;
+      background: rgba(115,182,59,.10);
+      color: var(--brand-ink);
+      border-color: rgba(115,182,59,.22);
+    }
+    .quick{ display:flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .chip{
+      border: 1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.95);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .chip:hover{ background: rgba(115,182,59,.10); color: var(--brand-ink); border-color: rgba(115,182,59,.22); }
+
+    .assistant-modal footer{
+      display:flex; gap: 10px;
+      padding: 12px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      background: rgba(255,255,255,.92);
+    }
+    .assistant-modal input{
+      flex: 1;
+      border: 1px solid rgba(15,23,42,.14);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      outline:none;
+    }
+    .assistant-modal input:focus{ box-shadow: 0 0 0 4px rgba(115,182,59,.18); border-color: rgba(115,182,59,.55); }
+    .send{
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 850;
+      cursor:pointer;
+      white-space: nowrap;
+    }
+    .send:hover{ background: var(--brand-2); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .filters{ grid-template-columns: 1fr; }
+      .modal-body{ grid-template-columns: 1fr; }
+      .footer-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px){
+      .nav-links{ display:none; }
+      .mobile-toggle{ display:inline-flex; }
+      .brand{ min-width: 0; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- NAVBAR -->
+  <div class="nav-wrap">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="../">
+          <img class="brand-logo" src="../image/logo.png" alt="FoodShare Seychelles logo" />
+          <div class="brand-name">
+            <strong>FoodShare Seychelles</strong>
+            <span data-i18n="nav.tagline">Share Food. Feed Seychelles.</span>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a class="nav-item" href="../find-food/" data-i18n="nav.findFood">Find Food</a>
+          <a class="nav-item" href="../about-us/" data-i18n="nav.about">About</a>
+          <a class="nav-item" href="../volunteer-now/" data-i18n="nav.volunteer">Volunteer</a>
+
+          <div class="dropdown" id="moreDropdown">
+            <button class="dropdown-btn" id="moreBtn" type="button" aria-haspopup="true" aria-expanded="false" data-i18n="nav.more">
+              More <span aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" role="menu" aria-label="More pages">
+              <a href="../learn/" role="menuitem" data-i18n="nav.learn">Learn</a>
+              <a href="../our-impact/" role="menuitem" data-i18n="nav.impact">Our Impact</a>
+              <a href="../our-partners/" role="menuitem" data-i18n="nav.partners">Our Partners</a>
+              <a href="../contact-us/" role="menuitem" data-i18n="nav.contact">Contact Us</a>
+              <a href="../social-media/" role="menuitem" data-i18n="nav.social">Social Media</a>
+              <a href="../privacy-policy/" role="menuitem" data-i18n="nav.privacy">Privacy Policy</a>
+              <a href="../terms-of-use/" role="menuitem" data-i18n="nav.terms">Terms Of Use</a>
+              <a href="../sitemap/" role="menuitem" data-i18n="nav.sitemap">Sitemap</a>
+              <a href="../staff-login/" role="menuitem" data-i18n="nav.staffLogin">Staff Login</a>
+            </div>
+          </div>
+
+          <a class="cta" href="../donate-now/" data-i18n="nav.donateNow">Donate Now</a>
+
+          <select class="lang" id="langSelect" aria-label="Language">
+            <option value="en">English</option>
+            <option value="cr">Kreol</option>
+            <option value="fr">Français</option>
+          </select>
+
+          <span class="pill" id="authSlot">
+            <a href="../auth/" id="authLink" data-i18n="nav.login">Login</a>
+          </span>
+        </nav>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Open menu" type="button">☰</button>
+      </div>
+
+      <!-- MOBILE PANEL -->
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <div class="container">
+          <div class="stack">
+            <a class="nav-item" href="../find-food/" data-i18n="nav.findFood">Find Food</a>
+            <a class="nav-item" href="../about-us/" data-i18n="nav.about">About</a>
+            <a class="nav-item" href="../volunteer-now/" data-i18n="nav.volunteer">Volunteer</a>
+            <a class="nav-item" href="../donate-now/" data-i18n="nav.donateNow">Donate Now</a>
+
+            <a class="nav-item" href="../learn/" data-i18n="nav.learn">Learn</a>
+            <a class="nav-item" href="../our-impact/" data-i18n="nav.impact">Our Impact</a>
+            <a class="nav-item" href="../our-partners/" data-i18n="nav.partners">Our Partners</a>
+            <a class="nav-item" href="../contact-us/" data-i18n="nav.contact">Contact Us</a>
+            <a class="nav-item" href="../social-media/" data-i18n="nav.social">Social Media</a>
+            <a class="nav-item" href="../privacy-policy/" data-i18n="nav.privacy">Privacy Policy</a>
+            <a class="nav-item" href="../terms-of-use/" data-i18n="nav.terms">Terms Of Use</a>
+            <a class="nav-item" href="../sitemap/" data-i18n="nav.sitemap">Sitemap</a>
+            <a class="nav-item" href="../staff-login/" data-i18n="nav.staffLogin">Staff Login</a>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+              <select class="lang" id="langSelectMobile" aria-label="Language (mobile)">
+                <option value="en">English</option>
+                <option value="cr">Kreol</option>
+                <option value="fr">Français</option>
+              </select>
+              <span class="pill" id="authSlotMobile">
+                <a href="../auth/" id="authLinkMobile" data-i18n="nav.login">Login</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="page">
+      <div class="container page-inner">
+        <div class="title">
+          <h1 data-i18n="find.title">Find Food</h1>
+          <p data-i18n="find.subtitle">
+            Browse available listings. If you’re logged in, your claim is linked to your account. If you’re not logged in, we’ll include your contact details inside the claim notes.
+          </p>
+        </div>
+
+        <div class="filters" aria-label="Filters">
+          <input id="qSearch" type="text" placeholder="Search by title / category / area" />
+          <select id="qArea">
+            <option value="">All areas</option>
+          </select>
+          <select id="qCategory">
+            <option value="">All categories</option>
+          </select>
+          <button class="btn" id="btnReset" type="button">Reset</button>
+        </div>
+
+        <div id="listingsWrap">
+          <div class="grid" id="grid"></div>
+          <div class="empty" id="emptyState" style="display:none;">
+            No active listings match your filters. Please check back soon or contact us for support.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- CLAIM MODAL -->
+  <div class="overlay" id="claimOverlay" role="dialog" aria-modal="true" aria-label="Claim listing">
+    <div class="modal">
+      <header>
+        <strong id="claimTitle">Claim</strong>
+        <button type="button" id="claimClose" aria-label="Close">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="box">
+          <h4 data-i18n="find.detailsTitle">Listing details</h4>
+          <div class="sub" id="claimDetails"></div>
+        </div>
+
+        <div class="box">
+          <h4 data-i18n="find.claimTitle">Submit a claim</h4>
+
+          <div class="form">
+            <div id="loginHint" class="sub" style="margin-top:8px;">
+              You’re not logged in. Add contact details so staff can follow up (we store this inside claim notes).
+            </div>
+
+            <div id="anonFields" style="display:grid; gap: 10px;">
+              <div>
+                <label for="anonName" data-i18n="find.name">Your name</label>
+                <input id="anonName" type="text" placeholder="Full name" />
+              </div>
+              <div>
+                <label for="anonPhone" data-i18n="find.phone">Phone</label>
+                <input id="anonPhone" type="text" placeholder="+248..." />
+              </div>
+              <div>
+                <label for="anonEmail" data-i18n="find.email">Email</label>
+                <input id="anonEmail" type="email" placeholder="you@email.com" />
+              </div>
+            </div>
+
+            <div>
+              <label for="claimNotes" data-i18n="find.notes">Notes (optional)</label>
+              <textarea id="claimNotes" rows="4" placeholder="Anything you want us to know…"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="note" id="claimStatusText"></div>
+        <button class="btn" type="button" id="btnCancelClaim">Cancel</button>
+        <button class="btn primary" type="button" id="btnSubmitClaim">Submit claim</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <p class="foot-title">FoodShare Seychelles</p>
+            <p class="foot-text">
+              A community initiative to reduce food waste and improve food access across Seychelles—coordinated with privacy-first systems.
+            </p>
+          </div>
+
+          <div>
+            <p class="foot-title">Pages</p>
+            <div class="foot-links">
+              <a href="../">Home</a>
+              <a href="../about-us/">About Us</a>
+              <a href="../learn/">Learn</a>
+              <a href="../our-impact/">Our Impact</a>
+              <a href="../our-partners/">Our Partners</a>
+              <a href="../social-media/">Social Media</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title">Actions</p>
+            <div class="foot-links">
+              <a href="../find-food/">Find Food</a>
+              <a href="../donate-now/">Donate Now</a>
+              <a href="../volunteer-now/">Volunteer Now</a>
+              <a href="../contact-us/">Contact Us</a>
+              <a href="../auth/">Login</a>
+              <a href="../staff-login/">Staff Login</a>
+            </div>
+          </div>
+
+          <div>
+            <p class="foot-title">Legal</p>
+            <div class="foot-links">
+              <a href="../privacy-policy/">Privacy Policy</a>
+              <a href="../terms-of-use/">Terms Of Use</a>
+              <a href="../sitemap/">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-bottom-inner">
+          <div>
+            <span>© <span id="year"></span> FoodShare Seychelles.</span>
+            <span> </span>
+            <span>
+              Website made by
+              <a href="https://tylernicholasgroup.com/staff/tyler" target="_blank" rel="noreferrer">Tyler Nicholas</a>
+            </span>
+          </div>
+          <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+            <a href="../privacy-policy/">Privacy Policy</a>
+            <a href="../terms-of-use/">Terms Of Use</a>
+            <a href="../sitemap/">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Assistant -->
+  <button class="assistant-btn" id="assistantBtn" type="button" aria-haspopup="dialog">
+    <span aria-hidden="true">✦</span>
+    <span data-i18n="assistant.button">Ask Assistant</span>
+  </button>
+
+  <div class="assistant-overlay" id="assistantOverlay" role="dialog" aria-modal="true" aria-label="Assistant">
+    <div class="assistant-modal">
+      <header>
+        <strong data-i18n="assistant.title">FoodShare Assistant</strong>
+        <button type="button" id="assistantClose" aria-label="Close">✕</button>
+      </header>
+
+      <div class="assistant-body">
+        <div class="chat" id="chat">
+          <div class="bubble" data-i18n="assistant.welcome">
+            Hi — ask me about donating, volunteering, finding food, privacy, or today’s announcement. If I can’t answer, I’ll send you to Contact Us.
+          </div>
+        </div>
+
+        <div class="quick" aria-label="Suggested questions">
+          <button class="chip" type="button" data-q="announcement">What’s the announcement?</button>
+          <button class="chip" type="button" data-q="impact">Show impact totals</button>
+          <button class="chip" type="button" data-q="donate">How do I donate?</button>
+          <button class="chip" type="button" data-q="volunteer">How do I volunteer?</button>
+          <button class="chip" type="button" data-q="find food">How do I find food?</button>
+        </div>
+      </div>
+
+      <footer>
+        <input id="assistantInput" type="text" placeholder="Type a question…" />
+        <button class="send" id="assistantSend" type="button">Send</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // ===========================
+    // Supabase
+    // ===========================
+    const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ===========================
+    // i18n (minimal keys for this page)
+    // ===========================
+    const I18N = {
+      en: {
+        "nav.tagline":"Share Food. Feed Seychelles.",
+        "nav.findFood":"Find Food",
+        "nav.about":"About",
+        "nav.volunteer":"Volunteer",
+        "nav.more":"More",
+        "nav.learn":"Learn",
+        "nav.impact":"Our Impact",
+        "nav.partners":"Our Partners",
+        "nav.contact":"Contact Us",
+        "nav.social":"Social Media",
+        "nav.privacy":"Privacy Policy",
+        "nav.terms":"Terms Of Use",
+        "nav.sitemap":"Sitemap",
+        "nav.staffLogin":"Staff Login",
+        "nav.donateNow":"Donate Now",
+        "nav.login":"Login",
+
+        "find.title":"Find Food",
+        "find.subtitle":"Browse available listings. If you’re logged in, your claim is linked to your account. If you’re not logged in, we’ll include your contact details inside the claim notes.",
+        "find.detailsTitle":"Listing details",
+        "find.claimTitle":"Submit a claim",
+        "find.name":"Your name",
+        "find.phone":"Phone",
+        "find.email":"Email",
+        "find.notes":"Notes (optional)",
+
+        "assistant.button":"Ask Assistant",
+        "assistant.title":"FoodShare Assistant",
+        "assistant.welcome":"Hi — ask me about donating, volunteering, finding food, privacy, or today’s announcement. If I can’t answer, I’ll send you to Contact Us.",
+      },
+      cr: {
+        "nav.tagline":"Partaz Manze. Nouri Sesel.",
+        "nav.findFood":"Rod Manze",
+        "nav.about":"Lo Nou",
+        "nav.volunteer":"Volonter",
+        "nav.more":"Plis",
+        "nav.learn":"Aprann",
+        "nav.impact":"Nou Lenpak",
+        "nav.partners":"Nou Partener",
+        "nav.contact":"Kontak Nou",
+        "nav.social":"Sosyal Media",
+        "nav.privacy":"Politik Lasanble",
+        "nav.terms":"Kondisyon Itilizasyon",
+        "nav.sitemap":"Plan Sit",
+        "nav.staffLogin":"Login Staff",
+        "nav.donateNow":"Donnen Aster",
+        "nav.login":"Login",
+
+        "find.title":"Rod Manze",
+        "find.subtitle":"Get keksoz ki disponib. Si ou login, ou claim i ganny lyen avek ou kont. Si ou pa login, nou pou met ou kontak dan claim notes.",
+        "find.detailsTitle":"Detay keksoz",
+        "find.claimTitle":"Soumet en claim",
+        "find.name":"Ou non",
+        "find.phone":"Telefon",
+        "find.email":"Email",
+        "find.notes":"Not (opsyonel)",
+
+        "assistant.button":"Asistan",
+        "assistant.title":"Asistan FoodShare",
+        "assistant.welcome":"Bonzour — kestyon lo don, volonter, rod manze, vi prive, ouswa anons ozordi. Si mon pa kapab reponn, mon pou anvoy ou lo Kontak Nou.",
+      },
+      fr: {
+        "nav.tagline":"Partagez la nourriture. Nourrissez les Seychelles.",
+        "nav.findFood":"Trouver de la nourriture",
+        "nav.about":"À propos",
+        "nav.volunteer":"Bénévolat",
+        "nav.more":"Plus",
+        "nav.learn":"En savoir plus",
+        "nav.impact":"Notre impact",
+        "nav.partners":"Nos partenaires",
+        "nav.contact":"Nous contacter",
+        "nav.social":"Réseaux sociaux",
+        "nav.privacy":"Confidentialité",
+        "nav.terms":"Conditions",
+        "nav.sitemap":"Plan du site",
+        "nav.staffLogin":"Connexion staff",
+        "nav.donateNow":"Faire un don",
+        "nav.login":"Connexion",
+
+        "find.title":"Trouver de la nourriture",
+        "find.subtitle":"Parcourez les annonces. Si vous êtes connecté, la demande est liée à votre compte. Sinon, nous ajoutons vos coordonnées dans les notes.",
+        "find.detailsTitle":"Détails de l’annonce",
+        "find.claimTitle":"Soumettre une demande",
+        "find.name":"Votre nom",
+        "find.phone":"Téléphone",
+        "find.email":"Email",
+        "find.notes":"Notes (facultatif)",
+
+        "assistant.button":"Assistant",
+        "assistant.title":"Assistant FoodShare",
+        "assistant.welcome":"Bonjour — questions sur les dons, bénévolat, trouver de la nourriture, confidentialité ou annonce du jour. Si je ne peux pas répondre, je vous renvoie vers Contact.",
+      }
+    };
+
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      const dict = I18N[lang] || I18N.en;
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+
+      // placeholder
+      const search = document.getElementById('qSearch');
+      if (search){
+        search.placeholder =
+          (lang === 'fr') ? 'Rechercher (titre / catégorie / zone)' :
+          (lang === 'cr') ? 'Rod (tit / kategori / landrwa)' :
+          'Search by title / category / area';
+      }
+      const ai = document.getElementById('assistantInput');
+      if (ai){
+        ai.placeholder =
+          (lang === 'fr') ? 'Tapez une question…' :
+          (lang === 'cr') ? 'Tap kestyon…' :
+          'Type a question…';
+      }
+    }
+
+    // ===========================
+    // Navbar interactions
+    // ===========================
+    const moreDropdown = document.getElementById('moreDropdown');
+    const moreBtn = document.getElementById('moreBtn');
+    function closeMore(){
+      moreDropdown?.classList.remove('open');
+      moreBtn?.setAttribute('aria-expanded','false');
+    }
+    moreBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = moreDropdown.classList.toggle('open');
+      moreBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (!moreDropdown) return;
+      if (!moreDropdown.contains(e.target)) closeMore();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMore();
+    });
+
+    const mobileToggle = document.getElementById('mobileToggle');
+    const mobilePanel = document.getElementById('mobilePanel');
+    mobileToggle?.addEventListener('click', () => mobilePanel.classList.toggle('open'));
+
+    // ===========================
+    // Auth slot
+    // ===========================
+    async function setAuthUI(){
+      const { data } = await sb.auth.getSession();
+      const isLoggedIn = !!data?.session?.user;
+
+      const desktop = document.getElementById('authSlot');
+      const mobile = document.getElementById('authSlotMobile');
+      const desktopLink = document.getElementById('authLink');
+      const mobileLink = document.getElementById('authLinkMobile');
+
+      if (!desktop || !mobile || !desktopLink || !mobileLink) return;
+
+      if (!isLoggedIn){
+        desktopLink.href = "../auth/";
+        mobileLink.href = "../auth/";
+        return;
+      }
+
+      const user = data.session.user;
+      let roleId = 4;
+      try{
+        const { data: prof } = await sb.from('profiles').select('role_id').eq('user_id', user.id).single();
+        if (prof?.role_id) roleId = prof.role_id;
+      }catch(_){}
+
+      let target = "../dashboard/";
+      if (roleId === 1) target = "../admin-dashboard/";
+      else if (roleId === 2 || roleId === 3) target = "../staff-dashboard/";
+
+      desktop.innerHTML = `
+        <a href="${target}" style="text-decoration:none; font-weight:750;">Dashboard</a>
+        <span style="opacity:.45; padding:0 8px;">|</span>
+        <button type="button" id="signOutBtn" style="font-weight:750;">Sign out</button>
+      `;
+      mobile.innerHTML = `
+        <a href="${target}" style="text-decoration:none; font-weight:750;">Dashboard</a>
+        <span style="opacity:.45; padding:0 8px;">|</span>
+        <button type="button" id="signOutBtnMobile" style="font-weight:750;">Sign out</button>
+      `;
+
+      document.getElementById('signOutBtn')?.addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+      document.getElementById('signOutBtnMobile')?.addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+    }
+
+    // ===========================
+    // Listings logic
+    // ===========================
+    const grid = document.getElementById('grid');
+    const emptyState = document.getElementById('emptyState');
+    const qSearch = document.getElementById('qSearch');
+    const qArea = document.getElementById('qArea');
+    const qCategory = document.getElementById('qCategory');
+    const btnReset = document.getElementById('btnReset');
+
+    let allListings = [];
+    let isLoggedIn = false;
+    let currentUserId = null;
+
+    function fmtDate(d){
+      if (!d) return "—";
+      try{
+        return new Date(d).toLocaleString(undefined, { year:'numeric', month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      }catch(_){ return "—"; }
+    }
+
+    function safe(s){ return (s ?? '').toString().trim(); }
+
+    function renderFilters(){
+      const areas = Array.from(new Set(allListings.map(x => safe(x.pickup_area)).filter(Boolean))).sort();
+      const cats = Array.from(new Set(allListings.map(x => safe(x.category)).filter(Boolean))).sort();
+
+      qArea.innerHTML = `<option value="">All areas</option>` + areas.map(a => `<option value="${a}">${a}</option>`).join('');
+      qCategory.innerHTML = `<option value="">All categories</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    function matchesFilters(item){
+      const s = safe(qSearch.value).toLowerCase();
+      const a = safe(qArea.value);
+      const c = safe(qCategory.value);
+
+      if (a && safe(item.pickup_area) !== a) return false;
+      if (c && safe(item.category) !== c) return false;
+
+      if (!s) return true;
+      const hay = [
+        item.title, item.description, item.category, item.pickup_area, item.quantity_text, item.listing_type
+      ].map(v => safe(v).toLowerCase()).join(' | ');
+      return hay.includes(s);
+    }
+
+    function renderGrid(){
+      const items = allListings.filter(matchesFilters);
+
+      if (!items.length){
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      grid.innerHTML = items.map(l => {
+        const qty = safe(l.quantity_text) || (l.estimated_kg ? `${l.estimated_kg} kg` : '');
+        const cat = safe(l.category) || 'General';
+        const area = safe(l.pickup_area) || 'Seychelles';
+        const expires = l.expires_at ? fmtDate(l.expires_at) : '—';
+        const windowLine = (l.pickup_window_start || l.pickup_window_end)
+          ? `${fmtDate(l.pickup_window_start)} → ${fmtDate(l.pickup_window_end)}`
+          : '—';
+
+        const desc = safe(l.description) || safe(l.pickup_notes_public) || '';
+
+        return `
+          <div class="card">
+            <div class="meta-top">
+              <div class="pill-mini">${cat}</div>
+              <div class="pill-mini" style="background:rgba(2,6,23,.04); border-color:rgba(15,23,42,.10); color:rgba(15,23,42,.78);">
+                ${safe(l.listing_type) || 'item'}
+              </div>
+            </div>
+
+            <h3>${safe(l.title) || 'Listing'}</h3>
+            <p>${desc ? desc.slice(0, 120) + (desc.length > 120 ? '…' : '') : 'No public notes provided.'}</p>
+
+            <div class="kv">
+              <div><strong>Area:</strong> ${area}</div>
+              <div><strong>Quantity:</strong> ${qty || '—'}</div>
+              <div><strong>Pickup window:</strong> ${windowLine}</div>
+              <div><strong>Expires:</strong> ${expires}</div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" type="button" data-claim="${l.id}">Claim</button>
+              <a class="btn" href="../contact-us/" title="Contact us">Need help?</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // bind claim buttons
+      grid.querySelectorAll('[data-claim]').forEach(btn => {
+        btn.addEventListener('click', () => openClaim(btn.getAttribute('data-claim')));
+      });
+    }
+
+    async function loadListings(){
+      // RLS should already restrict to active + not expired if your policies do that,
+      // but we still filter here to keep UI clean.
+      const nowIso = new Date().toISOString();
+
+      const { data, error } = await sb
+        .from('food_listings')
+        .select('id, title, description, listing_type, category, quantity_text, estimated_kg, pickup_area, pickup_notes_public, pickup_window_start, pickup_window_end, expires_at, status')
+        .eq('status', 'active')
+        .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+        .order('created_at', { ascending: false });
+
+      if (error){
+        allListings = [];
+        renderFilters();
+        renderGrid();
+        emptyState.style.display = 'block';
+        emptyState.textContent = "Unable to load listings right now. Please try again later or contact us.";
+        return;
+      }
+
+      allListings = Array.isArray(data) ? data : [];
+      renderFilters();
+      renderGrid();
+    }
+
+    // ===========================
+    // Claim modal logic
+    // ===========================
+    const claimOverlay = document.getElementById('claimOverlay');
+    const claimClose = document.getElementById('claimClose');
+    const btnCancelClaim = document.getElementById('btnCancelClaim');
+    const btnSubmitClaim = document.getElementById('btnSubmitClaim');
+    const claimTitle = document.getElementById('claimTitle');
+    const claimDetails = document.getElementById('claimDetails');
+    const claimNotes = document.getElementById('claimNotes');
+    const claimStatusText = document.getElementById('claimStatusText');
+
+    const loginHint = document.getElementById('loginHint');
+    const anonFields = document.getElementById('anonFields');
+    const anonName = document.getElementById('anonName');
+    const anonPhone = document.getElementById('anonPhone');
+    const anonEmail = document.getElementById('anonEmail');
+
+    let activeListing = null;
+
+    function openModal(){
+      claimOverlay.style.display = 'flex';
+    }
+    function closeModal(){
+      claimOverlay.style.display = 'none';
+      activeListing = null;
+      claimTitle.textContent = 'Claim';
+      claimDetails.textContent = '';
+      claimNotes.value = '';
+      claimStatusText.textContent = '';
+      anonName.value = '';
+      anonPhone.value = '';
+      anonEmail.value = '';
+      btnSubmitClaim.disabled = false;
+    }
+
+    claimClose.addEventListener('click', closeModal);
+    btnCancelClaim.addEventListener('click', closeModal);
+    claimOverlay.addEventListener('click', (e) => { if (e.target === claimOverlay) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && claimOverlay.style.display === 'flex') closeModal(); });
+
+    function openClaim(listingId){
+      activeListing = allListings.find(x => x.id === listingId);
+      if (!activeListing) return;
+
+      claimTitle.textContent = `Claim: ${safe(activeListing.title) || 'Listing'}`;
+
+      const qty = safe(activeListing.quantity_text) || (activeListing.estimated_kg ? `${activeListing.estimated_kg} kg` : '—');
+      const lines = [
+        `Category: ${safe(activeListing.category) || 'General'}`,
+        `Area: ${safe(activeListing.pickup_area) || '—'}`,
+        `Quantity: ${qty}`,
+        `Pickup window: ${(activeListing.pickup_window_start || activeListing.pickup_window_end) ? `${fmtDate(activeListing.pickup_window_start)} → ${fmtDate(activeListing.pickup_window_end)}` : '—'}`,
+        `Expires: ${activeListing.expires_at ? fmtDate(activeListing.expires_at) : '—'}`,
+        ``,
+        `Public notes: ${safe(activeListing.pickup_notes_public) || '—'}`
+      ];
+      claimDetails.textContent = lines.join('\n');
+
+      // show/hide anon fields
+      if (isLoggedIn){
+        loginHint.textContent = "You are logged in. Your claim will be linked to your account.";
+        anonFields.style.display = 'none';
+      } else {
+        loginHint.textContent = "You’re not logged in. Add contact details so staff can follow up (we store this inside claim notes).";
+        anonFields.style.display = 'grid';
+      }
+
+      openModal();
+    }
+
+    async function submitClaim(){
+      if (!activeListing) return;
+
+      btnSubmitClaim.disabled = true;
+      claimStatusText.textContent = "Submitting…";
+
+      const note = (claimNotes.value || '').trim();
+
+      let finalNotes = note;
+
+      if (!isLoggedIn){
+        const n = (anonName.value || '').trim();
+        const p = (anonPhone.value || '').trim();
+        const e = (anonEmail.value || '').trim();
+
+        if (!n && !p && !e && !note){
+          claimStatusText.textContent = "Please add at least a name/phone/email or a note so we can follow up.";
+          btnSubmitClaim.disabled = false;
+          return;
+        }
+
+        const contactBlock = [
+          "— Contact details (from public form) —",
+          n ? `Name: ${n}` : "",
+          p ? `Phone: ${p}` : "",
+          e ? `Email: ${e}` : ""
+        ].filter(Boolean).join('\n');
+
+        finalNotes = [contactBlock, note].filter(Boolean).join('\n\n');
+      }
+
+      const payload = {
+        listing_id: activeListing.id,
+        claim_notes: finalNotes || null
+      };
+      if (isLoggedIn) payload.user_id = currentUserId;
+
+      const { error } = await sb.from('claims').insert(payload);
+
+      if (error){
+        claimStatusText.textContent = "Could not submit claim. Please try again or contact us.";
+        btnSubmitClaim.disabled = false;
+        return;
+      }
+
+      claimStatusText.textContent = "Claim submitted successfully. We will follow up soon.";
+      setTimeout(closeModal, 900);
+    }
+
+    btnSubmitClaim.addEventListener('click', submitClaim);
+
+    // ===========================
+    // Assistant (rule-based + uses live settings/impact if available)
+    // ===========================
+    let liveAnnouncement = "";
+    let liveImpact = { kg: 0, meals: 0, co2: 0 };
+
+    async function loadAssistantData(){
+      try{
+        const { data } = await sb.from('settings').select('home_announcement').eq('id', true).single();
+        liveAnnouncement = (data?.home_announcement || '').trim();
+      }catch(_){}
+
+      try{
+        const { data, error } = await sb
+          .from('impact_events')
+          .select('kg.sum(), meals_estimate.sum(), co2_estimate.sum()');
+
+        if (!error && data && data[0]){
+          liveImpact.kg = Number(data[0]["kg"]?.sum || 0);
+          liveImpact.meals = Number(data[0]["meals_estimate"]?.sum || 0);
+          liveImpact.co2 = Number(data[0]["co2_estimate"]?.sum || 0);
+        }
+      }catch(_){}
+    }
+
+    const assistantBtn = document.getElementById('assistantBtn');
+    const assistantOverlay = document.getElementById('assistantOverlay');
+    const assistantClose = document.getElementById('assistantClose');
+    const chat = document.getElementById('chat');
+    const assistantInput = document.getElementById('assistantInput');
+    const assistantSend = document.getElementById('assistantSend');
+
+    function addBubble(text, who="bot"){
+      const div = document.createElement('div');
+      div.className = `bubble ${who === "me" ? "me" : ""}`;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.parentElement.scrollTop = chat.parentElement.scrollHeight;
+    }
+
+    function formatNumber(n, decimals=0){
+      if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
+      return new Intl.NumberFormat(undefined, { maximumFractionDigits: decimals }).format(Number(n));
+    }
+
+    function assistantAnswer(q){
+      const s = (q || "").toLowerCase().trim();
+      const lang = getSavedLang();
+      const contactLine =
+        (lang === 'fr') ? "Je ne suis pas sûr — utilisez le formulaire Contact : ../contact-us/" :
+        (lang === 'cr') ? "Mon pa sir — silvouple servi form Kontak : ../contact-us/" :
+        "I’m not fully sure — please use the Contact form: ../contact-us/";
+
+      if (!s) return contactLine;
+
+      if (s.includes("announcement") || s.includes("anons") || s.includes("annonce")){
+        if (liveAnnouncement) return liveAnnouncement;
+        return (lang === 'fr') ? "Aucune annonce publiée pour le moment." :
+               (lang === 'cr') ? "Pa ena anons pou lemoman." :
+               "No announcement posted at the moment.";
+      }
+
+      if (s.includes("impact") || s.includes("lenpak") || s.includes("stats")){
+        const meals = formatNumber(liveImpact.meals, 0);
+        const kg = formatNumber(liveImpact.kg, 0);
+        const co2 = formatNumber(liveImpact.co2, 0);
+        if (lang === 'fr') return `Impact (totaux publics) :\n• Repas (estim.) : ${meals}\n• KG sauvés : ${kg}\n• CO₂ évité (estim.) : ${co2}`;
+        if (lang === 'cr') return `Lenpak (total piblik) :\n• Repas (estim.) : ${meals}\n• KG sov : ${kg}\n• CO₂ anpesé (estim.) : ${co2}`;
+        return `Impact (public totals):\n• Meals (est.): ${meals}\n• KG diverted: ${kg}\n• CO₂ prevented (est.): ${co2}`;
+      }
+
+      if (s.includes("donate") || s.includes("donnen") || s.includes("don")){
+        if (lang === 'fr') return "Allez à ../donate-now/ et remplissez le formulaire (coordonnées + fenêtre de collecte + détails).";
+        if (lang === 'cr') return "Al lo ../donate-now/ pou ranpli form (kontak + ler ranmasaz + detay keksoz).";
+        return "Go to ../donate-now/ and complete the form (contact + pickup window + details).";
+      }
+
+      if (s.includes("volunteer") || s.includes("volonter") || s.includes("bénévol")){
+        if (lang === 'fr') return "Allez à ../volunteer-now/ pour soumettre votre disponibilité et vos intérêts.";
+        if (lang === 'cr') return "Al lo ../volunteer-now/ pou soumet ou disponibilite ek keksoz ki enteres ou.";
+        return "Go to ../volunteer-now/ to submit your availability and interests.";
+      }
+
+      if (s.includes("find") || s.includes("food") || s.includes("rod") || s.includes("nourriture")){
+        if (lang === 'fr') return "Vous êtes sur la page Trouver. Utilisez les filtres et cliquez sur « Claim » pour demander.";
+        if (lang === 'cr') return "Ou lo paz Rod Manze. Servi filter e klik « Claim » pou demande.";
+        return "You’re on the Find Food page. Use the filters and press “Claim” to request.";
+      }
+
+      if (s.includes("privacy") || s.includes("confidential") || s.includes("vi prive")){
+        if (lang === 'fr') return "Les pages publiques n’affichent pas vos coordonnées. Les totaux d’impact sont agrégés.";
+        if (lang === 'cr') return "Paz piblik pa afis ou kontak. Total lenpak i an total ansanm.";
+        return "Public pages do not display your contact details. Impact totals are aggregated.";
+      }
+
+      return contactLine;
+    }
+
+    function openAssistant(){ assistantOverlay.style.display = "flex"; setTimeout(()=>assistantInput?.focus(), 50); }
+    function closeAssistant(){ assistantOverlay.style.display = "none"; }
+    assistantBtn?.addEventListener('click', openAssistant);
+    assistantClose?.addEventListener('click', closeAssistant);
+    assistantOverlay?.addEventListener('click', (e) => { if (e.target === assistantOverlay) closeAssistant(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && assistantOverlay.style.display === 'flex') closeAssistant(); });
+
+    function sendToAssistant(q){
+      addBubble(q, "me");
+      addBubble(assistantAnswer(q), "bot");
+    }
+    assistantSend?.addEventListener('click', () => {
+      const q = assistantInput.value;
+      assistantInput.value = "";
+      sendToAssistant(q);
+    });
+    assistantInput?.addEventListener('keydown', (e) => {
+      if (e.key === "Enter"){ e.preventDefault(); assistantSend.click(); }
+    });
+    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => sendToAssistant(b.getAttribute('data-q'))));
+
+    // ===========================
+    // Init
+    // ===========================
+    (async function init(){
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      const lang = getSavedLang();
+      applyLanguage(lang);
+      document.getElementById('langSelect')?.addEventListener('change', (e) => { localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+      document.getElementById('langSelectMobile')?.addEventListener('change', (e) => { localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
+
+      const sess = await sb.auth.getSession();
+      isLoggedIn = !!sess.data?.session?.user;
+      currentUserId = sess.data?.session?.user?.id || null;
+
+      await setAuthUI();
+      await loadListings();
+      await loadAssistantData();
+
+      // filter listeners
+      qSearch.addEventListener('input', renderGrid);
+      qArea.addEventListener('change', renderGrid);
+      qCategory.addEventListener('change', renderGrid);
+      btnReset.addEventListener('click', () => {
+        qSearch.value = '';
+        qArea.value = '';
+        qCategory.value = '';
+        renderGrid();
+      });
+    })();
+  </script>
+</body>
+</html>
