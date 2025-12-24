@@ -204,10 +204,54 @@
     }
     .title p{
       margin:12px auto 0;
-      max-width:820px;
+      max-width:880px;
       color:var(--muted);
       font-size:15px;
     }
+
+    .banner{
+      margin:18px auto 0;
+      max-width:920px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.88);
+      border-radius:18px;
+      padding:14px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      box-shadow:0 10px 22px rgba(2,6,23,.04);
+    }
+    .banner .left{
+      display:flex; flex-direction:column; gap:2px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .banner .left strong{ color:var(--text); font-size:13px; }
+    .banner .right{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:11px 14px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:rgba(255,255,255,.90);
+      color:var(--text);
+      font-weight:850;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform .15s ease, background .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ background:#fff; transform:translateY(-1px); text-decoration:none; }
+    .btn.primary{
+      background:var(--brand);
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 8px 22px rgba(115,182,59,.20);
+    }
+    .btn.primary:hover{ background:var(--brand-2); }
 
     /* Layout */
     .layout{
@@ -224,17 +268,8 @@
       padding:18px;
       box-shadow:0 10px 22px rgba(2,6,23,.04);
     }
-    .card h2{
-      margin:0;
-      font-size:18px;
-      letter-spacing:-0.2px;
-    }
-    .sub{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.55;
-    }
+    .card h2{ margin:0; font-size:18px; letter-spacing:-0.2px; }
+    .sub{ margin-top:8px; color:var(--muted); font-size:13px; line-height:1.55; }
 
     /* Form */
     .form{
@@ -279,28 +314,8 @@
       gap:10px;
       flex-wrap:wrap;
       margin-top:14px;
+      align-items:center;
     }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:11px 14px;
-      border-radius:999px;
-      border:1px solid rgba(15,23,42,.12);
-      background:rgba(255,255,255,.85);
-      color:var(--text);
-      font-weight:850;
-      font-size:14px;
-      cursor:pointer;
-      transition: transform .15s ease, background .15s ease;
-      white-space:nowrap;
-    }
-    .btn:hover{ background:#fff; transform:translateY(-1px); }
-    .btn.primary{
-      background:var(--brand);
-      color:#fff;
-      border-color:transparent;
-      box-shadow:0 8px 22px rgba(115,182,59,.20);
-    }
-    .btn.primary:hover{ background:var(--brand-2); }
 
     .status{
       margin-top:12px;
@@ -311,12 +326,31 @@
     .ok{ color:#0f5132; }
     .err{ color:#842029; }
 
-    /* Sidebar */
-    .tips{
-      display:grid;
-      gap:10px;
-      margin-top:14px;
+    details.debug{
+      margin-top:10px;
+      border:1px dashed rgba(15,23,42,.18);
+      border-radius:14px;
+      padding:10px 12px;
+      background:rgba(255,255,255,.72);
     }
+    details.debug summary{
+      cursor:pointer;
+      font-weight:850;
+      color:var(--muted);
+      font-size:13px;
+    }
+    pre{
+      margin:10px 0 0;
+      overflow:auto;
+      font-size:12px;
+      color:#0b1220;
+      background:rgba(2,6,23,.04);
+      padding:10px;
+      border-radius:12px;
+    }
+
+    /* Sidebar */
+    .tips{ display:grid; gap:10px; margin-top:14px; }
     .tip{
       border:1px solid rgba(15,23,42,.10);
       border-radius:18px;
@@ -338,18 +372,8 @@
       grid-template-columns:1.3fr 1fr 1fr 1fr;
       gap:18px;
     }
-    .foot-title{
-      font-weight:850;
-      color:#fff;
-      margin:0 0 10px;
-      font-size:14px;
-    }
-    .foot-text{
-      margin:0;
-      color:rgba(255,255,255,.70);
-      font-size:13px;
-      line-height:1.55;
-    }
+    .foot-title{ font-weight:850; color:#fff; margin:0 0 10px; font-size:14px; }
+    .foot-text{ margin:0; color:rgba(255,255,255,.70); font-size:13px; line-height:1.55; }
     .foot-links{
       display:flex;
       flex-direction:column;
@@ -374,115 +398,11 @@
     }
     .footer-bottom a{ color:rgba(255,255,255,.85); text-decoration:underline; }
 
-    /* Assistant */
-    .assistant-btn{
-      position:fixed; right:18px; bottom:18px; z-index:60;
-      border:none; cursor:pointer;
-      background:var(--brand); color:#fff;
-      border-radius:999px;
-      padding:12px 14px;
-      font-weight:850;
-      box-shadow:0 18px 40px rgba(115,182,59,.28);
-      display:flex; align-items:center; gap:10px;
-    }
-    .assistant-btn:hover{ background:var(--brand-2); }
-    .assistant-overlay{
-      position:fixed; inset:0;
-      background:rgba(2,6,23,.55);
-      z-index:80;
-      display:none;
-      align-items:flex-end;
-      justify-content:flex-end;
-      padding:18px;
-    }
-    .assistant-modal{
-      width:min(520px, 100%);
-      background:var(--surface);
-      border:1px solid rgba(15,23,42,.12);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .assistant-modal header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px;
-      border-bottom:1px solid rgba(15,23,42,.08);
-    }
-    .assistant-modal header strong{ font-size:14px; }
-    .assistant-modal header button{
-      border:1px solid rgba(15,23,42,.12);
-      background:rgba(255,255,255,.85);
-      border-radius:12px;
-      padding:8px 10px;
-      cursor:pointer;
-    }
-    .assistant-body{
-      padding:14px;
-      max-height:60vh;
-      overflow:auto;
-    }
-    .chat{ display:flex; flex-direction:column; gap:10px; }
-    .bubble{
-      padding:12px;
-      border-radius:16px;
-      border:1px solid rgba(15,23,42,.10);
-      font-size:14px;
-      color:var(--muted);
-      background:rgba(251,252,251,.92);
-      white-space:pre-wrap;
-    }
-    .bubble.me{
-      align-self:flex-end;
-      background:rgba(115,182,59,.10);
-      color:var(--brand-ink);
-      border-color:rgba(115,182,59,.22);
-    }
-    .quick{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .chip{
-      border:1px solid rgba(15,23,42,.12);
-      background:rgba(255,255,255,.95);
-      border-radius:999px;
-      padding:8px 10px;
-      font-size:13px;
-      cursor:pointer;
-      color:var(--muted);
-    }
-    .chip:hover{ background:rgba(115,182,59,.10); color:var(--brand-ink); border-color:rgba(115,182,59,.22); }
-    .assistant-modal footer{
-      display:flex; gap:10px;
-      padding:12px;
-      border-top:1px solid rgba(15,23,42,.08);
-      background:rgba(255,255,255,.92);
-    }
-    .assistant-modal input{
-      flex:1;
-      border:1px solid rgba(15,23,42,.14);
-      background:rgba(255,255,255,.95);
-      border-radius:14px;
-      padding:12px;
-      font-size:14px;
-      outline:none;
-    }
-    .assistant-modal input:focus{
-      box-shadow:0 0 0 4px rgba(115,182,59,.18);
-      border-color:rgba(115,182,59,.55);
-    }
-    .send{
-      border:none;
-      border-radius:14px;
-      padding:12px 14px;
-      background:var(--brand);
-      color:#fff;
-      font-weight:850;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .send:hover{ background:var(--brand-2); }
-
     /* Responsive */
     @media (max-width: 980px){
       .layout{ grid-template-columns: 1fr; }
       .footer-grid{ grid-template-columns: 1fr 1fr; }
+      .banner{ flex-direction:column; align-items:flex-start; }
     }
     @media (max-width: 860px){
       .nav-links{ display:none; }
@@ -502,7 +422,7 @@
     <div class="container">
       <div class="nav">
         <a class="brand" href="../">
-          <img class="brand-logo" src="/image/logo.png" alt="FoodShare Seychelles logo" />
+          <img class="brand-logo" src="../assets/logo.png" alt="FoodShare Seychelles logo" />
           <div class="brand-name">
             <strong>FoodShare Seychelles</strong>
             <span data-i18n="nav.tagline">Share Food. Feed Seychelles.</span>
@@ -591,6 +511,17 @@
           <p data-i18n="donate.subtitle">
             Submit a donation request and our team will coordinate pickup. If you’re logged in, we’ll link the donation to your dashboard.
           </p>
+
+          <div class="banner" id="loginBanner" style="display:none;">
+            <div class="left">
+              <strong>Tip:</strong>
+              <span>Log in to track your donation history in your dashboard.</span>
+            </div>
+            <div class="right">
+              <a class="btn" href="../auth/">Login / Sign up</a>
+              <a class="btn" href="../contact-us/">Contact Us</a>
+            </div>
+          </div>
         </div>
 
         <div class="layout">
@@ -604,7 +535,7 @@
             <form id="donationForm" novalidate>
               <div class="form">
                 <div class="field">
-                  <label for="donorType" data-i18n="donate.donorType">Donor type</label>
+                  <label for="donorType">Donor type *</label>
                   <select id="donorType" required>
                     <option value="">Select…</option>
                     <option value="individual">Individual</option>
@@ -617,37 +548,37 @@
                 </div>
 
                 <div class="field">
-                  <label for="displayName" data-i18n="donate.displayName">Public display name (optional)</label>
+                  <label for="displayName">Public display name (optional)</label>
                   <input id="displayName" type="text" placeholder="e.g., John D. / Café Example" />
                 </div>
 
                 <div class="field">
-                  <label for="email" data-i18n="donate.email">Email</label>
+                  <label for="email">Email (recommended)</label>
                   <input id="email" type="email" placeholder="name@email.com" />
                 </div>
 
                 <div class="field">
-                  <label for="phone" data-i18n="donate.phone">Phone</label>
+                  <label for="phone">Phone (recommended)</label>
                   <input id="phone" type="text" placeholder="+248..." />
                 </div>
 
                 <div class="field span-2">
-                  <label for="pickupAddress" data-i18n="donate.address">Pickup address</label>
+                  <label for="pickupAddress">Pickup address *</label>
                   <input id="pickupAddress" type="text" placeholder="Address / landmark" required />
                 </div>
 
                 <div class="field">
-                  <label for="pickupWindow" data-i18n="donate.window">Preferred pickup window</label>
+                  <label for="pickupWindow">Preferred pickup window *</label>
                   <input id="pickupWindow" type="text" placeholder="e.g., Today 3–5pm / Tomorrow morning" required />
                 </div>
 
                 <div class="field">
-                  <label for="estimatedKg" data-i18n="donate.kg">Estimated kilograms (optional)</label>
+                  <label for="estimatedKg">Estimated kilograms (optional)</label>
                   <input id="estimatedKg" type="number" step="0.1" min="0" placeholder="e.g., 12.5" />
                 </div>
 
                 <div class="field span-2">
-                  <label for="pickupNotes" data-i18n="donate.notes">Pickup notes (optional)</label>
+                  <label for="pickupNotes">Pickup notes (optional)</label>
                   <textarea id="pickupNotes" placeholder="Gate code, best entrance, contact person, etc."></textarea>
                 </div>
               </div>
@@ -655,41 +586,44 @@
               <div class="toggle-row">
                 <input id="consentName" type="checkbox" />
                 <div>
-                  <strong data-i18n="donate.hofTitle">Show my name in the Hall of Fame</strong>
-                  <p data-i18n="donate.hofText">
-                    If you opt in, we display only your chosen public display name (not email, phone, or address).
-                  </p>
+                  <strong>Show my name in the Hall of Fame</strong>
+                  <p>If you opt in, we display only your chosen public display name (not email, phone, or address).</p>
                 </div>
               </div>
 
               <div class="actions">
-                <button class="btn primary" type="submit" id="btnSubmit" data-i18n="donate.submit">Submit donation</button>
-                <a class="btn" href="../contact-us/" data-i18n="donate.needHelp">Need help?</a>
+                <button class="btn primary" type="submit" id="btnSubmit">Submit donation</button>
+                <a class="btn" href="../contact-us/">Need help?</a>
+                <span style="color:var(--muted); font-size:13px;" id="authHint"></span>
               </div>
 
               <div class="status" id="statusText"></div>
+              <details class="debug" id="debugBox" style="display:none;">
+                <summary>Show technical details (for troubleshooting)</summary>
+                <pre id="debugText"></pre>
+              </details>
             </form>
           </div>
 
           <!-- SIDEBAR -->
           <div class="card">
-            <h2 data-i18n="donate.sidebarTitle">What happens next</h2>
-            <div class="sub" data-i18n="donate.sidebarSubtitle">
+            <h2>What happens next</h2>
+            <div class="sub">
               We review submissions quickly and coordinate logistics through staff and volunteers.
             </div>
 
             <div class="tips">
               <div class="tip">
-                <h3 data-i18n="donate.tip1Title">1) Submit details</h3>
-                <p data-i18n="donate.tip1Text">Include a clear pickup window and address so we can plan an efficient route.</p>
+                <h3>1) Submit details</h3>
+                <p>Include a clear pickup window and address so we can plan an efficient route.</p>
               </div>
               <div class="tip">
-                <h3 data-i18n="donate.tip2Title">2) We confirm</h3>
-                <p data-i18n="donate.tip2Text">A coordinator may contact you if we need clarification or timing changes.</p>
+                <h3>2) We confirm</h3>
+                <p>A coordinator may contact you if we need clarification or timing changes.</p>
               </div>
               <div class="tip">
-                <h3 data-i18n="donate.tip3Title">3) Pickup & impact</h3>
-                <p data-i18n="donate.tip3Text">Once fulfilled, impact totals update without exposing your personal data.</p>
+                <h3>3) Pickup & impact</h3>
+                <p>Once fulfilled, impact totals update without exposing your personal data.</p>
               </div>
             </div>
 
@@ -772,41 +706,6 @@
     </div>
   </footer>
 
-  <!-- Assistant -->
-  <button class="assistant-btn" id="assistantBtn" type="button" aria-haspopup="dialog">
-    <span aria-hidden="true">✦</span>
-    <span data-i18n="assistant.button">Ask Assistant</span>
-  </button>
-
-  <div class="assistant-overlay" id="assistantOverlay" role="dialog" aria-modal="true" aria-label="Assistant">
-    <div class="assistant-modal">
-      <header>
-        <strong data-i18n="assistant.title">FoodShare Assistant</strong>
-        <button type="button" id="assistantClose" aria-label="Close">✕</button>
-      </header>
-
-      <div class="assistant-body">
-        <div class="chat" id="chat">
-          <div class="bubble" data-i18n="assistant.welcome">
-            Hi — ask me about donating, volunteering, finding food, privacy, or today’s announcement. If I can’t answer, I’ll send you to Contact Us.
-          </div>
-        </div>
-
-        <div class="quick" aria-label="Suggested questions">
-          <button class="chip" type="button" data-q="donate">How do I donate?</button>
-          <button class="chip" type="button" data-q="hall of fame">Hall of Fame</button>
-          <button class="chip" type="button" data-q="privacy">Privacy</button>
-          <button class="chip" type="button" data-q="contact">Contact</button>
-        </div>
-      </div>
-
-      <footer>
-        <input id="assistantInput" type="text" placeholder="Type a question…" />
-        <button class="send" id="assistantSend" type="button">Send</button>
-      </footer>
-    </div>
-  </div>
-
   <script>
     // ===========================
     // Supabase
@@ -814,176 +713,6 @@
     const SUPABASE_URL = 'https://edotvuleaydztulkxehe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkb3R2dWxlYXlkenR1bGt4ZWhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU2MDAyNDYsImV4cCI6MjA4MTE3NjI0Nn0.gDni31MI8twOpNmNcIpj1jGsra75eZ2iLL6gQM0i9lw';
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // ===========================
-    // i18n (core keys)
-    // ===========================
-    const I18N = {
-      en: {
-        "nav.tagline":"Share Food. Feed Seychelles.",
-        "nav.findFood":"Find Food",
-        "nav.about":"About",
-        "nav.volunteer":"Volunteer",
-        "nav.more":"More",
-        "nav.learn":"Learn",
-        "nav.impact":"Our Impact",
-        "nav.partners":"Our Partners",
-        "nav.contact":"Contact Us",
-        "nav.social":"Social Media",
-        "nav.privacy":"Privacy Policy",
-        "nav.terms":"Terms Of Use",
-        "nav.sitemap":"Sitemap",
-        "nav.staffLogin":"Staff Login",
-        "nav.donateNow":"Donate Now",
-        "nav.login":"Login",
-
-        "donate.title":"Donate Now",
-        "donate.subtitle":"Submit a donation request and our team will coordinate pickup. If you’re logged in, we’ll link the donation to your dashboard.",
-        "donate.formTitle":"Donation details",
-        "donate.formSubtitle":"Please provide accurate information. Contact details are used only for coordination and are not displayed publicly.",
-        "donate.donorType":"Donor type",
-        "donate.displayName":"Public display name (optional)",
-        "donate.email":"Email",
-        "donate.phone":"Phone",
-        "donate.address":"Pickup address",
-        "donate.window":"Preferred pickup window",
-        "donate.kg":"Estimated kilograms (optional)",
-        "donate.notes":"Pickup notes (optional)",
-        "donate.hofTitle":"Show my name in the Hall of Fame",
-        "donate.hofText":"If you opt in, we display only your chosen public display name (not email, phone, or address).",
-        "donate.submit":"Submit donation",
-        "donate.needHelp":"Need help?",
-        "donate.sidebarTitle":"What happens next",
-        "donate.sidebarSubtitle":"We review submissions quickly and coordinate logistics through staff and volunteers.",
-        "donate.tip1Title":"1) Submit details",
-        "donate.tip1Text":"Include a clear pickup window and address so we can plan an efficient route.",
-        "donate.tip2Title":"2) We confirm",
-        "donate.tip2Text":"A coordinator may contact you if we need clarification or timing changes.",
-        "donate.tip3Title":"3) Pickup & impact",
-        "donate.tip3Text":"Once fulfilled, impact totals update without exposing your personal data.",
-
-        "assistant.button":"Ask Assistant",
-        "assistant.title":"FoodShare Assistant",
-        "assistant.welcome":"Hi — ask me about donating, volunteering, privacy, or contacting the team. If I can’t answer, I’ll send you to Contact Us.",
-      },
-      cr: {
-        "nav.tagline":"Partaz Manze. Nouri Sesel.",
-        "nav.findFood":"Rod Manze",
-        "nav.about":"Lo Nou",
-        "nav.volunteer":"Volonter",
-        "nav.more":"Plis",
-        "nav.learn":"Aprann",
-        "nav.impact":"Nou Lenpak",
-        "nav.partners":"Nou Partener",
-        "nav.contact":"Kontak Nou",
-        "nav.social":"Sosyal Media",
-        "nav.privacy":"Politik Lasanble",
-        "nav.terms":"Kondisyon Itilizasyon",
-        "nav.sitemap":"Plan Sit",
-        "nav.staffLogin":"Login Staff",
-        "nav.donateNow":"Donnen Aster",
-        "nav.login":"Login",
-
-        "donate.title":"Donnen Aster",
-        "donate.subtitle":"Soumet en don e nou pou koordin ranmasaz. Si ou login, don i pou aparèt dan ou dashboard.",
-        "donate.formTitle":"Detay don",
-        "donate.formSubtitle":"Silvouple donn keksoz korek. Detay kontak i zis pou koordinasyon e pa afis an piblik.",
-        "donate.donorType":"Kalite donater",
-        "donate.displayName":"Non piblik (opsyonel)",
-        "donate.email":"Email",
-        "donate.phone":"Telefon",
-        "donate.address":"Adrès ranmasaz",
-        "donate.window":"Ler ranmasaz swete",
-        "donate.kg":"Kilogram estimen (opsyonel)",
-        "donate.notes":"Not ranmasaz (opsyonel)",
-        "donate.hofTitle":"Met mon non Lasanble Onorab",
-        "donate.hofText":"Si ou krwar, nou montre zis non piblik ou swazir (pa email/telefon/adres).",
-        "donate.submit":"Soumet don",
-        "donate.needHelp":"Bezwen led?",
-        "donate.sidebarTitle":"Kwa ki arive apre",
-        "donate.sidebarSubtitle":"Nou revize vit e koordin keksoz atraver staff ek volonter.",
-        "donate.tip1Title":"1) Soumet detay",
-        "donate.tip1Text":"Met en bon ler ranmasaz ek adrès pou planifye keksoz byen.",
-        "donate.tip2Title":"2) Nou konfirm",
-        "donate.tip2Text":"En koordinater i kapab kontakte ou si i bezwen kestyon.",
-        "donate.tip3Title":"3) Ranmasaz & lenpak",
-        "donate.tip3Text":"Apre keksoz, total lenpak i met a zour san done prive.",
-
-        "assistant.button":"Asistan",
-        "assistant.title":"Asistan FoodShare",
-        "assistant.welcome":"Bonzour — kestyon lo don, vi prive, ouswa kontak nou. Si mon pa kapab reponn, mon pou anvoy ou lo Kontak Nou.",
-      },
-      fr: {
-        "nav.tagline":"Partagez la nourriture. Nourrissez les Seychelles.",
-        "nav.findFood":"Trouver",
-        "nav.about":"À propos",
-        "nav.volunteer":"Bénévolat",
-        "nav.more":"Plus",
-        "nav.learn":"En savoir plus",
-        "nav.impact":"Notre impact",
-        "nav.partners":"Nos partenaires",
-        "nav.contact":"Contact",
-        "nav.social":"Réseaux sociaux",
-        "nav.privacy":"Confidentialité",
-        "nav.terms":"Conditions",
-        "nav.sitemap":"Plan du site",
-        "nav.staffLogin":"Connexion staff",
-        "nav.donateNow":"Faire un don",
-        "nav.login":"Connexion",
-
-        "donate.title":"Faire un don",
-        "donate.subtitle":"Soumettez un don et notre équipe coordonnera la collecte. Si vous êtes connecté, il apparaîtra dans votre tableau de bord.",
-        "donate.formTitle":"Détails du don",
-        "donate.formSubtitle":"Vos coordonnées servent uniquement à la coordination et ne sont pas affichées publiquement.",
-        "donate.donorType":"Type de donateur",
-        "donate.displayName":"Nom public (optionnel)",
-        "donate.email":"Email",
-        "donate.phone":"Téléphone",
-        "donate.address":"Adresse de collecte",
-        "donate.window":"Créneau souhaité",
-        "donate.kg":"Kilogrammes estimés (optionnel)",
-        "donate.notes":"Notes (optionnel)",
-        "donate.hofTitle":"Afficher mon nom dans le Hall of Fame",
-        "donate.hofText":"Si vous acceptez, seul votre nom public sera affiché (pas d’email/téléphone/adresse).",
-        "donate.submit":"Soumettre",
-        "donate.needHelp":"Besoin d’aide ?",
-        "donate.sidebarTitle":"Étapes suivantes",
-        "donate.sidebarSubtitle":"Nous vérifions rapidement et coordonnons la logistique avec staff et bénévoles.",
-        "donate.tip1Title":"1) Envoyer les détails",
-        "donate.tip1Text":"Ajoutez un créneau clair et une adresse pour optimiser la tournée.",
-        "donate.tip2Title":"2) Confirmation",
-        "donate.tip2Text":"Un coordinateur peut vous contacter pour préciser ou ajuster.",
-        "donate.tip3Title":"3) Collecte & impact",
-        "donate.tip3Text":"Une fois réalisé, l’impact se met à jour sans données personnelles.",
-
-        "assistant.button":"Assistant",
-        "assistant.title":"Assistant FoodShare",
-        "assistant.welcome":"Bonjour — questions sur les dons, la confidentialité ou comment nous contacter. Si je ne peux pas répondre, je vous renvoie vers Contact.",
-      }
-    };
-
-    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
-    function applyLanguage(lang){
-      const dict = I18N[lang] || I18N.en;
-      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (dict[key]) el.textContent = dict[key];
-      });
-      const s1 = document.getElementById('langSelect');
-      const s2 = document.getElementById('langSelectMobile');
-      if (s1) s1.value = lang;
-      if (s2) s2.value = lang;
-
-      // placeholder tweaks
-      const ai = document.getElementById('assistantInput');
-      if (ai){
-        ai.placeholder =
-          (lang === 'fr') ? 'Tapez une question…' :
-          (lang === 'cr') ? 'Tap kestyon…' :
-          'Type a question…';
-      }
-    }
 
     // ===========================
     // Navbar interactions
@@ -1010,8 +739,21 @@
     mobileToggle?.addEventListener('click', () => mobilePanel.classList.toggle('open'));
 
     // ===========================
-    // Auth slot
+    // Language (simple stub; keep consistent with your other pages)
     // ===========================
+    function getSavedLang(){ return localStorage.getItem('fs_lang') || 'en'; }
+    function applyLanguage(lang){
+      document.documentElement.lang = (lang === 'cr') ? 'cr' : lang;
+      const s1 = document.getElementById('langSelect');
+      const s2 = document.getElementById('langSelectMobile');
+      if (s1) s1.value = lang;
+      if (s2) s2.value = lang;
+    }
+
+    // ===========================
+    // Auth slot + role redirect target
+    // ===========================
+    let authState = { isLoggedIn:false, userId:null, userEmail:null, roleId:4 };
     async function setAuthUI(){
       const { data } = await sb.auth.getSession();
       const isLoggedIn = !!data?.session?.user;
@@ -1021,16 +763,18 @@
       const desktopLink = document.getElementById('authLink');
       const mobileLink = document.getElementById('authLinkMobile');
 
-      if (!desktop || !mobile || !desktopLink || !mobileLink) return;
+      if (!desktop || !mobile || !desktopLink || !mobileLink) return authState;
 
       if (!isLoggedIn){
         desktopLink.href = "../auth/";
         mobileLink.href = "../auth/";
-        return { isLoggedIn:false, userId:null };
+        authState = { isLoggedIn:false, userId:null, userEmail:null, roleId:4 };
+        return authState;
       }
 
       const user = data.session.user;
       let roleId = 4;
+
       try{
         const { data: prof } = await sb.from('profiles').select('role_id').eq('user_id', user.id).single();
         if (prof?.role_id) roleId = prof.role_id;
@@ -1054,15 +798,18 @@
       document.getElementById('signOutBtn')?.addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
       document.getElementById('signOutBtnMobile')?.addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
 
-      return { isLoggedIn:true, userId: user.id };
+      authState = { isLoggedIn:true, userId: user.id, userEmail: user.email || null, roleId };
+      return authState;
     }
 
     // ===========================
-    // Donation form submit
+    // Donation form submit (FIXED)
     // ===========================
     const form = document.getElementById('donationForm');
     const statusText = document.getElementById('statusText');
     const btnSubmit = document.getElementById('btnSubmit');
+    const debugBox = document.getElementById('debugBox');
+    const debugText = document.getElementById('debugText');
 
     const donorType = document.getElementById('donorType');
     const displayName = document.getElementById('displayName');
@@ -1074,36 +821,51 @@
     const pickupNotes = document.getElementById('pickupNotes');
     const consentName = document.getElementById('consentName');
 
-    let authState = { isLoggedIn:false, userId:null };
-
     function setStatus(msg, kind=""){
       statusText.className = "status " + (kind || "");
       statusText.textContent = msg;
     }
+    function setDebug(obj){
+      debugBox.style.display = "block";
+      debugText.textContent = JSON.stringify(obj, null, 2);
+    }
+    function clearDebug(){
+      debugBox.style.display = "none";
+      debugText.textContent = "";
+    }
 
     function numOrNull(v){
-      if (v === null || v === undefined) return null;
-      const s = String(v).trim();
+      const s = String(v ?? "").trim();
       if (!s) return null;
       const n = Number(s);
-      if (Number.isNaN(n)) return null;
-      return n;
+      return Number.isFinite(n) ? n : null;
+    }
+
+    async function createHallOfFameEntry(donationId, donorDisplayName){
+      // If RLS blocks this, we ignore it (donation still succeeded).
+      try{
+        await sb.from('hall_of_fame_entries').insert({
+          donation_id: donationId,
+          donor_display_name: donorDisplayName
+        });
+      }catch(_){}
     }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
+      clearDebug();
       setStatus("");
+
       btnSubmit.disabled = true;
 
-      // Basic validation
-      if (!pickupAddress.value.trim() || !pickupWindow.value.trim() || !donorType.value.trim()){
-        setStatus("Please complete donor type, pickup address, and pickup window.", "err");
+      // Required fields
+      if (!donorType.value.trim() || !pickupAddress.value.trim() || !pickupWindow.value.trim()){
+        setStatus("Please complete: Donor type, Pickup address, and Preferred pickup window.", "err");
         btnSubmit.disabled = false;
         return;
       }
 
-      // Build payload matching your schema
+      // Build payload exactly matching your schema
       const payload = {
         donor_type: donorType.value.trim(),
         donor_display_name: displayName.value.trim() || null,
@@ -1119,110 +881,60 @@
 
       if (authState.isLoggedIn) payload.user_id = authState.userId;
 
+      setStatus("Submitting donation…");
+
+      // IMPORTANT FIX:
+      // - We now surface the real Supabase error (in debug) so you can see if it's RLS/policy.
+      // - We also show a correct user-facing message based on the error.
       try{
-        setStatus("Submitting donation…");
-        const { data, error } = await sb.from('donations').insert(payload).select('id').single();
+        const { data, error } = await sb
+          .from('donations')
+          .insert(payload)
+          .select('id')
+          .single();
 
         if (error){
-          setStatus("Could not submit donation. Please try again or use Contact Us.", "err");
+          const msg = (error.message || "").toLowerCase();
+
+          // Common: RLS / permission / policy block
+          if (msg.includes("row-level security") || msg.includes("permission") || msg.includes("not allowed")){
+            setStatus(
+              "Donation submission was blocked by backend security (RLS policy). " +
+              "Please log in and try again. If it still fails, your donations INSERT policy for anon/authenticated needs fixing in Supabase.",
+              "err"
+            );
+            setDebug({ where: "donations.insert", error });
+            btnSubmit.disabled = false;
+            return;
+          }
+
+          // Common: missing column / bad type / constraint
+          setStatus(
+            "Donation could not be submitted due to a backend validation/constraint error. Please review the technical details and fix the backend rule.",
+            "err"
+          );
+          setDebug({ where: "donations.insert", payload, error });
           btnSubmit.disabled = false;
           return;
         }
 
-        // If opted into Hall of Fame, create entry (safe display name only)
+        // Hall of Fame (optional, best-effort)
         const dn = displayName.value.trim();
         if (consentName.checked && dn && data?.id){
-          // Your table enforces donation_id unique, so this is safe to try once
-          await sb.from('hall_of_fame_entries').insert({
-            donation_id: data.id,
-            donor_display_name: dn
-          });
+          await createHallOfFameEntry(data.id, dn);
         }
 
         setStatus("Donation submitted successfully. Our team will coordinate pickup soon.", "ok");
-
-        // reset
+        clearDebug();
         form.reset();
-      }catch(_){
-        setStatus("Unexpected error. Please try again or contact us.", "err");
+
+      }catch (ex){
+        setStatus("Unexpected error in the browser. Please try again or use Contact Us.", "err");
+        setDebug({ where: "try/catch", ex: String(ex) });
       }finally{
         btnSubmit.disabled = false;
       }
     });
-
-    // ===========================
-    // Assistant (simple, page-aware)
-    // ===========================
-    const assistantBtn = document.getElementById('assistantBtn');
-    const assistantOverlay = document.getElementById('assistantOverlay');
-    const assistantClose = document.getElementById('assistantClose');
-    const chat = document.getElementById('chat');
-    const assistantInput = document.getElementById('assistantInput');
-    const assistantSend = document.getElementById('assistantSend');
-
-    function addBubble(text, who="bot"){
-      const div = document.createElement('div');
-      div.className = `bubble ${who === "me" ? "me" : ""}`;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.parentElement.scrollTop = chat.parentElement.scrollHeight;
-    }
-
-    function assistantAnswer(q){
-      const s = (q || "").toLowerCase().trim();
-      const lang = getSavedLang();
-      const contactLine =
-        (lang === 'fr') ? "Je ne suis pas sûr — utilisez le formulaire Contact : ../contact-us/" :
-        (lang === 'cr') ? "Mon pa sir — silvouple servi form Kontak : ../contact-us/" :
-        "I’m not fully sure — please use the Contact form: ../contact-us/";
-
-      if (!s) return contactLine;
-
-      if (s.includes("donate") || s.includes("donnen") || s.includes("don")){
-        if (lang === 'fr') return "Remplissez le formulaire : coordonnées + adresse + créneau. Cliquez sur “Soumettre”.";
-        if (lang === 'cr') return "Ranpli form: kontak + adrès + ler ranmasaz. Apre klik “Soumet don”.";
-        return "Complete the form: contact + address + pickup window, then press “Submit donation”.";
-      }
-
-      if (s.includes("hall") || s.includes("fame") || s.includes("onor") || s.includes("onore")){
-        if (lang === 'fr') return "Cochez l’option Hall of Fame et ajoutez un nom public. Seul ce nom sera affiché.";
-        if (lang === 'cr') return "Tike opsyon Lasanble Onorab e met en non piblik. Nou montre zis sa non la.";
-        return "Tick Hall of Fame and add a public display name. Only that name is shown publicly.";
-      }
-
-      if (s.includes("privacy") || s.includes("confidential") || s.includes("vi prive")){
-        if (lang === 'fr') return "Votre email/téléphone/adresse ne sont pas affichés publiquement. Seuls des totaux et noms opt-in sont publics.";
-        if (lang === 'cr') return "Ou email/telefon/adres pa afis an piblik. Zis total keksoz ek non opt-in i piblik.";
-        return "Your email/phone/address are not shown publicly. Only aggregates and opt-in names are public.";
-      }
-
-      if (s.includes("contact") || s.includes("kontak")){
-        return "../contact-us/";
-      }
-
-      return contactLine;
-    }
-
-    function openAssistant(){ assistantOverlay.style.display = "flex"; setTimeout(()=>assistantInput?.focus(), 50); }
-    function closeAssistant(){ assistantOverlay.style.display = "none"; }
-    assistantBtn?.addEventListener('click', openAssistant);
-    assistantClose?.addEventListener('click', closeAssistant);
-    assistantOverlay?.addEventListener('click', (e) => { if (e.target === assistantOverlay) closeAssistant(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && assistantOverlay.style.display === 'flex') closeAssistant(); });
-
-    function sendToAssistant(q){
-      addBubble(q, "me");
-      addBubble(assistantAnswer(q), "bot");
-    }
-    assistantSend?.addEventListener('click', () => {
-      const q = assistantInput.value;
-      assistantInput.value = "";
-      sendToAssistant(q);
-    });
-    assistantInput?.addEventListener('keydown', (e) => {
-      if (e.key === "Enter"){ e.preventDefault(); assistantSend.click(); }
-    });
-    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => sendToAssistant(b.getAttribute('data-q'))));
 
     // ===========================
     // Init
@@ -1236,6 +948,19 @@
       document.getElementById('langSelectMobile')?.addEventListener('change', (e) => { localStorage.setItem('fs_lang', e.target.value); applyLanguage(e.target.value); });
 
       authState = await setAuthUI();
+
+      // Show a banner nudging login if user is not logged in (helps if RLS allows only authenticated)
+      const loginBanner = document.getElementById('loginBanner');
+      const authHint = document.getElementById('authHint');
+      if (!authState.isLoggedIn){
+        loginBanner.style.display = "flex";
+        authHint.textContent = "Not logged in (you can still donate if backend allows public inserts).";
+      }else{
+        loginBanner.style.display = "none";
+        authHint.textContent = "Logged in — this donation will be linked to your dashboard.";
+        // Prefill email if empty
+        if (authState.userEmail && !email.value) email.value = authState.userEmail;
+      }
     })();
   </script>
 </body>
