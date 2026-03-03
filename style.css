@@ -1,12 +1,12 @@
 /* --- BASE RESET & VARIABLES --- */
 :root {
-    --primary-color: #003366; /* Corporate Navy */
-    --secondary-color: #008080; /* Teal/Green for Food/Eco feel */
+    --dark-green: #608d38;  /* From "FoodShare" text */
+    --light-green: #a3c94f; /* From "Seychelles" text and leaf accent */
     --text-dark: #333333;
+    --text-grey: #666666;
     --text-light: #ffffff;
-    --bg-light: #f8f9fa;
-    --border-color: #dddddd;
-    --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --bg-white: #ffffff;
+    --font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -19,7 +19,7 @@ body {
     font-family: var(--font-family);
     color: var(--text-dark);
     line-height: 1.6;
-    background-color: var(--bg-light);
+    background-color: var(--bg-white);
 }
 
 .container {
@@ -33,42 +33,52 @@ ul { list-style: none; }
 
 /* --- ANNOUNCEMENT BAR --- */
 .announcement-bar {
-    background-color: var(--secondary-color);
+    background-color: var(--dark-green);
     color: var(--text-light);
     text-align: center;
     padding: 10px;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: bold;
 }
 .announcement-bar.hidden { display: none; }
 
+/* --- TOP BAR (Socials) --- */
+.top-bar {
+    background-color: var(--bg-white);
+    padding: 5px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.top-bar-content {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.social-icons a {
+    color: var(--light-green);
+    margin-left: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
 /* --- NAVIGATION BAR --- */
 .navbar {
-    background-color: var(--text-light);
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-white);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .nav-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 80px;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--primary-color);
+    height: 100px;
 }
 
 .logo img {
-    height: 50px;
+    height: 80px; /* Sized up to show the leaf details */
     width: auto;
 }
 
@@ -79,99 +89,107 @@ ul { list-style: none; }
 }
 
 .nav-links a {
-    color: var(--text-dark);
-    font-weight: 500;
+    color: var(--text-grey);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
     transition: color 0.3s ease;
 }
 
-.nav-links a:hover {
-    color: var(--secondary-color);
+.nav-links a:hover, .nav-links a.member-login {
+    color: var(--dark-green);
 }
 
-/* Dropdown specific styles */
+/* Dropdown */
 .dropdown { position: relative; }
 .dropdown-content {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--text-light);
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-    border-radius: 4px;
-    overflow: hidden;
+    background-color: var(--bg-white);
+    min-width: 150px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.1);
+    border-top: 3px solid var(--light-green);
 }
 
 .dropdown-content a {
-    color: var(--text-dark);
     padding: 12px 16px;
     display: block;
     border-bottom: 1px solid #f1f1f1;
+    font-size: 0.8rem;
 }
 
 .dropdown-content a:hover { background-color: #f9f9f9; }
 .dropdown:hover .dropdown-content { display: block; }
 
-/* Buttons */
-.btn-donate {
-    background-color: var(--secondary-color);
-    color: var(--text-light);
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: background 0.3s ease;
-}
-.btn-donate:hover { background-color: #006666; }
-
 /* --- HERO SECTION --- */
 .hero {
-    background-color: var(--primary-color);
+    position: relative;
+    /* Replace this URL with a beautiful local photo of Seychelles or fresh food */
+    background-image: url('https://images.unsplash.com/photo-1464226184884-fa280b87c399?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-overlay {
+    background-color: rgba(0, 0, 0, 0.2); /* Slight darkening for text readability */
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.hero-words {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 80px; /* Pushes words up slightly to make room for banner */
+}
+
+.word {
     color: var(--text-light);
-    padding: 100px 0;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    border-top: 2px solid var(--text-light);
+    border-bottom: 2px solid var(--text-light);
+    padding: 10px 0;
+    width: 30%;
     text-align: center;
 }
 
-.hero h1 {
-    font-size: 3rem;
-    margin-bottom: 20px;
+/* Mission Banner Overlapping Bottom */
+.mission-banner {
+    background-color: rgba(163, 201, 79, 0.95); /* Light green with slight transparency */
+    color: var(--text-light);
+    text-align: center;
+    padding: 30px 20px;
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    width: 80%;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
-.hero p {
+.mission-banner p {
     font-size: 1.2rem;
-    max-width: 700px;
-    margin: 0 auto 40px;
-    opacity: 0.9;
-}
-
-.hero-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.btn-primary {
-    background-color: var(--secondary-color);
-    color: var(--text-light);
-    padding: 15px 30px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.btn-secondary {
-    background-color: transparent;
-    border: 2px solid var(--text-light);
-    color: var(--text-light);
-    padding: 15px 30px;
-    border-radius: 5px;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 /* --- FOOTER --- */
 .corporate-footer {
-    background-color: var(--text-dark);
-    color: var(--text-light);
+    background-color: #f8f8f8;
+    color: var(--text-grey);
     padding: 40px 0 20px;
-    margin-top: 50px;
+    border-top: 1px solid #eaeaea;
 }
 
 .footer-content {
@@ -188,19 +206,18 @@ ul { list-style: none; }
 }
 
 .footer-links a {
-    color: #cccccc;
+    color: var(--dark-green);
     font-size: 0.9rem;
+    font-weight: bold;
 }
 
 .footer-credits {
-    border-top: 1px solid #555;
     padding-top: 20px;
     width: 100%;
     font-size: 0.85rem;
-    color: #aaaaaa;
 }
 
 .footer-credits a {
-    color: var(--text-light);
+    color: var(--dark-green);
     text-decoration: underline;
 }
