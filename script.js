@@ -8,8 +8,6 @@ const supabase = supabaseClient.createClient(supabaseUrl, supabaseKey);
 // 2. Function to load the announcement bar
 async function loadAnnouncement() {
     try {
-        // Query the announcements table for the active message
-        // Thanks to RLS, the public can only select where is_active = true
         const { data, error } = await supabase
             .from('announcements')
             .select('message, link_url')
@@ -19,22 +17,19 @@ async function loadAnnouncement() {
 
         if (error) throw error;
 
-        // If data exists, display the bar
         if (data) {
             const bar = document.getElementById('announcement-bar');
             const textElement = document.getElementById('announcement-text');
             
-            // Make it a link if a URL is provided by admin
             if (data.link_url) {
                 textElement.innerHTML = `<a href="${data.link_url}" style="color: white; text-decoration: underline;">${data.message}</a>`;
             } else {
                 textElement.textContent = data.message;
             }
             
-            bar.classList.remove('hidden'); // Show the bar
+            bar.classList.remove('hidden'); 
         }
     } catch (error) {
-        // If there is no active announcement or a network error, it silently fails and stays hidden
         console.log('No active announcements to display.', error.message);
     }
 }
