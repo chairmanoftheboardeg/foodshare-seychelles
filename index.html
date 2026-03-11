@@ -73,36 +73,46 @@
         </p>
     </footer>
 
-    <script>
-        // --- 1. Loader Logic ---
-        window.addEventListener('load', function() {
-            const loader = document.getElementById('loader');
-            // Fade out
-            loader.style.opacity = '0';
-            // Remove from DOM flow after transition
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500); 
-        });
+<script>
+        // --- 1. Supabase Initialization ---
+        // We use 'supabaseClient' to avoid conflicting with the global 'supabase' object
+        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
+        
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        console.log("Supabase Client Initialized:", supabaseClient);
 
         // --- 2. Mobile Menu Toggle ---
         const mobileMenu = document.getElementById('mobile-menu');
         const navList = document.getElementById('nav-list');
 
-        mobileMenu.addEventListener('click', () => {
-            navList.classList.toggle('active');
-        });
+        if (mobileMenu && navList) {
+            mobileMenu.addEventListener('click', () => {
+                navList.classList.toggle('active');
+            });
+        }
 
-        // --- 3. Supabase Initialization ---
-        // Initialize Supabase using your project credentials
-        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
-        
-        // Use window.supabase from the CDN script
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // --- 3. Bulletproof Loader Logic ---
+        function removeLoader() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500); 
+            }
+        }
 
-        // Quick console test to ensure connection
-        console.log("Supabase Client Initialized:", supabase);
+        // Attempt to remove loader when the window fully loads
+        window.addEventListener('load', removeLoader);
+
+        // Fallback 1: If the document is somehow already complete
+        if (document.readyState === 'complete') {
+            removeLoader();
+        }
+
+        // Fallback 2: Failsafe timer. If the CDN hangs, force the loader to disappear after 2.5 seconds.
+        setTimeout(removeLoader, 2500);
     </script>
 </body>
 </html>
