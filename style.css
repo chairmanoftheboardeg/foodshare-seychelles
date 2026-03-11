@@ -655,3 +655,74 @@ footer a:hover {
 .close-modal:hover {
     color: var(--text-dark);
 }
+
+/* =========================================
+   Contact Page Styles
+   ========================================= */
+
+.contact-wrapper {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+/* Contact Info Box */
+.contact-info-box {
+    background-color: var(--primary-green);
+    color: var(--white);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.contact-info-box h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 10px;
+}
+
+.contact-detail {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+}
+
+.contact-detail i {
+    font-size: 1.3rem;
+    margin-right: 15px;
+    margin-top: 4px;
+}
+
+.contact-socials {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.contact-socials a {
+    background-color: var(--white);
+    color: var(--primary-green);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.contact-socials a:hover {
+    background-color: var(--dark-green);
+    color: var(--white);
+    transform: translateY(-3px);
+}
+
+@media (max-width: 992px) {
+    .contact-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
