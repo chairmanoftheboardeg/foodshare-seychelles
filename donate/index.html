@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate Food | FoodShare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="../style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="loader-wrapper" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="top-bar">
+        <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank" title="Official LinkedIn Page"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank" title="LinkedIn Blog"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+
+    <header>
+        <div class="logo">
+            <a href="../"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
+        </div>
+        
+        <div class="menu-toggle" id="mobile-menu">&#9776;</div>
+
+        <nav>
+            <ul id="nav-list">
+                <li><a href="../about/">ABOUT</a></li>
+                <li><a href="../volunteer/">VOLUNTEER</a></li>
+                <li><a href="../find-food/">FIND FOOD</a></li>
+                <li><a href="../donate/" class="active">DONATE</a></li>
+                <li><a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank">BLOG</a></li>
+                <li><a href="../contact/">CONTACT</a></li>
+                <li><a href="../staff/" class="staff-login">STAFF LOGIN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <h1>Donate Surplus Food</h1>
+    </section>
+
+    <section class="section-container" style="text-align: center; padding-bottom: 20px;">
+        <h2 class="section-title">Share the Abundance</h2>
+        <div style="max-width: 800px; margin: 0 auto; font-size: 1.1rem; color: #555;">
+            <p>Whether you are a local household with extra garden produce or a supermarket with surplus inventory, your donation makes a massive impact in Seychelles. Fill out the form below to add your surplus to our intake portal.</p>
+        </div>
+    </section>
+
+    <section class="section-container" style="background-color: #f9f9f9; padding-top: 40px;">
+        <div class="form-container">
+            <form id="donation-form">
+                
+                <div class="form-group">
+                    <label for="donorType">Donor Type</label>
+                    <select id="donorType" name="donorType" required>
+                        <option value="" disabled selected>Select your donor category...</option>
+                        <option value="Personal">Personal (Household / Individual)</option>
+                        <option value="Organizational">Organizational (Supermarket, Hotel, Farm)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="foodDetails">Food Details & Quantity</label>
+                    <textarea id="foodDetails" name="foodDetails" placeholder="Example: 10kg of fresh tomatoes, 5 loaves of bread (Best before tomorrow). Please be as specific as possible!" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Collection Preference</label>
+                    <div style="margin-top: 10px;">
+                        <label style="display: block; margin-bottom: 10px; cursor: pointer;">
+                            <input type="radio" name="collectionPreference" value="Drop-off" required checked> 
+                            <strong>I will drop it off</strong> (Bring it to our Victoria Depot)
+                        </label>
+                        <label style="display: block; cursor: pointer;">
+                            <input type="radio" name="collectionPreference" value="Request Pickup"> 
+                            <strong>Request Pickup</strong> (A volunteer driver will come to you)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="foodPhoto">Upload Photo (Optional)</label>
+                    <input type="file" id="foodPhoto" name="foodPhoto" accept="image/png, image/jpeg">
+                    <small style="color: #888; display: block; margin-top: 5px;">A quick snap helps our sorters know what to expect.</small>
+                </div>
+
+                <div id="form-message" style="margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
+
+                <button type="submit" class="btn btn-primary" id="submit-btn" style="width: 100%;">Submit Donation Offer</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FoodShare Seychelles. All Rights Reserved.</p>
+        <p>
+            FoodShare Seychelles is powered & a proud member of 
+            <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> 
+            In Official Partner with the 
+            <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.
+        </p>
+    </footer>
+
+    <script>
+        // 1. Initialize Supabase
+        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // UI Scripts (Menu & Loader)
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navList = document.getElementById('nav-list');
+        if (mobileMenu && navList) {
+            mobileMenu.addEventListener('click', () => {
+                navList.classList.toggle('active');
+            });
+        }
+
+        function removeLoader() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500); 
+            }
+        }
+        window.addEventListener('load', removeLoader);
+        if (document.readyState === 'complete') { removeLoader(); }
+        setTimeout(removeLoader, 2500);
+
+        // 2. Form Submission to Supabase
+        document.getElementById('donation-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submit-btn');
+            const messageDiv = document.getElementById('form-message');
+            
+            // Change button state
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+            messageDiv.innerText = "";
+            messageDiv.style.color = "";
+
+            // Gather form data
+            const donorType = document.getElementById('donorType').value;
+            const foodDetails = document.getElementById('foodDetails').value;
+            const collectionPreference = document.querySelector('input[name="collectionPreference"]:checked').value;
+
+            /* Note: To attach this to a specific user, we would get the session here.
+               For now, the SQL schema allows 'donor_id' to be NULL, so anyone can submit a donation offer.
+            */
+
+            // Insert into Supabase
+            const { data, error } = await supabaseClient
+                .from('donations')
+                .insert([
+                    { 
+                        donor_type: donorType, 
+                        food_details: foodDetails, 
+                        collection_preference: collectionPreference,
+                        status: 'Pending Review' 
+                    }
+                ]);
+
+            if (error) {
+                console.error("Error inserting donation:", error);
+                messageDiv.innerText = "Oops! Something went wrong. Please check your connection and try again.";
+                messageDiv.style.color = "red";
+                btn.innerText = "Submit Donation Offer";
+                btn.disabled = false;
+            } else {
+                messageDiv.innerText = "Thank you! Your donation offer has been sent to our team for review.";
+                messageDiv.style.color = "green";
+                document.getElementById('donation-form').reset();
+                btn.innerText = "Submit Another Donation";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
