@@ -11,7 +11,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="../style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -28,20 +28,20 @@
 
     <header>
         <div class="logo">
-            <a href="/"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
+            <a href="../"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
         </div>
         
         <div class="menu-toggle" id="mobile-menu">&#9776;</div>
 
         <nav>
             <ul id="nav-list">
-                <li><a href="/about/">ABOUT</a></li>
-                <li><a href="/volunteer/" class="active">VOLUNTEER</a></li>
-                <li><a href="/find-food/">FIND FOOD</a></li>
-                <li><a href="/donate/">DONATE</a></li>
+                <li><a href="../about/">ABOUT</a></li>
+                <li><a href="../volunteer/" class="active">VOLUNTEER</a></li>
+                <li><a href="../find-food/">FIND FOOD</a></li>
+                <li><a href="../donate/">DONATE</a></li>
                 <li><a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank">BLOG</a></li>
-                <li><a href="/contact/">CONTACT</a></li>
-                <li><a href="/staff/" class="staff-login">STAFF LOGIN</a></li>
+                <li><a href="../contact/">CONTACT</a></li>
+                <li><a href="../staff/" class="staff-login">STAFF LOGIN</a></li>
             </ul>
         </nav>
     </header>
@@ -50,28 +50,22 @@
         <h1>Join The FoodShare Army</h1>
     </section>
 
-    <section class="section-container">
+    <section class="section-container" style="text-align: center;">
         <h2 class="section-title">Current Opportunities</h2>
-        <div class="role-grid">
-            <div class="role-card">
-                <i class="fas fa-truck"></i>
-                <h3>Delivery Drivers</h3>
-                <p>Help us transport rescued food safely. Collect surplus from our corporate partners and deliver food parcels to designated community drop-offs or vulnerable individuals.</p>
-            </div>
-            <div class="role-card">
-                <i class="fas fa-boxes"></i>
-                <h3>Inventory Sorters</h3>
-                <p>The backbone of our operations. Receive incoming donations, check expiration dates, categorize items, and prepare packages for rapid distribution.</p>
-            </div>
-            <div class="role-card">
-                <i class="fas fa-bullhorn"></i>
-                <h3>Community Outreach</h3>
-                <p>Be the face of FoodShare. Engage with local businesses to secure new donations, educate the public on food waste, and coordinate with local charities.</p>
-            </div>
+        <div style="max-width: 800px; margin: 0 auto; font-size: 1.1rem; color: #555;">
+            <p style="margin-bottom: 20px;">We are always looking for passionate individuals to help us bridge the gap between surplus food and community needs in Seychelles. Our core volunteer roles include:</p>
+            
+            <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-weight: 600; color: var(--dark-green); font-size: 1.2rem; display: flex; flex-direction: column; gap: 10px;">
+                <li><i class="fas fa-hands-helping" style="color: var(--primary-green); margin-right: 10px;"></i> Regular Volunteer</li>
+                <li><i class="fas fa-users-cog" style="color: var(--primary-green); margin-right: 10px;"></i> Volunteer Coordinator</li>
+                <li><i class="fas fa-project-diagram" style="color: var(--primary-green); margin-right: 10px;"></i> Project Officer</li>
+            </ul>
+
+            <p>Looking for something more specialized or want to offer a unique skill? <br>Please <a href="../contact/" style="color: var(--primary-green); font-weight: bold; text-decoration: underline;">contact us directly</a> to discuss specific roles.</p>
         </div>
     </section>
 
-    <section class="section-container" style="background-color: #fff;">
+    <section class="section-container" style="background-color: #f9f9f9;">
         <h2 class="section-title">Apply to Volunteer</h2>
         <div class="form-container">
             <form id="volunteer-form">
@@ -95,10 +89,10 @@
                     <label for="preferredRole">Preferred Role</label>
                     <select id="preferredRole" name="preferredRole" required>
                         <option value="" disabled selected>Select a role...</option>
-                        <option value="Delivery Driver">Delivery Driver</option>
-                        <option value="Inventory Sorter">Inventory Sorter</option>
-                        <option value="Community Outreach">Community Outreach</option>
-                        <option value="General Support">General Support (Wherever Needed)</option>
+                        <option value="Regular Volunteer">Regular Volunteer</option>
+                        <option value="Volunteer Coordinator">Volunteer Coordinator</option>
+                        <option value="Project Officer">Project Officer</option>
+                        <option value="Other">Other (I will contact you)</option>
                     </select>
                 </div>
 
@@ -114,7 +108,7 @@
 
                 <div class="form-group">
                     <label for="specialSkills">Special Skills or Relevant Experience (Optional)</label>
-                    <textarea id="specialSkills" name="specialSkills" placeholder="Do you have a large vehicle for transport? Experience in logistics? Let us know!"></textarea>
+                    <textarea id="specialSkills" name="specialSkills" placeholder="Do you have experience in logistics, team management, or community outreach? Let us know!"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
@@ -133,12 +127,10 @@
     </footer>
 
     <script>
-        // Supabase Initialization
         const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Mobile Menu Toggle
         const mobileMenu = document.getElementById('mobile-menu');
         const navList = document.getElementById('nav-list');
         if (mobileMenu && navList) {
@@ -147,7 +139,6 @@
             });
         }
 
-        // Loader Logic
         function removeLoader() {
             const loader = document.getElementById('loader');
             if (loader && loader.style.display !== 'none') {
@@ -159,7 +150,6 @@
         if (document.readyState === 'complete') { removeLoader(); }
         setTimeout(removeLoader, 2500);
 
-        // Form Submission Placeholder (Prevents page reload for now)
         document.getElementById('volunteer-form').addEventListener('submit', function(e) {
             e.preventDefault();
             alert("Thanks for applying! (This will be connected to Supabase soon).");
