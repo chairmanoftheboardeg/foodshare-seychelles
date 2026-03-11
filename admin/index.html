@@ -4,20 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | FoodShare Seychelles</title>
-    
     <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="../style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="admin-body">
 
     <div class="loader-wrapper" id="loader" style="background-color: #f4f7f6;">
         <div class="loader"></div>
-        <p style="position: absolute; margin-top: 100px; font-weight: bold; color: var(--dark-green);" id="loading-text">Verifying Admin Credentials...</p>
+        <p style="position: absolute; margin-top: 100px; font-weight: bold; color: var(--dark-green);">Verifying Admin Access...</p>
     </div>
 
     <aside class="sidebar">
@@ -28,7 +25,9 @@
         <ul class="sidebar-menu">
             <li class="active" onclick="switchTab('donations')"><i class="fas fa-box-open"></i> Donations Hub</li>
             <li onclick="switchTab('claims')"><i class="fas fa-hand-holding-heart"></i> Food Claims</li>
-            <li onclick="switchTab('volunteers')"><i class="fas fa-users"></i> Volunteers</li>
+            <li onclick="switchTab('tasks')"><i class="fas fa-clipboard-list"></i> Task Manager</li>
+            <li onclick="switchTab('users')"><i class="fas fa-user-shield"></i> Staff & Users</li>
+            <li onclick="switchTab('volunteers')"><i class="fas fa-users"></i> Volunteer Apps</li>
             <li onclick="switchTab('messages')"><i class="fas fa-envelope"></i> Messages</li>
         </ul>
         <div class="sidebar-footer">
@@ -39,28 +38,19 @@
     <main class="main-content">
         <div class="dashboard-header">
             <h1 id="dashboard-title">Donations Hub</h1>
-            <div>
-                <span style="color: #666; font-weight: 600;" id="admin-name">Loading...</span>
-            </div>
+            <div><span style="color: #666; font-weight: 600;" id="admin-name">Loading...</span></div>
         </div>
 
         <section id="donations-tab" class="admin-tab active">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Incoming Donation Offers</h3>
+                <h3>Incoming Donation Offers</h3>
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Donor Type</th>
-                                <th>Food Details</th>
-                                <th>Preference</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
+                            <tr><th>Date</th><th>Donor Type</th><th>Details</th><th>Preference</th><th>Status</th></tr>
                         </thead>
                         <tbody id="donations-table-body">
-                            <tr><td colspan="6" style="text-align: center;">Loading donations...</td></tr>
+                            <tr><td colspan="5">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -69,20 +59,63 @@
 
         <section id="claims-tab" class="admin-tab">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Digital Pantry Claims</h3>
+                <h3>Digital Pantry Claims</h3>
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Item Claimed</th>
-                                <th>Claimant ID</th>
-                                <th>Method</th>
-                                <th>Status</th>
-                            </tr>
+                            <tr><th>Date</th><th>Method</th><th>Status</th></tr>
                         </thead>
                         <tbody id="claims-table-body">
-                            <tr><td colspan="5" style="text-align: center;">Loading claims...</td></tr>
+                            <tr><td colspan="3">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="tasks-tab" class="admin-tab">
+            <div class="admin-card" style="background-color: #f1f8e9; border-left: 4px solid var(--primary-green);">
+                <h3 style="margin-bottom: 15px;">Assign a New Task</h3>
+                <form id="assign-task-form" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex-grow: 1;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Assign To (Staff Only):</label>
+                        <select id="task-assignee" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
+                            <option value="">Loading Staff...</option>
+                        </select>
+                    </div>
+                    <div style="flex-grow: 3;">
+                        <label style="font-size: 0.85rem; font-weight: bold;">Task Description:</label>
+                        <input type="text" id="task-description" placeholder="e.g., Collect surplus from SPAR at 4PM" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Assign Task</button>
+                </form>
+            </div>
+
+            <div class="admin-card">
+                <h3>Active Tasks</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Date Assigned</th><th>Task Description</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="tasks-table-body">
+                            <tr><td colspan="3">Loading tasks...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="users-tab" class="admin-tab">
+            <div class="admin-card">
+                <h3>Registered Users & Staff Overseer</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Full Name</th><th>Contact Number</th><th>System Role</th><th>Joined</th></tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr><td colspan="4">Loading users...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -91,20 +124,14 @@
 
         <section id="volunteers-tab" class="admin-tab">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Volunteer Applications</h3>
+                <h3>Volunteer Applications</h3>
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Contact</th>
-                                <th>Role</th>
-                                <th>Availability</th>
-                                <th>Skills</th>
-                            </tr>
+                            <tr><th>Name</th><th>Contact</th><th>Role</th><th>Availability</th></tr>
                         </thead>
                         <tbody id="volunteers-table-body">
-                            <tr><td colspan="5" style="text-align: center;">Loading volunteers...</td></tr>
+                            <tr><td colspan="4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -113,25 +140,19 @@
 
         <section id="messages-tab" class="admin-tab">
             <div class="admin-card">
-                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Contact Inquiries</h3>
+                <h3>Contact Inquiries</h3>
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Name / Email</th>
-                                <th>Subject</th>
-                                <th>Message</th>
-                            </tr>
+                            <tr><th>Date</th><th>Name</th><th>Subject</th><th>Message</th></tr>
                         </thead>
                         <tbody id="messages-table-body">
-                            <tr><td colspan="4" style="text-align: center;">Loading messages...</td></tr>
+                            <tr><td colspan="4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
-
     </main>
 
     <script>
@@ -139,177 +160,141 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // 1. SECURITY CHECK: Verify Login & Admin Role
+        // Security Check
         async function checkAdminAccess() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (!session) {
-                // Not logged in -> Kick to login page
+            if (!session) { window.location.href = '../login/'; return; }
+
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', session.user.id).single();
+            if (!profile || profile.role !== 'admin') {
+                alert("Access Denied. Admin privileges required.");
                 window.location.href = '../login/';
                 return;
             }
 
-            const userId = session.user.id;
-
-            // Check if this user is actually an admin in the profiles table
-            const { data: profile, error } = await supabaseClient
-                .from('profiles')
-                .select('full_name, role')
-                .eq('id', userId)
-                .single();
-
-            // NOTE: Since you just created your account, your role is currently "public".
-            // To test this dashboard properly, you will need to go to your Supabase 
-            // Dashboard -> Table Editor -> profiles, and manually change your role from 'public' to 'admin'.
-            
-            if (error || !profile || profile.role !== 'admin') {
-                alert("Access Denied. You do not have administrator privileges.");
-                window.location.href = '../find-food/';
-                return;
-            }
-
-            // Access Granted
-            document.getElementById('admin-name').innerText = `Logged in as: ${profile.full_name}`;
+            document.getElementById('admin-name').innerText = `Admin: ${profile.full_name}`;
             document.getElementById('loader').style.display = 'none';
 
-            // Load Data
-            fetchDonations();
-            fetchVolunteers();
-            fetchMessages();
-            fetchClaims();
+            // Load All Data
+            fetchDonations(); fetchClaims(); fetchVolunteers(); fetchMessages(); fetchUsersAndPopulateStaff(); fetchTasks();
         }
-
-        // Run security check on page load
         window.addEventListener('load', checkAdminAccess);
 
-        // 2. TAB SWITCHING LOGIC
+        // Tab Switching
         function switchTab(tabName) {
-            // Update Menu UI
             document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
             event.currentTarget.classList.add('active');
 
-            // Update Header Title
             const titles = {
-                'donations': 'Donations Hub',
-                'claims': 'Food Claims',
-                'volunteers': 'Volunteers',
-                'messages': 'Contact Inquiries'
+                'donations': 'Donations Hub', 'claims': 'Food Claims', 'tasks': 'Task Manager', 
+                'users': 'Staff & Users', 'volunteers': 'Volunteer Apps', 'messages': 'Contact Inquiries'
             };
             document.getElementById('dashboard-title').innerText = titles[tabName];
 
-            // Show corresponding section
             document.querySelectorAll('.admin-tab').forEach(sec => sec.classList.remove('active'));
             document.getElementById(tabName + '-tab').classList.add('active');
         }
 
-        // 3. LOGOUT LOGIC
-        async function logout() {
-            await supabaseClient.auth.signOut();
-            window.location.href = '../login/';
-        }
+        async function logout() { await supabaseClient.auth.signOut(); window.location.href = '../login/'; }
 
-        // 4. DATA FETCHING FUNCTIONS
-        
-        // Fetch Donations
+        // --- FETCH FUNCTIONS ---
         async function fetchDonations() {
-            const { data, error } = await supabaseClient.from('donations').select('*').order('created_at', { ascending: false });
+            const { data } = await supabaseClient.from('donations').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('donations-table-body');
-            
-            if (error || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">No donations found.</td></tr>';
-                return;
-            }
-
             tbody.innerHTML = '';
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No data</td></tr>'; return; }
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
-                const statusClass = item.status === 'Pending Review' ? 'status-pending' : 'status-approved';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${date}</td>
-                        <td><strong>${item.donor_type}</strong></td>
-                        <td>${item.food_details}</td>
-                        <td>${item.collection_preference}</td>
-                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-                        <td><button class="action-btn btn-approve" onclick="alert('Update status feature coming soon!')">Review</button></td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.donor_type}</strong></td><td>${item.food_details}</td><td>${item.collection_preference}</td><td><span class="status-badge">${item.status}</span></td></tr>`;
             });
         }
 
-        // Fetch Volunteers
-        async function fetchVolunteers() {
-            const { data, error } = await supabaseClient.from('volunteer_applications').select('*').order('created_at', { ascending: false });
-            const tbody = document.getElementById('volunteers-table-body');
-            
-            if (error || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No volunteer applications found.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${item.full_name}</strong></td>
-                        <td>${item.email}<br>${item.phone}</td>
-                        <td>${item.preferred_role}</td>
-                        <td>${item.availability}</td>
-                        <td>${item.special_skills || '-'}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        // Fetch Messages
-        async function fetchMessages() {
-            const { data, error } = await supabaseClient.from('contact_messages').select('*').order('created_at', { ascending: false });
-            const tbody = document.getElementById('messages-table-body');
-            
-            if (error || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4">No messages found.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const date = new Date(item.created_at).toLocaleDateString();
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="white-space: nowrap;">${date}</td>
-                        <td><strong>${item.name}</strong><br><a href="mailto:${item.email}" style="color:var(--primary-green);">${item.email}</a></td>
-                        <td><strong>${item.subject}</strong></td>
-                        <td>${item.message}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        // Fetch Claims
         async function fetchClaims() {
-            const { data, error } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+            const { data } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('claims-table-body');
-            
-            if (error || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No claims found.</td></tr>';
-                return;
-            }
-
             tbody.innerHTML = '';
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="3">No data</td></tr>'; return; }
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
-                const statusClass = item.status === 'Pending' ? 'status-pending' : 'status-approved';
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${date}</td>
-                        <td>Item ID: ${item.inventory_id.substring(0,8)}...</td>
-                        <td>User ID: ${item.claimant_id.substring(0,8)}...</td>
-                        <td>${item.fulfillment_method}</td>
-                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
-                    </tr>
-                `;
+                tbody.innerHTML += `<tr><td>${date}</td><td>${item.fulfillment_method}</td><td><span class="status-badge">${item.status}</span></td></tr>`;
             });
         }
+
+        async function fetchVolunteers() {
+            const { data } = await supabaseClient.from('volunteer_applications').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('volunteers-table-body');
+            tbody.innerHTML = '';
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No data</td></tr>'; return; }
+            data.forEach(item => {
+                tbody.innerHTML += `<tr><td><strong>${item.full_name}</strong></td><td>${item.email}<br>${item.phone}</td><td>${item.preferred_role}</td><td>${item.availability}</td></tr>`;
+            });
+        }
+
+        async function fetchMessages() {
+            const { data } = await supabaseClient.from('contact_messages').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('messages-table-body');
+            tbody.innerHTML = '';
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No data</td></tr>'; return; }
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString();
+                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.name}</strong></td><td>${item.subject}</td><td>${item.message}</td></tr>`;
+            });
+        }
+
+        // NEW: Fetch Users for Overview AND populate the Assign Task dropdown
+        async function fetchUsersAndPopulateStaff() {
+            const { data } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('users-table-body');
+            const staffDropdown = document.getElementById('task-assignee');
+            
+            tbody.innerHTML = '';
+            staffDropdown.innerHTML = '<option value="" disabled selected>Select staff member...</option>';
+
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No users found</td></tr>'; return; }
+            
+            data.forEach(user => {
+                // Populate Users Table
+                const date = new Date(user.created_at).toLocaleDateString();
+                let roleColor = user.role === 'admin' ? 'red' : (user.role === 'staff' ? 'orange' : 'green');
+                tbody.innerHTML += `<tr><td><strong>${user.full_name}</strong></td><td>${user.contact_number}</td><td><strong style="color:${roleColor}; text-transform:uppercase;">${user.role}</strong></td><td>${date}</td></tr>`;
+                
+                // Populate Dropdown (Only admins and staff)
+                if(user.role === 'admin' || user.role === 'staff') {
+                    staffDropdown.innerHTML += `<option value="${user.id}">${user.full_name} (${user.role})</option>`;
+                }
+            });
+        }
+
+        // NEW: Fetch Tasks
+        async function fetchTasks() {
+            const { data } = await supabaseClient.from('tasks').select('*, profiles(full_name)').order('created_at', { ascending: false });
+            const tbody = document.getElementById('tasks-table-body');
+            tbody.innerHTML = '';
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="3">No active tasks</td></tr>'; return; }
+            
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString();
+                const assigneeName = item.profiles ? item.profiles.full_name : 'Unknown';
+                tbody.innerHTML += `<tr><td>${date}<br><small>Assigned to: <b>${assigneeName}</b></small></td><td>${item.task_description}</td><td><span class="status-badge status-pending">${item.status}</span></td></tr>`;
+            });
+        }
+
+        // NEW: Assign Task Logic
+        document.getElementById('assign-task-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Assigning...";
+            
+            const assigneeId = document.getElementById('task-assignee').value;
+            const description = document.getElementById('task-description').value;
+
+            const { error } = await supabaseClient.from('tasks').insert([{ assigned_to: assigneeId, task_description: description }]);
+            
+            if(error) { alert("Failed to assign task."); console.error(error); } 
+            else { alert("Task Assigned Successfully!"); document.getElementById('assign-task-form').reset(); fetchTasks(); }
+            
+            btn.innerText = "Assign Task";
+        });
     </script>
 </body>
 </html>
