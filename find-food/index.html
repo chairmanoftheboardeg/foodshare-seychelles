@@ -6,11 +6,8 @@
     <title>Find Food | FoodShare Seychelles</title>
     
     <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
-
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="../style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -54,66 +51,19 @@
         
         <div class="pantry-controls">
             <div>
-                <select id="category-filter">
-                    <option value="all">All Categories</option>
-                    <option value="produce">Produce</option>
-                    <option value="baked-goods">Baked Goods</option>
-                    <option value="non-perishable">Non-Perishables</option>
+                <select id="category-filter" onchange="fetchAvailableFood()">
+                    <option value="All">All Categories</option>
+                    <option value="Produce">Produce</option>
+                    <option value="Baked Goods">Baked Goods</option>
+                    <option value="Non-Perishable">Non-Perishable</option>
+                    <option value="Other">Other</option>
                 </select>
             </div>
             <p style="color: #666; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Log in to claim items.</p>
         </div>
 
         <div class="pantry-grid" id="pantry-grid">
-            
-            <div class="food-card">
-                <div class="food-img-container">
-                    <img src="https://images.unsplash.com/photo-1518843875459-f738682238a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Mixed Vegetables">
-                    <div class="food-badge">Produce</div>
-                </div>
-                <div class="food-details">
-                    <h3>Assorted Fresh Vegetables</h3>
-                    <p>A 5kg box of mixed seasonal vegetables rescued from a local distributor. Includes carrots, cabbage, and tomatoes.</p>
-                    <div class="food-meta">
-                        <span><i class="far fa-calendar-alt"></i> Best Before: Mar 14, 2026</span>
-                        <span><i class="fas fa-map-marker-alt"></i> Current Location: Victoria Depot</span>
-                    </div>
-                    <button class="btn btn-primary" onclick="openModal('Assorted Fresh Vegetables')" style="width: 100%; padding: 10px;">Claim Food</button>
-                </div>
-            </div>
-
-            <div class="food-card">
-                <div class="food-img-container">
-                    <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Bakery Bread">
-                    <div class="food-badge" style="background-color: #ff9800;">Baked Goods</div>
-                </div>
-                <div class="food-details">
-                    <h3>Assorted Bread & Pastries</h3>
-                    <p>Two large bags of fresh daily bread and assorted pastries from local bakeries.</p>
-                    <div class="food-meta">
-                        <span><i class="far fa-calendar-alt"></i> Best Before: Mar 12, 2026</span>
-                        <span><i class="fas fa-map-marker-alt"></i> Current Location: SPAR Supermarket Hub</span>
-                    </div>
-                    <button class="btn btn-primary" onclick="openModal('Assorted Bread & Pastries')" style="width: 100%; padding: 10px;">Claim Food</button>
-                </div>
-            </div>
-
-            <div class="food-card">
-                <div class="food-img-container">
-                    <img src="https://images.unsplash.com/photo-1606859191214-25806e8e2423?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60" alt="Canned Goods">
-                    <div class="food-badge" style="background-color: #2196f3;">Non-Perishable</div>
-                </div>
-                <div class="food-details">
-                    <h3>Canned Beans & Soups</h3>
-                    <p>A crate containing 24 assorted canned goods, including baked beans and vegetable soup.</p>
-                    <div class="food-meta">
-                        <span><i class="far fa-calendar-alt"></i> Best Before: Nov 2026</span>
-                        <span><i class="fas fa-map-marker-alt"></i> Current Location: Victoria Depot</span>
-                    </div>
-                    <button class="btn btn-primary" onclick="openModal('Canned Beans & Soups')" style="width: 100%; padding: 10px;">Claim Food</button>
-                </div>
-            </div>
-
+            <p style="grid-column: 1 / -1; text-align: center; font-weight: 600;">Loading live inventory from database...</p>
         </div>
     </section>
 
@@ -121,9 +71,11 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal()">&times;</span>
             <h2 style="color: var(--dark-green); margin-bottom: 15px;">Claim Request</h2>
-            <p style="margin-bottom: 20px;">You are requesting to claim: <br><strong id="modal-item-name">Item Name Here</strong></p>
+            <p style="margin-bottom: 20px;">You are requesting to claim: <br><strong id="modal-item-name"></strong></p>
             
             <form id="claim-form">
+                <input type="hidden" id="modal-item-id">
+                
                 <div class="form-group" style="text-align: left;">
                     <label>Fulfillment Method</label>
                     <div style="margin-top: 10px;">
@@ -137,7 +89,7 @@
                         </label>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Confirm Claim</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;" id="submit-claim-btn">Confirm Claim</button>
             </form>
         </div>
     </div>
@@ -153,35 +105,99 @@
     </footer>
 
     <script>
+        // 1. Initialize Supabase
         const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // UI Basics (Menu & Loader)
         const mobileMenu = document.getElementById('mobile-menu');
         const navList = document.getElementById('nav-list');
         if (mobileMenu && navList) {
-            mobileMenu.addEventListener('click', () => {
-                navList.classList.toggle('active');
-            });
+            mobileMenu.addEventListener('click', () => navList.classList.toggle('active'));
         }
-
         function removeLoader() {
             const loader = document.getElementById('loader');
             if (loader && loader.style.display !== 'none') {
                 loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 500); 
+                setTimeout(() => { loader.style.display = 'none'; fetchAvailableFood(); }, 500); 
             }
         }
         window.addEventListener('load', removeLoader);
         if (document.readyState === 'complete') { removeLoader(); }
         setTimeout(removeLoader, 2500);
 
-        // --- Modal Logic ---
+        // 2. FETCH REAL DATA FROM SUPABASE
+        async function fetchAvailableFood() {
+            const grid = document.getElementById('pantry-grid');
+            const categoryFilter = document.getElementById('category-filter').value;
+            
+            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Refreshing inventory...</p>';
+
+            // Build the query
+            let query = supabaseClient.from('food_inventory').select('*').eq('status', 'Available');
+            
+            // Apply filter if not "All"
+            if (categoryFilter !== 'All') {
+                query = query.eq('category', categoryFilter);
+            }
+
+            // Execute query
+            const { data, error } = await query;
+
+            if (error) {
+                console.error("Error fetching data:", error);
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Failed to load inventory. Please check your database connection.</p>';
+                return;
+            }
+
+            // Render the data
+            if (data.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; font-weight: 600;">No food items match your criteria right now. Check back soon!</p>';
+                return;
+            }
+
+            grid.innerHTML = ''; // Clear loading text
+            
+            data.forEach(item => {
+                // Determine badge color based on category
+                let badgeColor = 'var(--primary-green)';
+                if (item.category === 'Baked Goods') badgeColor = '#ff9800';
+                if (item.category === 'Non-Perishable') badgeColor = '#2196f3';
+
+                // Use a default image if photo_url is null
+                const imageUrl = item.photo_url ? item.photo_url : 'https://via.placeholder.com/500x300?text=No+Photo+Available';
+                
+                // Format expiry date
+                const expiryText = item.expiry_date ? item.expiry_date : 'N/A';
+
+                const cardHTML = `
+                    <div class="food-card">
+                        <div class="food-img-container">
+                            <img src="${imageUrl}" alt="${item.category}">
+                            <div class="food-badge" style="background-color: ${badgeColor};">${item.category}</div>
+                        </div>
+                        <div class="food-details">
+                            <p style="font-weight: bold; margin-bottom: 10px; color: var(--text-dark);">${item.description}</p>
+                            <div class="food-meta">
+                                <span><i class="far fa-calendar-alt"></i> Best Before: ${expiryText}</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="openModal('${item.id}', '${item.description.replace(/'/g, "\\'")}')" style="width: 100%; padding: 10px;">Claim Food</button>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+
+        // 3. MODAL LOGIC
         const modal = document.getElementById('claim-modal');
         const itemNameDisplay = document.getElementById('modal-item-name');
+        const itemIdInput = document.getElementById('modal-item-id');
 
-        function openModal(itemName) {
-            itemNameDisplay.innerText = itemName;
+        function openModal(id, description) {
+            itemIdInput.value = id;
+            itemNameDisplay.innerText = description;
             modal.style.display = 'flex';
         }
 
@@ -189,18 +205,54 @@
             modal.style.display = 'none';
         }
 
-        // Close modal if user clicks outside the white box
         window.onclick = function(event) {
-            if (event.target == modal) {
-                closeModal();
-            }
+            if (event.target == modal) closeModal();
         }
 
-        document.getElementById('claim-form').addEventListener('submit', function(e) {
+        // 4. INSERT CLAIM INTO DATABASE
+        document.getElementById('claim-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const method = document.querySelector('input[name="fulfillment"]:checked').value;
-            alert(`Claim submitted for ${itemNameDisplay.innerText} via ${method}. (Will connect to Supabase later).`);
-            closeModal();
+            const btn = document.getElementById('submit-claim-btn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            const inventoryId = itemIdInput.value;
+            const fulfillmentMethod = document.querySelector('input[name="fulfillment"]:checked').value;
+
+            // Check if user is logged in
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                alert("You must be logged in to claim food. (Staff/Public login integration needed).");
+                btn.innerText = "Confirm Claim";
+                btn.disabled = false;
+                return;
+            }
+
+            const userId = session.user.id;
+
+            // Push to Supabase claims table
+            const { data, error } = await supabaseClient
+                .from('claims')
+                .insert([
+                    { 
+                        inventory_id: inventoryId, 
+                        claimant_id: userId, 
+                        fulfillment_method: fulfillmentMethod,
+                        status: 'Pending'
+                    }
+                ]);
+
+            if (error) {
+                console.error("Error submitting claim:", error);
+                alert("There was an error submitting your claim. Please try again.");
+            } else {
+                alert("Claim submitted successfully! We will review it shortly.");
+                closeModal();
+            }
+
+            btn.innerText = "Confirm Claim";
+            btn.disabled = false;
         });
     </script>
 </body>
