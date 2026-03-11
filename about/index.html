@@ -6,14 +6,75 @@
     <title>About Us | FoodShare Seychelles</title>
     
     <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
-
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="/style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .impact-bg {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: var(--white);
+            text-align: center;
+        }
+        .impact-bg .section-title {
+            color: var(--white);
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .impact-stat i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        .impact-stat h3 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+        .impact-stat p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .partners-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 50px;
+            margin-top: 30px;
+        }
+        .partner-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: transform 0.3s ease;
+        }
+        .partner-logo:hover {
+            transform: translateY(-5px);
+            color: var(--primary-green);
+        }
+        .partner-logo i {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: #555;
+            transition: color 0.3s ease;
+        }
+        .partner-logo:hover i {
+            color: var(--primary-green);
+        }
+        .partner-logo h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
@@ -73,6 +134,34 @@
         </div>
     </section>
 
+    <section class="section-container impact-bg">
+        <h2 class="section-title">Our Impact So Far</h2>
+        <p style="font-size: 1.1rem; max-width: 700px; margin: 0 auto;">Together with our community, we are making a measurable difference in food security and environmental sustainability across the islands.</p>
+        
+        <div class="impact-grid">
+            <div class="impact-stat">
+                <i class="fas fa-box-open"></i>
+                <h3>N/A</h3>
+                <p>KGs of Food Rescued</p>
+            </div>
+            <div class="impact-stat">
+                <i class="fas fa-utensils"></i>
+                <h3>N/A</h3>
+                <p>Meals Provided</p>
+            </div>
+            <div class="impact-stat">
+                <i class="fas fa-users"></i>
+                <h3>5+</h3>
+                <p>Active Volunteers</p>
+            </div>
+            <div class="impact-stat">
+                <i class="fas fa-leaf"></i>
+                <h3>N/A</h3>
+                <p>Tons CO2 Saved</p>
+            </div>
+        </div>
+    </section>
+
     <section class="section-container">
         <h2 class="section-title">Meet The Team</h2>
         <div class="team-grid">
@@ -83,10 +172,27 @@
             </div>
             
             <div class="team-member">
-                <img src="https://media.licdn.com/dms/image/v2/D4D03AQFPaPFmzIkEQg/profile-displayphoto-shrink_200_200/B4DZOYKjpcG4AY-/0/1733424725878?e=1775088000&v=beta&t=tACiJ9e5AQhockgBwhezUWK3Zm8ctrUkCbHdz5Y9F8U" alt="Board Member">
+                <img src="https://media.licdn.com/dms/image/v2/D4D03AQFPaPFmzIkEQg/profile-displayphoto-shrink_200_200/B4DZOYKjpcG4AY-/0/1733424725878?e=1775088000&v=beta&t=tACiJ9e5AQhockgBwhezUWK3Zm8ctrUkCbHdz5Y9F8U" alt="Rosetta Alcindor">
                 <h4>Rosetta Alcindor</h4>
                 <p>Founder & Lead Administrator</p>
             </div>
+        </div> </section>
+
+    <section class="section-container" style="background-color: #f9f9f9; text-align: center;">
+        <h2 class="section-title">Our Partners</h2>
+        <p style="color: #666; font-size: 1.1rem; max-width: 700px; margin: 0 auto;">We are proud to collaborate with organizations committed to ending food waste and empowering youth in Seychelles.</p>
+        
+        <div class="partners-grid">
+            <a href="https://tylernicholasgroup.com" target="_blank" class="partner-logo">
+                <i class="<a href="https://ibb.co/vvRvMNC5"><img src="https://i.ibb.co/XkMkGnfB/TNG-Logo.png" alt="TNG Logo" border="0"></a>" style="color: #2c3e50;"></i>
+                <h4>Tyler Nicholas Group</h4>
+            </a>
+            
+            <a href="https://tyler-nicholas-foundation.online" target="_blank" class="partner-logo">
+                <i class="https://i.ibb.co/wNsNvyRw/TNF-Logo.png" style="color: var(--primary-green);"></i>
+                <h4>Tyler Nicholas Foundation</h4>
+            </a>
+        </div>
     </section>
 
     <footer>
