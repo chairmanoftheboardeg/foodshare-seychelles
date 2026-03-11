@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | FoodShare Seychelles</title>
+    <title>Login & Access | FoodShare Seychelles</title>
     
     <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -14,9 +14,7 @@
 </head>
 <body>
 
-    <div class="loader-wrapper" id="loader">
-        <div class="loader"></div>
-    </div>
+    <div class="loader-wrapper" id="loader"><div class="loader"></div></div>
 
     <div class="top-bar">
         <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank"><i class="fab fa-linkedin"></i></a>
@@ -27,9 +25,7 @@
         <div class="logo">
             <a href="../"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
         </div>
-        
         <div class="menu-toggle" id="mobile-menu">&#9776;</div>
-
         <nav>
             <ul id="nav-list">
                 <li><a href="../about/">ABOUT</a></li>
@@ -43,88 +39,86 @@
         </nav>
     </header>
 
-    <section class="auth-wrapper">
-        <div class="auth-container">
+    <section class="auth-page-wrapper">
+        <div class="auth-grid">
             
-            <div id="login-section">
-                <div class="auth-header">
-                    <h2>Welcome Back</h2>
-                    <p style="color: #666; font-size: 0.9rem;">Log in to claim food or access your dashboard.</p>
+            <div class="auth-info-panel">
+                <h2>Account Access</h2>
+                
+                <div class="info-block">
+                    <h3><i class="fas fa-apple-alt"></i> Why sign up to claim food?</h3>
+                    <p>Creating an account gives you direct access to our Digital Pantry. To ensure our rescued food reaches real community members and to prevent spam claims, we require everyone to register. Signing up allows you to securely claim surplus food and gives our volunteer drivers the information they need to coordinate your delivery or pickup.</p>
                 </div>
 
-                <div class="auth-info-box staff-notice">
-                    <strong><i class="fas fa-id-badge"></i> Staff & Volunteers</strong>
-                    Your credentials are pre-registered by the system administrator. Please sign in directly. If you cannot recover your credentials, please connect with an admin.
-                </div>
-
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Email Address</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    
-                    <div id="login-message" style="margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
-                    
-                    <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">Log In</button>
-                </form>
-                <div class="auth-toggle">
-                    Need to claim food? <span onclick="toggleAuth()">Sign Up Here</span>
+                <div class="info-block" style="margin-top: 20px;">
+                    <h3><i class="fas fa-id-badge"></i> Staff & Volunteers</h3>
+                    <p>If you are an official staff member or volunteer, your credentials are already registered in the system. Please sign in directly on the right to access your management dashboard. <br><br><strong>Note:</strong> If you cannot recover your credentials, please do not create a new account. Connect with an admin directly to reset your access.</p>
                 </div>
             </div>
 
-            <div id="signup-section" class="hidden-form">
-                <div class="auth-header">
-                    <h2>Create an Account</h2>
-                    <p style="color: #666; font-size: 0.9rem;">Join FoodShare to request food claims.</p>
+            <div class="auth-form-panel">
+                
+                <div id="login-section">
+                    <div class="auth-header">
+                        <h2>Welcome Back</h2>
+                    </div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        
+                        <div id="login-message" style="margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
+                        
+                        <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">Log In</button>
+                    </form>
+                    <div class="auth-toggle">
+                        Need access to the Digital Pantry? <span onclick="toggleAuth()">Sign Up Here</span>
+                    </div>
                 </div>
 
-                <div class="auth-info-box">
-                    <strong><i class="fas fa-shield-alt"></i> Why do I need to sign up?</strong>
-                    To prevent spam and ensure surplus food reaches the right hands, we require a verified account. This allows our volunteer drivers to securely coordinate your delivery or pickup location.
+                <div id="signup-section" class="hidden-form">
+                    <div class="auth-header">
+                        <h2>Create an Account</h2>
+                    </div>
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPhone">Phone Number</label>
+                            <input type="tel" id="signupPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password (Min 6 chars)</label>
+                            <input type="password" id="signupPassword" minlength="6" required>
+                        </div>
+
+                        <div id="signup-message" style="margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
+
+                        <button type="submit" class="btn btn-primary" id="signup-btn" style="width: 100%;">Create Account</button>
+                    </form>
+                    <div class="auth-toggle">
+                        Already registered? <span onclick="toggleAuth()">Log In Here</span>
+                    </div>
                 </div>
 
-                <form id="signup-form">
-                    <div class="form-group">
-                        <label for="signupName">Full Name</label>
-                        <input type="text" id="signupName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPhone">Phone Number</label>
-                        <input type="tel" id="signupPhone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Email Address</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password (Min 6 characters)</label>
-                        <input type="password" id="signupPassword" minlength="6" required>
-                    </div>
-
-                    <div id="signup-message" style="margin-bottom: 15px; font-weight: bold; text-align: center;"></div>
-
-                    <button type="submit" class="btn btn-primary" id="signup-btn" style="width: 100%;">Create Account</button>
-                </form>
-                <div class="auth-toggle">
-                    Already have an account? <span onclick="toggleAuth()">Log In Here</span>
-                </div>
             </div>
-
         </div>
     </section>
 
     <footer>
         <p>&copy; 2026 FoodShare Seychelles. All Rights Reserved.</p>
-        <p>
-            FoodShare Seychelles is powered & a proud member of 
-            <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> 
-            In Official Partner with the 
-            <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.
-        </p>
+        <p>Powered by <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> & <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.</p>
     </footer>
 
     <script>
@@ -147,11 +141,9 @@
         if (document.readyState === 'complete') removeLoader();
         setTimeout(removeLoader, 2500);
 
-        // --- Toggle Between Login and Signup ---
         function toggleAuth() {
             const loginSec = document.getElementById('login-section');
             const signupSec = document.getElementById('signup-section');
-            
             if (loginSec.classList.contains('hidden-form')) {
                 loginSec.classList.remove('hidden-form');
                 signupSec.classList.add('hidden-form');
@@ -161,7 +153,6 @@
             }
         }
 
-        // --- LOG IN LOGIC ---
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('login-btn');
@@ -173,10 +164,7 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password,
-            });
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
 
             if (error) {
                 msg.innerText = error.message;
@@ -190,7 +178,6 @@
             }
         });
 
-        // --- SIGN UP LOGIC ---
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('signup-btn');
@@ -205,14 +192,8 @@
             const password = document.getElementById('signupPassword').value;
 
             const { data, error } = await supabaseClient.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        full_name: name,
-                        contact_number: phone
-                    }
-                }
+                email: email, password: password,
+                options: { data: { full_name: name, contact_number: phone } }
             });
 
             if (error) {
