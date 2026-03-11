@@ -126,33 +126,67 @@
         </p>
     </footer>
 
-    <script>
+<script>
         const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
         const mobileMenu = document.getElementById('mobile-menu');
         const navList = document.getElementById('nav-list');
-        if (mobileMenu && navList) {
-            mobileMenu.addEventListener('click', () => {
-                navList.classList.toggle('active');
-            });
-        }
+        if (mobileMenu && navList) mobileMenu.addEventListener('click', () => navList.classList.toggle('active'));
 
         function removeLoader() {
             const loader = document.getElementById('loader');
             if (loader && loader.style.display !== 'none') {
                 loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 500); 
+                setTimeout(() => loader.style.display = 'none', 500); 
             }
         }
         window.addEventListener('load', removeLoader);
-        if (document.readyState === 'complete') { removeLoader(); }
+        if (document.readyState === 'complete') removeLoader();
         setTimeout(removeLoader, 2500);
 
-        document.getElementById('volunteer-form').addEventListener('submit', function(e) {
+        // Submit Volunteer Application to Database
+        document.getElementById('volunteer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert("Thanks for applying! (This will be connected to Supabase soon).");
+            
+            const btn = document.querySelector('#volunteer-form button[type="submit"]');
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const preferredRole = document.getElementById('preferredRole').value;
+            const specialSkills = document.getElementById('specialSkills').value;
+            
+            // Gather all checked availability boxes into a comma-separated string
+            const checkboxes = document.querySelectorAll('input[name="availability"]:checked');
+            let availabilityArray = [];
+            checkboxes.forEach((cb) => { availabilityArray.push(cb.value); });
+            const availability = availabilityArray.join(', ');
+
+            const { data, error } = await supabaseClient
+                .from('volunteer_applications')
+                .insert([{ 
+                    full_name: fullName, 
+                    email: email, 
+                    phone: phone,
+                    preferred_role: preferredRole,
+                    availability: availability,
+                    special_skills: specialSkills
+                }]);
+
+            if (error) {
+                console.error("Database Error:", error);
+                alert("Error submitting application. Please try again.");
+            } else {
+                alert("Success! Your volunteer application has been submitted.");
+                document.getElementById('volunteer-form').reset();
+            }
+            
+            btn.innerText = "Submit Application";
+            btn.disabled = false;
         });
     </script>
 </body>
