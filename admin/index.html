@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | FoodShare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="admin-body">
+
+    <div class="loader-wrapper" id="loader" style="background-color: #f4f7f6;">
+        <div class="loader"></div>
+        <p style="position: absolute; margin-top: 100px; font-weight: bold; color: var(--dark-green);" id="loading-text">Verifying Admin Credentials...</p>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="Logo">
+            <h3>Admin Center</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active" onclick="switchTab('donations')"><i class="fas fa-box-open"></i> Donations Hub</li>
+            <li onclick="switchTab('claims')"><i class="fas fa-hand-holding-heart"></i> Food Claims</li>
+            <li onclick="switchTab('volunteers')"><i class="fas fa-users"></i> Volunteers</li>
+            <li onclick="switchTab('messages')"><i class="fas fa-envelope"></i> Messages</li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,255,255,0.3); padding: 10px;">Log Out</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="dashboard-header">
+            <h1 id="dashboard-title">Donations Hub</h1>
+            <div>
+                <span style="color: #666; font-weight: 600;" id="admin-name">Loading...</span>
+            </div>
+        </div>
+
+        <section id="donations-tab" class="admin-tab active">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Incoming Donation Offers</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Donor Type</th>
+                                <th>Food Details</th>
+                                <th>Preference</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donations-table-body">
+                            <tr><td colspan="6" style="text-align: center;">Loading donations...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="claims-tab" class="admin-tab">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Digital Pantry Claims</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item Claimed</th>
+                                <th>Claimant ID</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="claims-table-body">
+                            <tr><td colspan="5" style="text-align: center;">Loading claims...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="volunteers-tab" class="admin-tab">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Volunteer Applications</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Role</th>
+                                <th>Availability</th>
+                                <th>Skills</th>
+                            </tr>
+                        </thead>
+                        <tbody id="volunteers-table-body">
+                            <tr><td colspan="5" style="text-align: center;">Loading volunteers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="messages-tab" class="admin-tab">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Contact Inquiries</h3>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name / Email</th>
+                                <th>Subject</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table-body">
+                            <tr><td colspan="4" style="text-align: center;">Loading messages...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // 1. SECURITY CHECK: Verify Login & Admin Role
+        async function checkAdminAccess() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                // Not logged in -> Kick to login page
+                window.location.href = '../login/';
+                return;
+            }
+
+            const userId = session.user.id;
+
+            // Check if this user is actually an admin in the profiles table
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('full_name, role')
+                .eq('id', userId)
+                .single();
+
+            // NOTE: Since you just created your account, your role is currently "public".
+            // To test this dashboard properly, you will need to go to your Supabase 
+            // Dashboard -> Table Editor -> profiles, and manually change your role from 'public' to 'admin'.
+            
+            if (error || !profile || profile.role !== 'admin') {
+                alert("Access Denied. You do not have administrator privileges.");
+                window.location.href = '../find-food/';
+                return;
+            }
+
+            // Access Granted
+            document.getElementById('admin-name').innerText = `Logged in as: ${profile.full_name}`;
+            document.getElementById('loader').style.display = 'none';
+
+            // Load Data
+            fetchDonations();
+            fetchVolunteers();
+            fetchMessages();
+            fetchClaims();
+        }
+
+        // Run security check on page load
+        window.addEventListener('load', checkAdminAccess);
+
+        // 2. TAB SWITCHING LOGIC
+        function switchTab(tabName) {
+            // Update Menu UI
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Update Header Title
+            const titles = {
+                'donations': 'Donations Hub',
+                'claims': 'Food Claims',
+                'volunteers': 'Volunteers',
+                'messages': 'Contact Inquiries'
+            };
+            document.getElementById('dashboard-title').innerText = titles[tabName];
+
+            // Show corresponding section
+            document.querySelectorAll('.admin-tab').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // 3. LOGOUT LOGIC
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = '../login/';
+        }
+
+        // 4. DATA FETCHING FUNCTIONS
+        
+        // Fetch Donations
+        async function fetchDonations() {
+            const { data, error } = await supabaseClient.from('donations').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('donations-table-body');
+            
+            if (error || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No donations found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString();
+                const statusClass = item.status === 'Pending Review' ? 'status-pending' : 'status-approved';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${date}</td>
+                        <td><strong>${item.donor_type}</strong></td>
+                        <td>${item.food_details}</td>
+                        <td>${item.collection_preference}</td>
+                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                        <td><button class="action-btn btn-approve" onclick="alert('Update status feature coming soon!')">Review</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fetch Volunteers
+        async function fetchVolunteers() {
+            const { data, error } = await supabaseClient.from('volunteer_applications').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('volunteers-table-body');
+            
+            if (error || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No volunteer applications found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${item.full_name}</strong></td>
+                        <td>${item.email}<br>${item.phone}</td>
+                        <td>${item.preferred_role}</td>
+                        <td>${item.availability}</td>
+                        <td>${item.special_skills || '-'}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fetch Messages
+        async function fetchMessages() {
+            const { data, error } = await supabaseClient.from('contact_messages').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('messages-table-body');
+            
+            if (error || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4">No messages found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString();
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="white-space: nowrap;">${date}</td>
+                        <td><strong>${item.name}</strong><br><a href="mailto:${item.email}" style="color:var(--primary-green);">${item.email}</a></td>
+                        <td><strong>${item.subject}</strong></td>
+                        <td>${item.message}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fetch Claims
+        async function fetchClaims() {
+            const { data, error } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('claims-table-body');
+            
+            if (error || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No claims found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(item => {
+                const date = new Date(item.created_at).toLocaleDateString();
+                const statusClass = item.status === 'Pending' ? 'status-pending' : 'status-approved';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${date}</td>
+                        <td>Item ID: ${item.inventory_id.substring(0,8)}...</td>
+                        <td>User ID: ${item.claimant_id.substring(0,8)}...</td>
+                        <td>${item.fulfillment_method}</td>
+                        <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+                    </tr>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
