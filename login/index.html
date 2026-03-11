@@ -51,6 +51,12 @@
                     <h2>Welcome Back</h2>
                     <p style="color: #666; font-size: 0.9rem;">Log in to claim food or access your dashboard.</p>
                 </div>
+
+                <div class="auth-info-box staff-notice">
+                    <strong><i class="fas fa-id-badge"></i> Staff & Volunteers</strong>
+                    Your credentials are pre-registered by the system administrator. Please sign in directly. If you cannot recover your credentials, please connect with an admin.
+                </div>
+
                 <form id="login-form">
                     <div class="form-group">
                         <label for="loginEmail">Email Address</label>
@@ -66,7 +72,7 @@
                     <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%;">Log In</button>
                 </form>
                 <div class="auth-toggle">
-                    Don't have an account? <span onclick="toggleAuth()">Sign Up Here</span>
+                    Need to claim food? <span onclick="toggleAuth()">Sign Up Here</span>
                 </div>
             </div>
 
@@ -75,6 +81,12 @@
                     <h2>Create an Account</h2>
                     <p style="color: #666; font-size: 0.9rem;">Join FoodShare to request food claims.</p>
                 </div>
+
+                <div class="auth-info-box">
+                    <strong><i class="fas fa-shield-alt"></i> Why do I need to sign up?</strong>
+                    To prevent spam and ensure surplus food reaches the right hands, we require a verified account. This allows our volunteer drivers to securely coordinate your delivery or pickup location.
+                </div>
+
                 <form id="signup-form">
                     <div class="form-group">
                         <label for="signupName">Full Name</label>
@@ -174,7 +186,6 @@
             } else {
                 msg.innerText = "Success! Redirecting...";
                 msg.style.color = "green";
-                // Redirect to Find Food page after successful login
                 setTimeout(() => { window.location.href = '../find-food/'; }, 1000);
             }
         });
@@ -193,7 +204,6 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
 
-            // Sign up and pass the metadata so our SQL trigger can catch it
             const { data, error } = await supabaseClient.auth.signUp({
                 email: email,
                 password: password,
@@ -214,7 +224,7 @@
                 msg.innerText = "Account created! You can now log in.";
                 msg.style.color = "green";
                 document.getElementById('signup-form').reset();
-                setTimeout(() => { toggleAuth(); }, 1500); // Switch to login screen
+                setTimeout(() => { toggleAuth(); }, 1500);
             }
         });
     </script>
