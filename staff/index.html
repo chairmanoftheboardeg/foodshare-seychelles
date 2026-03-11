@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal | FoodShare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="../style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="admin-body">
+
+    <div class="loader-wrapper" id="loader" style="background-color: #f4f7f6;">
+        <div class="loader"></div>
+        <p style="position: absolute; margin-top: 100px; font-weight: bold; color: var(--dark-green);">Verifying Staff Credentials...</p>
+    </div>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="Logo">
+            <h3>Staff Portal</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active" onclick="switchTab('tasks')"><i class="fas fa-clipboard-check"></i> My Tasks</li>
+            <li onclick="switchTab('profile')"><i class="fas fa-user-circle"></i> My Profile</li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,255,255,0.3); padding: 10px;">Log Out</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="dashboard-header">
+            <h1 id="dashboard-title">My Assigned Tasks</h1>
+            <div>
+                <span style="color: #666; font-weight: 600;" id="staff-name">Loading...</span>
+            </div>
+        </div>
+
+        <section id="tasks-tab" class="admin-tab active">
+            <div class="admin-card">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Current Duties</h3>
+                <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Keep the Admin team updated by changing your task status as you work.</p>
+                
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date Assigned</th>
+                                <th>Task Description</th>
+                                <th>Current Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-tasks-table-body">
+                            <tr><td colspan="4" style="text-align: center;">Loading your tasks...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="profile-tab" class="admin-tab">
+            <div class="admin-card" style="max-width: 600px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-dark);">Contact Information</h3>
+                <form id="update-profile-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Number (For Dispatch)</label>
+                        <input type="tel" id="profile-phone" required>
+                    </div>
+                    <div id="profile-msg" style="margin-bottom: 15px; font-weight: bold;"></div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let currentUserId = null;
+
+        // 1. SECURITY CHECK: Verify Login & Staff Role
+        async function checkStaffAccess() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            
+            if (!session) {
+                window.location.href = '../login/';
+                return;
+            }
+
+            currentUserId = session.user.id;
+
+            // Fetch profile
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUserId)
+                .single();
+            
+            // Allow both staff and admins to view this page (so you can test it)
+            if (error || !profile || (profile.role !== 'staff' && profile.role !== 'admin')) {
+                alert("Access Denied. Staff privileges required.");
+                window.location.href = '../login/';
+                return;
+            }
+
+            // Setup UI
+            document.getElementById('staff-name').innerText = `Team Member: ${profile.full_name}`;
+            document.getElementById('profile-name').value = profile.full_name;
+            document.getElementById('profile-phone').value = profile.contact_number;
+            
+            document.getElementById('loader').style.display = 'none';
+
+            // Load Data
+            fetchMyTasks();
+        }
+
+        window.addEventListener('load', checkStaffAccess);
+
+        // 2. TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll('.sidebar-menu li').forEach(li => li.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const titles = { 'tasks': 'My Assigned Tasks', 'profile': 'My Profile Settings' };
+            document.getElementById('dashboard-title').innerText = titles[tabName];
+
+            document.querySelectorAll('.admin-tab').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        // 3. LOGOUT
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = '../login/';
+        }
+
+        // 4. FETCH MY TASKS
+        async function fetchMyTasks() {
+            const { data, error } = await supabaseClient
+                .from('tasks')
+                .select('*')
+                .eq('assigned_to', currentUserId)
+                .order('created_at', { ascending: false });
+                
+            const tbody = document.getElementById('my-tasks-table-body');
+            
+            if (error || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">You have no assigned tasks right now. Great job!</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(task => {
+                const date = new Date(task.created_at).toLocaleDateString();
+                
+                // Color code the status badge
+                let statusColor = '#fff3e0'; // default pending orange
+                let textColor = '#e65100';
+                if (task.status === 'In Progress') { statusColor = '#e3f2fd'; textColor = '#1565c0'; }
+                if (task.status === 'Completed') { statusColor = '#e8f5e9'; textColor = '#2e7d32'; }
+                if (task.status === 'Issue Reported') { statusColor = '#ffebee'; textColor = '#c62828'; }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${date}</td>
+                        <td style="font-weight: 500;">${task.task_description}</td>
+                        <td><span class="status-badge" style="background-color:${statusColor}; color:${textColor};">${task.status}</span></td>
+                        <td>
+                            <select onchange="updateTaskStatus('${task.id}', this.value)" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc;">
+                                <option value="" disabled selected>Change Status...</option>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Issue Reported">Report Issue</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 5. UPDATE TASK STATUS
+        async function updateTaskStatus(taskId, newStatus) {
+            if (!newStatus) return;
+
+            const { error } = await supabaseClient
+                .from('tasks')
+                .update({ status: newStatus })
+                .eq('id', taskId);
+
+            if (error) {
+                alert("Failed to update task status.");
+                console.error(error);
+            } else {
+                // Refresh the table to show the new color badge
+                fetchMyTasks();
+            }
+        }
+
+        // 6. UPDATE PROFILE
+        document.getElementById('update-profile-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const msg = document.getElementById('profile-msg');
+            msg.innerText = "Updating...";
+            msg.style.color = "black";
+
+            const newName = document.getElementById('profile-name').value;
+            const newPhone = document.getElementById('profile-phone').value;
+
+            const { error } = await supabaseClient
+                .from('profiles')
+                .update({ full_name: newName, contact_number: newPhone })
+                .eq('id', currentUserId);
+
+            if (error) {
+                msg.innerText = "Error updating profile.";
+                msg.style.color = "red";
+            } else {
+                msg.innerText = "Profile updated successfully!";
+                msg.style.color = "green";
+                document.getElementById('staff-name').innerText = `Team Member: ${newName}`;
+            }
+        });
+    </script>
+</body>
+</html>
