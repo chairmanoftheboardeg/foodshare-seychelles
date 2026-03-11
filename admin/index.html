@@ -9,6 +9,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .btn-delete { background-color: #f44336; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-delete:hover { background-color: #d32f2f; }
+        .role-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; }
+    </style>
 </head>
 <body class="admin-body">
 
@@ -47,7 +52,7 @@
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Date</th><th>Donor Type</th><th>Details</th><th>Preference</th><th>Status</th></tr>
+                            <tr><th>Date</th><th>Donor Type</th><th>Details</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="donations-table-body">
                             <tr><td colspan="5">Loading...</td></tr>
@@ -63,10 +68,10 @@
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Date</th><th>Method</th><th>Status</th></tr>
+                            <tr><th>Date</th><th>Method</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="claims-table-body">
-                            <tr><td colspan="3">Loading...</td></tr>
+                            <tr><td colspan="4">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -96,10 +101,10 @@
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Date Assigned</th><th>Task Description</th><th>Status</th></tr>
+                            <tr><th>Date Assigned</th><th>Task Description</th><th>Status</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="tasks-table-body">
-                            <tr><td colspan="3">Loading tasks...</td></tr>
+                            <tr><td colspan="4">Loading tasks...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -109,10 +114,11 @@
         <section id="users-tab" class="admin-tab">
             <div class="admin-card">
                 <h3>Registered Users & Staff Overseer</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">To add a new staff member, ask them to sign up on the login page, then change their role here.</p>
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Full Name</th><th>Contact Number</th><th>System Role</th><th>Joined</th></tr>
+                            <tr><th>Full Name</th><th>Contact Number</th><th>System Role</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="users-table-body">
                             <tr><td colspan="4">Loading users...</td></tr>
@@ -128,10 +134,10 @@
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Name</th><th>Contact</th><th>Role</th><th>Availability</th></tr>
+                            <tr><th>Name</th><th>Contact</th><th>Role</th><th>Availability</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="volunteers-table-body">
-                            <tr><td colspan="4">Loading...</td></tr>
+                            <tr><td colspan="5">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -144,10 +150,10 @@
                 <div class="data-table-wrapper">
                     <table class="data-table">
                         <thead>
-                            <tr><th>Date</th><th>Name</th><th>Subject</th><th>Message</th></tr>
+                            <tr><th>Date</th><th>Name</th><th>Subject</th><th>Message</th><th>Actions</th></tr>
                         </thead>
                         <tbody id="messages-table-body">
-                            <tr><td colspan="4">Loading...</td></tr>
+                            <tr><td colspan="5">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -176,9 +182,13 @@
             document.getElementById('loader').style.display = 'none';
 
             // Load All Data
-            fetchDonations(); fetchClaims(); fetchVolunteers(); fetchMessages(); fetchUsersAndPopulateStaff(); fetchTasks();
+            fetchAllData();
         }
         window.addEventListener('load', checkAdminAccess);
+
+        function fetchAllData() {
+            fetchDonations(); fetchClaims(); fetchVolunteers(); fetchMessages(); fetchUsersAndPopulateStaff(); fetchTasks();
+        }
 
         // Tab Switching
         function switchTab(tabName) {
@@ -197,6 +207,31 @@
 
         async function logout() { await supabaseClient.auth.signOut(); window.location.href = '../login/'; }
 
+        // --- UNIVERSAL DELETE FUNCTION ---
+        async function deleteRecord(table, id) {
+            if (confirm("Are you sure you want to permanently delete this item?")) {
+                const { error } = await supabaseClient.from(table).delete().eq('id', id);
+                if (error) {
+                    alert("Failed to delete record.");
+                    console.error(error);
+                } else {
+                    fetchAllData(); // Refresh all tables to show it was removed
+                }
+            }
+        }
+
+        // --- UPDATE USER ROLE FUNCTION ---
+        async function updateUserRole(userId, newRole) {
+            if (confirm(`Are you sure you want to change this user's role to ${newRole.toUpperCase()}?`)) {
+                const { error } = await supabaseClient.from('profiles').update({ role: newRole }).eq('id', userId);
+                if (error) {
+                    alert("Failed to update role.");
+                } else {
+                    fetchUsersAndPopulateStaff(); // Refresh table
+                }
+            }
+        }
+
         // --- FETCH FUNCTIONS ---
         async function fetchDonations() {
             const { data } = await supabaseClient.from('donations').select('*').order('created_at', { ascending: false });
@@ -205,7 +240,8 @@
             if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No data</td></tr>'; return; }
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
-                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.donor_type}</strong></td><td>${item.food_details}</td><td>${item.collection_preference}</td><td><span class="status-badge">${item.status}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.donor_type}</strong></td><td>${item.food_details}</td><td><span class="status-badge">${item.status}</span></td>
+                <td><button class="btn-delete" onclick="deleteRecord('donations', '${item.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -213,10 +249,11 @@
             const { data } = await supabaseClient.from('claims').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('claims-table-body');
             tbody.innerHTML = '';
-            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="3">No data</td></tr>'; return; }
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No data</td></tr>'; return; }
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
-                tbody.innerHTML += `<tr><td>${date}</td><td>${item.fulfillment_method}</td><td><span class="status-badge">${item.status}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td>${date}</td><td>${item.fulfillment_method}</td><td><span class="status-badge">${item.status}</span></td>
+                <td><button class="btn-delete" onclick="deleteRecord('claims', '${item.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -224,9 +261,10 @@
             const { data } = await supabaseClient.from('volunteer_applications').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('volunteers-table-body');
             tbody.innerHTML = '';
-            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No data</td></tr>'; return; }
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No data</td></tr>'; return; }
             data.forEach(item => {
-                tbody.innerHTML += `<tr><td><strong>${item.full_name}</strong></td><td>${item.email}<br>${item.phone}</td><td>${item.preferred_role}</td><td>${item.availability}</td></tr>`;
+                tbody.innerHTML += `<tr><td><strong>${item.full_name}</strong></td><td>${item.email}<br>${item.phone}</td><td>${item.preferred_role}</td><td>${item.availability}</td>
+                <td><button class="btn-delete" onclick="deleteRecord('volunteer_applications', '${item.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -234,14 +272,14 @@
             const { data } = await supabaseClient.from('contact_messages').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('messages-table-body');
             tbody.innerHTML = '';
-            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No data</td></tr>'; return; }
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="5">No data</td></tr>'; return; }
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
-                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.name}</strong></td><td>${item.subject}</td><td>${item.message}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${date}</td><td><strong>${item.name}</strong></td><td>${item.subject}</td><td>${item.message}</td>
+                <td><button class="btn-delete" onclick="deleteRecord('contact_messages', '${item.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
-        // NEW: Fetch Users for Overview AND populate the Assign Task dropdown
         async function fetchUsersAndPopulateStaff() {
             const { data } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
             const tbody = document.getElementById('users-table-body');
@@ -253,33 +291,44 @@
             if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No users found</td></tr>'; return; }
             
             data.forEach(user => {
-                // Populate Users Table
-                const date = new Date(user.created_at).toLocaleDateString();
                 let roleColor = user.role === 'admin' ? 'red' : (user.role === 'staff' ? 'orange' : 'green');
-                tbody.innerHTML += `<tr><td><strong>${user.full_name}</strong></td><td>${user.contact_number}</td><td><strong style="color:${roleColor}; text-transform:uppercase;">${user.role}</strong></td><td>${date}</td></tr>`;
                 
-                // Populate Dropdown (Only admins and staff)
+                // Role Selector Dropdown
+                let roleOptions = `
+                    <select class="role-select" style="color: ${roleColor};" onchange="updateUserRole('${user.id}', this.value)">
+                        <option value="public" ${user.role === 'public' ? 'selected' : ''}>Public</option>
+                        <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>Staff</option>
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    </select>
+                `;
+
+                tbody.innerHTML += `<tr>
+                    <td><strong>${user.full_name}</strong></td>
+                    <td>${user.contact_number}</td>
+                    <td>${roleOptions}</td>
+                    <td><button class="btn-delete" onclick="deleteRecord('profiles', '${user.id}')" title="Remove Profile"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+                
                 if(user.role === 'admin' || user.role === 'staff') {
                     staffDropdown.innerHTML += `<option value="${user.id}">${user.full_name} (${user.role})</option>`;
                 }
             });
         }
 
-        // NEW: Fetch Tasks
         async function fetchTasks() {
             const { data } = await supabaseClient.from('tasks').select('*, profiles(full_name)').order('created_at', { ascending: false });
             const tbody = document.getElementById('tasks-table-body');
             tbody.innerHTML = '';
-            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="3">No active tasks</td></tr>'; return; }
+            if(!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="4">No active tasks</td></tr>'; return; }
             
             data.forEach(item => {
                 const date = new Date(item.created_at).toLocaleDateString();
                 const assigneeName = item.profiles ? item.profiles.full_name : 'Unknown';
-                tbody.innerHTML += `<tr><td>${date}<br><small>Assigned to: <b>${assigneeName}</b></small></td><td>${item.task_description}</td><td><span class="status-badge status-pending">${item.status}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td>${date}<br><small>Assigned to: <b>${assigneeName}</b></small></td><td>${item.task_description}</td><td><span class="status-badge status-pending">${item.status}</span></td>
+                <td><button class="btn-delete" onclick="deleteRecord('tasks', '${item.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         }
 
-        // NEW: Assign Task Logic
         document.getElementById('assign-task-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = e.target.querySelector('button');
