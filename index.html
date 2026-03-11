@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FoodShare Seychelles | Share Food, Feed Seychelles</title>
     
+    <link rel="icon" type="image/png" href="image_d25259.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,10 +22,8 @@
     </div>
 
     <div class="top-bar">
-        <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank">IN</a>
-        <a href="#" target="_blank">FB</a>
-        <a href="#" target="_blank">TW</a>
-        <a href="#" target="_blank">IG</a>
+        <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank" title="Official LinkedIn Page"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank" title="LinkedIn Blog"><i class="fab fa-linkedin-in"></i></a>
     </div>
 
     <header>
@@ -73,9 +75,8 @@
         </p>
     </footer>
 
-<script>
+    <script>
         // --- 1. Supabase Initialization ---
-        // We use 'supabaseClient' to avoid conflicting with the global 'supabase' object
         const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         
@@ -103,15 +104,10 @@
             }
         }
 
-        // Attempt to remove loader when the window fully loads
         window.addEventListener('load', removeLoader);
-
-        // Fallback 1: If the document is somehow already complete
         if (document.readyState === 'complete') {
             removeLoader();
         }
-
-        // Fallback 2: Failsafe timer. If the CDN hangs, force the loader to disappear after 2.5 seconds.
         setTimeout(removeLoader, 2500);
     </script>
 </body>
