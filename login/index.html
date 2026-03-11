@@ -121,7 +121,7 @@
         <p>Powered by <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> & <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.</p>
     </footer>
 
-    <script>
+<script>
         const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -153,6 +153,7 @@
             }
         }
 
+        // UPDATED LOG IN LOGIC WITH SMART REDIRECTS
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('login-btn');
@@ -164,20 +165,49 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+            // 1. Sign In
+            const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-            if (error) {
-                msg.innerText = error.message;
+            if (authError) {
+                msg.innerText = authError.message;
                 msg.style.color = "red";
                 btn.innerText = "Log In";
                 btn.disabled = false;
-            } else {
-                msg.innerText = "Success! Redirecting...";
-                msg.style.color = "green";
-                setTimeout(() => { window.location.href = '../find-food/'; }, 1000);
+                return;
             }
+
+            // 2. Fetch User Role
+            msg.innerText = "Verifying permissions...";
+            msg.style.color = "#8bc34a"; // Green
+            
+            const { data: profile, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', authData.user.id)
+                .single();
+
+            if (profileError || !profile) {
+                msg.innerText = "Error reading profile. Contact Admin.";
+                msg.style.color = "red";
+                btn.innerText = "Log In";
+                btn.disabled = false;
+                return;
+            }
+
+            // 3. Smart Routing based on role
+            msg.innerText = `Welcome! Redirecting to ${profile.role} dashboard...`;
+            setTimeout(() => { 
+                if (profile.role === 'admin') {
+                    window.location.href = '../admin/';
+                } else if (profile.role === 'staff') {
+                    window.location.href = '../staff/'; // We will build this next
+                } else {
+                    window.location.href = '../find-food/';
+                }
+            }, 1000);
         });
 
+        // SIGN UP LOGIC (Unchanged)
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('signup-btn');
