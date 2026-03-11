@@ -3,117 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found</title>
+    <title>Page Not Found | FoodShare Seychelles</title>
     
-    <link rel="icon" href="/image/logo.png" type="image/png">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
     
-    <style>
-        /* [404 Page CSS] - Reusing core professional styles */
-        :root {
-            --primary-main: #4CAF50; 
-            --primary-dark: #388E3C;
-            --accent-blue: #2196F3;
-            --accent-red: #D32F2F;
-            --neutral-bg: #EAEFF2; 
-            --neutral-card: #FFFFFF;
-            --text-dark: #2C3E50; 
-            --text-light: #7f8c8d;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--neutral-bg);
-            color: var(--text-dark);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .error-container {
-            background-color: var(--neutral-card);
-            padding: 50px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
-        }
+    <link rel="stylesheet" href="/style.css">
 
-        .error-code {
-            font-size: 8em;
-            font-weight: 800;
-            color: var(--accent-red);
-            margin-bottom: 5px;
-            line-height: 1;
-        }
-        .error-message {
-            font-size: 2.2em;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 20px;
-        }
-        .error-detail {
-            font-size: 1.1em;
-            color: var(--text-light);
-            margin-bottom: 30px;
-        }
-
-        .action-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .action-link {
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-decoration: none;
-            transition: background-color 0.3s, transform 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .link-home {
-            background-color: var(--primary-main);
-            color: white;
-        }
-        .link-home:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .link-inquiry {
-            background-color: #f0f0f0;
-            color: var(--text-dark);
-            border: 1px solid #ddd;
-        }
-        .link-inquiry:hover {
-            background-color: #e5e5e5;
-            transform: translateY(-2px);
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="error-container">
-        <div class="error-code">404</div>
-        <h1 class="error-message">Oops! Page Not Found.</h1>
-        <p class="error-detail">
-            We couldn't locate the page you were looking for. It might have been moved, deleted, or you may have typed the address incorrectly.
-        </p>
 
-        <div class="action-links">
-            <a href="/" class="action-link link-home">
-                <i class="fas fa-home"></i> Go to Homepage
-            </a>
-            
-            <a href="/contact/inquiry.html" class="action-link link-inquiry">
-                <i class="fas fa-question-circle"></i> Submit a General Inquiry
-            </a>
-        </div>
+    <div class="loader-wrapper" id="loader">
+        <div class="loader"></div>
     </div>
+
+    <div class="top-bar">
+        <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank" title="Official LinkedIn Page"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank" title="LinkedIn Blog"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+
+    <header>
+        <div class="logo">
+            <a href="/"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
+        </div>
+        
+        <div class="menu-toggle" id="mobile-menu">&#9776;</div>
+
+        <nav>
+            <ul id="nav-list">
+                <li><a href="/about/">ABOUT</a></li>
+                <li><a href="/volunteer/">VOLUNTEER</a></li>
+                <li><a href="/find-food/">FIND FOOD</a></li>
+                <li><a href="/donate/">DONATE</a></li>
+                <li><a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank">BLOG</a></li>
+                <li><a href="/contact/">CONTACT</a></li>
+                <li><a href="/login/" class="staff-login">STAFF LOGIN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="section-container" style="min-height: 70vh; display: flex; justify-content: center; align-items: center; background-color: #f9f9f9;">
+        <div style="text-align: center; background-color: var(--white); padding: 60px 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); max-width: 650px; width: 100%; border-top: 5px solid var(--primary-green);">
+            
+            <h1 style="font-size: 6rem; color: var(--primary-green); margin-bottom: 10px; line-height: 1;">404</h1>
+            <h2 style="color: var(--dark-green); font-size: 2rem; margin-bottom: 20px; text-transform: uppercase;">Page Not Found</h2>
+            
+            <p style="color: #666; font-size: 1.1rem; margin-bottom: 40px; line-height: 1.6;">
+                Oops! It looks like this page got lost in transit, or the food has already been rescued. Don't worry, let's get you back to where you need to go.
+            </p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="/" class="btn btn-primary"><i class="fas fa-home" style="margin-right: 8px;"></i> Back to Home</a>
+                <a href="/find-food/" class="btn btn-outline" style="border-color: var(--primary-green); color: var(--primary-green);"><i class="fas fa-search" style="margin-right: 8px;"></i> Find Food</a>
+                <a href="/contact/" class="btn btn-outline" style="border-color: var(--primary-green); color: var(--primary-green);"><i class="fas fa-envelope" style="margin-right: 8px;"></i> Contact Us</a>
+            </div>
+            
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FoodShare Seychelles. All Rights Reserved.</p>
+        <p>
+            FoodShare Seychelles is powered & a proud member of 
+            <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> 
+            In Official Partner with the 
+            <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.
+        </p>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navList = document.getElementById('nav-list');
+        if (mobileMenu && navList) {
+            mobileMenu.addEventListener('click', () => {
+                navList.classList.toggle('active');
+            });
+        }
+
+        // Loader Logic
+        function removeLoader() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500); 
+            }
+        }
+        window.addEventListener('load', removeLoader);
+        if (document.readyState === 'complete') { removeLoader(); }
+        setTimeout(removeLoader, 2500);
+    </script>
 </body>
 </html>
