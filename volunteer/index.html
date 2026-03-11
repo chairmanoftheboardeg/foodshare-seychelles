@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer | FoodShare Seychelles</title>
+    
+    <link rel="icon" type="image/png" href="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="loader-wrapper" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="top-bar">
+        <a href="https://sc.linkedin.com/company/foodshare-seychelles" target="_blank" title="Official LinkedIn Page"><i class="fab fa-linkedin"></i></a>
+        <a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank" title="LinkedIn Blog"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+
+    <header>
+        <div class="logo">
+            <a href="/"><img src="https://i.ibb.co/TxWz44h0/Food-Share-Seychelles-Logo.png" alt="FoodShare Seychelles Logo"></a>
+        </div>
+        
+        <div class="menu-toggle" id="mobile-menu">&#9776;</div>
+
+        <nav>
+            <ul id="nav-list">
+                <li><a href="/about/">ABOUT</a></li>
+                <li><a href="/volunteer/" class="active">VOLUNTEER</a></li>
+                <li><a href="/find-food/">FIND FOOD</a></li>
+                <li><a href="/donate/">DONATE</a></li>
+                <li><a href="https://www.linkedin.com/newsletters/foodshare-seychelles-7406371244033617921" target="_blank">BLOG</a></li>
+                <li><a href="/contact/">CONTACT</a></li>
+                <li><a href="/staff/" class="staff-login">STAFF LOGIN</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <h1>Join The FoodShare Army</h1>
+    </section>
+
+    <section class="section-container">
+        <h2 class="section-title">Current Opportunities</h2>
+        <div class="role-grid">
+            <div class="role-card">
+                <i class="fas fa-truck"></i>
+                <h3>Delivery Drivers</h3>
+                <p>Help us transport rescued food safely. Collect surplus from our corporate partners and deliver food parcels to designated community drop-offs or vulnerable individuals.</p>
+            </div>
+            <div class="role-card">
+                <i class="fas fa-boxes"></i>
+                <h3>Inventory Sorters</h3>
+                <p>The backbone of our operations. Receive incoming donations, check expiration dates, categorize items, and prepare packages for rapid distribution.</p>
+            </div>
+            <div class="role-card">
+                <i class="fas fa-bullhorn"></i>
+                <h3>Community Outreach</h3>
+                <p>Be the face of FoodShare. Engage with local businesses to secure new donations, educate the public on food waste, and coordinate with local charities.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" style="background-color: #fff;">
+        <h2 class="section-title">Apply to Volunteer</h2>
+        <div class="form-container">
+            <form id="volunteer-form">
+                
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="Enter your best contact number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="preferredRole">Preferred Role</label>
+                    <select id="preferredRole" name="preferredRole" required>
+                        <option value="" disabled selected>Select a role...</option>
+                        <option value="Delivery Driver">Delivery Driver</option>
+                        <option value="Inventory Sorter">Inventory Sorter</option>
+                        <option value="Community Outreach">Community Outreach</option>
+                        <option value="General Support">General Support (Wherever Needed)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>General Availability</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="availability" value="Weekdays"> Weekdays</label>
+                        <label><input type="checkbox" name="availability" value="Weekends"> Weekends</label>
+                        <label><input type="checkbox" name="availability" value="Mornings"> Mornings</label>
+                        <label><input type="checkbox" name="availability" value="Afternoons"> Afternoons</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialSkills">Special Skills or Relevant Experience (Optional)</label>
+                    <textarea id="specialSkills" name="specialSkills" placeholder="Do you have a large vehicle for transport? Experience in logistics? Let us know!"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Application</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 FoodShare Seychelles. All Rights Reserved.</p>
+        <p>
+            FoodShare Seychelles is powered & a proud member of 
+            <a href="https://tylernicholasgroup.com" target="_blank">The Tyler Nicholas Group</a> 
+            In Official Partner with the 
+            <a href="https://tyler-nicholas-foundation.online" target="_blank">Tyler Nicholas Foundation</a>.
+        </p>
+    </footer>
+
+    <script>
+        // Supabase Initialization
+        const supabaseUrl = 'https://czebjuuklhqidukkfjmu.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6ZWJqdXVrbGhxaWR1a2tmam11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyMjYxOTksImV4cCI6MjA4ODgwMjE5OX0.6LDKvcHt07c-Sg6ZjOGyzrhGVCteSg234ulLpV9iNU4';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navList = document.getElementById('nav-list');
+        if (mobileMenu && navList) {
+            mobileMenu.addEventListener('click', () => {
+                navList.classList.toggle('active');
+            });
+        }
+
+        // Loader Logic
+        function removeLoader() {
+            const loader = document.getElementById('loader');
+            if (loader && loader.style.display !== 'none') {
+                loader.style.opacity = '0';
+                setTimeout(() => { loader.style.display = 'none'; }, 500); 
+            }
+        }
+        window.addEventListener('load', removeLoader);
+        if (document.readyState === 'complete') { removeLoader(); }
+        setTimeout(removeLoader, 2500);
+
+        // Form Submission Placeholder (Prevents page reload for now)
+        document.getElementById('volunteer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert("Thanks for applying! (This will be connected to Supabase soon).");
+        });
+    </script>
+</body>
+</html>
